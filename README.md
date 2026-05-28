@@ -1,4 +1,4 @@
-# 🛜Network Analysis Course — 1-Month Plan
+# 🌎Network Analysis Course — 1-Month Plan
 
 > **Duration**: 4 Weeks | **Schedule**: 2 Classes/Week | **Class Length**: 3 Hours (including 10 min break)  
 > **Total Sessions**: 8 | **Total Contact Hours**: 24 Hours
