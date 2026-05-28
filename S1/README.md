@@ -1,37 +1,178 @@
 ## Session 1 — Introduction to Network Analysis & The OSI Model
 
+- [Session 1 — Introduction to Network Analysis \& The OSI Model](#session-1--introduction-to-network-analysis--the-osi-model)
+  - [📖 Lecture (60 min)](#-lecture-60-min)
+  - [Break (10 min)](#break-10-min)
+  - [Hands-on Lab (80 min)](#hands-on-lab-80-min)
+  - [🔍 Deep Dive: The `ping` Command \& Options](#-deep-dive-the-ping-command--options)
+    - [Analyzing the `ping` Output Fields:](#analyzing-the-ping-output-fields)
+    - [Crucial `ping` Command Options:](#crucial-ping-command-options)
+  - [🔍 Deep Dive: Wireshark Display Filters](#-deep-dive-wireshark-display-filters)
+    - [1. Common Comparison \& Logical Operators](#1-common-comparison--logical-operators)
+    - [2. Essential Filter Recipes for Network Analysis](#2-essential-filter-recipes-for-network-analysis)
+  - [🎯 Workshop Activity: "Layer Matching Game" \& Review (30 min)](#-workshop-activity-layer-matching-game--review-30-min)
+  - [📚 Homework](#-homework)
+
+
+
 **Learning Objectives**: Understand what network analysis is and why it matters. Learn the OSI model and TCP/IP stack. Set up tools.
 
-### 📖 Lecture (30 min)
-- What is network analysis? Real-world use cases (troubleshooting, security, performance)
-- The OSI 7-Layer Model — purpose of each layer
-- TCP/IP 4-Layer Model — mapping to OSI
-- Encapsulation & de-encapsulation: how data becomes frames
-- Brief overview: What is a packet? What is a protocol?
+### 📖 Lecture (60 min)
+- **Introduction**: What is network analysis? Real-world use cases (troubleshooting, security, performance) (15 min)
+- **The OSI 7-Layer Model**: Detailed breakdown of the purpose and function of each layer (15 min)
+- **TCP/IP 4-Layer Model**: Understanding the modern mapping to OSI layers (10 min)
+- **Encapsulation & De-encapsulation**: Step-by-step visual walkthrough of how data becomes frames (10 min)
 
-### 🛠️ Hands-on Lab (45 min)
+### Break (10 min)
+- Step away, stretch, and grab a drink before diving into the hands-on labs.
 
-**Lab A — Wireshark: First Capture (20 min)**
-1. Install and open Wireshark
-2. Select network interface and start capturing
-3. Open a web browser → visit `http://example.com`
-4. Stop capture — observe the packet list
-5. Explore the 3 panes: Packet List, Packet Details, Packet Bytes
-6. Identify Ethernet, IP, TCP, and HTTP layers in a single packet
-7. Practice basic display filters: `http`, `dns`, `icmp`
+### Hands-on Lab (80 min)
 
-**Lab B — Cisco Packet Tracer: Build Your First Network (25 min)**
-1. Install Packet Tracer and create an account
-2. Place 2 PCs and 1 switch on the workspace
-3. Connect devices with copper straight-through cables
-4. Assign static IP addresses (e.g., `192.168.1.10` and `192.168.1.20`)
-5. Use **Simulation Mode** → send a ping → watch packets travel layer-by-layer
-6. Observe ARP request/reply and ICMP echo/reply in the event list
+---
 
-### 🎯 Workshop Activity: "Layer Matching Game" (10 min)
-- Students receive cards with protocol names (HTTP, TCP, IP, Ethernet, etc.)
-- Match each protocol to its correct OSI layer
-- Discuss: *"Why does layering matter for network analysis?"*
+**Lab A — Wireshark: First Capture (35 min)**
+
+1. **Launch and Interface Selection**:
+   * Open Wireshark. Look at the home screen listing available network interfaces.
+   * Identify the active interface (look for the one with a dynamic, moving line graph showing traffic).
+   * Double-click your active interface (e.g., `Wi-Fi` or `en0`) to begin live capturing.
+2. **Generate Traffic**:
+   * Open your web browser (incognito/private mode is recommended to avoid browser cache).
+   * Enter `http://example.com` (use `http://` instead of `https://` so the traffic remains unencrypted and readable in plain text).
+3. **Stop & Save**:
+   * Return to Wireshark and click the red square button (🟥) in the top-left corner to **Stop** the capture.
+4. **Packet Analysis & Layout Exploration**:
+   * Locate the three main panes:
+     * **Packet List (Top)**: Displays captured packets with time, source/destination IPs, protocol, and info.
+     * **Packet Details (Middle)**: A tree structure showing the protocol layers of the selected packet.
+     * **Packet Bytes (Bottom)**: Hexadecimal and ASCII representation of the raw packet data.
+5. **Applying Display Filters**:
+   * In the green filter bar at the top, type `http` and press Enter. This hides all non-HTTP packets.
+   * Find the packet with `GET / HTTP/1.1` in the Info column. Click it.
+6. **OSI Layer Mapping (Deep-Dive)**:
+   * Expand the layers in the **Packet Details** pane to see encapsulation in action:
+     * **Layer 2 (Data Link)**: Expand `Ethernet II`. Notice the **Source MAC Address** (your network card) and **Destination MAC Address** (your local router's gateway).
+     * **Layer 3 (Network)**: Expand `Internet Protocol Version 4`. Identify your **Source IP Address** and the **Destination IP Address** of `example.com`.
+     * **Layer 4 (Transport)**: Expand `Transmission Control Protocol`. Identify the random high **Source Port** generated by your browser and the **Destination Port** `80` (HTTP).
+     * **Layer 7 (Application)**: Expand `Hypertext Transfer Protocol`. View the HTTP GET request headers (Host, User-Agent, Accept).
+7. **Exporting Captures**:
+   * Click **File** -> **Export Specified Packets...**.
+   * Under packet range, select **All packets** or **Filtered** and save the file as `my_first_capture.pcap` for future analysis.
+
+---
+
+**Lab B — Cisco Packet Tracer: Build Your First Network (45 min)**
+1. **Workspace Setup**:
+   * Open Packet Tracer and log in.
+   * From the bottom-left device menu, drag the following onto the main workspace:
+     * **2 End Devices**: Drag two `PC` icons onto the screen (named `PC0` and `PC1`).
+     * **1 Switch**: Under "Network Devices" -> "Switches", drag a `2960` switch to the center.
+     * **1 Server**: Under "End Devices", drag a `Server` icon (named `Server0`).
+2. **Physical Connections**:
+   * Click the **Connections** icon (lightning bolt). Select the **Copper Straight-Through** cable (solid black line).
+   * Click `PC0` -> select `FastEthernet0`. Click the `2960 Switch` -> select `FastEthernet0/1`.
+   * Repeat this connection for `PC1` (connect to `FastEthernet0/2` of the switch) and `Server0` (connect to `FastEthernet0/3`).
+   * *Note: Observe the orange link lights turn green on the switch. This indicates the spanning-tree protocol (STP) has completed port initialization.*
+3. **Logical IP Configuration**:
+   * Click `PC0` -> Go to the **Desktop** tab -> Click **IP Configuration**.
+   * Set IP Address to `192.168.1.10` and Subnet Mask to `255.255.255.0`.
+   * Click `PC1` and configure its IP to `192.168.1.20` with the same subnet mask.
+   * Click `Server0` and configure its IP to `192.168.1.100` with the same subnet mask.
+4. **Command Line Execution (Real-Time Mode)**:
+   * Click `PC0` -> Go to the **Desktop** tab -> Open **Command Prompt**.
+   * Type `ping 192.168.1.20` and press Enter. You should receive 4 successful replies.
+5. **Inspect Packets in Simulation Mode (Visual OSI Breakdown)**:
+   * In the bottom-right corner, click **Simulation Mode** (stopwatch icon) to pause real-time traffic.
+   * Click `PC0` -> open Command Prompt -> run `ping 192.168.1.100`.
+   * An envelope (PDU) will appear next to `PC0`. Click the **Play/Forward** button in the simulation panel to watch the packet travel step-by-step from PC0 → Switch → Server0 and back.
+   * Click on the envelope at any step of the journey to open the **PDU Information** window:
+     * Check the **In Layers** and **Out Layers** tabs. It visually tracks exactly how the packet is encapsulated/de-encapsulated at each device!
+6. **Switch MAC Address Table Verification**:
+   * Click the `2960 Switch` -> Go to the **CLI** (Command Line Interface) tab.
+   * Press Enter to get the command prompt. Run the following commands:
+     ```ios
+     Switch> enable
+     Switch# show mac address-table
+     ```
+   * Observe how the switch has dynamically learned the MAC addresses of `PC0`, `PC1`, and `Server0` and mapped them to their respective physical ports (`Fa0/1`, `Fa0/2`, `Fa0/3`).
+7. **Troubleshooting Challenge**:
+   * Click `PC1` -> Go to **IP Configuration** and change its IP to `192.168.2.20` (changing the network ID).
+   * Try to `ping 192.168.2.20` from `PC0`.
+   * Watch the simulation to see why it fails (packets cannot be delivered directly because they are on different subnets without a router).
+
+---
+
+### 🔍 Deep Dive: The `ping` Command & Options
+
+`ping` is the most widely used network utility for checking host reachability. It utilizes the **Internet Control Message Protocol (ICMP)**, operating at **Layer 3 (Network)** of the OSI model. 
+
+When you run `ping`, your system sends an **ICMP Echo Request (Type 8)** packet to the target IP. If the target is alive and reachable, it responds with an **ICMP Echo Reply (Type 0)**.
+
+#### Analyzing the `ping` Output Fields:
+```text
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=115 time=14.2 ms
+```
+* **`64 bytes`**: The size of the ICMP payload sent.
+* **`icmp_seq=1`**: The sequence number of the packet, allowing you to track packet loss and order.
+* **`ttl=115` (Time to Live)**: A counter that decrements by 1 at every router hop. Used to prevent routing loops. If it hits 0, the packet is discarded.
+* **`time=14.2 ms` (Round-Trip Time / RTT)**: The total milliseconds it took for the request to reach the destination and for the reply to return.
+
+#### Crucial `ping` Command Options:
+
+| Action / Goal | macOS / Linux Command | Windows Command | Explanation |
+| :--- | :--- | :--- | :--- |
+| **Set packet count** | `ping -c 5 8.8.8.8` | `ping -n 5 8.8.8.8` | Stops automatically after sending exactly `5` requests. |
+| **Continuous ping** | `ping 8.8.8.8` *(default)* | `ping -t 8.8.8.8` | Pings forever until you manually stop it with **`Ctrl + C`**. |
+| **Change packet size** | `ping -s 1000 8.8.8.8` | `ping -l 1000 8.8.8.8` | Sends a custom payload size (1000 bytes) to test maximum transmission unit (MTU) limits. |
+| **Adjust interval** | `ping -i 0.5 8.8.8.8` | *Not native* | Sets the wait time between packets to `0.5` seconds (requires root permissions for values under `0.2`). |
+| **Set Timeout** | `ping -t 2 8.8.8.8` | `ping -w 2000 8.8.8.8` | Sets a timeout in seconds (macOS) or milliseconds (Windows) before declaring a packet lost. |
+
+---
+
+### 🔍 Deep Dive: Wireshark Display Filters
+
+Unlike **Capture Filters** (which decide which packets are recorded to the disk *during* capture), **Display Filters** are applied to already-captured packets. They let you search, hide, and drill down into thousands of packets instantly.
+
+Wireshark uses a very intuitive, color-coded syntax in its filter bar:
+* **Green Background**: The syntax is valid.
+* **Red Background**: The syntax has an error and won't run.
+
+#### 1. Common Comparison & Logical Operators
+
+| Operator | Alternate Syntax | Meaning | Example |
+| :--- | :--- | :--- | :--- |
+| **`==`** | `eq` | Equal to | `ip.addr == 192.168.1.10` |
+| **`!=`** | `ne` | Not equal to | `tcp.port != 80` |
+| **`&&`** | `and` | Logical AND (Both must be true) | `ip.addr == 192.168.1.10 && tcp` |
+| **`\|\|`** | `or` | Logical OR (Either can be true) | `dns or http` |
+| **`!`** | `not` | Logical NOT (Negate) | `!arp` (hides all ARP packets) |
+| **`contains`** | *N/A* | Search for a text string | `http.host contains "example"` |
+
+#### 2. Essential Filter Recipes for Network Analysis
+
+| Category | Filter Expression | What it Displays |
+| :--- | :--- | :--- |
+| **Protocol Filters** | `http` | Shows only standard HTTP packets. |
+| | `dns` | Shows all Domain Name System queries and responses. |
+| | `icmp` | Shows ping requests/replies and other control messages. |
+| | `arp` | Shows address resolution mapping requests/replies. |
+| **IP Addresses** | `ip.addr == 192.168.1.10` | Shows any packet where this IP is either the source or destination. |
+| | `ip.src == 10.0.0.5` | Shows only packets originating from this specific device. |
+| | `ip.dst == 8.8.8.8` | Shows only traffic destined for Google DNS. |
+| **Ports** | `tcp.port == 80` | Shows web traffic on standard HTTP port 80 (incoming or outgoing). |
+| | `udp.port == 53` | Shows all standard DNS resolution port 53 traffic. |
+| | `tcp.srcport == 443` | Shows outgoing encrypted HTTPS responses. |
+| **Combined Filters** | `ip.addr == 192.168.1.10 && tcp.port == 80` | Isolates web traffic to/from a specific target host. |
+| | `http.request.method == "GET"` | Shows only HTTP GET requests (useful for tracking web browsing). |
+
+> [!TIP]
+> **Right-Click Helper**: If you don't remember a filter name, find the field inside the **Packet Details** pane (middle pane), **right-click** it, and select **Apply as Filter** -> **Selected**. Wireshark will automatically construct the correct syntax for you!
+
+---
+
+### 🎯 Workshop Activity: "Layer Matching Game" & Review (30 min)
+- **Activity (15 min)**: Group challenge. Match standard network protocols (HTTP, TCP, IP, Ethernet, DNS, ARP) to their correct OSI layers and explain their function.
+- **Review & Discussion (15 min)**: Group discussion on *"Why does layering matter for network analysis?"* and QA session.
 
 ### 📚 Homework
 - Read: Wireshark User Guide — Chapter 1 & 3

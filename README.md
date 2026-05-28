@@ -1,7 +1,7 @@
-# 📡 Network Analysis Course — 1-Month Plan
+# 🛜Network Analysis Course — 1-Month Plan
 
-> **Duration**: 4 Weeks | **Schedule**: 2 Classes/Week | **Class Length**: 1 Hour 30 Minutes  
-> **Total Sessions**: 8 | **Total Contact Hours**: 12 Hours
+> **Duration**: 4 Weeks | **Schedule**: 2 Classes/Week | **Class Length**: 3 Hours (including 10 min break)  
+> **Total Sessions**: 8 | **Total Contact Hours**: 24 Hours
 
 ---
 
@@ -17,13 +17,12 @@ This course introduces students to the fundamentals of network analysis — from
 
 ## Required Software (Free)
 
-| Tool | Purpose | Download |
+| Tool | Purpose | Download Link & Installation Guide |
 |------|---------|----------|
-| **Wireshark** | Live packet capture & protocol analysis | [wireshark.org](https://www.wireshark.org) |
-| **Cisco Packet Tracer** | Network simulation & topology design | [netacad.com](https://www.netacad.com/cisco-packet-tracer) |
+| **Wireshark** | Live packet capture & protocol analysis | [wireshark](https://www.wireshark.org/docs/wsug_html_chunked/ChBuildInstallWinInstall.html) |
+| **Cisco Packet Tracer** | Network simulation & topology design | [netacad](https://www.netacad.com/skillsforall/files/Cisco_Packet_Tracer_Download_and_Installation_Instructions.pdf) |
 
 ## Table of Topic
----
 - [Session 1 — Introduction to Network Analysis & The OSI Model](/S1/README.md)
 - [Session 2 — The Protocol Stack Deep Dive: Ethernet, IP, TCP & UDP](/S2/README.md)
 - [Session 3 — Network Services: DHCP, DNS & ARP](/S3/README.md)
@@ -44,20 +43,21 @@ This course introduces students to the fundamentals of network analysis — from
 
 ---
 
-## Time Allocation Per Session (90 Minutes)
+## Time Allocation Per Session (3 Hours / 180 Minutes)
 
 | Segment | Duration | Description |
 |---------|----------|-------------|
-| 🔄 Warm-up & Review | 5 min | Recap previous session, answer questions |
-| 📖 Lecture & Live Demo | 30–35 min | Core concepts with real-time demonstrations |
-| 🛠️ Hands-on Lab | 40–45 min | Guided exercises using Wireshark & Packet Tracer |
-| 🎯 Workshop Activity | 10–15 min | Challenge, group exercise, or mini-CTF |
-| 📝 Wrap-up & Preview | 5 min | Key takeaways, homework, next session preview |
+| 🔄 Warm-up & Review | 10 min | Recap previous session, Q&A, and homework check |
+| 📖 Lecture & Live Demo | 50 min | Core concepts with real-world, real-time demonstrations |
+| ☕ Break | 10 min | Stretch, stand up, and grab a drink before the lab |
+| 🛠️ Hands-on Lab | 80 min | In-depth guided exercises using Wireshark & Cisco Packet Tracer |
+| 🎯 Workshop Activity | 20 min | Interactive team challenge, CTF, or configuration race |
+| 📝 Wrap-up & Preview | 10 min | Key takeaways, homework overview, and next session preview |
 
 
 ---
 
-## Assessment Summary
+<!-- ## Assessment Summary
 
 | Assessment | Weight | Session |
 |------------|--------|---------|
@@ -66,10 +66,11 @@ This course introduces students to the fundamentals of network analysis — from
 | Mini CTF Performance | 15% | Session 7 |
 | Capstone Project | 35% | Session 8 |
 
----
+--- -->
 
 ## Recommended Resources
-
+> [!IMPORTANT] Importance
+> You can check more information about Wireshark at this [Wireshark User’s Guide](https://www.wireshark.org/docs/wsug_html_chunked/)
 ### PCAP Datasets for Practice
 | Source | URL | Level |
 |--------|-----|-------|
@@ -89,21 +90,10 @@ This course introduces students to the fundamentals of network analysis — from
 
 ---
 
-## Open Questions
-
-> [!IMPORTANT]
-> **Target Audience**: What level are the students? (e.g., university undergrads, IT professionals, complete beginners?) This affects the depth of subnetting, routing, and security content.
-
-> [!IMPORTANT]
-> **Language**: Should course materials be prepared in English, Thai, or bilingual?
 
 > [!NOTE]
-> **Lab Environment**: Will students have their own laptops with admin rights to install Wireshark and Packet Tracer? Or will a computer lab be used?
+> **Lab Environment**: students should have their own laptops with admin rights to install Wireshark and Packet Tracer.
 
-> [!NOTE]
-> **Delivery Format**: Is this in-person, online (Zoom/Teams), or hybrid? This affects how labs and group activities are conducted.
 
-> [!NOTE]
-> **Output Format**: Would you like me to also generate this plan as a PowerPoint (`.pptx`) presentation or a detailed syllabus document?
 
 
