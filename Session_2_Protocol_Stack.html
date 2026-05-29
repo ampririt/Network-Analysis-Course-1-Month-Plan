@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Network Analysis — Course & Session 1 Deep Dive</title>
+    <title>Network Analysis — Session 2</title>
 
     <!-- Fonts: Fraunces (distinctive editorial serif) + DM Sans (clean body) + JetBrains Mono (technical) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -3412,13 +3412,16 @@
         gap: 28px;
         margin-top: 16px;
       }
-      .envelope, .ip-packet-card {
+      .envelope,
+      .ip-packet-card {
         border: 1.5px solid var(--ink);
         padding: 22px 26px;
         background: var(--paper-warm);
         position: relative;
       }
-      .envelope { background: linear-gradient(160deg, #fffbef, var(--paper-warm)); }
+      .envelope {
+        background: linear-gradient(160deg, #fffbef, var(--paper-warm));
+      }
       .envelope .env-stamp {
         position: absolute;
         top: 16px;
@@ -3432,7 +3435,8 @@
         background: var(--amber-soft);
         transform: rotate(-4deg);
       }
-      .envelope .env-tag, .ip-packet-card .env-tag {
+      .envelope .env-tag,
+      .ip-packet-card .env-tag {
         font-family: var(--font-mono);
         font-size: 12px;
         letter-spacing: 0.14em;
@@ -3443,11 +3447,13 @@
         align-items: center;
         gap: 8px;
       }
-      .envelope .env-tag .m-icon, .ip-packet-card .env-tag .m-icon {
+      .envelope .env-tag .m-icon,
+      .ip-packet-card .env-tag .m-icon {
         font-size: 18px;
         color: var(--cobalt);
       }
-      .env-line, .ip-line {
+      .env-line,
+      .ip-line {
         display: grid;
         grid-template-columns: 110px 1fr;
         gap: 14px;
@@ -3456,31 +3462,48 @@
         border-bottom: 1px dashed var(--rule);
         font-size: 16px;
       }
-      .env-line:last-child, .ip-line:last-child { border-bottom: none; }
-      .env-line .field-label, .ip-line .field-label {
+      .env-line:last-child,
+      .ip-line:last-child {
+        border-bottom: none;
+      }
+      .env-line .field-label,
+      .ip-line .field-label {
         font-family: var(--font-mono);
         font-size: 11px;
         letter-spacing: 0.1em;
         text-transform: uppercase;
         color: var(--muted);
       }
-      .env-line .field-val, .ip-line .field-val {
+      .env-line .field-val,
+      .ip-line .field-val {
         font-family: var(--font-display);
         font-weight: 700;
         font-size: 18px;
         color: var(--ink);
       }
-      .ip-line .field-val { font-family: var(--font-mono); font-size: 17px; }
-      .env-line .field-val em, .ip-line .field-val em {
+      .ip-line .field-val {
+        font-family: var(--font-mono);
+        font-size: 17px;
+      }
+      .env-line .field-val em,
+      .ip-line .field-val em {
         font-style: normal;
         background: var(--cobalt-soft);
         padding: 1px 6px;
         border-radius: 3px;
       }
-      .ip-packet-card { background: linear-gradient(160deg, var(--cobalt-soft), var(--paper-warm) 80%); border-color: var(--cobalt); }
+      .ip-packet-card {
+        background: linear-gradient(
+          160deg,
+          var(--cobalt-soft),
+          var(--paper-warm) 80%
+        );
+        border-color: var(--cobalt);
+      }
       .ip-packet-card .env-stamp {
         position: absolute;
-        top: 16px; right: 18px;
+        top: 16px;
+        right: 18px;
         font-family: var(--font-mono);
         font-size: 11px;
         letter-spacing: 0.14em;
@@ -3498,7 +3521,9 @@
         line-height: 1.5;
         color: var(--ink-soft);
       }
-      .postal-map strong { color: var(--ink); }
+      .postal-map strong {
+        color: var(--ink);
+      }
 
       /* ===========================================
            MAC DEEP-DIVE — 48-bit breakdown highlighting
@@ -3532,13 +3557,25 @@
         color: var(--ink);
         font-weight: 700;
       }
-      .mac-bits .b.oui  { background: var(--cobalt-soft); border-color: var(--cobalt); color: var(--cobalt-deep); }
-      .mac-bits .b.ser  { background: var(--amber-soft); border-color: var(--amber); }
-      .mac-bits .b.flag { background: var(--plum-soft); border-color: var(--plum); position: relative; }
+      .mac-bits .b.oui {
+        background: var(--cobalt-soft);
+        border-color: var(--cobalt);
+        color: var(--cobalt-deep);
+      }
+      .mac-bits .b.ser {
+        background: var(--amber-soft);
+        border-color: var(--amber);
+      }
+      .mac-bits .b.flag {
+        background: var(--plum-soft);
+        border-color: var(--plum);
+        position: relative;
+      }
       .mac-bits .b.flag::after {
         content: "";
         position: absolute;
-        top: -6px; left: 50%;
+        top: -6px;
+        left: 50%;
         transform: translateX(-50%);
         border: 4px solid transparent;
         border-top-color: var(--plum);
@@ -3567,14 +3604,21 @@
       }
       .mac-bits .mac-key .swatch {
         display: inline-block;
-        width: 14px; height: 14px;
+        width: 14px;
+        height: 14px;
         margin-right: 6px;
         vertical-align: middle;
         border: 1.2px solid var(--ink);
       }
-      .mac-bits .mac-key .swatch.oui  { background: var(--cobalt-soft); }
-      .mac-bits .mac-key .swatch.ser  { background: var(--amber-soft); }
-      .mac-bits .mac-key .swatch.flag { background: var(--plum-soft); }
+      .mac-bits .mac-key .swatch.oui {
+        background: var(--cobalt-soft);
+      }
+      .mac-bits .mac-key .swatch.ser {
+        background: var(--amber-soft);
+      }
+      .mac-bits .mac-key .swatch.flag {
+        background: var(--plum-soft);
+      }
 
       .mac-special {
         display: grid;
@@ -3594,8 +3638,12 @@
         color: var(--cobalt);
         margin-bottom: 4px;
       }
-      .mac-special .mc.amber .mc-tag { color: var(--amber); }
-      .mac-special .mc.moss  .mc-tag { color: var(--moss); }
+      .mac-special .mc.amber .mc-tag {
+        color: var(--amber);
+      }
+      .mac-special .mc.moss .mc-tag {
+        color: var(--moss);
+      }
       .mac-special .mc .mc-addr {
         font-family: var(--font-mono);
         font-size: 18px;
@@ -3623,7 +3671,9 @@
         justify-content: space-between;
         font-family: var(--font-mono);
       }
-      .vendor-row .v strong { color: var(--cobalt); }
+      .vendor-row .v strong {
+        color: var(--cobalt);
+      }
 
       /* ===========================================
            IP vs MAC — RESPONSIBILITY SPLIT
@@ -3640,8 +3690,22 @@
         padding: 22px 26px;
         background: var(--paper-warm);
       }
-      .role-card.ip   { background: linear-gradient(160deg, var(--moss-soft), var(--paper-warm) 75%); border-color: var(--moss); }
-      .role-card.mac  { background: linear-gradient(160deg, var(--amber-soft), var(--paper-warm) 75%); border-color: var(--amber); }
+      .role-card.ip {
+        background: linear-gradient(
+          160deg,
+          var(--moss-soft),
+          var(--paper-warm) 75%
+        );
+        border-color: var(--moss);
+      }
+      .role-card.mac {
+        background: linear-gradient(
+          160deg,
+          var(--amber-soft),
+          var(--paper-warm) 75%
+        );
+        border-color: var(--amber);
+      }
       .role-card .role-head {
         display: flex;
         align-items: center;
@@ -3654,7 +3718,9 @@
         font-size: 36px;
         color: var(--moss);
       }
-      .role-card.mac .role-head .m-icon { color: var(--amber); }
+      .role-card.mac .role-head .m-icon {
+        color: var(--amber);
+      }
       .role-card .role-head .rt {
         font-family: var(--font-display);
         font-weight: 700;
@@ -3678,7 +3744,9 @@
         margin-bottom: 8px;
       }
       .role-card ul {
-        margin: 0; padding: 0; list-style: none;
+        margin: 0;
+        padding: 0;
+        list-style: none;
       }
       .role-card li {
         font-size: 15px;
@@ -3694,8 +3762,14 @@
         color: var(--moss);
         font-weight: 700;
       }
-      .role-card.mac li::before { color: var(--amber); }
-      .role-card li.no::before { content: "✗"; color: var(--ink-soft); opacity: 0.5; }
+      .role-card.mac li::before {
+        color: var(--amber);
+      }
+      .role-card li.no::before {
+        content: "✗";
+        color: var(--ink-soft);
+        opacity: 0.5;
+      }
       .why-both-foot {
         margin-top: 16px;
         padding: 14px 22px;
@@ -3751,9 +3825,15 @@
         line-height: 0.9;
         letter-spacing: -0.04em;
       }
-      .acronym-card .acro .letter.a { color: var(--cobalt); }
-      .acronym-card .acro .letter.r { color: var(--amber); }
-      .acronym-card .acro .letter.p { color: var(--moss); }
+      .acronym-card .acro .letter.a {
+        color: var(--cobalt);
+      }
+      .acronym-card .acro .letter.r {
+        color: var(--amber);
+      }
+      .acronym-card .acro .letter.p {
+        color: var(--moss);
+      }
       .acronym-card .acro .word {
         font-family: var(--font-display);
         font-style: italic;
@@ -3773,7 +3853,9 @@
         line-height: 1.5;
         color: var(--ink-soft);
       }
-      .acronym-row strong { color: var(--ink); }
+      .acronym-row strong {
+        color: var(--ink);
+      }
       .acronym-meta {
         display: flex;
         flex-wrap: wrap;
@@ -3831,9 +3913,18 @@
         display: flex;
         align-items: center;
       }
-      .layer-place .lp-cell.tier-u { background: var(--cobalt-soft); border-color: var(--cobalt); }
-      .layer-place .lp-cell.tier-m { background: var(--amber-soft); border-color: var(--amber); }
-      .layer-place .lp-cell.tier-l { background: var(--moss-soft); border-color: var(--moss); }
+      .layer-place .lp-cell.tier-u {
+        background: var(--cobalt-soft);
+        border-color: var(--cobalt);
+      }
+      .layer-place .lp-cell.tier-m {
+        background: var(--amber-soft);
+        border-color: var(--amber);
+      }
+      .layer-place .lp-cell.tier-l {
+        background: var(--moss-soft);
+        border-color: var(--moss);
+      }
       .layer-place .lp-num {
         font-family: var(--font-mono);
         font-size: 13px;
@@ -3894,7 +3985,11 @@
       .arp-topo {
         border: 1.5px solid var(--ink);
         background:
-          radial-gradient(circle at 50% 70%, rgba(217, 98, 26, 0.06), transparent 60%),
+          radial-gradient(
+            circle at 50% 70%,
+            rgba(217, 98, 26, 0.06),
+            transparent 60%
+          ),
           rgba(255, 252, 244, 0.6);
         position: relative;
         overflow: hidden;
@@ -3913,7 +4008,10 @@
         fill: none;
         vector-effect: non-scaling-stroke;
         opacity: 0.35;
-        transition: opacity 0.3s ease, stroke 0.3s ease, stroke-width 0.3s ease;
+        transition:
+          opacity 0.3s ease,
+          stroke 0.3s ease,
+          stroke-width 0.3s ease;
       }
       .arp-topo .arp-lines line.active {
         opacity: 1;
@@ -3921,9 +4019,14 @@
         stroke-dasharray: none;
         stroke-width: 2.5;
       }
-      .arp-topo .arp-lines line.reply { stroke: var(--moss); }
-      .arp-topo .arp-lines line.data { stroke: var(--cobalt); }
-      .arp-host, .arp-switch {
+      .arp-topo .arp-lines line.reply {
+        stroke: var(--moss);
+      }
+      .arp-topo .arp-lines line.data {
+        stroke: var(--cobalt);
+      }
+      .arp-host,
+      .arp-switch {
         position: absolute;
         display: flex;
         flex-direction: column;
@@ -3935,14 +4038,18 @@
         color: var(--ink);
         z-index: 3;
       }
-      .arp-host .m-icon, .arp-switch .m-icon {
+      .arp-host .m-icon,
+      .arp-switch .m-icon {
         font-size: 38px;
         color: var(--cobalt);
         background: var(--paper-warm);
         border: 1.5px solid var(--ink);
         border-radius: 8px;
         padding: 6px;
-        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        transition:
+          background 0.3s ease,
+          color 0.3s ease,
+          transform 0.3s ease;
       }
       .arp-switch .m-icon {
         color: var(--amber);
@@ -3957,13 +4064,38 @@
         border: 1px solid var(--rule);
         border-radius: 3px;
       }
-      .arp-host .hinfo .ip { color: var(--moss); font-weight: 700; display: block; }
-      .arp-host .hinfo .mac { color: var(--amber); font-weight: 700; font-size: 9px; display: block; }
-      .arp-host.a { top: 6%; left: 4%; }
-      .arp-host.b { top: 6%; left: 30%; }
-      .arp-host.c { top: 6%; left: 56%; }
-      .arp-host.d { top: 6%; right: 4%; }
-      .arp-switch { bottom: 8%; left: 50%; transform: translateX(-50%); }
+      .arp-host .hinfo .ip {
+        color: var(--moss);
+        font-weight: 700;
+        display: block;
+      }
+      .arp-host .hinfo .mac {
+        color: var(--amber);
+        font-weight: 700;
+        font-size: 9px;
+        display: block;
+      }
+      .arp-host.a {
+        top: 6%;
+        left: 4%;
+      }
+      .arp-host.b {
+        top: 6%;
+        left: 30%;
+      }
+      .arp-host.c {
+        top: 6%;
+        left: 56%;
+      }
+      .arp-host.d {
+        top: 6%;
+        right: 4%;
+      }
+      .arp-switch {
+        bottom: 8%;
+        left: 50%;
+        transform: translateX(-50%);
+      }
       .arp-host.sender .m-icon {
         background: var(--cobalt);
         color: #fff;
@@ -3975,7 +4107,10 @@
         border-color: var(--moss);
         transform: scale(1.1);
       }
-      .arp-host.ignore .m-icon { opacity: 0.3; filter: grayscale(0.8); }
+      .arp-host.ignore .m-icon {
+        opacity: 0.3;
+        filter: grayscale(0.8);
+      }
       .arp-frame {
         position: absolute;
         width: 180px;
@@ -4006,20 +4141,28 @@
         background: rgba(255, 255, 255, 0.25);
         margin-bottom: 3px;
       }
-      .arp-frame.visible { opacity: 1; }
-      .arp-frame.reply { background: var(--moss); }
-      .arp-frame.data { background: var(--cobalt); }
+      .arp-frame.visible {
+        opacity: 1;
+      }
+      .arp-frame.reply {
+        background: var(--moss);
+      }
+      .arp-frame.data {
+        background: var(--cobalt);
+      }
       .arp-side {
         display: flex;
         flex-direction: column;
         gap: 12px;
       }
-      .arp-cache, .arp-steps {
+      .arp-cache,
+      .arp-steps {
         border: 1.5px solid var(--ink);
         background: #fff;
         padding: 12px 16px;
       }
-      .arp-cache .ch, .arp-steps .ch {
+      .arp-cache .ch,
+      .arp-steps .ch {
         font-family: var(--font-mono);
         font-size: 11px;
         letter-spacing: 0.12em;
@@ -4060,8 +4203,14 @@
         padding: 6px;
         border-bottom: 1px dotted var(--rule);
       }
-      .arp-cache .ip-col { color: var(--moss); font-weight: 700; }
-      .arp-cache .mac-col { color: var(--amber); font-weight: 700; }
+      .arp-cache .ip-col {
+        color: var(--moss);
+        font-weight: 700;
+      }
+      .arp-cache .mac-col {
+        color: var(--amber);
+        font-weight: 700;
+      }
       .arp-cache .empty-row td {
         text-align: center;
         font-style: italic;
@@ -4071,10 +4220,18 @@
         font-size: 14px;
         border-bottom: none;
       }
-      .arp-cache tr.new td { animation: arp-new-row 1.5s ease-in-out; }
+      .arp-cache tr.new td {
+        animation: arp-new-row 1.5s ease-in-out;
+      }
       @keyframes arp-new-row {
-        0% { background: var(--moss); color: #fff; }
-        100% { background: transparent; color: var(--ink); }
+        0% {
+          background: var(--moss);
+          color: #fff;
+        }
+        100% {
+          background: transparent;
+          color: var(--ink);
+        }
       }
       .arp-steps ol {
         margin: 0;
@@ -4087,7 +4244,9 @@
         padding: 3px 6px;
         margin-left: -6px;
         border-left: 3px solid transparent;
-        transition: color 0.3s ease, background 0.3s ease;
+        transition:
+          color 0.3s ease,
+          background 0.3s ease;
       }
       .arp-steps li.done {
         color: var(--moss);
@@ -4116,7 +4275,9 @@
         flex: 1;
         min-width: 0;
       }
-      .arp-controls .status strong { color: var(--ink); }
+      .arp-controls .status strong {
+        color: var(--ink);
+      }
       .arp-controls .status .narrate {
         display: block;
         font-family: var(--font-body);
@@ -4126,7 +4287,11 @@
         line-height: 1.35;
         letter-spacing: 0;
       }
-      .arp-controls .btns { display: flex; gap: 8px; flex-shrink: 0; }
+      .arp-controls .btns {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+      }
       .arp-controls button {
         font-family: var(--font-mono);
         font-size: 11px;
@@ -4145,14 +4310,23 @@
         color: #fff;
         border-color: var(--moss);
       }
-      .arp-controls button.primary:hover { background: var(--ink); border-color: var(--ink); }
+      .arp-controls button.primary:hover {
+        background: var(--ink);
+        border-color: var(--ink);
+      }
       .arp-controls button.pause {
         background: var(--amber);
         color: #fff;
         border-color: var(--amber);
       }
-      .arp-controls button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
-      .arp-controls button:disabled { opacity: 0.35; cursor: not-allowed; }
+      .arp-controls button:hover:not(:disabled) {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .arp-controls button:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
 
       /* ===========================================
            PING SIMULATION (new slide)
@@ -5075,6 +5249,259 @@
         outline-offset: 3px;
         background: rgba(29, 63, 184, 0.05);
       }
+      /* === IP CALC SIMULATION STYLES === */
+      .ipc-octet {
+        flex: 1;
+        background: var(--paper-warm);
+        border: 1.5px solid var(--rule);
+        border-radius: 10px;
+        padding: 18px 14px 14px;
+        text-align: center;
+        transition:
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .ipc-octet.active {
+        border-color: var(--cobalt);
+        box-shadow: 0 0 0 3px var(--cobalt-soft);
+      }
+      .ipc-octet.done-net {
+        border-color: var(--cobalt);
+        background: var(--cobalt-soft);
+      }
+      .ipc-octet.done-host {
+        border-color: var(--amber);
+        background: var(--amber-soft);
+      }
+      .ipc-dec {
+        font-family: var(--font-display);
+        font-size: 48px;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1;
+      }
+      .ipc-bin {
+        font-family: var(--font-mono);
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin-top: 10px;
+        transition: color 0.3s;
+      }
+      .ipc-octet.done-net .ipc-bin {
+        color: var(--cobalt-deep);
+      }
+      .ipc-octet.done-host .ipc-bin {
+        color: var(--amber);
+      }
+      .ipc-lbl {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      /* bit cells in the 32-bit strip */
+      .ipc-bit,
+      .sc-bit {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 15px;
+        font-weight: 700;
+        background: var(--paper-warm);
+        border: 1px solid var(--rule);
+        border-radius: 3px;
+        color: var(--ink);
+        transition:
+          background 0.3s,
+          border-color 0.3s,
+          color 0.3s;
+      }
+      .ipc-bit.net,
+      .sc-bit.net {
+        background: var(--cobalt-soft);
+        border-color: var(--cobalt);
+        color: var(--cobalt-deep);
+      }
+      .ipc-bit.host,
+      .sc-bit.host {
+        background: var(--amber-soft);
+        border-color: var(--amber);
+        color: var(--amber);
+      }
+      .sc-bit.subnet {
+        background: var(--plum-soft);
+        border-color: var(--plum);
+        color: var(--plum);
+      }
+      /* === HANDSHAKE SIMULATION === */
+      .hs-state {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        padding: 4px 12px;
+        border-radius: 5px;
+        display: inline-block;
+        margin-top: 10px;
+        background: var(--paper-warm);
+        border: 1px solid var(--rule);
+        color: var(--muted);
+        transition:
+          background 0.3s,
+          border-color 0.3s,
+          color 0.3s;
+      }
+      .hs-state.s-active {
+        background: var(--cobalt-soft);
+        border-color: var(--cobalt);
+        color: var(--cobalt-deep);
+      }
+      .hs-state.s-est {
+        background: var(--moss-soft);
+        border-color: var(--moss);
+        color: var(--moss);
+      }
+      .hs-msg,
+      .hs-side {
+        opacity: 0;
+        transition: opacity 0.45s ease;
+      }
+      .hs-msg.show,
+      .hs-side.show {
+        opacity: 1;
+      }
+      .hs-chip {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+      }
+      .hs-line {
+        height: 2px;
+        margin: 12px 30px 0;
+        position: relative;
+        border-radius: 1px;
+      }
+      .hs-tip {
+        position: absolute;
+        top: -9px;
+        font-size: 18px;
+        line-height: 1;
+      }
+      .hs-dot {
+        position: absolute;
+        top: -4px;
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        opacity: 0;
+      }
+      #hs-msg1.show .hs-dot,
+      #hs-msg3.show .hs-dot {
+        animation: hsTravelR 0.9s ease forwards;
+      }
+      #hs-msg2.show .hs-dot {
+        animation: hsTravelL 0.9s ease forwards;
+      }
+      @keyframes hsTravelR {
+        0% {
+          left: 0%;
+          opacity: 1;
+        }
+        100% {
+          left: 100%;
+          opacity: 1;
+        }
+      }
+      @keyframes hsTravelL {
+        0% {
+          left: 100%;
+          opacity: 1;
+        }
+        100% {
+          left: 0%;
+          opacity: 1;
+        }
+      }
+
+      /* === UDP SIMULATION === */
+      .udp-wire {
+        position: relative;
+        height: 132px;
+        background: var(--paper-warm);
+        border-top: 2px dashed var(--rule);
+        border-bottom: 2px dashed var(--rule);
+        border-radius: 8px;
+        overflow: visible;
+      }
+      .udp-dgram {
+        position: absolute;
+        left: 12px;
+        width: 60px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 15px;
+        background: var(--cobalt-soft);
+        border: 1.5px solid var(--cobalt);
+        color: var(--cobalt-deep);
+        border-radius: 6px;
+        opacity: 0;
+        transition:
+          left 1.1s ease,
+          top 1.1s ease,
+          opacity 0.5s ease,
+          background 0.3s,
+          border-color 0.3s,
+          color 0.3s;
+      }
+      .udp-dgram.show {
+        opacity: 1;
+      }
+      .udp-dgram.sent {
+        left: calc(100% - 72px);
+      }
+      .udp-dgram.midway {
+        left: 44%;
+        background: var(--amber-soft);
+        border-color: var(--amber);
+        color: var(--amber);
+      }
+      .udp-dgram.lost {
+        left: 46%;
+        top: 150px;
+        opacity: 0;
+      }
+
+      /* === PORTS IN DETAIL === */
+      .port-pkt {
+        font-family: var(--font-mono);
+        font-size: 17px;
+        font-weight: 500;
+        padding: 12px 16px;
+        background: var(--paper-warm);
+        border: 1.5px solid;
+        border-radius: 6px;
+      }
+      .port-app {
+        font-family: var(--font-mono);
+        font-size: 18px;
+        font-weight: 700;
+        padding: 10px 16px;
+        background: var(--paper);
+        border-left: 4px solid;
+        border-radius: 4px;
+      }
     </style>
   </head>
   <body>
@@ -5093,7 +5520,7 @@
             The Protocol<br /><span class="ital">Stack</span>.
           </h1>
           <p class="tagline reveal" style="--i: 2">
-            Session two of eight — opening Ethernet, IP, TCP &amp; UDP one field
+            Session two of four — opening Ethernet, IP, TCP &amp; UDP one field
             at a time, then designing the IP space those packets live in.
           </p>
           <div class="spec-row">
@@ -5103,7 +5530,7 @@
             </div>
             <div class="spec reveal" style="--i: 4">
               <div class="k">Sessions</div>
-              <div class="v">8 · 90 min</div>
+              <div class="v">4 · 3 hours</div>
             </div>
             <div class="spec reveal" style="--i: 5">
               <div class="k">Tools</div>
@@ -5274,9 +5701,9 @@
             <p style="font-size: 20px; color: var(--muted)">
               <strong style="color: var(--ink)">Supplementary later:</strong>
               <span class="mono">tcpdump</span> /
-              <span class="mono">tshark</span> (CLI capture, S8) ·
-              <span class="mono">Nmap</span> (scanning, S7) · NetworkMiner
-              (forensics, S7) · Scapy (custom packets, optional)
+              <span class="mono">tshark</span> (CLI capture, S4) ·
+              <span class="mono">Nmap</span> (scanning, S3) · NetworkMiner
+              (forensics, S3) · Scapy (custom packets, optional)
             </p>
           </div>
           <div class="page-num">P. 04</div>
@@ -5288,57 +5715,43 @@
         <section class="slide">
           <div class="masthead">
             <div class="left">
-              <span class="tag">Syllabus</span><span>8 Sessions · 4 Weeks</span>
+              <span class="tag">Syllabus</span><span>4 Sessions · 4 Weeks</span>
             </div>
             <div class="right">05 / 23</div>
           </div>
           <span class="eyebrow reveal" style="--i: 0">The roadmap</span>
           <h2 class="reveal" style="--i: 1; font-size: 64px">
-            Eight sessions, building <em class="display">one stack.</em>
+            Four sessions, building <em class="display">one stack.</em>
           </h2>
           <div class="roadmap" style="margin-top: 40px">
             <div class="road-week reveal" style="--i: 2">
               <div class="wk">Week 01 · Foundations</div>
               <div class="ttl">The stack</div>
               <div class="road-sess">
-                <span class="sn">S1 · Done</span>Introduction &amp; the OSI /
-                TCP-IP model
-              </div>
-              <div class="road-sess">
-                <span class="sn">S2 · Today</span>Protocol stack deep dive:
-                Ethernet · IP · TCP · UDP
+                <span class="sn">S1 · Done</span>Introduction to network
+                analysis &amp; the OSI / TCP-IP model
               </div>
             </div>
             <div class="road-week reveal" style="--i: 3">
-              <div class="wk">Week 02 · Services &amp; Apps</div>
-              <div class="ttl">What the apps say</div>
+              <div class="wk">Week 02 · Protocols</div>
+              <div class="ttl">Reading the wire</div>
               <div class="road-sess">
-                <span class="sn">S3</span>Network services: DHCP · DNS · ARP
-              </div>
-              <div class="road-sess">
-                <span class="sn">S4</span>Application protocols: HTTP · HTTPS ·
-                FTP
+                <span class="sn">S2 · Today</span>Protocol stack deep dive:
+                Ethernet · IP · TCP &amp; UDP
               </div>
             </div>
             <div class="road-week reveal" style="--i: 4">
-              <div class="wk">Week 03 · Infrastructure</div>
-              <div class="ttl">Moving the bits</div>
+              <div class="wk">Week 03 · Services</div>
+              <div class="ttl">What the network provides</div>
               <div class="road-sess">
-                <span class="sn">S5</span>Routing, switching &amp; VLANs
-              </div>
-              <div class="road-sess">
-                <span class="sn">S6</span>Troubleshooting methodology
+                <span class="sn">S3</span>Network services: DHCP · DNS &amp; ARP
               </div>
             </div>
             <div class="road-week reveal" style="--i: 5">
-              <div class="wk">Week 04 · Apply</div>
-              <div class="ttl">Real-world skill</div>
+              <div class="wk">Week 04 · Infrastructure</div>
+              <div class="ttl">Moving the bits</div>
               <div class="road-sess">
-                <span class="sn">S7</span>Network security &amp; threat
-                detection (Mini CTF)
-              </div>
-              <div class="road-sess">
-                <span class="sn">S8</span>Capstone project &amp; course review
+                <span class="sn">S4</span>Routing, switching &amp; VLANs
               </div>
             </div>
           </div>
@@ -5352,7 +5765,7 @@
           <div class="masthead">
             <div class="left">
               <span class="tag">Pedagogy</span
-              ><span>Session Shape · 90 min</span>
+              ><span>Session Shape · 3 hours</span>
             </div>
             <div class="right">06 / 23</div>
           </div>
@@ -5360,7 +5773,7 @@
             >How each class runs</span
           >
           <h2 class="reveal" style="--i: 1">
-            A 90-minute rhythm<br />that
+            A three-hour rhythm<br />that
             <em class="display">earns hands on keys.</em>
           </h2>
           <table class="data reveal" style="--i: 2; margin-top: 50px">
@@ -5825,7 +6238,8 @@
         <section class="slide">
           <div class="masthead">
             <div class="left">
-              <span class="tag">Session 02</span><span>Learning objectives</span>
+              <span class="tag">Session 02</span
+              ><span>Learning objectives</span>
             </div>
             <div class="right"></div>
           </div>
@@ -5836,7 +6250,8 @@
           <p class="lead reveal" style="--i: 2; margin-top: 24px">
             Session 2 is where the abstract stack becomes concrete bytes. We
             split into two halves: <strong>reading the protocols</strong> that
-            carry every conversation, then <strong>designing the IP space</strong>
+            carry every conversation, then
+            <strong>designing the IP space</strong>
             those conversations live in.
           </p>
           <div class="grid-4" style="margin-top: 44px">
@@ -5860,8 +6275,8 @@
               <div class="label">03 / Transport</div>
               <h3>TCP vs. UDP</h3>
               <p>
-                Reliability and the 3-way handshake versus connectionless
-                speed — and when to choose each.
+                Reliability and the 3-way handshake versus connectionless speed
+                — and when to choose each.
               </p>
             </div>
             <div class="card plum reveal" style="--i: 6">
@@ -6590,7 +7005,9 @@
           <div class="grid-2" style="margin-top: 36px; gap: 40px">
             <div class="card reveal" style="--i: 2; padding: 32px 38px">
               <div class="label">Connection-oriented</div>
-              <h3 style="font-size: 40px; margin: 6px 0 12px">TCP</h3>
+              <h3 style="font-size: 40px; margin: 6px 0 12px">
+                TCP (Transmission Control Protocol)
+              </h3>
               <p style="font-size: 20px">
                 Sets up a connection (3-way handshake), numbers every byte,
                 acknowledges receipt, retransmits losses, and controls flow. You
@@ -6605,7 +7022,9 @@
             </div>
             <div class="card amber reveal" style="--i: 3; padding: 32px 38px">
               <div class="label">Connectionless</div>
-              <h3 style="font-size: 40px; margin: 6px 0 12px">UDP</h3>
+              <h3 style="font-size: 40px; margin: 6px 0 12px">
+                UDP (User Datagram Protocol)
+              </h3>
               <p style="font-size: 20px">
                 No setup, no acknowledgements, no ordering — just address it and
                 send. If a datagram is lost, it's gone. Perfect when "late" is
@@ -6658,205 +7077,426 @@
         </section>
 
         <!-- =========================================================
-             THE 3-WAY HANDSHAKE
+             THE 3-WAY HANDSHAKE — STEP-BY-STEP SIMULATION
              ========================================================= -->
-        <section class="slide">
+        <section class="slide" id="handshakeSlide">
           <div class="masthead">
             <div class="left">
-              <span class="tag">TCP</span
+              <span class="tag">Interactive</span
               ><span>Connection setup · the 3-way handshake</span>
             </div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow reveal" style="--i: 0"
-            >SYN → SYN / ACK → ACK</span
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >Live simulation · Press START</span
           >
-          <h2 class="reveal" style="--i: 1; font-size: 54px">
+          <h2 class="reveal" style="--i: 1; font-size: 50px">
             Three packets to say
             <em class="display">"let's begin."</em>
           </h2>
           <p
             class="reveal"
-            style="--i: 2; font-size: 20px; margin-top: 8px; max-width: 1500px"
+            style="--i: 2; font-size: 19px; margin-top: 6px; max-width: 1500px"
           >
-            Before any data flows, both sides agree on starting sequence numbers
-            and confirm each other is reachable. In Wireshark, filter
+            Step through it one packet at a time and watch each side's TCP state
+            change. In Wireshark, filter
             <span class="mono">tcp.flags.syn == 1</span> to find it instantly.
           </p>
 
-          <!-- Handshake ladder: client on the left, server on the right,
-               three message rows with directional arrows between them. -->
           <div
             style="
-              margin-top: 30px;
+              margin-top: 22px;
               display: grid;
-              grid-template-columns: 240px 1fr 240px;
-              align-items: center;
-              row-gap: 26px;
+              grid-template-columns: 260px 1fr 260px;
+              align-items: start;
+              row-gap: 20px;
             "
           >
-            <!-- endpoint headers -->
-            <div
-              class="card reveal"
-              style="--i: 2; padding: 18px 22px; text-align: center"
-            >
+            <!-- endpoint: client -->
+            <div class="card" style="padding: 16px 20px; text-align: center">
               <div class="label" style="justify-content: center">Client</div>
-              <h3 style="font-size: 26px; margin-top: 4px">192.168.1.10</h3>
-              <div class="mono" style="font-size: 15px; color: var(--muted)">
+              <h3 style="font-size: 24px; margin-top: 4px">192.168.1.10</h3>
+              <div class="mono" style="font-size: 14px; color: var(--muted)">
                 port 49152
               </div>
+              <div class="hs-state" id="hsClientState">CLOSED</div>
             </div>
             <div></div>
+            <!-- endpoint: server -->
             <div
-              class="card amber reveal"
-              style="--i: 2; padding: 18px 22px; text-align: center"
+              class="card amber"
+              style="padding: 16px 20px; text-align: center"
             >
               <div class="label" style="justify-content: center">Server</div>
-              <h3 style="font-size: 26px; margin-top: 4px">93.184.216.34</h3>
-              <div class="mono" style="font-size: 15px; color: var(--muted)">
+              <h3 style="font-size: 24px; margin-top: 4px">93.184.216.34</h3>
+              <div class="mono" style="font-size: 14px; color: var(--muted)">
                 port 443
               </div>
+              <div class="hs-state" id="hsServerState">LISTEN</div>
             </div>
 
-            <!-- step 1: SYN client -> server -->
-            <div class="mono reveal" style="--i: 3; text-align: right; font-size: 16px; color: var(--muted)">
+            <!-- message 1: SYN, client -> server -->
+            <div
+              class="hs-side"
+              id="hs-seq1"
+              style="
+                text-align: right;
+                font-family: var(--font-mono);
+                font-size: 15px;
+                color: var(--muted);
+                padding-top: 12px;
+              "
+            >
               SEQ = x
             </div>
-            <div class="reveal" style="--i: 3; text-align: center">
+            <div class="hs-msg" id="hs-msg1" style="text-align: center">
               <div
-                class="mono"
+                class="mono hs-chip"
                 style="
-                  display: inline-block;
                   background: var(--cobalt-soft);
                   color: var(--cobalt-deep);
                   border: 1.5px solid var(--cobalt);
-                  border-radius: 6px;
-                  padding: 6px 16px;
-                  font-weight: 700;
-                  letter-spacing: 0.08em;
                 "
               >
                 ① SYN
               </div>
-              <div
-                style="
-                  height: 2px;
-                  background: var(--cobalt);
-                  margin: 10px 30px 0;
-                  position: relative;
-                "
-              >
-                <span
-                  style="
-                    position: absolute;
-                    right: -2px;
-                    top: -7px;
-                    color: var(--cobalt);
-                    font-size: 18px;
-                    line-height: 1;
-                  "
+              <div class="hs-line" style="background: var(--cobalt)">
+                <span class="hs-dot" style="background: var(--cobalt)"></span>
+                <span class="hs-tip" style="right: -2px; color: var(--cobalt)"
                   >▶</span
                 >
               </div>
-              <div style="font-size: 16px; color: var(--ink-soft); margin-top: 8px">
+              <div
+                class="hs-cap"
+                style="font-size: 15px; color: var(--ink-soft)"
+              >
                 "Open a connection. My byte stream starts at <em>x</em>."
               </div>
             </div>
             <div></div>
 
-            <!-- step 2: SYN/ACK server -> client -->
+            <!-- message 2: SYN/ACK, server -> client -->
             <div></div>
-            <div class="reveal" style="--i: 4; text-align: center">
+            <div class="hs-msg" id="hs-msg2" style="text-align: center">
               <div
-                class="mono"
+                class="mono hs-chip"
                 style="
-                  display: inline-block;
                   background: var(--amber-soft);
                   color: var(--amber);
                   border: 1.5px solid var(--amber);
-                  border-radius: 6px;
-                  padding: 6px 16px;
-                  font-weight: 700;
-                  letter-spacing: 0.08em;
                 "
               >
                 ② SYN / ACK
               </div>
-              <div
-                style="
-                  height: 2px;
-                  background: var(--amber);
-                  margin: 10px 30px 0;
-                  position: relative;
-                "
-              >
-                <span
-                  style="
-                    position: absolute;
-                    left: -2px;
-                    top: -7px;
-                    color: var(--amber);
-                    font-size: 18px;
-                    line-height: 1;
-                  "
+              <div class="hs-line" style="background: var(--amber)">
+                <span class="hs-dot" style="background: var(--amber)"></span>
+                <span class="hs-tip" style="left: -2px; color: var(--amber)"
                   >◀</span
                 >
               </div>
-              <div style="font-size: 16px; color: var(--ink-soft); margin-top: 8px">
+              <div
+                class="hs-cap"
+                style="font-size: 15px; color: var(--ink-soft)"
+              >
                 "Got it (ACK <em>x+1</em>). I'm in — my stream starts at
                 <em>y</em>."
               </div>
             </div>
-            <div class="mono reveal" style="--i: 4; font-size: 16px; color: var(--muted)">
+            <div
+              class="hs-side"
+              id="hs-seq2"
+              style="
+                font-family: var(--font-mono);
+                font-size: 15px;
+                color: var(--muted);
+                padding-top: 12px;
+              "
+            >
               SEQ = y · ACK = x+1
             </div>
 
-            <!-- step 3: ACK client -> server -->
-            <div class="mono reveal" style="--i: 5; text-align: right; font-size: 16px; color: var(--muted)">
+            <!-- message 3: ACK, client -> server -->
+            <div
+              class="hs-side"
+              id="hs-seq3"
+              style="
+                text-align: right;
+                font-family: var(--font-mono);
+                font-size: 15px;
+                color: var(--muted);
+                padding-top: 12px;
+              "
+            >
               ACK = y+1
             </div>
-            <div class="reveal" style="--i: 5; text-align: center">
+            <div class="hs-msg" id="hs-msg3" style="text-align: center">
               <div
-                class="mono"
+                class="mono hs-chip"
                 style="
-                  display: inline-block;
                   background: var(--moss-soft);
                   color: var(--moss);
                   border: 1.5px solid var(--moss);
-                  border-radius: 6px;
-                  padding: 6px 16px;
-                  font-weight: 700;
-                  letter-spacing: 0.08em;
                 "
               >
                 ③ ACK
               </div>
-              <div
-                style="
-                  height: 2px;
-                  background: var(--moss);
-                  margin: 10px 30px 0;
-                  position: relative;
-                "
-              >
-                <span
-                  style="
-                    position: absolute;
-                    right: -2px;
-                    top: -7px;
-                    color: var(--moss);
-                    font-size: 18px;
-                    line-height: 1;
-                  "
+              <div class="hs-line" style="background: var(--moss)">
+                <span class="hs-dot" style="background: var(--moss)"></span>
+                <span class="hs-tip" style="right: -2px; color: var(--moss)"
                   >▶</span
                 >
               </div>
-              <div style="font-size: 16px; color: var(--ink-soft); margin-top: 8px">
+              <div
+                class="hs-cap"
+                style="font-size: 15px; color: var(--ink-soft)"
+              >
                 "Acknowledged. Connection <strong>established</strong> — data
                 may flow."
               </div>
             </div>
             <div></div>
+          </div>
+
+          <div class="sim-controls">
+            <div class="sim-status">
+              <span>STATUS<span class="badge" id="hsBadge">IDLE</span></span>
+              <span class="narration" id="hsNarration"
+                >Click START to watch the TCP three-way handshake one packet at
+                a time — and see each side's connection state change.</span
+              >
+            </div>
+            <div class="btns">
+              <button class="sim-btn primary" id="hsStart">▶ Start</button>
+              <button class="sim-btn pause" id="hsPause" disabled>
+                ❚❚ Pause
+              </button>
+              <button class="sim-btn" id="hsStop" disabled>■ Stop</button>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             UDP — FIRE & FORGET SIMULATION
+             ========================================================= -->
+        <section class="slide" id="udpSimSlide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Interactive</span
+              ><span>UDP · connectionless delivery</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0"
+            >Live simulation · Press START</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 50px">
+            UDP just <em class="display">fires and forgets.</em>
+          </h2>
+          <p
+            class="reveal"
+            style="--i: 2; font-size: 19px; margin-top: 6px; max-width: 1500px"
+          >
+            No handshake, no acknowledgement, no retransmission. The client
+            sends datagrams and never looks back — if one is lost, it stays
+            lost.
+          </p>
+
+          <div
+            style="
+              margin-top: 22px;
+              display: grid;
+              grid-template-columns: 210px 1fr 210px;
+              align-items: center;
+              gap: 18px;
+            "
+          >
+            <div
+              class="card moss"
+              style="padding: 16px 18px; text-align: center"
+            >
+              <div class="label" style="justify-content: center">Client</div>
+              <h3 style="font-size: 22px; margin-top: 4px">10.0.0.5</h3>
+              <div class="mono" style="font-size: 13px; color: var(--muted)">
+                no connection state
+              </div>
+            </div>
+            <div class="udp-wire" id="udpWire">
+              <div class="udp-dgram" id="udp-d1" style="top: 8px">D1</div>
+              <div class="udp-dgram" id="udp-d2" style="top: 48px">D2</div>
+              <div class="udp-dgram" id="udp-d3" style="top: 88px">D3</div>
+            </div>
+            <div class="card" style="padding: 16px 18px; text-align: center">
+              <div class="label" style="justify-content: center">Server</div>
+              <h3 style="font-size: 22px; margin-top: 4px">8.8.8.8</h3>
+              <div class="mono" style="font-size: 13px; color: var(--muted)">
+                port 53 · DNS
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="
+              margin-top: 18px;
+              display: flex;
+              gap: 40px;
+              font-family: var(--font-mono);
+              font-size: 20px;
+            "
+          >
+            <div>
+              <span style="color: var(--muted)">Sent:</span>
+              <strong id="udpSent" style="color: var(--cobalt-deep)">0</strong>
+            </div>
+            <div>
+              <span style="color: var(--muted)">Delivered:</span>
+              <strong id="udpDeliv" style="color: var(--moss)">0</strong>
+            </div>
+            <div>
+              <span style="color: var(--muted)">Lost:</span>
+              <strong id="udpLostCount" style="color: var(--amber)">0</strong>
+            </div>
+          </div>
+
+          <div class="sim-controls">
+            <div class="sim-status">
+              <span>STATUS<span class="badge" id="udpBadge">IDLE</span></span>
+              <span class="narration" id="udpNarration"
+                >Click START to send three UDP datagrams. Watch what happens
+                when one goes missing — and notice nobody asks for it
+                again.</span
+              >
+            </div>
+            <div class="btns">
+              <button class="sim-btn primary" id="udpStart">▶ Start</button>
+              <button class="sim-btn pause" id="udpPause" disabled>
+                ❚❚ Pause
+              </button>
+              <button class="sim-btn" id="udpStop" disabled>■ Stop</button>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             PORTS IN DETAIL — DEMULTIPLEXING
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Reference</span
+              ><span>Ports in detail · demultiplexing</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)"
+            >One IP, many doors</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 48px">
+            A port is a <em class="display">16-bit door</em> on the host.
+          </h2>
+          <p
+            class="reveal"
+            style="--i: 2; font-size: 19px; margin-top: 8px; max-width: 1520px"
+          >
+            A host has one IP but 65,536 ports (<span class="mono"
+              >0 – 65,535</span
+            >). The <strong>destination port</strong> tells the OS which
+            listening program should receive each packet — this sorting is
+            called <strong>demultiplexing</strong>.
+          </p>
+
+          <!-- demux diagram -->
+          <div
+            class="reveal"
+            style="
+              --i: 3;
+              margin-top: 26px;
+              display: grid;
+              grid-template-columns: 300px 70px 1fr;
+              align-items: center;
+            "
+          >
+            <div style="display: flex; flex-direction: column; gap: 14px">
+              <div
+                class="port-pkt"
+                style="border-color: var(--cobalt); color: var(--cobalt-deep)"
+              >
+                packet → dst <strong>:443</strong>
+              </div>
+              <div
+                class="port-pkt"
+                style="border-color: var(--amber); color: var(--amber)"
+              >
+                packet → dst <strong>:22</strong>
+              </div>
+              <div
+                class="port-pkt"
+                style="border-color: var(--moss); color: var(--moss)"
+              >
+                packet → dst <strong>:53</strong>
+              </div>
+            </div>
+            <div
+              style="text-align: center; font-size: 30px; color: var(--muted)"
+            >
+              ▶
+            </div>
+            <div class="card" style="padding: 20px 26px">
+              <div class="label">Host 203.0.113.7 · OS routes by port</div>
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: 11px;
+                  margin-top: 12px;
+                "
+              >
+                <div
+                  class="port-app"
+                  style="border-color: var(--cobalt); color: var(--cobalt-deep)"
+                >
+                  :443 → Web server (HTTPS)
+                </div>
+                <div
+                  class="port-app"
+                  style="border-color: var(--amber); color: var(--amber)"
+                >
+                  :22 → SSH daemon
+                </div>
+                <div
+                  class="port-app"
+                  style="border-color: var(--moss); color: var(--moss)"
+                >
+                  :53 → DNS resolver
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top: 26px; gap: 48px">
+            <div class="card reveal" style="--i: 4">
+              <div class="label">Source vs destination port</div>
+              <p style="margin-top: 8px; font-size: 19px">
+                The client picks a throwaway
+                <strong>ephemeral source port</strong> (<span class="mono"
+                  >49152+</span
+                >) and aims at the server's fixed
+                <strong>well-known destination port</strong>. On the reply, the
+                two simply swap places.
+              </p>
+            </div>
+            <div class="card amber reveal" style="--i: 5">
+              <div class="label">Listening vs connecting</div>
+              <p style="margin-top: 8px; font-size: 19px">
+                A server <strong>listens</strong> on one fixed port; each client
+                <strong>connects</strong> from its own ephemeral port. The
+                4-tuple
+                <span class="mono">src ip:port → dst ip:port</span> keeps
+                thousands of connections to
+                <span class="mono">:443</span> distinct.
+              </p>
+            </div>
           </div>
           <div class="page-num"></div>
         </section>
@@ -6879,7 +7519,10 @@
             The IP finds the host.<br />The
             <em class="display">port finds the program.</em>
           </h2>
-          <div class="grid-2" style="margin-top: 30px; gap: 48px; align-items: start">
+          <div
+            class="grid-2"
+            style="margin-top: 30px; gap: 48px; align-items: start"
+          >
             <table class="data reveal" style="--i: 2">
               <thead>
                 <tr>
@@ -6889,14 +7532,46 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td class="mono">20 / 21</td><td class="mono">TCP</td><td>FTP — file transfer (data / control)</td></tr>
-                <tr><td class="mono">22</td><td class="mono">TCP</td><td>SSH — secure remote shell</td></tr>
-                <tr><td class="mono">25</td><td class="mono">TCP</td><td>SMTP — sending email</td></tr>
-                <tr><td class="mono">53</td><td class="mono">UDP / TCP</td><td>DNS — name resolution</td></tr>
-                <tr><td class="mono">67 / 68</td><td class="mono">UDP</td><td>DHCP — automatic addressing</td></tr>
-                <tr><td class="mono">80</td><td class="mono">TCP</td><td>HTTP — the web, in the clear</td></tr>
-                <tr><td class="mono">443</td><td class="mono">TCP / UDP</td><td>HTTPS · QUIC — the encrypted web</td></tr>
-                <tr><td class="mono">3389</td><td class="mono">TCP</td><td>RDP — Windows remote desktop</td></tr>
+                <tr>
+                  <td class="mono">20 / 21</td>
+                  <td class="mono">TCP</td>
+                  <td>FTP — file transfer (data / control)</td>
+                </tr>
+                <tr>
+                  <td class="mono">22</td>
+                  <td class="mono">TCP</td>
+                  <td>SSH — secure remote shell</td>
+                </tr>
+                <tr>
+                  <td class="mono">25</td>
+                  <td class="mono">TCP</td>
+                  <td>SMTP — sending email</td>
+                </tr>
+                <tr>
+                  <td class="mono">53</td>
+                  <td class="mono">UDP / TCP</td>
+                  <td>DNS — name resolution</td>
+                </tr>
+                <tr>
+                  <td class="mono">67 / 68</td>
+                  <td class="mono">UDP</td>
+                  <td>DHCP — automatic addressing</td>
+                </tr>
+                <tr>
+                  <td class="mono">80</td>
+                  <td class="mono">TCP</td>
+                  <td>HTTP — the web, in the clear</td>
+                </tr>
+                <tr>
+                  <td class="mono">443</td>
+                  <td class="mono">TCP / UDP</td>
+                  <td>HTTPS · QUIC — the encrypted web</td>
+                </tr>
+                <tr>
+                  <td class="mono">3389</td>
+                  <td class="mono">TCP</td>
+                  <td>RDP — Windows remote desktop</td>
+                </tr>
               </tbody>
             </table>
             <div>
@@ -6914,8 +7589,8 @@
                 <div class="label">A socket = the full address</div>
                 <p style="margin-top: 8px; font-size: 20px">
                   A connection is identified by the 4-tuple
-                  <span class="mono">src IP : src port → dst IP : dst port</span>.
-                  That's how one server on port 443 can hold thousands of
+                  <span class="mono">src IP : src port → dst IP : dst port</span
+                  >. That's how one server on port 443 can hold thousands of
                   simultaneous conversations.
                 </p>
               </div>
@@ -6973,10 +7648,38 @@
 
           <div class="reveal" style="--i: 3; margin-top: 30px">
             <div class="ip-bits">
-              <div class="bit net">1</div><div class="bit net">1</div><div class="bit net">0</div><div class="bit net">0</div><div class="bit net">0</div><div class="bit net">0</div><div class="bit net">0</div><div class="bit net">0</div>
-              <div class="bit net">1</div><div class="bit net">0</div><div class="bit net">1</div><div class="bit net">0</div><div class="bit net">1</div><div class="bit net">0</div><div class="bit net">0</div><div class="bit net">0</div>
-              <div class="bit net">0</div><div class="bit net">0</div><div class="bit net">0</div><div class="bit net">0</div><div class="bit net">0</div><div class="bit net">0</div><div class="bit net">0</div><div class="bit net">1</div>
-              <div class="bit host">0</div><div class="bit host">0</div><div class="bit host">0</div><div class="bit host">0</div><div class="bit host">1</div><div class="bit host">0</div><div class="bit host">1</div><div class="bit host">0</div>
+              <div class="bit net">1</div>
+              <div class="bit net">1</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">1</div>
+              <div class="bit net">0</div>
+              <div class="bit net">1</div>
+              <div class="bit net">0</div>
+              <div class="bit net">1</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">0</div>
+              <div class="bit net">1</div>
+              <div class="bit host">0</div>
+              <div class="bit host">0</div>
+              <div class="bit host">0</div>
+              <div class="bit host">0</div>
+              <div class="bit host">1</div>
+              <div class="bit host">0</div>
+              <div class="bit host">1</div>
+              <div class="bit host">0</div>
             </div>
             <div class="ip-octet-labels">
               <span>192</span><span>168</span><span>1</span><span>10</span>
@@ -6985,7 +7688,9 @@
 
           <div class="grid-2" style="margin-top: 34px; gap: 48px">
             <div class="reveal" style="--i: 4">
-              <h3 style="color: var(--cobalt-deep)">Network portion · 24 bits</h3>
+              <h3 style="color: var(--cobalt-deep)">
+                Network portion · 24 bits
+              </h3>
               <p style="margin-top: 10px">
                 Shared by every device on the LAN —
                 <span class="mono">192.168.1.0</span>. Routers forward by this
@@ -6996,10 +7701,209 @@
               <h3 style="color: var(--amber)">Host portion · 8 bits</h3>
               <p style="margin-top: 10px">
                 Unique to each device — <span class="mono">.10</span>. With 8
-                host bits there are <span class="mono">2⁸ − 2 = 254</span> usable
-                hosts (minus network &amp; broadcast). It answers "<em>which
-                device?</em>"
+                host bits there are
+                <span class="mono">2⁸ − 2 = 254</span> usable hosts (minus
+                network &amp; broadcast). It answers "<em>which device?</em>"
               </p>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             SIM SLIDE — IP ADDRESS CALCULATION
+             Interactive: shows how 192.168.1.10/24 converts to binary
+             and how network/host parts are identified.
+             ========================================================= -->
+        <section class="slide" id="ipCalcSlide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Interactive</span
+              ><span>IP address calculation · step by step</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >Live simulation · Press START</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            From dotted decimal to
+            <em class="display">bits and back.</em>
+          </h2>
+
+          <!-- ── Four octet boxes ── -->
+          <div
+            id="ipOctets"
+            style="
+              display: flex;
+              gap: 24px;
+              margin-top: 28px;
+              align-items: stretch;
+            "
+          >
+            <div class="ipc-octet" id="ipc-o0">
+              <div class="ipc-dec">192</div>
+              <div class="ipc-bin">????????</div>
+              <div class="ipc-lbl">Octet 1</div>
+            </div>
+            <div
+              style="
+                font-size: 52px;
+                color: var(--ink);
+                align-self: center;
+                padding-bottom: 18px;
+              "
+            >
+              .
+            </div>
+            <div class="ipc-octet" id="ipc-o1">
+              <div class="ipc-dec">168</div>
+              <div class="ipc-bin">????????</div>
+              <div class="ipc-lbl">Octet 2</div>
+            </div>
+            <div
+              style="
+                font-size: 52px;
+                color: var(--ink);
+                align-self: center;
+                padding-bottom: 18px;
+              "
+            >
+              .
+            </div>
+            <div class="ipc-octet" id="ipc-o2">
+              <div class="ipc-dec">1</div>
+              <div class="ipc-bin">????????</div>
+              <div class="ipc-lbl">Octet 3</div>
+            </div>
+            <div
+              style="
+                font-size: 52px;
+                color: var(--ink);
+                align-self: center;
+                padding-bottom: 18px;
+              "
+            >
+              .
+            </div>
+            <div class="ipc-octet" id="ipc-o3">
+              <div class="ipc-dec">10</div>
+              <div class="ipc-bin">????????</div>
+              <div class="ipc-lbl">Octet 4</div>
+            </div>
+            <div
+              style="
+                font-size: 40px;
+                color: var(--muted);
+                align-self: center;
+                padding-bottom: 18px;
+                margin-left: 8px;
+                font-family: var(--font-mono);
+              "
+            >
+              /24
+            </div>
+          </div>
+
+          <!-- ── 32-bit combined strip ── -->
+          <div id="ipc-strip" style="margin-top: 20px">
+            <div
+              id="ipc-bits"
+              style="
+                display: grid;
+                grid-template-columns: repeat(32, 1fr);
+                gap: 3px;
+              "
+            ></div>
+            <div
+              id="ipc-part-labels"
+              style="
+                display: grid;
+                grid-template-columns: repeat(32, 1fr);
+                gap: 3px;
+                margin-top: 4px;
+                opacity: 0;
+                transition: opacity 0.4s;
+              "
+            >
+              <div
+                style="
+                  grid-column: span 24;
+                  text-align: center;
+                  font-family: var(--font-mono);
+                  font-size: 16px;
+                  font-weight: 700;
+                  color: var(--cobalt-deep);
+                  padding: 6px 0;
+                  background: var(--cobalt-soft);
+                  border-radius: 4px;
+                "
+              >
+                NETWORK PART · 24 bits
+              </div>
+              <div
+                style="
+                  grid-column: span 8;
+                  text-align: center;
+                  font-family: var(--font-mono);
+                  font-size: 16px;
+                  font-weight: 700;
+                  color: var(--amber);
+                  padding: 6px 0;
+                  background: var(--amber-soft);
+                  border-radius: 4px;
+                "
+              >
+                HOST · 8 bits
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Result row ── -->
+          <div
+            id="ipc-result"
+            style="
+              margin-top: 16px;
+              display: flex;
+              gap: 32px;
+              opacity: 0;
+              transition: opacity 0.5s;
+            "
+          >
+            <div style="font-family: var(--font-mono); font-size: 22px">
+              <span style="color: var(--muted)">Network:</span>
+              <strong style="color: var(--cobalt-deep)">192.168.1.0</strong>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 22px">
+              <span style="color: var(--muted)">Host:</span>
+              <strong style="color: var(--amber)">.10</strong>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 22px">
+              <span style="color: var(--muted)">Broadcast:</span>
+              <strong style="color: var(--plum)">192.168.1.255</strong>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 22px">
+              <span style="color: var(--muted)">Usable:</span>
+              <strong style="color: var(--moss)">.1 – .254</strong>
+            </div>
+          </div>
+
+          <div class="sim-controls">
+            <div class="sim-status">
+              <span id="ipCalcBadge"
+                >STATUS<span class="badge" id="ipcBadge">IDLE</span></span
+              >
+              <span class="narration" id="ipcNarration"
+                >Click START — watch how 192.168.1.10/24 is broken into bits and
+                how the network part is separated from the host part.</span
+              >
+            </div>
+            <div class="btns">
+              <button class="sim-btn primary" id="ipcStart">▶ Start</button>
+              <button class="sim-btn pause" id="ipcPause" disabled>
+                ❚❚ Pause
+              </button>
+              <button class="sim-btn" id="ipcStop" disabled>■ Stop</button>
             </div>
           </div>
           <div class="page-num"></div>
@@ -7016,12 +7920,17 @@
             </div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow reveal" style="--i: 0">Drawing the boundary</span>
+          <span class="eyebrow reveal" style="--i: 0"
+            >Drawing the boundary</span
+          >
           <h2 class="reveal" style="--i: 1; font-size: 52px">
             CIDR just counts the
             <em class="display">network bits.</em>
           </h2>
-          <div class="grid-2" style="margin-top: 32px; gap: 48px; align-items: start">
+          <div
+            class="grid-2"
+            style="margin-top: 32px; gap: 48px; align-items: start"
+          >
             <div>
               <div class="card reveal" style="--i: 2">
                 <div class="label">The mask is a run of 1s</div>
@@ -7051,11 +7960,31 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td class="mono">/8</td><td class="mono">255.0.0.0</td><td>N.H.H.H</td></tr>
-                <tr><td class="mono">/16</td><td class="mono">255.255.0.0</td><td>N.N.H.H</td></tr>
-                <tr><td class="mono">/24</td><td class="mono">255.255.255.0</td><td>N.N.N.H</td></tr>
-                <tr><td class="mono">/26</td><td class="mono">255.255.255.192</td><td>N.N.N.<strong>nn</strong>H</td></tr>
-                <tr><td class="mono">/30</td><td class="mono">255.255.255.252</td><td>point-to-point link</td></tr>
+                <tr>
+                  <td class="mono">/8</td>
+                  <td class="mono">255.0.0.0</td>
+                  <td>N.H.H.H</td>
+                </tr>
+                <tr>
+                  <td class="mono">/16</td>
+                  <td class="mono">255.255.0.0</td>
+                  <td>N.N.H.H</td>
+                </tr>
+                <tr>
+                  <td class="mono">/24</td>
+                  <td class="mono">255.255.255.0</td>
+                  <td>N.N.N.H</td>
+                </tr>
+                <tr>
+                  <td class="mono">/26</td>
+                  <td class="mono">255.255.255.192</td>
+                  <td>N.N.N.<strong>nn</strong>H</td>
+                </tr>
+                <tr>
+                  <td class="mono">/30</td>
+                  <td class="mono">255.255.255.252</td>
+                  <td>point-to-point link</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -7126,7 +8055,15 @@
               </tr>
             </tbody>
           </table>
-          <p class="reveal" style="--i: 4; margin-top: 28px; font-size: 19px; color: var(--muted)">
+          <p
+            class="reveal"
+            style="
+              --i: 4;
+              margin-top: 28px;
+              font-size: 19px;
+              color: var(--muted);
+            "
+          >
             See one of these as a source IP in a capture from the public
             internet? It's spoofed or misconfigured — these never leave the LAN
             unaltered.
@@ -7145,12 +8082,17 @@
             </div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow reveal" style="--i: 0">Memorise the shape, not the rows</span>
+          <span class="eyebrow reveal" style="--i: 0"
+            >Memorise the shape, not the rows</span
+          >
           <h2 class="reveal" style="--i: 1; font-size: 50px">
             Each bit borrowed
             <em class="display">halves the hosts.</em>
           </h2>
-          <table class="data reveal" style="--i: 2; margin-top: 24px; font-size: 20px">
+          <table
+            class="data reveal"
+            style="--i: 2; margin-top: 24px; font-size: 20px"
+          >
             <thead>
               <tr>
                 <th>CIDR</th>
@@ -7161,15 +8103,69 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td class="mono">/30</td><td class="mono">255.255.255.252</td><td class="mono">4</td><td class="mono">2</td><td>Point-to-point links</td></tr>
-              <tr><td class="mono">/28</td><td class="mono">255.255.255.240</td><td class="mono">16</td><td class="mono">14</td><td>Small management LANs</td></tr>
-              <tr><td class="mono">/27</td><td class="mono">255.255.255.224</td><td class="mono">32</td><td class="mono">30</td><td>Small departments</td></tr>
-              <tr><td class="mono">/26</td><td class="mono">255.255.255.192</td><td class="mono">64</td><td class="mono">62</td><td>Medium departments</td></tr>
-              <tr><td class="mono">/25</td><td class="mono">255.255.255.128</td><td class="mono">128</td><td class="mono">126</td><td>Large departments</td></tr>
-              <tr><td class="mono">/24</td><td class="mono">255.255.255.0</td><td class="mono">256</td><td class="mono">254</td><td>Standard LAN segment</td></tr>
-              <tr><td class="mono">/23</td><td class="mono">255.255.254.0</td><td class="mono">512</td><td class="mono">510</td><td>Large LAN</td></tr>
-              <tr><td class="mono">/22</td><td class="mono">255.255.252.0</td><td class="mono">1,024</td><td class="mono">1,022</td><td>Campus building</td></tr>
-              <tr><td class="mono">/16</td><td class="mono">255.255.0.0</td><td class="mono">65,536</td><td class="mono">65,534</td><td>Large site</td></tr>
+              <tr>
+                <td class="mono">/30</td>
+                <td class="mono">255.255.255.252</td>
+                <td class="mono">4</td>
+                <td class="mono">2</td>
+                <td>Point-to-point links</td>
+              </tr>
+              <tr>
+                <td class="mono">/28</td>
+                <td class="mono">255.255.255.240</td>
+                <td class="mono">16</td>
+                <td class="mono">14</td>
+                <td>Small management LANs</td>
+              </tr>
+              <tr>
+                <td class="mono">/27</td>
+                <td class="mono">255.255.255.224</td>
+                <td class="mono">32</td>
+                <td class="mono">30</td>
+                <td>Small departments</td>
+              </tr>
+              <tr>
+                <td class="mono">/26</td>
+                <td class="mono">255.255.255.192</td>
+                <td class="mono">64</td>
+                <td class="mono">62</td>
+                <td>Medium departments</td>
+              </tr>
+              <tr>
+                <td class="mono">/25</td>
+                <td class="mono">255.255.255.128</td>
+                <td class="mono">128</td>
+                <td class="mono">126</td>
+                <td>Large departments</td>
+              </tr>
+              <tr>
+                <td class="mono">/24</td>
+                <td class="mono">255.255.255.0</td>
+                <td class="mono">256</td>
+                <td class="mono">254</td>
+                <td>Standard LAN segment</td>
+              </tr>
+              <tr>
+                <td class="mono">/23</td>
+                <td class="mono">255.255.254.0</td>
+                <td class="mono">512</td>
+                <td class="mono">510</td>
+                <td>Large LAN</td>
+              </tr>
+              <tr>
+                <td class="mono">/22</td>
+                <td class="mono">255.255.252.0</td>
+                <td class="mono">1,024</td>
+                <td class="mono">1,022</td>
+                <td>Campus building</td>
+              </tr>
+              <tr>
+                <td class="mono">/16</td>
+                <td class="mono">255.255.0.0</td>
+                <td class="mono">65,536</td>
+                <td class="mono">65,534</td>
+                <td>Large site</td>
+              </tr>
             </tbody>
           </table>
           <div class="page-num"></div>
@@ -7186,17 +8182,22 @@
             </div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow moss reveal" style="--i: 0">A repeatable recipe</span>
+          <span class="eyebrow moss reveal" style="--i: 0"
+            >A repeatable recipe</span
+          >
           <h2 class="reveal" style="--i: 1; font-size: 56px">
             Subnetting in
             <em class="display">four moves.</em>
           </h2>
-          <div class="grid-2" style="gap: 56px; margin-top: 36px; align-items: start">
+          <div
+            class="grid-2"
+            style="gap: 56px; margin-top: 36px; align-items: start"
+          >
             <div class="steps reveal" style="--i: 2">
               <div class="step">
                 <div class="body">
-                  <strong>Count the need.</strong> How many subnets, and how many
-                  hosts in the largest one? Size for the biggest.
+                  <strong>Count the need.</strong> How many subnets, and how
+                  many hosts in the largest one? Size for the biggest.
                 </div>
               </div>
               <div class="step">
@@ -7208,8 +8209,8 @@
               </div>
               <div class="step">
                 <div class="body">
-                  <strong>Walk the blocks.</strong> Subnets begin at multiples of
-                  the block size <span class="mono">256 / 2ⁿ</span> in the
+                  <strong>Walk the blocks.</strong> Subnets begin at multiples
+                  of the block size <span class="mono">256 / 2ⁿ</span> in the
                   affected octet — e.g. <span class="mono">/26</span> →
                   <span class="mono">.0, .64, .128, .192</span>.
                 </div>
@@ -7226,7 +8227,8 @@
               <div class="card amber reveal" style="--i: 3">
                 <div class="label">Quick formula · /(24 + n)</div>
                 <p style="margin-top: 10px; font-size: 21px">
-                  Subnet size = <span class="mono">256 / 2ⁿ</span> addresses<br />
+                  Subnet size =
+                  <span class="mono">256 / 2ⁿ</span> addresses<br />
                   Usable hosts = <span class="mono">size − 2</span><br />
                   Subnets start at multiples of the size
                 </p>
@@ -7245,6 +8247,285 @@
         </section>
 
         <!-- =========================================================
+             SIM SLIDE — SUBNETTING CALCULATOR
+             Interactive: 192.168.32.89/27 → network, broadcast, range
+             Walks through bit manipulation step by step.
+             ========================================================= -->
+        <section class="slide" id="subnetCalcSlide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Interactive</span
+              ><span>Subnetting calculation · step by step</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0"
+            >Live simulation · Press START</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            From one address, find
+            <em class="display">the whole subnet.</em>
+          </h2>
+
+          <!-- ── Target address display ── -->
+          <div
+            style="
+              margin-top: 24px;
+              display: flex;
+              gap: 20px;
+              align-items: baseline;
+            "
+          >
+            <span
+              style="
+                font-family: var(--font-mono);
+                font-size: 44px;
+                font-weight: 700;
+                color: var(--ink);
+              "
+              >192.168.32.<span id="sc-host-dec" style="color: var(--amber)"
+                >89</span
+              ></span
+            >
+            <span
+              style="
+                font-family: var(--font-mono);
+                font-size: 36px;
+                color: var(--cobalt-deep);
+                font-weight: 700;
+              "
+              >/27</span
+            >
+            <span
+              style="
+                font-family: var(--font-mono);
+                font-size: 22px;
+                color: var(--muted);
+                margin-left: 8px;
+              "
+              >→ 3 network bits + 5 host bits in last octet</span
+            >
+          </div>
+
+          <!-- ── Bit strip for 4th octet ── -->
+          <div style="margin-top: 20px">
+            <div
+              style="
+                font-family: var(--font-mono);
+                font-size: 16px;
+                color: var(--muted);
+                margin-bottom: 8px;
+              "
+            >
+              4th octet · /27 splits into
+              <span style="color: var(--cobalt-deep)">3 net bits</span> +
+              <span style="color: var(--amber)">5 host bits</span>
+            </div>
+            <div
+              id="sc-bits"
+              style="
+                display: grid;
+                grid-template-columns: repeat(8, 72px);
+                gap: 5px;
+              "
+            ></div>
+            <div
+              id="sc-bit-label"
+              style="
+                margin-top: 6px;
+                font-family: var(--font-mono);
+                font-size: 17px;
+                color: var(--muted);
+                opacity: 0;
+                transition: opacity 0.4s;
+              "
+            >
+              decimal:
+              <strong id="sc-bit-val" style="color: var(--ink)">89</strong>
+            </div>
+          </div>
+
+          <!-- ── Three result rows ── -->
+          <div
+            id="sc-results"
+            style="
+              margin-top: 22px;
+              display: grid;
+              grid-template-columns: 1fr 1fr 1fr;
+              gap: 16px;
+            "
+          >
+            <div
+              class="card"
+              id="sc-net-card"
+              style="padding: 18px 22px; opacity: 0; transition: opacity 0.5s"
+            >
+              <div class="label">Network address</div>
+              <div
+                style="
+                  font-family: var(--font-mono);
+                  font-size: 26px;
+                  font-weight: 700;
+                  color: var(--cobalt-deep);
+                  margin-top: 6px;
+                "
+                id="sc-net-val"
+              >
+                192.168.32.?
+              </div>
+              <div
+                style="
+                  font-family: var(--font-mono);
+                  font-size: 16px;
+                  color: var(--muted);
+                  margin-top: 4px;
+                "
+              >
+                host bits all → 0
+              </div>
+            </div>
+            <div
+              class="card amber"
+              id="sc-bc-card"
+              style="padding: 18px 22px; opacity: 0; transition: opacity 0.5s"
+            >
+              <div class="label">Broadcast address</div>
+              <div
+                style="
+                  font-family: var(--font-mono);
+                  font-size: 26px;
+                  font-weight: 700;
+                  color: var(--amber);
+                  margin-top: 6px;
+                "
+                id="sc-bc-val"
+              >
+                192.168.32.?
+              </div>
+              <div
+                style="
+                  font-family: var(--font-mono);
+                  font-size: 16px;
+                  color: var(--muted);
+                  margin-top: 4px;
+                "
+              >
+                host bits all → 1
+              </div>
+            </div>
+            <div
+              class="card moss"
+              id="sc-range-card"
+              style="padding: 18px 22px; opacity: 0; transition: opacity 0.5s"
+            >
+              <div class="label">Usable range</div>
+              <div
+                style="
+                  font-family: var(--font-mono);
+                  font-size: 26px;
+                  font-weight: 700;
+                  color: var(--moss);
+                  margin-top: 6px;
+                "
+                id="sc-range-val"
+              >
+                192.168.32.?–?
+              </div>
+              <div
+                style="
+                  font-family: var(--font-mono);
+                  font-size: 16px;
+                  color: var(--muted);
+                  margin-top: 4px;
+                "
+                id="sc-count-val"
+              >
+                ? usable hosts
+              </div>
+            </div>
+          </div>
+
+          <div class="sim-controls">
+            <div class="sim-status">
+              <span id="subnetCalcBadge"
+                >STATUS<span class="badge" id="scBadge">IDLE</span></span
+              >
+              <span class="narration" id="scNarration"
+                >Click START — see how 192.168.32.89/27 reveals its network
+                address, broadcast address, and the usable host range step by
+                step.</span
+              >
+            </div>
+            <div class="btns">
+              <button class="sim-btn primary" id="scStart">▶ Start</button>
+              <button class="sim-btn pause" id="scPause" disabled>
+                ❚❚ Pause
+              </button>
+              <button class="sim-btn" id="scStop" disabled>■ Stop</button>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             IP DESIGN BEST PRACTICES
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">IP Design</span
+              ><span>Best practices · planning &amp; documentation</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0"
+            >Design once, grow without renumbering</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 50px">
+            A good address plan is
+            <em class="display">boring on purpose.</em>
+          </h2>
+          <div class="grid-3" style="margin-top: 38px; gap: 32px">
+            <div class="card reveal" style="--i: 2">
+              <div class="label">01 / Plan by function</div>
+              <h3>One subnet per role</h3>
+              <p style="margin-top: 8px">
+                Give each department or device class its own subnet — Sales,
+                Engineering, servers, printers, management. Keep blocks
+                contiguous so routes and firewall rules stay simple.
+              </p>
+            </div>
+            <div class="card amber reveal" style="--i: 3">
+              <div class="label">02 / Size for growth</div>
+              <h3>Round up, leave gaps</h3>
+              <p style="margin-top: 8px">
+                Pick a prefix above today's host count and reserve the next
+                block. Renumbering a live network is painful — a /24 that only
+                holds 50 hosts is cheap insurance.
+              </p>
+            </div>
+            <div class="card plum reveal" style="--i: 4">
+              <div class="label">03 / Document it</div>
+              <h3>Write the plan down</h3>
+              <p style="margin-top: 8px">
+                Maintain an IPAM sheet: every subnet, its mask, VLAN, gateway,
+                DHCP range, and purpose. Undocumented IP space is how conflicts
+                and outages happen.
+              </p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 5; margin-top: 30px">
+            <p style="font-size: 20px; color: var(--muted)">
+              <strong style="color: var(--ink)">Common conventions:</strong>
+              gateway on <span class="mono">.1</span> · servers on low static
+              addresses · DHCP pool in the upper range · same third octet ≈ same
+              VLAN. Consistency beats cleverness.
+            </p>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
              LAB A — WIRESHARK: TCP 3-WAY HANDSHAKE
              ========================================================= -->
         <section class="slide">
@@ -7255,7 +8536,9 @@
             </div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow reveal" style="--i: 0">Hands-on · 20 minutes</span>
+          <span class="eyebrow reveal" style="--i: 0"
+            >Hands-on · 20 minutes</span
+          >
           <h2 class="reveal" style="--i: 1; font-size: 58px">
             Lab A — <em class="display">catch the handshake.</em>
           </h2>
@@ -7270,15 +8553,17 @@
               <div class="step">
                 <div class="body">
                   <strong>Filter</strong>
-                  <span class="mono">tcp.flags.syn == 1</span> — every connection
-                  setup jumps to the top.
+                  <span class="mono">tcp.flags.syn == 1</span> — every
+                  connection setup jumps to the top.
                 </div>
               </div>
               <div class="step">
                 <div class="body">
-                  <strong>Find the trio:</strong> <span class="mono">[SYN]</span>
-                  → <span class="mono">[SYN, ACK]</span> →
-                  <span class="mono">[ACK]</span> between the same two endpoints.
+                  <strong>Find the trio:</strong>
+                  <span class="mono">[SYN]</span> →
+                  <span class="mono">[SYN, ACK]</span> →
+                  <span class="mono">[ACK]</span> between the same two
+                  endpoints.
                 </div>
               </div>
               <div class="step">
@@ -7289,9 +8574,9 @@
               </div>
               <div class="step">
                 <div class="body">
-                  <strong>Compare</strong> a TCP exchange (HTTP) with a UDP one —
-                  filter <span class="mono">udp.port == 53</span> and notice: no
-                  handshake, just query and reply.
+                  <strong>Compare</strong> a TCP exchange (HTTP) with a UDP one
+                  — filter <span class="mono">udp.port == 53</span> and notice:
+                  no handshake, just query and reply.
                 </div>
               </div>
             </div>
@@ -7330,7 +8615,9 @@
             </div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow amber reveal" style="--i: 0">Hands-on · 20 minutes</span>
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >Hands-on · 20 minutes</span
+          >
           <h2 class="reveal" style="--i: 1; font-size: 58px">
             Lab B — <em class="display">step the packet by hand.</em>
           </h2>
@@ -7338,32 +8625,34 @@
             <div class="steps reveal" style="--i: 2">
               <div class="step">
                 <div class="body">
-                  <strong>Build</strong> 2 PCs → switch → router → server. Put the
-                  PCs and server on <em>different</em> subnets, router as gateway.
+                  <strong>Build</strong> 2 PCs → switch → router → server. Put
+                  the PCs and server on <em>different</em> subnets, router as
+                  gateway.
                 </div>
               </div>
               <div class="step">
                 <div class="body">
-                  <strong>Switch to Simulation Mode</strong> and ping from a PC to
-                  the server.
+                  <strong>Switch to Simulation Mode</strong> and ping from a PC
+                  to the server.
                 </div>
               </div>
               <div class="step">
                 <div class="body">
-                  <strong>Watch ARP first:</strong> the PC resolves the gateway's
-                  MAC before any IP packet can leave the LAN.
+                  <strong>Watch ARP first:</strong> the PC resolves the
+                  gateway's MAC before any IP packet can leave the LAN.
                 </div>
               </div>
               <div class="step">
                 <div class="body">
-                  <strong>Open each PDU</strong> — see ICMP encapsulated inside IP
-                  inside Ethernet, and the <em>In/Out Layers</em> at every hop.
+                  <strong>Open each PDU</strong> — see ICMP encapsulated inside
+                  IP inside Ethernet, and the <em>In/Out Layers</em> at every
+                  hop.
                 </div>
               </div>
               <div class="step">
                 <div class="body">
-                  <strong>Confirm</strong> the TTL drops by 1 each time the packet
-                  crosses the router.
+                  <strong>Confirm</strong> the TTL drops by 1 each time the
+                  packet crosses the router.
                 </div>
               </div>
             </div>
@@ -7373,8 +8662,8 @@
                 <h3>Headers in motion</h3>
                 <p style="margin-top: 10px">
                   Every field from the anatomy slides — MACs, IP addresses, the
-                  Protocol byte, TTL — is right there in the PDU window, changing
-                  hop by hop.
+                  Protocol byte, TTL — is right there in the PDU window,
+                  changing hop by hop.
                 </p>
               </div>
               <div class="card reveal" style="--i: 4; margin-top: 20px">
@@ -7397,7 +8686,10 @@
           <div class="masthead">
             <div class="left">
               <span class="tag">Lab C</span
-              ><span>Packet Tracer · IP design &amp; multi-subnet build · 40 min</span>
+              ><span
+                >Packet Tracer · IP design &amp; multi-subnet build · 40
+                min</span
+              >
             </div>
             <div class="right"></div>
           </div>
@@ -7416,7 +8708,10 @@
             hosts), Marketing (25), and Management (10). Size each subnet to the
             need, then build and verify in Packet Tracer.
           </p>
-          <div class="grid-2" style="gap: 52px; margin-top: 24px; align-items: start">
+          <div
+            class="grid-2"
+            style="gap: 52px; margin-top: 24px; align-items: start"
+          >
             <table class="data reveal" style="--i: 3">
               <thead>
                 <tr>
@@ -7450,8 +8745,8 @@
             <div class="steps reveal" style="--i: 4">
               <div class="step">
                 <div class="body">
-                  <strong>Build</strong> 6 PCs, 3 switches, 1 router — one switch
-                  per department.
+                  <strong>Build</strong> 6 PCs, 3 switches, 1 router — one
+                  switch per department.
                 </div>
               </div>
               <div class="step">
@@ -7488,7 +8783,9 @@
             </div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow reveal" style="--i: 0">Practise &amp; take it home</span>
+          <span class="eyebrow reveal" style="--i: 0"
+            >Practise &amp; take it home</span
+          >
           <h2 class="reveal" style="--i: 1; font-size: 56px">
             Earn the skill <em class="display">in your own captures.</em>
           </h2>
@@ -7507,8 +8804,8 @@
               <h3>Kurose &amp; Ross — TCP lab</h3>
               <p style="margin-top: 8px">
                 Work the textbook's TCP Wireshark lab: locate a handshake,
-                annotate the sequence numbers, and note one retransmission if you
-                find one.
+                annotate the sequence numbers, and note one retransmission if
+                you find one.
               </p>
             </div>
             <div class="card moss reveal" style="--i: 4">
@@ -8205,7 +9502,7 @@
         const rdMac = document.getElementById("rdMac");
 
         const HOPS = [
-          { left: "4%",  mac: "AA:11 → BB:22", label: "HOP 1 · PC → R1" },
+          { left: "4%", mac: "AA:11 → BB:22", label: "HOP 1 · PC → R1" },
           { left: "30%", mac: "CC:33 → DD:44", label: "HOP 2 · R1 → R2" },
           { left: "55%", mac: "EE:55 → FF:66", label: "HOP 3 · R2 → SRV" },
           { left: "73%", mac: "✓ delivered", label: "AT SERVER · NIC accepts" },
@@ -8609,7 +9906,7 @@
         // Coordinates (in % of topo) for the frame's resting positions.
         // Topo-relative: PCs at top, switch at bottom-centre.
         const POS = {
-          A: { left: "4%",  top: "12%" },
+          A: { left: "4%", top: "12%" },
           B: { left: "30%", top: "12%" },
           C: { left: "56%", top: "12%" },
           D: { left: "76%", top: "12%" },
@@ -8621,17 +9918,20 @@
         const STEPS = [
           {
             tag: "L3 → L2 LOOKUP",
-            story: "PC A needs to send to 192.168.1.20. It checks its ARP cache — empty.",
+            story:
+              "PC A needs to send to 192.168.1.20. It checks its ARP cache — empty.",
             apply() {
               hostA.classList.add("sender");
               frame.classList.remove("visible", "reply", "data");
-              frameBody.innerHTML = "src AA → dst <strong>FF</strong><br>Who has 192.168.1.20?";
+              frameBody.innerHTML =
+                "src AA → dst <strong>FF</strong><br>Who has 192.168.1.20?";
               positionAt("A");
             },
           },
           {
             tag: "BROADCAST · OUT",
-            story: "PC A broadcasts the ARP request — destination MAC is FF:FF:FF:FF:FF:FF.",
+            story:
+              "PC A broadcasts the ARP request — destination MAC is FF:FF:FF:FF:FF:FF.",
             apply() {
               frame.classList.add("visible");
               document.getElementById("aLine").classList.add("active");
@@ -8640,14 +9940,18 @@
           },
           {
             tag: "SWITCH · FLOOD",
-            story: "The switch sees a broadcast destination and floods the frame out every other port.",
+            story:
+              "The switch sees a broadcast destination and floods the frame out every other port.",
             apply() {
-              ["bLine", "cLine", "dLine"].forEach((id) => document.getElementById(id).classList.add("active"));
+              ["bLine", "cLine", "dLine"].forEach((id) =>
+                document.getElementById(id).classList.add("active"),
+              );
             },
           },
           {
             tag: "DROP · WRONG IP",
-            story: "PC C and PC D inspect the request, see it's not their IP, and silently drop it.",
+            story:
+              "PC C and PC D inspect the request, see it's not their IP, and silently drop it.",
             apply() {
               hostC.classList.add("ignore");
               hostD.classList.add("ignore");
@@ -8656,13 +9960,17 @@
           },
           {
             tag: "MATCH · PC B",
-            story: "PC B sees its own IP (192.168.1.20) and builds an ARP reply — unicast back to PC A.",
+            story:
+              "PC B sees its own IP (192.168.1.20) and builds an ARP reply — unicast back to PC A.",
             apply() {
               hostB.classList.add("match");
               frame.classList.remove("active");
               frame.classList.add("reply");
-              frameBody.innerHTML = "src <strong>BB</strong> → dst AA<br>192.168.1.20 is at BB:BB:BB:BB:BB:BB";
-              ["aLine", "cLine", "dLine"].forEach((id) => document.getElementById(id).classList.remove("active"));
+              frameBody.innerHTML =
+                "src <strong>BB</strong> → dst AA<br>192.168.1.20 is at BB:BB:BB:BB:BB:BB";
+              ["aLine", "cLine", "dLine"].forEach((id) =>
+                document.getElementById(id).classList.remove("active"),
+              );
               document.getElementById("bLine").classList.add("active");
               document.getElementById("bLine").classList.add("reply");
               positionAt("B");
@@ -8670,9 +9978,12 @@
           },
           {
             tag: "REPLY · UNICAST BACK",
-            story: "The reply travels back via the switch — only to PC A, not broadcast this time.",
+            story:
+              "The reply travels back via the switch — only to PC A, not broadcast this time.",
             apply() {
-              document.getElementById("bLine").classList.remove("active", "reply");
+              document
+                .getElementById("bLine")
+                .classList.remove("active", "reply");
               document.getElementById("aLine").classList.add("active");
               document.getElementById("aLine").classList.add("reply");
               positionAt("A");
@@ -8680,30 +9991,36 @@
           },
           {
             tag: "CACHED ✓",
-            story: "PC A caches the IP→MAC pair (TTL ~5 min) so future packets to 192.168.1.20 skip ARP entirely.",
+            story:
+              "PC A caches the IP→MAC pair (TTL ~5 min) so future packets to 192.168.1.20 skip ARP entirely.",
             apply() {
               cacheBody.innerHTML =
                 '<tr class="new"><td class="ip-col">192.168.1.20</td><td class="mac-col">BB:BB:BB:BB:BB:BB</td><td>300s</td></tr>';
               cacheBadge.textContent = "1 ENTRY";
               cacheBadge.style.background = "var(--moss)";
               frame.classList.remove("visible");
-              document.getElementById("aLine").classList.remove("active", "reply");
+              document
+                .getElementById("aLine")
+                .classList.remove("active", "reply");
             },
           },
           {
             tag: "DATA · NOW POSSIBLE",
-            story: "Now PC A wraps the actual ICMP / TCP / HTTP frame with the correct destination MAC and sends.",
+            story:
+              "Now PC A wraps the actual ICMP / TCP / HTTP frame with the correct destination MAC and sends.",
             apply() {
               frame.classList.add("visible", "data");
               frame.classList.remove("reply");
-              frameBody.innerHTML = "src AA → dst <strong>BB</strong><br>Real data (ICMP / TCP / …)";
+              frameBody.innerHTML =
+                "src AA → dst <strong>BB</strong><br>Real data (ICMP / TCP / …)";
               positionAt("A");
               document.getElementById("aLine").classList.add("active", "data");
             },
           },
           {
             tag: "DELIVERED ✓",
-            story: "Frame arrives at PC B. Conversation can begin. ARP only runs again when the cache entry expires.",
+            story:
+              "Frame arrives at PC B. Conversation can begin. ARP only runs again when the cache entry expires.",
             apply() {
               positionAt("switch");
               setTimeout(() => positionAt("B"), 350);
@@ -8724,15 +10041,17 @@
 
         function clearAll() {
           [hostA, hostB, hostC, hostD].forEach((h) =>
-            h.classList.remove("sender", "match", "ignore")
+            h.classList.remove("sender", "match", "ignore"),
           );
           ["aLine", "bLine", "cLine", "dLine"].forEach((id) =>
-            document.getElementById(id).classList.remove("active", "reply", "data")
+            document
+              .getElementById(id)
+              .classList.remove("active", "reply", "data"),
           );
           frame.classList.remove("visible", "reply", "data");
-          stepList.querySelectorAll("li").forEach((li) =>
-            li.classList.remove("done", "now")
-          );
+          stepList
+            .querySelectorAll("li")
+            .forEach((li) => li.classList.remove("done", "now"));
           cacheBody.innerHTML =
             '<tr class="empty-row"><td colspan="3">— no entries —</td></tr>';
           cacheBadge.textContent = "EMPTY";
@@ -8790,12 +10109,14 @@
           tick();
         }
         function pause() {
-          clearTimeout(timer); timer = null;
+          clearTimeout(timer);
+          timer = null;
           paused = true;
           paint("paused");
         }
         function stop() {
-          clearTimeout(timer); timer = null;
+          clearTimeout(timer);
+          timer = null;
           paused = false;
           idx = -1;
           clearAll();
@@ -8832,6 +10153,682 @@
    toggles .paused / .stopped classes. For containers that
    register a custom controller (window._animOverrides), those
    methods are called instead. =========================================================== */
+      /* ===========================================================
+         IP ADDRESS CALCULATION SIMULATOR
+         Converts 192.168.1.10/24 step by step:
+         1. Show address / mask
+         2. Convert each octet to binary
+         3. Build the 32-bit strip
+         4. Colour first 24 bits (net) vs last 8 (host)
+         5. Show results
+         =========================================================== */
+      (function () {
+        const slide = document.getElementById("ipCalcSlide");
+        if (!slide) return;
+
+        const IP = [192, 168, 1, 10];
+        const PREFIX = 24;
+        const OCTETS = ["ipc-o0", "ipc-o1", "ipc-o2", "ipc-o3"];
+        const toBin8 = (n) => n.toString(2).padStart(8, "0");
+
+        let timer = null,
+          stepIdx = 0,
+          paused = false;
+
+        const narration = document.getElementById("ipcNarration");
+        const badge = document.getElementById("ipcBadge");
+        const startBtn = document.getElementById("ipcStart");
+        const pauseBtn = document.getElementById("ipcPause");
+        const stopBtn = document.getElementById("ipcStop");
+        const bitsDiv = document.getElementById("ipc-bits");
+        const partLabels = document.getElementById("ipc-part-labels");
+        const resultDiv = document.getElementById("ipc-result");
+
+        function setBadge(txt, col) {
+          badge.textContent = txt;
+          badge.style.background = col || "var(--cobalt)";
+        }
+
+        function buildBitStrip() {
+          bitsDiv.innerHTML = "";
+          IP.forEach((oct) => {
+            toBin8(oct)
+              .split("")
+              .forEach((b) => {
+                const d = document.createElement("div");
+                d.className = "ipc-bit";
+                d.textContent = "?";
+                bitsDiv.appendChild(d);
+              });
+          });
+        }
+
+        const STEPS = [
+          {
+            narr: "Step 1 — The address 192.168.1.10 has a /24 prefix. That means the first 24 bits identify the network and the last 8 identify the host.",
+            fn() {
+              // reset all
+              OCTETS.forEach((id, i) => {
+                const el = document.getElementById(id);
+                el.classList.remove("active", "done-net", "done-host");
+                el.querySelector(".ipc-bin").textContent = "????????";
+              });
+              partLabels.style.opacity = "0";
+              resultDiv.style.opacity = "0";
+              buildBitStrip();
+            },
+          },
+          {
+            narr: "Step 2 — Convert 192 (first octet) to binary: 128+64 = 192 → 11000000.",
+            fn() {
+              const el = document.getElementById("ipc-o0");
+              el.classList.add("active");
+              el.querySelector(".ipc-bin").textContent = toBin8(192);
+              // fill first 8 bits in strip
+              [...bitsDiv.children].slice(0, 8).forEach((b, i) => {
+                b.textContent = toBin8(192)[i];
+                b.classList.add("net");
+              });
+            },
+          },
+          {
+            narr: "Step 3 — Convert 168 (second octet): 128+32+8 = 168 → 10101000.",
+            fn() {
+              const el = document.getElementById("ipc-o1");
+              el.classList.remove("active");
+              document.getElementById("ipc-o0").classList.add("done-net");
+              el.classList.add("active");
+              el.querySelector(".ipc-bin").textContent = toBin8(168);
+              [...bitsDiv.children].slice(8, 16).forEach((b, i) => {
+                b.textContent = toBin8(168)[i];
+                b.classList.add("net");
+              });
+            },
+          },
+          {
+            narr: "Step 4 — Convert 1 (third octet): 00000001.",
+            fn() {
+              const el = document.getElementById("ipc-o2");
+              document.getElementById("ipc-o1").classList.add("done-net");
+              el.classList.add("active");
+              el.querySelector(".ipc-bin").textContent = toBin8(1);
+              [...bitsDiv.children].slice(16, 24).forEach((b, i) => {
+                b.textContent = toBin8(1)[i];
+                b.classList.add("net");
+              });
+            },
+          },
+          {
+            narr: "Step 5 — Convert 10 (fourth octet / host part): 00001010. These 8 bits are the host part.",
+            fn() {
+              const el = document.getElementById("ipc-o3");
+              document.getElementById("ipc-o2").classList.add("done-net");
+              el.classList.add("active");
+              el.querySelector(".ipc-bin").textContent = toBin8(10);
+              [...bitsDiv.children].slice(24, 32).forEach((b, i) => {
+                b.textContent = toBin8(10)[i];
+                b.classList.add("host");
+              });
+            },
+          },
+          {
+            narr: "Step 6 — Apply the /24 mask: bits 1–24 (blue) = network 192.168.1, bits 25–32 (amber) = host .10. The network address sets host bits to 0.",
+            fn() {
+              document.getElementById("ipc-o3").classList.add("done-host");
+              partLabels.style.opacity = "1";
+            },
+          },
+          {
+            narr: "Done! Network = 192.168.1.0  ·  Host = .10  ·  Broadcast = 192.168.1.255  ·  Usable hosts: .1 – .254 (254 addresses).",
+            fn() {
+              resultDiv.style.opacity = "1";
+              setBadge("DONE", "var(--moss)");
+            },
+          },
+        ];
+
+        function runStep() {
+          if (stepIdx >= STEPS.length) {
+            stopSim();
+            return;
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          if (stepIdx < STEPS.length) timer = setTimeout(runStep, 2000);
+          else timer = setTimeout(stopSim, 1800);
+        }
+
+        function stopSim() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx >= STEPS.length) setBadge("DONE", "var(--moss)");
+          else {
+            setBadge("IDLE");
+            resetVisual();
+          }
+        }
+
+        function resetVisual() {
+          OCTETS.forEach((id) => {
+            const el = document.getElementById(id);
+            el.classList.remove("active", "done-net", "done-host");
+            el.querySelector(".ipc-bin").textContent = "????????";
+          });
+          partLabels.style.opacity = "0";
+          resultDiv.style.opacity = "0";
+          buildBitStrip();
+          narration.textContent =
+            "Click START — watch how 192.168.1.10/24 is broken into bits and how the network part is separated from the host part.";
+          setBadge("IDLE", "var(--ink)");
+        }
+
+        startBtn.addEventListener("click", () => {
+          if (paused) {
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            setBadge("RUNNING");
+            timer = setTimeout(runStep, 500);
+            return;
+          }
+          stepIdx = 0;
+          resetVisual();
+          buildBitStrip();
+          startBtn.disabled = true;
+          pauseBtn.disabled = false;
+          stopBtn.disabled = false;
+          setBadge("RUNNING");
+          timer = setTimeout(runStep, 600);
+        });
+        pauseBtn.addEventListener("click", () => {
+          if (paused) return;
+          paused = true;
+          clearTimeout(timer);
+          timer = null;
+          pauseBtn.textContent = "▶ Resume";
+          setBadge("PAUSED", "var(--amber)");
+          startBtn.disabled = false;
+        });
+        stopBtn.addEventListener("click", () => {
+          stepIdx = STEPS.length;
+          stopSim();
+          resetVisual();
+        });
+
+        buildBitStrip();
+        setBadge("IDLE", "var(--ink)");
+      })();
+
+      /* ===========================================================
+         SUBNETTING CALCULATOR SIMULATOR
+         Shows 192.168.32.89/27 → subnet, network addr,
+         broadcast addr, usable range — step by step.
+         =========================================================== */
+      (function () {
+        const slide = document.getElementById("subnetCalcSlide");
+        if (!slide) return;
+
+        const HOST_DEC = 89; // .89
+        const NET_BITS = 3; // from /27: 3 bits borrowed in last octet
+        const HOST_BITS = 5;
+
+        const toBin8 = (n) => n.toString(2).padStart(8, "0");
+        const bin8 = toBin8(HOST_DEC); // "01011001"
+        const subnetPart = bin8.slice(0, NET_BITS); // "010"
+        const networkBin = subnetPart + "0".repeat(HOST_BITS); // "01000000" = 64
+        const broadcastBin = subnetPart + "1".repeat(HOST_BITS); // "01011111" = 95
+        const networkOct = parseInt(networkBin, 2); // 64
+        const broadcastOct = parseInt(broadcastBin, 2); // 95
+
+        let timer = null,
+          stepIdx = 0,
+          paused = false;
+
+        const narration = document.getElementById("scNarration");
+        const badge = document.getElementById("scBadge");
+        const startBtn = document.getElementById("scStart");
+        const pauseBtn = document.getElementById("scPause");
+        const stopBtn = document.getElementById("scStop");
+        const bitsDiv = document.getElementById("sc-bits");
+        const netCard = document.getElementById("sc-net-card");
+        const bcCard = document.getElementById("sc-bc-card");
+        const rangeCard = document.getElementById("sc-range-card");
+        const netVal = document.getElementById("sc-net-val");
+        const bcVal = document.getElementById("sc-bc-val");
+        const rangeVal = document.getElementById("sc-range-val");
+        const countVal = document.getElementById("sc-count-val");
+        const bitLabel = document.getElementById("sc-bit-label");
+
+        function setBadge(t, c) {
+          badge.textContent = t;
+          badge.style.background = c || "var(--moss)";
+        }
+
+        function buildBits(vals) {
+          bitsDiv.innerHTML = "";
+          vals.forEach((v, i) => {
+            const d = document.createElement("div");
+            d.className = "sc-bit";
+            d.textContent = v;
+            if (i < NET_BITS) d.classList.add("subnet");
+            else d.classList.add("host");
+            bitsDiv.appendChild(d);
+          });
+        }
+
+        function resetVisual() {
+          buildBits("????????".split(""));
+          [netCard, bcCard, rangeCard].forEach((c) => (c.style.opacity = "0"));
+          netVal.textContent = "192.168.32.?";
+          bcVal.textContent = "192.168.32.?";
+          rangeVal.textContent = "192.168.32.?–?";
+          countVal.textContent = "? usable hosts";
+          bitLabel.style.opacity = "0";
+          narration.textContent =
+            "Click START — see how 192.168.32.89/27 reveals its network address, broadcast address, and the usable host range step by step.";
+          setBadge("IDLE", "var(--ink)");
+        }
+
+        const STEPS = [
+          {
+            narr: "Step 1 — Take the last octet: 89. Write it in 8-bit binary.",
+            fn() {
+              buildBits("????????".split(""));
+              [netCard, bcCard, rangeCard].forEach(
+                (c) => (c.style.opacity = "0"),
+              );
+              bitLabel.style.opacity = "0";
+            },
+          },
+          {
+            narr: `Step 2 — 89 in binary = ${bin8}. Split by /27: first 3 bits = subnet part (${subnetPart}), last 5 = host part.`,
+            fn() {
+              buildBits(bin8.split(""));
+              bitLabel.style.opacity = "1";
+            },
+          },
+          {
+            narr: `Step 3 — Network address: keep subnet bits (${subnetPart}), set host bits to 0 → ${networkBin} = ${networkOct} → 192.168.32.${networkOct}`,
+            fn() {
+              netVal.textContent = `192.168.32.${networkOct}`;
+              netCard.style.opacity = "1";
+            },
+          },
+          {
+            narr: `Step 4 — Broadcast address: keep subnet bits (${subnetPart}), set host bits to 1 → ${broadcastBin} = ${broadcastOct} → 192.168.32.${broadcastOct}`,
+            fn() {
+              bcVal.textContent = `192.168.32.${broadcastOct}`;
+              bcCard.style.opacity = "1";
+            },
+          },
+          {
+            narr: `Step 5 — Usable range: network+1 to broadcast−1 = .${networkOct + 1} – .${broadcastOct - 1}. Total usable = 2⁵ − 2 = ${Math.pow(2, HOST_BITS) - 2} hosts.`,
+            fn() {
+              rangeVal.textContent = `192.168.32.${networkOct + 1} – .${broadcastOct - 1}`;
+              countVal.textContent = `${Math.pow(2, HOST_BITS) - 2} usable hosts`;
+              rangeCard.style.opacity = "1";
+              setBadge("DONE", "var(--moss)");
+            },
+          },
+        ];
+
+        function runStep() {
+          if (stepIdx >= STEPS.length) {
+            stopSim();
+            return;
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          if (stepIdx < STEPS.length) timer = setTimeout(runStep, 2200);
+          else timer = setTimeout(stopSim, 1800);
+        }
+
+        function stopSim() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx < STEPS.length) {
+            resetVisual();
+            setBadge("IDLE", "var(--ink)");
+          }
+        }
+
+        startBtn.addEventListener("click", () => {
+          if (paused) {
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            setBadge("RUNNING");
+            timer = setTimeout(runStep, 500);
+            return;
+          }
+          stepIdx = 0;
+          resetVisual();
+          buildBits("????????".split(""));
+          startBtn.disabled = true;
+          pauseBtn.disabled = false;
+          stopBtn.disabled = false;
+          setBadge("RUNNING");
+          timer = setTimeout(runStep, 600);
+        });
+        pauseBtn.addEventListener("click", () => {
+          if (paused) return;
+          paused = true;
+          clearTimeout(timer);
+          timer = null;
+          pauseBtn.textContent = "▶ Resume";
+          setBadge("PAUSED", "var(--amber)");
+          startBtn.disabled = false;
+        });
+        stopBtn.addEventListener("click", () => {
+          stepIdx = STEPS.length;
+          stopSim();
+          resetVisual();
+        });
+
+        resetVisual();
+      })();
+
+      /* ===========================================================
+         3-WAY HANDSHAKE SIMULATOR
+         Reveals SYN → SYN/ACK → ACK one step at a time and
+         updates each side's TCP connection state.
+         =========================================================== */
+      (function () {
+        const slide = document.getElementById("handshakeSlide");
+        if (!slide) return;
+        const C = document.getElementById("hsClientState");
+        const S = document.getElementById("hsServerState");
+        const msgs = ["hs-msg1", "hs-msg2", "hs-msg3"].map((i) =>
+          document.getElementById(i),
+        );
+        const seqs = ["hs-seq1", "hs-seq2", "hs-seq3"].map((i) =>
+          document.getElementById(i),
+        );
+        const narration = document.getElementById("hsNarration");
+        const badge = document.getElementById("hsBadge");
+        const startBtn = document.getElementById("hsStart");
+        const pauseBtn = document.getElementById("hsPause");
+        const stopBtn = document.getElementById("hsStop");
+        let timer = null,
+          idx = 0,
+          paused = false;
+
+        const setBadge = (t, c) => {
+          badge.textContent = t;
+          badge.style.background = c || "var(--cobalt)";
+        };
+        const setState = (el, txt, cls) => {
+          el.textContent = txt;
+          el.className = "hs-state" + (cls ? " " + cls : "");
+        };
+        function showMsg(i) {
+          if (seqs[i]) seqs[i].classList.add("show");
+          msgs[i].classList.add("show");
+          const dot = msgs[i].querySelector(".hs-dot");
+          if (dot) {
+            dot.style.animation = "none";
+            void dot.offsetWidth;
+            dot.style.animation = "";
+          }
+        }
+        function resetVisual() {
+          msgs.forEach((m) => m.classList.remove("show"));
+          seqs.forEach((s) => s.classList.remove("show"));
+          setState(C, "CLOSED", "");
+          setState(S, "LISTEN", "");
+          narration.textContent =
+            "Click START to watch the TCP three-way handshake one packet at a time — and see each side's connection state change.";
+          setBadge("IDLE", "var(--ink)");
+        }
+        const STEPS = [
+          {
+            n: "Step 1 — The client sends a SYN carrying its initial sequence number (x). It leaves LISTEN/CLOSED and moves to SYN-SENT.",
+            f() {
+              showMsg(0);
+              setState(C, "SYN-SENT", "s-active");
+            },
+          },
+          {
+            n: "Step 2 — The server replies SYN/ACK: it acknowledges x+1 and sends its own sequence number (y). It moves to SYN-RECEIVED.",
+            f() {
+              showMsg(1);
+              setState(S, "SYN-RECEIVED", "s-active");
+            },
+          },
+          {
+            n: "Step 3 — The client ACKs y+1. Both sides are now ESTABLISHED — the connection is open and data can flow.",
+            f() {
+              showMsg(2);
+              setState(C, "ESTABLISHED", "s-est");
+              setState(S, "ESTABLISHED", "s-est");
+              setBadge("DONE", "var(--moss)");
+            },
+          },
+        ];
+        function runStep() {
+          if (idx >= STEPS.length) return finish();
+          const s = STEPS[idx++];
+          narration.textContent = s.n;
+          s.f();
+          timer = setTimeout(idx < STEPS.length ? runStep : finish, 2300);
+        }
+        function finish() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+          setBadge("DONE", "var(--moss)");
+        }
+        startBtn.addEventListener("click", () => {
+          if (paused) {
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            setBadge("RUNNING");
+            timer = setTimeout(runStep, 400);
+            return;
+          }
+          idx = 0;
+          resetVisual();
+          startBtn.disabled = true;
+          pauseBtn.disabled = false;
+          stopBtn.disabled = false;
+          setBadge("RUNNING");
+          timer = setTimeout(runStep, 500);
+        });
+        pauseBtn.addEventListener("click", () => {
+          if (paused) return;
+          paused = true;
+          clearTimeout(timer);
+          timer = null;
+          pauseBtn.textContent = "▶ Resume";
+          setBadge("PAUSED", "var(--amber)");
+          startBtn.disabled = false;
+        });
+        stopBtn.addEventListener("click", () => {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          idx = 0;
+          resetVisual();
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+        });
+        resetVisual();
+      })();
+
+      /* ===========================================================
+         UDP FIRE-&-FORGET SIMULATOR
+         Sends three datagrams; the second is lost in transit with
+         no acknowledgement and no retransmission.
+         =========================================================== */
+      (function () {
+        const slide = document.getElementById("udpSimSlide");
+        if (!slide) return;
+        const d = ["udp-d1", "udp-d2", "udp-d3"].map((i) =>
+          document.getElementById(i),
+        );
+        const sentEl = document.getElementById("udpSent");
+        const delivEl = document.getElementById("udpDeliv");
+        const lostEl = document.getElementById("udpLostCount");
+        const narration = document.getElementById("udpNarration");
+        const badge = document.getElementById("udpBadge");
+        const startBtn = document.getElementById("udpStart");
+        const pauseBtn = document.getElementById("udpPause");
+        const stopBtn = document.getElementById("udpStop");
+        let timer = null,
+          idx = 0,
+          paused = false,
+          sent = 0,
+          deliv = 0,
+          lost = 0;
+        const pending = [];
+        const later = (fn, ms) => {
+          const id = setTimeout(fn, ms);
+          pending.push(id);
+        };
+        const clearPending = () => {
+          while (pending.length) clearTimeout(pending.pop());
+        };
+
+        const setBadge = (t, c) => {
+          badge.textContent = t;
+          badge.style.background = c || "var(--moss)";
+        };
+        const counters = () => {
+          sentEl.textContent = sent;
+          delivEl.textContent = deliv;
+          lostEl.textContent = lost;
+        };
+        function resetVisual() {
+          clearPending();
+          d.forEach((x) => {
+            x.className = "udp-dgram";
+          });
+          sent = deliv = lost = 0;
+          counters();
+          narration.textContent =
+            "Click START to send three UDP datagrams. Watch what happens when one goes missing — and notice nobody asks for it again.";
+          setBadge("IDLE", "var(--ink)");
+        }
+        const STEPS = [
+          {
+            n: "No handshake — the client just sends. Datagram D1 leaves immediately for the server.",
+            f() {
+              d[0].classList.add("show");
+              requestAnimationFrame(() => d[0].classList.add("sent"));
+              sent++;
+              counters();
+              later(() => {
+                deliv++;
+                counters();
+              }, 1150);
+            },
+          },
+          {
+            n: "D2 is sent — but it is lost in transit. UDP has no acknowledgement, so neither side ever notices, and nothing is resent.",
+            f() {
+              d[1].classList.add("show");
+              requestAnimationFrame(() => d[1].classList.add("midway"));
+              sent++;
+              counters();
+              later(() => {
+                d[1].classList.add("lost");
+                lost++;
+                counters();
+              }, 850);
+            },
+          },
+          {
+            n: "D3 is sent and arrives. Every datagram is independent — UDP guarantees neither delivery nor order.",
+            f() {
+              d[2].classList.add("show");
+              requestAnimationFrame(() => d[2].classList.add("sent"));
+              sent++;
+              counters();
+              later(() => {
+                deliv++;
+                counters();
+              }, 1150);
+            },
+          },
+          {
+            n: "3 sent · 2 delivered · 1 lost. No setup, no ACK, no retransmit — that is why UDP is fast and used for DNS, VoIP, video, and games.",
+            f() {
+              setBadge("DONE", "var(--moss)");
+            },
+          },
+        ];
+        function runStep() {
+          if (idx >= STEPS.length) return finish();
+          const s = STEPS[idx++];
+          narration.textContent = s.n;
+          s.f();
+          timer = setTimeout(idx < STEPS.length ? runStep : finish, 2500);
+        }
+        function finish() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+          setBadge("DONE", "var(--moss)");
+        }
+        startBtn.addEventListener("click", () => {
+          if (paused) {
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            setBadge("RUNNING");
+            timer = setTimeout(runStep, 400);
+            return;
+          }
+          idx = 0;
+          resetVisual();
+          startBtn.disabled = true;
+          pauseBtn.disabled = false;
+          stopBtn.disabled = false;
+          setBadge("RUNNING");
+          timer = setTimeout(runStep, 500);
+        });
+        pauseBtn.addEventListener("click", () => {
+          if (paused) return;
+          paused = true;
+          clearTimeout(timer);
+          timer = null;
+          pauseBtn.textContent = "▶ Resume";
+          setBadge("PAUSED", "var(--amber)");
+          startBtn.disabled = false;
+        });
+        stopBtn.addEventListener("click", () => {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          idx = 0;
+          resetVisual();
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+        });
+        resetVisual();
+      })();
+
       window._animOverrides = window._animOverrides || {};
       if (hopSim) window._animOverrides["hopStage"] = hopSim;
 

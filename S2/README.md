@@ -16,14 +16,14 @@
 
 ### 📖 Lecture
 
-**Part 1 — Protocol Headers (25 min)**
+**Part 1 — Protocol Headers**
 - **Ethernet Frame**: Source/Destination MAC, EtherType, payload
 - **IPv4 Header**: Source/Destination IP, TTL, Protocol field, fragmentation
 - **TCP Header**: Ports, sequence/ack numbers, flags (SYN, ACK, FIN, RST), 3-way handshake
 - **UDP Header**: Ports, length, checksum — connectionless simplicity
 - Ports & well-known services: 80 (HTTP), 443 (HTTPS), 53 (DNS), 22 (SSH)
 
-**Part 2 — IP Network Design & Subnetting (25 min)**
+**Part 2 — IP Network Design & Subnetting**
 - **IPv4 Address Structure**: Network portion vs. host portion, dotted-decimal & binary representation
 - **Subnet Masks**: How masks define network boundaries — `255.255.255.0` (`/24`), `255.255.0.0` (`/16`)
 - **CIDR Notation**: Classless Inter-Domain Routing — why classful addressing is obsolete
