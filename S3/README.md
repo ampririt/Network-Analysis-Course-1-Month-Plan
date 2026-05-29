@@ -1,19 +1,21 @@
-# Week 2: Network Services & Applications
-
----
-
 ## Session 3 — Network Services: DHCP, DNS & ARP
+
+- [Session 3 — Network Services: DHCP, DNS \& ARP](#session-3--network-services-dhcp-dns--arp)
+  - [📖 Lecture](#-lecture)
+  - [🛠️ Hands-on Lab](#️-hands-on-lab)
+  - [📚 Homework](#-homework)
+
 
 **Learning Objectives**: Understand how devices obtain IPs, resolve names, and discover MAC addresses. Analyze these protocols in captures.
 
-### 📖 Lecture (30 min)
+### 📖 Lecture
 - **ARP**: Address Resolution Protocol — MAC discovery, ARP table, gratuitous ARP
 - **DHCP**: Discover → Offer → Request → Acknowledge (DORA process)
 - **DNS**: Queries & responses, record types (A, AAAA, CNAME, MX, TXT), recursive vs. iterative
 - **NAT**: Network Address Translation — how private IPs reach the internet
 - Live demo: Capture a DHCP lease renewal in Wireshark
 
-### 🛠️ Hands-on Lab (45 min)
+### 🛠️ Hands-on Lab
 
 **Lab A — Wireshark: DHCP & DNS Analysis (20 min)**
 1. Release and renew IP: `ipconfig /release` → `ipconfig /renew` (Windows) or `sudo dhclient -r && sudo dhclient` (Linux/Mac)
@@ -29,14 +31,6 @@
 4. Configure DNS Server with entries (e.g., `www.lab.com` → `192.168.1.100`)
 5. Switch to **Simulation Mode** — observe DORA packets in real time
 6. From a PC, use the web browser to visit `www.lab.com` — observe DNS query then HTTP
-
-### 🎯 Workshop Activity: "DNS Detective" (10 min)
-- Provide a PCAP with suspicious DNS traffic
-- Students must find:
-  - An unusually long DNS query (possible DNS tunneling)
-  - A DNS response pointing to an unexpected IP
-  - How many unique domains were queried
-- Discuss: *"How can DNS be abused by attackers?"*
 
 ### 📚 Homework
 - Kurose & Ross Wireshark Lab: **DNS**

@@ -1,23 +1,22 @@
 ## Session 1 — Introduction to Network Analysis & The OSI Model
 
 - [Session 1 — Introduction to Network Analysis \& The OSI Model](#session-1--introduction-to-network-analysis--the-osi-model)
-  - [📖 Lecture (60 min)](#-lecture-60-min)
+  - [📖 Lecture](#-lecture)
   - [Break (10 min)](#break-10-min)
-  - [Hands-on Lab (80 min)](#hands-on-lab-80-min)
+  - [Hands-on Lab](#hands-on-lab)
   - [🔍 Deep Dive: The `ping` Command \& Options](#-deep-dive-the-ping-command--options)
     - [Analyzing the `ping` Output Fields:](#analyzing-the-ping-output-fields)
     - [Crucial `ping` Command Options:](#crucial-ping-command-options)
   - [🔍 Deep Dive: Wireshark Display Filters](#-deep-dive-wireshark-display-filters)
     - [1. Common Comparison \& Logical Operators](#1-common-comparison--logical-operators)
     - [2. Essential Filter Recipes for Network Analysis](#2-essential-filter-recipes-for-network-analysis)
-  - [🎯 Workshop Activity: "Layer Matching Game" \& Review (30 min)](#-workshop-activity-layer-matching-game--review-30-min)
   - [📚 Homework](#-homework)
 
 
 
 **Learning Objectives**: Understand what network analysis is and why it matters. Learn the OSI model and TCP/IP stack. Set up tools.
 
-### 📖 Lecture (60 min)
+### 📖 Lecture
 - **Introduction**: What is network analysis? Real-world use cases (troubleshooting, security, performance) (15 min)
 - **The OSI 7-Layer Model**: Detailed breakdown of the purpose and function of each layer (15 min)
 - **TCP/IP 4-Layer Model**: Understanding the modern mapping to OSI layers (10 min)
@@ -26,7 +25,7 @@
 ### Break (10 min)
 - Step away, stretch, and grab a drink before diving into the hands-on labs.
 
-### Hands-on Lab (80 min)
+### Hands-on Lab
 
 ---
 
@@ -169,10 +168,6 @@ Wireshark uses a very intuitive, color-coded syntax in its filter bar:
 > **Right-Click Helper**: If you don't remember a filter name, find the field inside the **Packet Details** pane (middle pane), **right-click** it, and select **Apply as Filter** -> **Selected**. Wireshark will automatically construct the correct syntax for you!
 
 ---
-
-### 🎯 Workshop Activity: "Layer Matching Game" & Review (30 min)
-- **Activity (15 min)**: Group challenge. Match standard network protocols (HTTP, TCP, IP, Ethernet, DNS, ARP) to their correct OSI layers and explain their function.
-- **Review & Discussion (15 min)**: Group discussion on *"Why does layering matter for network analysis?"* and QA session.
 
 ### 📚 Homework
 - Read: Wireshark User Guide — Chapter 1 & 3

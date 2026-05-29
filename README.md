@@ -47,7 +47,6 @@ This course introduces students to the fundamentals of network analysis — from
 | 📖 Lecture & Live Demo | 50 min | Core concepts with real-world, real-time demonstrations |
 | ☕ Break | 10 min | Stretch, stand up, and grab a drink before the lab |
 | 🛠️ Hands-on Lab | 80 min | In-depth guided exercises using Wireshark & Cisco Packet Tracer |
-| 🎯 Workshop Activity | 20 min | Interactive team challenge, CTF, or configuration race |
 | 📝 Wrap-up & Preview | 10 min | Key takeaways, homework overview, and next session preview |
 
 

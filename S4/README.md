@@ -1,8 +1,15 @@
 ## Session 4 — Routing, Switching & VLANs
 
+- [Session 4 — Routing, Switching \& VLANs](#session-4--routing-switching--vlans)
+  - [📖 Lecture](#-lecture)
+  - [Break (10 min)](#break-10-min)
+  - [🛠️ Hands-on Lab](#️-hands-on-lab)
+  - [📚 Homework](#-homework)
+
+
 **Learning Objectives**: Understand how switches forward traffic using MAC address tables. Configure VLANs to segment networks. Learn how routers forward traffic between subnets. Analyze routing & switching in captures.
 
-### 📖 Lecture (35 min)
+### 📖 Lecture 
 - **Switching**: MAC address table, broadcast vs. unicast, switch forwarding decisions
 - **VLANs**: Why segment networks? VLAN tagging (802.1Q), trunk vs. access ports
 - **Routing**: Routing table, static vs. dynamic routing, default gateway
@@ -13,7 +20,7 @@
 ### Break (10 min)
 - Step away, stretch, and grab a drink before diving into the hands-on labs.
 
-### 🛠️ Hands-on Lab (80 min)
+### 🛠️ Hands-on Lab
 
 **Lab A — Cisco Packet Tracer: "Small Office Network" Mega-Lab (55 min)**
 
@@ -43,22 +50,6 @@
 4. Filter: `icmp` → trace a ping across subnets — observe TTL decrement at each router hop
 5. Use **Statistics → Endpoints** to identify all active subnets in the capture
 6. Use **Statistics → Conversations** to map traffic flow between VLANs
-
-### 🎯 Workshop Activity: "Subnet Design Challenge" & Network Troubleshooting (20 min)
-
-**Part 1 — Subnet Design (10 min)**
-- Given: A company has 4 departments with 30, 60, 10, and 120 hosts
-- Challenge: Design a subnetting scheme using `172.16.0.0/16`
-- Each team presents their subnet plan and explains their choices
-- Discuss: efficiency, scalability, and broadcast domain size
-
-**Part 2 — "The Broken Network" Quick Fix (10 min)**
-- Students receive a pre-configured network with **3 hidden problems**:
-  1. ❌ A switch port is in the wrong VLAN
-  2. ❌ The trunk link is configured as access mode
-  3. ❌ A router sub-interface has the wrong IP
-- Students must use `ping`, `show` commands, and simulation mode to find and fix all issues
-- First team to restore full connectivity wins
 
 ### 📚 Homework
 - Save the Small Office `.pkt` file for future practice
