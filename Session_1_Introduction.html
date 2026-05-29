@@ -157,7 +157,8 @@
           break-after: auto;
           page-break-after: auto;
         }
-        .deck-controls {
+        .deck-controls,
+        #txt-ctl {
           display: none !important;
         }
       }
@@ -240,14 +241,7 @@
 
       /* Page number bottom-right */
       .page-num {
-        position: absolute;
-        bottom: 38px;
-        right: 96px;
-        font-family: var(--font-mono);
-        font-size: 14px;
-        color: var(--muted);
-        letter-spacing: 0.1em;
-        z-index: 2;
+        display: none;
       }
 
       /* ===========================================
@@ -12480,6 +12474,74 @@
           }
         }).observe(simSlide, { attributes: true, attributeFilter: ["class"] });
       }
+
+      /* ===========================================================
+         TEXT-SIZE CONTROL
+         Floating A− / A+ box that scales the text on every slide
+         except the excluded pages. Each element's original size is
+         recorded once, then multiplied by the chosen factor.
+         =========================================================== */
+      (function () {
+        // 1-indexed page numbers to leave at their original size
+        const EXCLUDE = new Set([1, 11, 13, 25, 26, 28, 33, 35, 49]);
+        const slides = [...document.querySelectorAll(".slide")];
+        const targets = [];
+        slides.forEach((sl, i) => {
+          if (EXCLUDE.has(i + 1)) return;
+          sl.querySelectorAll("*").forEach((el) => {
+            if (el.tagName === "svg" || el.closest("svg")) return;
+            const fs = parseFloat(getComputedStyle(el).fontSize);
+            if (fs) {
+              el.__baseFs = fs;
+              targets.push(el);
+            }
+          });
+        });
+
+        const bar = document.createElement("div");
+        bar.id = "txt-ctl";
+        bar.style.cssText =
+          "position:fixed;right:10px;bottom:10px;z-index:3000;display:flex;align-items:center;gap:5px;" +
+          "background:rgba(244,239,228,.95);border:1px solid #0f2030;border-radius:7px;padding:3px 6px;" +
+          "font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#0f2030;" +
+          "box-shadow:0 3px 10px rgba(0,0,0,.15)";
+        const btnCss =
+          "font:inherit;cursor:pointer;border:1px solid #0f2030;background:#fff;color:#0f2030;" +
+          "border-radius:5px;width:21px;height:19px;line-height:1;padding:0";
+        bar.innerHTML =
+          '<span style="letter-spacing:.06em">TEXT</span>' +
+          '<button id="txt-dn" style="' + btnCss + '">A−</button>' +
+          '<span id="txt-pct" style="min-width:32px;text-align:center">100%</span>' +
+          '<button id="txt-up" style="' + btnCss + '">A+</button>' +
+          '<button id="txt-rst" style="' + btnCss + ';width:auto;padding:0 5px">reset</button>';
+        document.body.appendChild(bar);
+
+        const DEFAULT = 1.12;
+        let factor = parseFloat(localStorage.getItem("deckTextFactorS1"));
+        if (!factor || isNaN(factor)) factor = DEFAULT;
+
+        function apply() {
+          targets.forEach((el) => {
+            el.style.fontSize = (el.__baseFs * factor).toFixed(2) + "px";
+          });
+          document.getElementById("txt-pct").textContent =
+            Math.round(factor * 100) + "%";
+          localStorage.setItem("deckTextFactorS1", factor.toFixed(3));
+        }
+        document.getElementById("txt-up").addEventListener("click", () => {
+          factor = Math.min(1.7, factor + 0.04);
+          apply();
+        });
+        document.getElementById("txt-dn").addEventListener("click", () => {
+          factor = Math.max(0.8, factor - 0.04);
+          apply();
+        });
+        document.getElementById("txt-rst").addEventListener("click", () => {
+          factor = 1;
+          apply();
+        });
+        apply();
+      })();
     </script>
   </body>
 </html>

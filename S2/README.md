@@ -31,6 +31,22 @@
 - **Private vs. Public IP Ranges**: RFC 1918 (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) and why NAT is needed
 - **IP Design Best Practices**: Address planning for departments, growth considerations, documentation standards
 
+**Part 3 — Enterprise Network Design Principles**
+- **Hierarchical Design Model**:
+    - **Access Layer**: Local connection for end devices (PCs, APs).
+    - **Distribution Layer**: Aggregates access switches; handles routing, filtering, and security policies.
+    - **Core Layer**: The high-speed backbone of the network, optimized for fast transport.
+- **Redundancy & High Availability (HA)**:
+    - **L2 Redundancy**: EtherChannel (link bundling) and Spanning Tree Protocol (STP).
+    - **L3 Redundancy**: First Hop Redundancy Protocols (**HSRP/VRRP**) for gateway failover.
+- **Segmentation & Security**:
+    - **VLANs**: Why we separate traffic at Layer 2 (Security, Broadcast control).
+    - **Inter-VLAN Routing**: Using Router-on-a-Stick (ROAS) vs. Layer 3 Switches.
+    - **DMZ (Demilitarized Zone)**: Isolating public-facing servers from the internal enterprise network.
+- **Scalability & IPAM**:
+    - **Route Summarization**: Reducing routing table size by grouping subnets.
+    - **IP Address Management (IPAM)**: Tools and workflows for tracking thousands of IP allocations.
+
 
 ### Break (10 min)
 - Step away, stretch, and grab a drink before diving into the hands-on labs.

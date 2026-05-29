@@ -29,7 +29,7 @@
 
 ---
 
-**Lab A — Wireshark: First Capture (35 min)**
+**Lab A — Wireshark: First Capture**
 
 1. **Launch and Interface Selection**:
    * Open Wireshark. Look at the home screen listing available network interfaces.
@@ -60,7 +60,7 @@
 
 ---
 
-**Lab B — Cisco Packet Tracer: Build Your First Network (45 min)**
+**Lab B — Cisco Packet Tracer: Build Your First Network**
 1. **Workspace Setup**:
    * Open Packet Tracer and log in.
    * From the bottom-left device menu, drag the following onto the main workspace:

@@ -157,7 +157,8 @@
           break-after: auto;
           page-break-after: auto;
         }
-        .deck-controls {
+        .deck-controls,
+        #txt-ctl {
           display: none !important;
         }
       }
@@ -240,14 +241,7 @@
 
       /* Page number bottom-right */
       .page-num {
-        position: absolute;
-        bottom: 38px;
-        right: 96px;
-        font-family: var(--font-mono);
-        font-size: 14px;
-        color: var(--muted);
-        letter-spacing: 0.1em;
-        z-index: 2;
+        display: none;
       }
 
       /* ===========================================
@@ -1275,8 +1269,8 @@
         display: grid;
         grid-template-columns: 1fr 320px 1fr;
         gap: 22px;
-        margin-top: 12px;
-        height: 660px;
+        margin-top: 8px;
+        height: 600px;
       }
       .sim-side {
         border: 1.5px solid var(--ink);
@@ -5339,6 +5333,611 @@
         border-color: var(--plum);
         color: var(--plum);
       }
+      /* === SUBNET CALC — image-style binary breakdown ===
+           Yellow = network bits, cyan = host bits (mirrors the
+           reference handout); result chips keep the deck accents. */
+      .bin-row {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        line-height: 1.3;
+        transition: opacity 0.45s var(--ease-out-expo);
+      }
+      .bn-net {
+        background: #fbeea2;
+        color: #5a4a00;
+        padding: 2px 2px;
+        border-radius: 3px;
+      }
+      .bn-host {
+        background: #bfeef0;
+        color: #0a5e61;
+        padding: 2px 2px;
+        border-radius: 3px;
+      }
+      .scz-chip {
+        display: inline-flex;
+        align-items: center;
+        font-family: var(--font-mono);
+        font-size: 16px;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 7px;
+        transition: opacity 0.45s var(--ease-out-expo);
+      }
+      /* macOS-style network settings panel */
+      .os-panel {
+        border: 1.5px solid var(--rule);
+        border-radius: 14px;
+        background: #fbfaf6;
+        overflow: hidden;
+        box-shadow: 0 10px 26px rgba(15, 32, 48, 0.1);
+      }
+      .os-head {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .os-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--moss);
+        box-shadow: 0 0 0 3px rgba(58, 125, 68, 0.18);
+      }
+      .os-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        font-size: 16px;
+        border-bottom: 1px solid rgba(201, 191, 168, 0.45);
+      }
+      .os-row:last-child {
+        border-bottom: none;
+      }
+      .os-row .k {
+        color: var(--muted);
+      }
+      .os-row .v {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        color: var(--ink);
+      }
+      /* result summary box (blush) */
+      .res-box {
+        background: #fbe4e6;
+        border: 1.5px solid #e0a6ad;
+        border-radius: 11px;
+        padding: 16px 22px;
+      }
+      .res-line {
+        font-size: 18px;
+        color: var(--ink);
+        margin: 5px 0;
+        transition: opacity 0.45s var(--ease-out-expo);
+      }
+      .res-line .hl {
+        background: #fbeea2;
+        padding: 1px 7px;
+        border-radius: 4px;
+        font-family: var(--font-mono);
+        font-weight: 700;
+      }
+      /* powers-of-two reference strip */
+      .pow-strip {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 9px;
+      }
+      .pow-cell {
+        text-align: center;
+        border: 1.5px solid var(--moss);
+        background: var(--moss-soft);
+        border-radius: 9px;
+        padding: 7px 4px;
+      }
+      .pow-cell .e {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--moss);
+      }
+      .pow-cell .n {
+        font-family: var(--font-mono);
+        font-size: 23px;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1.15;
+      }
+      /* === WHY-SUBNET visuals === */
+      /* department PC chip (Sales / IT / Accounting) */
+      .dept-pc {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 48px;
+        border-radius: 7px;
+        font-family: var(--font-mono);
+        font-size: 18px;
+        font-weight: 700;
+        border: 1.5px solid;
+      }
+      .dept-pc.s,
+      .dept-key.s {
+        background: var(--cobalt-soft);
+        border-color: var(--cobalt);
+        color: var(--cobalt-deep);
+      }
+      .dept-pc.i,
+      .dept-key.i {
+        background: var(--moss-soft);
+        border-color: var(--moss);
+        color: var(--moss);
+      }
+      .dept-pc.a,
+      .dept-key.a {
+        background: var(--amber-soft);
+        border-color: var(--amber);
+        color: var(--amber);
+      }
+      .dept-key {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        border: 1.5px solid;
+        vertical-align: -2px;
+        margin-right: 4px;
+      }
+      /* waste / subnet mini-cards with usage bars */
+      .waste-card,
+      .sub-card {
+        border: 1.5px solid var(--rule);
+        border-radius: 8px;
+        padding: 10px 11px;
+        background: rgba(255, 252, 244, 0.6);
+      }
+      .waste-bar,
+      .sub-bar {
+        margin-top: 8px;
+        height: 8px;
+        border-radius: 4px;
+        background: var(--paper-warm);
+        border: 1px solid var(--rule);
+        overflow: hidden;
+      }
+      .waste-bar span,
+      .sub-bar span {
+        display: block;
+        height: 100%;
+      }
+      .waste-bar span {
+        background: var(--amber);
+      }
+      .sub-bar span {
+        background: var(--moss);
+      }
+      /* === TCP SLIDING WINDOW (concept pictures + byte-level sim) === */
+      /* shared segment box (sender stream) */
+      .sw-box {
+        position: relative;
+        flex: 0 0 auto;
+        width: 96px;
+        height: 64px;
+        border: 1.5px solid var(--rule);
+        border-radius: 8px;
+        background: var(--paper-warm);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        transition:
+          background 0.4s,
+          border-color 0.4s,
+          color 0.4s;
+      }
+      .sw-box .bx-seq {
+        font-size: 17px;
+        font-weight: 700;
+      }
+      .sw-box .bx-sub {
+        font-size: 10px;
+        color: var(--muted);
+        margin-top: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .sw-box.inflight {
+        background: var(--cobalt-soft);
+        border-color: var(--cobalt);
+        color: var(--cobalt-deep);
+      }
+      .sw-box.inflight .bx-sub {
+        color: var(--cobalt-deep);
+      }
+      .sw-box.acked {
+        background: var(--moss-soft);
+        border-color: var(--moss);
+        color: var(--moss);
+      }
+      .sw-box.acked .bx-sub {
+        color: var(--moss);
+      }
+      /* sender stream + sliding blue window frame */
+      .sw-stream {
+        position: relative;
+        display: flex;
+        gap: 8px;
+        padding-top: 30px;
+      }
+      .sw-frame {
+        position: absolute;
+        top: 22px;
+        height: 80px;
+        border: 3px solid var(--cobalt);
+        border-radius: 12px;
+        background: rgba(29, 63, 184, 0.06);
+        box-shadow: 0 0 0 4px rgba(29, 63, 184, 0.07);
+        pointer-events: none;
+        transition:
+          left 0.6s var(--ease-out-expo),
+          width 0.6s var(--ease-out-expo),
+          opacity 0.3s;
+      }
+      .sw-frame-label {
+        position: absolute;
+        top: -24px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--cobalt-deep);
+        background: var(--paper);
+        padding: 1px 9px;
+        border-radius: 6px;
+        border: 1.5px solid var(--cobalt);
+      }
+      /* host endpoints (simple monitor glyph) */
+      .sw-host {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .sw-host .mon {
+        width: 32px;
+        height: 24px;
+        border: 2px solid var(--ink);
+        border-radius: 4px;
+        position: relative;
+        flex: 0 0 auto;
+        background: var(--paper-warm);
+      }
+      .sw-host .mon::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: -6px;
+        transform: translateX(-50%);
+        width: 14px;
+        height: 4px;
+        background: var(--ink);
+        border-radius: 0 0 2px 2px;
+      }
+      /* the wire where packets animate diagonally */
+      .sw-wire {
+        position: relative;
+        height: 168px;
+        overflow: hidden;
+      }
+      .sw-life {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        border-left: 2px dashed var(--rule);
+      }
+      .sw-packet {
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 15px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .sw-packet.send {
+        background: var(--cobalt);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(29, 63, 184, 0.3);
+      }
+      .sw-packet.ack {
+        background: #c0392b;
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(192, 57, 43, 0.3);
+      }
+      /* receiver buffer */
+      .sw-buf {
+        display: flex;
+        gap: 8px;
+      }
+      .sw-slot {
+        width: 62px;
+        height: 48px;
+        border: 1.5px solid var(--rule);
+        border-radius: 7px;
+        background: var(--paper-warm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--muted);
+        transition:
+          background 0.4s,
+          border-color 0.4s,
+          color 0.4s;
+      }
+      .sw-slot.filled {
+        background: var(--cobalt-soft);
+        border-color: var(--cobalt);
+        color: var(--cobalt-deep);
+        font-weight: 700;
+      }
+      .sw-buf.flush .sw-slot {
+        animation: sw-flush 0.55s var(--ease-out-expo);
+      }
+      @keyframes sw-flush {
+        0% {
+          background: var(--moss-soft);
+          border-color: var(--moss);
+        }
+      }
+      /* concept mini segment box */
+      .mini-seg {
+        flex: 0 0 auto;
+        min-width: 80px;
+        padding: 13px 9px;
+        text-align: center;
+        border: 1.5px solid var(--rule);
+        border-radius: 8px;
+        background: var(--paper-warm);
+        font-family: var(--font-mono);
+        font-size: 19px;
+        font-weight: 700;
+      }
+      /* legend (shared) */
+      .ws-legend {
+        display: flex;
+        gap: 22px;
+        align-items: center;
+        margin-top: 18px;
+        font-size: 15px;
+        color: var(--muted);
+        flex-wrap: wrap;
+      }
+      .ws-swatch {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1.5px solid;
+        vertical-align: -3px;
+        margin-right: 6px;
+      }
+      /* === SUBNET DESIGN — building icon + requirement checklist === */
+      .bldg {
+        position: relative;
+        width: 116px;
+        height: 158px;
+        flex: 0 0 auto;
+        background: var(--cobalt-deep);
+        border-radius: 6px 6px 0 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 11px;
+        padding: 16px 15px 30px;
+        align-content: start;
+      }
+      .bldg i {
+        background: #fbeea2;
+        border-radius: 2px;
+        height: 17px;
+      }
+      .bldg::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        width: 34px;
+        height: 22px;
+        background: var(--amber);
+        border-radius: 4px 4px 0 0;
+      }
+      .req {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .req li {
+        position: relative;
+        padding: 11px 0 11px 40px;
+        font-size: 21px;
+        line-height: 1.4;
+        border-bottom: 1px solid rgba(201, 191, 168, 0.5);
+      }
+      .req li:last-child {
+        border-bottom: none;
+      }
+      .req li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 13px;
+        width: 22px;
+        height: 22px;
+        border: 2px solid var(--cobalt);
+        border-radius: 5px;
+        background: var(--cobalt-soft);
+      }
+      .req li::after {
+        content: "✓";
+        position: absolute;
+        left: 4px;
+        top: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--cobalt-deep);
+      }
+      /* === NETWORK TOPOLOGY + CAST TYPES === */
+      .topo {
+        border: 1.5px solid var(--rule);
+        border-radius: 14px;
+        padding: 20px 16px;
+        background: rgba(255, 252, 244, 0.6);
+        text-align: center;
+      }
+      .topo h4 {
+        font-family: var(--font-mono);
+        font-size: 22px;
+        margin-bottom: 10px;
+        color: var(--cobalt-deep);
+      }
+      .topo svg {
+        display: block;
+        margin: 0 auto;
+      }
+      .topo p {
+        font-size: 17px;
+        color: var(--muted);
+        margin-top: 12px;
+        line-height: 1.45;
+      }
+      @keyframes topo-ping {
+        0% {
+          r: 4;
+          opacity: 0.9;
+        }
+        100% {
+          r: 46;
+          opacity: 0;
+        }
+      }
+      .topo-ping {
+        animation: topo-ping 2.2s ease-out infinite;
+      }
+      /* cast (unicast / broadcast / multicast) simulation */
+      .cm-stage {
+        position: relative;
+        width: 1040px;
+        height: 448px;
+      }
+      .cm-node {
+        position: absolute;
+        border: 2px solid var(--ink);
+        border-radius: 9px;
+        background: var(--paper-warm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 17px;
+        font-weight: 700;
+        text-align: center;
+        z-index: 2;
+        transition:
+          background 0.3s,
+          border-color 0.3s,
+          color 0.3s,
+          box-shadow 0.3s;
+      }
+      .cm-node.lit {
+        box-shadow: 0 0 0 5px rgba(29, 63, 184, 0.18);
+      }
+      .cm-dot {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        opacity: 0;
+        z-index: 6;
+        box-shadow: 0 2px 7px rgba(0, 0, 0, 0.28);
+        transition:
+          transform 0.6s linear,
+          opacity 0.25s;
+      }
+      .cm-mode-btn {
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 19px;
+        padding: 12px 24px;
+        border-radius: 10px;
+        border: 1.5px solid var(--ink);
+        background: var(--paper);
+        color: var(--ink);
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+      .cm-mode-btn.active {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      /* === ADDRESS-PLAN "building the plan" animation === */
+      .plan-bar {
+        display: flex;
+        height: 30px;
+        border: 1.5px solid var(--rule);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .plan-seg {
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.45s var(--ease-out-expo);
+      }
+      .plan-seg.show {
+        opacity: 1;
+      }
+      .plan-row {
+        display: grid;
+        grid-template-columns: 16px 1fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: 11px 0;
+        border-bottom: 1px solid rgba(201, 191, 168, 0.5);
+        opacity: 0;
+        transform: translateX(20px);
+        transition:
+          opacity 0.45s var(--ease-out-expo),
+          transform 0.45s var(--ease-out-expo);
+      }
+      .plan-row.show {
+        opacity: 1;
+        transform: none;
+      }
+      .plan-row:last-child {
+        border-bottom: none;
+      }
+      .plan-row .stripe {
+        width: 16px;
+        height: 30px;
+        border-radius: 3px;
+      }
       /* === HANDSHAKE SIMULATION === */
       .hs-state {
         font-family: var(--font-mono);
@@ -7277,6 +7876,454 @@
         </section>
 
         <!-- =========================================================
+             TCP SLIDING WINDOW — CONCEPT
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">TCP</span
+              ><span>Flow control · the sliding window</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)"
+            >Slice the stream · keep several pieces in flight</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 54px">
+            TCP streams data in a <em class="display">sliding window.</em>
+          </h2>
+
+          <div
+            class="reveal"
+            style="
+              --i: 2;
+              margin-top: 24px;
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 22px 28px;
+            "
+          >
+            <!-- 1 — segmentation -->
+            <div class="card" style="padding: 18px 22px">
+              <div class="label" style="color: var(--cobalt-deep); font-size: 18px">
+                1 · Slice the byte stream into segments
+              </div>
+              <div
+                style="
+                  margin-top: 14px;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                "
+              >
+                <span
+                  style="
+                    font-family: var(--font-display);
+                    font-style: italic;
+                    font-size: 21px;
+                    color: var(--muted);
+                  "
+                  >data&nbsp;→</span
+                >
+                <div class="mini-seg">1</div>
+                <div class="mini-seg">1001</div>
+                <div class="mini-seg">2001</div>
+                <div class="mini-seg">3001</div>
+                <div
+                  class="mini-seg"
+                  style="border-style: dashed; color: var(--muted)"
+                >
+                  …
+                </div>
+              </div>
+              <p
+                style="
+                  margin-top: 14px;
+                  font-size: 19px;
+                  line-height: 1.5;
+                  color: var(--ink-soft);
+                "
+              >
+                Each piece is one <strong>MSS</strong> (here 1000 bytes), tagged
+                by the <strong>sequence number</strong> of its first byte.
+              </p>
+            </div>
+
+            <!-- 2 — send & wait for ACK (mini sequence diagram) -->
+            <div class="card" style="padding: 18px 22px">
+              <div class="label" style="color: var(--amber); font-size: 18px">
+                2 · Send, then wait for the ACK
+              </div>
+              <div
+                style="
+                  margin-top: 8px;
+                  display: flex;
+                  gap: 16px;
+                  align-items: center;
+                "
+              >
+                <svg width="250" height="143" viewBox="0 0 210 120">
+                  <line x1="20" y1="6" x2="20" y2="108" stroke="#c9bfa8" stroke-width="2" />
+                  <line x1="190" y1="6" x2="190" y2="108" stroke="#c9bfa8" stroke-width="2" />
+                  <text x="20" y="118" font-size="9" text-anchor="middle" fill="#6b7785" font-family="monospace">sender</text>
+                  <text x="190" y="118" font-size="9" text-anchor="middle" fill="#6b7785" font-family="monospace">receiver</text>
+                  <line x1="20" y1="22" x2="188" y2="52" stroke="#1d3fb8" stroke-width="2.5" marker-end="url(#ah-b)" />
+                  <text x="100" y="30" font-size="11" text-anchor="middle" fill="#1d3fb8" font-family="monospace" font-weight="700">SEND seq</text>
+                  <line x1="190" y1="68" x2="22" y2="98" stroke="#c0392b" stroke-width="2.5" marker-end="url(#ah-r)" />
+                  <text x="105" y="94" font-size="11" text-anchor="middle" fill="#c0392b" font-family="monospace" font-weight="700">ACK next</text>
+                  <defs>
+                    <marker id="ah-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#1d3fb8" /></marker>
+                    <marker id="ah-r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#c0392b" /></marker>
+                  </defs>
+                </svg>
+                <p style="font-size: 19px; line-height: 1.5; color: var(--ink-soft)">
+                  The <strong>ACK number</strong> is the next byte the receiver
+                  expects — proof the earlier bytes arrived safely.
+                </p>
+              </div>
+            </div>
+
+            <!-- 3 — receiver window = free buffer -->
+            <div class="card" style="padding: 18px 22px">
+              <div class="label" style="color: var(--moss); font-size: 18px">
+                3 · The window = free space at the receiver
+              </div>
+              <div
+                style="
+                  margin-top: 26px;
+                  display: flex;
+                  align-items: flex-end;
+                  gap: 6px;
+                "
+              >
+                <div class="sw-slot filled" style="width: 82px; height: 62px; font-size: 15px">data</div>
+                <div
+                  style="
+                    position: relative;
+                    display: flex;
+                    gap: 6px;
+                    border: 2px dashed var(--moss);
+                    border-radius: 8px;
+                    padding: 4px;
+                  "
+                >
+                  <div class="sw-slot" style="width: 82px; height: 62px; font-size: 15px">free</div>
+                  <div class="sw-slot" style="width: 82px; height: 62px; font-size: 15px">free</div>
+                  <span
+                    style="
+                      position: absolute;
+                      top: -24px;
+                      left: 50%;
+                      transform: translateX(-50%);
+                      white-space: nowrap;
+                      font-size: 15px;
+                      font-weight: 700;
+                      color: var(--moss);
+                      font-family: var(--font-mono);
+                    "
+                    >window (rwnd)</span
+                  >
+                </div>
+              </div>
+              <p
+                style="
+                  margin-top: 16px;
+                  font-size: 19px;
+                  line-height: 1.5;
+                  color: var(--ink-soft);
+                "
+              >
+                The receiver advertises its <strong>free buffer</strong>. It
+                shrinks as data arrives and grows as the app reads — that is
+                <strong>flow control.</strong>
+              </p>
+            </div>
+
+            <!-- 4 — the window slides -->
+            <div class="card" style="padding: 18px 22px">
+              <div class="label" style="color: var(--cobalt-deep); font-size: 18px">
+                4 · Each ACK slides the window forward
+              </div>
+              <div
+                style="
+                  margin-top: 16px;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                "
+              >
+                <div style="display: flex; gap: 4px">
+                  <span
+                    class="mini-seg"
+                    style="
+                      min-width: 56px;
+                      background: var(--moss-soft);
+                      border-color: var(--moss);
+                      color: var(--moss);
+                    "
+                    >✓</span
+                  >
+                  <span
+                    class="mini-seg"
+                    style="
+                      min-width: 56px;
+                      border-color: var(--cobalt);
+                      background: var(--cobalt-soft);
+                      color: var(--cobalt-deep);
+                    "
+                    >·</span
+                  >
+                  <span
+                    class="mini-seg"
+                    style="
+                      min-width: 56px;
+                      border-color: var(--cobalt);
+                      background: var(--cobalt-soft);
+                      color: var(--cobalt-deep);
+                    "
+                    >·</span
+                  >
+                  <span class="mini-seg" style="min-width: 56px">·</span>
+                </div>
+                <span style="font-size: 22px; color: var(--amber)">→</span>
+                <div style="display: flex; gap: 4px">
+                  <span
+                    class="mini-seg"
+                    style="
+                      min-width: 56px;
+                      background: var(--moss-soft);
+                      border-color: var(--moss);
+                      color: var(--moss);
+                    "
+                    >✓</span
+                  >
+                  <span
+                    class="mini-seg"
+                    style="
+                      min-width: 56px;
+                      background: var(--moss-soft);
+                      border-color: var(--moss);
+                      color: var(--moss);
+                    "
+                    >✓</span
+                  >
+                  <span
+                    class="mini-seg"
+                    style="
+                      min-width: 56px;
+                      border-color: var(--cobalt);
+                      background: var(--cobalt-soft);
+                      color: var(--cobalt-deep);
+                    "
+                    >·</span
+                  >
+                  <span
+                    class="mini-seg"
+                    style="
+                      min-width: 56px;
+                      border-color: var(--cobalt);
+                      background: var(--cobalt-soft);
+                      color: var(--cobalt-deep);
+                    "
+                    >·</span
+                  >
+                </div>
+              </div>
+              <p
+                style="
+                  margin-top: 16px;
+                  font-size: 19px;
+                  line-height: 1.5;
+                  color: var(--ink-soft);
+                "
+              >
+                When the oldest bytes are ACKed, the window edge moves right and
+                fresh segments go out — keeping the pipe full.
+              </p>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             TCP SLIDING WINDOW — SIMULATION
+             A window of segments stays in flight; the amber window
+             frame slides right as each cumulative ACK arrives.
+             ========================================================= -->
+        <section class="slide" id="windowSlide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Interactive</span
+              ><span>TCP sliding window · in motion</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >Live simulation · Press START</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            Send, wait for the ACK, then <em class="display">slide.</em>
+          </h2>
+
+          <!-- SENDER byte stream with the sliding window frame -->
+          <div class="reveal" style="--i: 2; margin-top: 16px">
+            <div class="sw-host" style="margin-bottom: 8px">
+              <span class="mon"></span>SENDER · 送信側 — stream sliced into 1000 B
+              segments
+            </div>
+            <div class="sw-stream" id="sw-stream">
+              <div class="sw-frame" id="sw-frame">
+                <span class="sw-frame-label" id="sw-frame-label">window</span>
+              </div>
+              <div class="sw-box" data-seq="1">
+                <div class="bx-seq">1</div>
+                <div class="bx-sub">pending</div>
+              </div>
+              <div class="sw-box" data-seq="1001">
+                <div class="bx-seq">1001</div>
+                <div class="bx-sub">pending</div>
+              </div>
+              <div class="sw-box" data-seq="2001">
+                <div class="bx-seq">2001</div>
+                <div class="bx-sub">pending</div>
+              </div>
+              <div class="sw-box" data-seq="3001">
+                <div class="bx-seq">3001</div>
+                <div class="bx-sub">pending</div>
+              </div>
+              <div class="sw-box" data-seq="4001">
+                <div class="bx-seq">4001</div>
+                <div class="bx-sub">pending</div>
+              </div>
+              <div class="sw-box" data-seq="5001">
+                <div class="bx-seq">5001</div>
+                <div class="bx-sub">pending</div>
+              </div>
+            </div>
+            <div
+              id="sw-acked"
+              style="
+                margin-top: 8px;
+                font-family: var(--font-mono);
+                font-size: 14px;
+                color: var(--muted);
+              "
+            >
+              bytes confirmed up to: 0
+            </div>
+          </div>
+
+          <!-- WIRE (animated SEND / ACK packets) + RECEIVER buffer & window -->
+          <div
+            class="reveal"
+            style="
+              --i: 3;
+              margin-top: 14px;
+              display: grid;
+              grid-template-columns: 1fr 360px;
+              gap: 30px;
+              align-items: stretch;
+            "
+          >
+            <div class="sw-wire" id="sw-wire">
+              <div class="sw-life" style="left: 3px"></div>
+              <div class="sw-life" style="left: auto; right: 3px"></div>
+              <div class="sw-packet" id="sw-packet"></div>
+            </div>
+            <div>
+              <div
+                class="sw-host"
+                style="justify-content: flex-end; margin-bottom: 10px"
+              >
+                <span class="mon"></span>RECEIVER · 受信側
+              </div>
+              <div class="sw-buf" id="sw-buf" style="justify-content: flex-end">
+                <div class="sw-slot">1000 B</div>
+                <div class="sw-slot">1000 B</div>
+                <div class="sw-slot">1000 B</div>
+              </div>
+              <div style="margin-top: 12px; text-align: right">
+                <div
+                  style="
+                    font-size: 12px;
+                    color: var(--muted);
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                  "
+                >
+                  Advertised window (rwnd)
+                </div>
+                <div
+                  id="sw-rwnd"
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 34px;
+                    font-weight: 700;
+                    color: var(--amber);
+                    line-height: 1.1;
+                  "
+                >
+                  3000 B
+                </div>
+                <div style="font-size: 12px; color: var(--muted)">
+                  = free space in the receive buffer
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- legend -->
+          <div class="ws-legend reveal" style="--i: 4">
+            <span
+              ><span
+                class="ws-swatch"
+                style="background: var(--paper-warm); border-color: var(--rule)"
+              ></span
+              >pending</span
+            >
+            <span
+              ><span
+                class="ws-swatch"
+                style="
+                  background: var(--cobalt-soft);
+                  border-color: var(--cobalt);
+                "
+              ></span
+              >in flight</span
+            >
+            <span
+              ><span
+                class="ws-swatch"
+                style="background: var(--moss-soft); border-color: var(--moss)"
+              ></span
+              >ACKed</span
+            >
+            <span style="color: var(--cobalt-deep); font-weight: 700"
+              >▭ blue frame = sender's window</span
+            >
+          </div>
+
+          <div class="sim-controls">
+            <div class="sim-status">
+              <span>STATUS<span class="badge" id="wsBadge">IDLE</span></span>
+              <span class="narration" id="wsNarration"
+                >Click START — the sender slices data into 1000-byte segments,
+                fills the receiver's window, and slides forward as each ACK
+                confirms delivery.</span
+              >
+            </div>
+            <div class="btns">
+              <button class="sim-btn primary" id="wsStart">▶ Start</button>
+              <button class="sim-btn pause" id="wsPause" disabled>
+                ❚❚ Pause
+              </button>
+              <button class="sim-btn" id="wsStop" disabled>■ Stop</button>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
              UDP — FIRE & FORGET SIMULATION
              ========================================================= -->
         <section class="slide" id="udpSimSlide">
@@ -7498,6 +8545,43 @@
               </p>
             </div>
           </div>
+
+          <div
+            class="reveal"
+            style="
+              --i: 6;
+              margin-top: 22px;
+              padding: 14px 24px;
+              border: 1.5px solid var(--ink);
+              background: var(--paper-warm);
+              display: flex;
+              gap: 30px;
+              align-items: center;
+              flex-wrap: wrap;
+            "
+          >
+            <span
+              style="
+                font-family: var(--font-display);
+                font-style: italic;
+                font-size: 19px;
+                color: var(--cobalt-deep);
+              "
+              >Think of a building</span
+            >
+            <span style="font-size: 18px"
+              ><strong>IP address</strong> → the street address (which
+              building)</span
+            >
+            <span style="font-size: 18px"
+              ><strong>Port</strong> → the apartment number (which program
+              answers inside)</span
+            >
+            <span style="font-size: 16px; color: var(--muted)"
+              >Both source &amp; destination port are 16-bit fields in every
+              TCP / UDP header.</span
+            >
+          </div>
           <div class="page-num"></div>
         </section>
 
@@ -7684,9 +8768,46 @@
             <div class="ip-octet-labels">
               <span>192</span><span>168</span><span>1</span><span>10</span>
             </div>
+            <!-- labelled split: the mask draws the boundary at /24 -->
+            <div
+              style="
+                margin-top: 12px;
+                display: grid;
+                grid-template-columns: 3fr 1fr;
+                gap: 8px;
+                font-family: var(--font-mono);
+                font-weight: 700;
+                font-size: 15px;
+              "
+            >
+              <div
+                style="
+                  text-align: center;
+                  padding: 9px;
+                  background: var(--cobalt-soft);
+                  color: var(--cobalt-deep);
+                  border: 1.5px solid var(--cobalt);
+                  border-radius: 7px;
+                "
+              >
+                ◀——  NETWORK portion · first 24 bits  ——▶
+              </div>
+              <div
+                style="
+                  text-align: center;
+                  padding: 9px;
+                  background: var(--amber-soft);
+                  color: var(--amber);
+                  border: 1.5px solid var(--amber);
+                  border-radius: 7px;
+                "
+              >
+                ◀ HOST · 8 ▶
+              </div>
+            </div>
           </div>
 
-          <div class="grid-2" style="margin-top: 34px; gap: 48px">
+          <div class="grid-2" style="margin-top: 30px; gap: 48px">
             <div class="reveal" style="--i: 4">
               <h3 style="color: var(--cobalt-deep)">
                 Network portion · 24 bits
@@ -7706,6 +8827,28 @@
                 network &amp; broadcast). It answers "<em>which device?</em>"
               </p>
             </div>
+          </div>
+
+          <!-- why the address is split in two -->
+          <div
+            class="reveal"
+            style="
+              --i: 6;
+              margin-top: 26px;
+              padding: 16px 24px;
+              border: 1.5px solid var(--ink);
+              background: var(--paper-warm);
+              font-size: 18px;
+              line-height: 1.55;
+            "
+          >
+            <strong>Why split it?</strong> Routers steer packets using
+            <em>only</em> the network part — one routing entry per network, not
+            per device — then the local switch uses the host part to reach the
+            exact machine. It's a postal address: the
+            <strong>ZIP code / city</strong> (network) carries the letter across
+            the country; the <strong>street &amp; house number</strong> (host)
+            finds the door.
           </div>
           <div class="page-num"></div>
         </section>
@@ -7910,6 +9053,129 @@
         </section>
 
         <!-- =========================================================
+             WHY CLASSFUL DIED → CIDR
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">IP Design</span
+              ><span>From classful to classless</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >A short history · why the rules changed</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 50px">
+            Why we dropped <em class="display">Class A / B / C.</em>
+          </h2>
+
+          <div
+            class="grid-2"
+            style="
+              grid-template-columns: 1.05fr 0.95fr;
+              gap: 44px;
+              margin-top: 26px;
+              align-items: start;
+            "
+          >
+            <!-- LEFT — the old classful system -->
+            <div class="card reveal" style="--i: 2; padding: 20px 24px">
+              <div class="label" style="color: var(--cobalt-deep)">
+                The classful system (1981)
+              </div>
+              <table
+                class="data"
+                style="margin-top: 12px; font-size: 19px; width: 100%"
+              >
+                <thead>
+                  <tr>
+                    <th>Class</th>
+                    <th>Fixed prefix</th>
+                    <th>Hosts per network</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="mono">A</td>
+                    <td class="mono">/8</td>
+                    <td class="mono">~16,777,214</td>
+                  </tr>
+                  <tr>
+                    <td class="mono">B</td>
+                    <td class="mono">/16</td>
+                    <td class="mono">65,534</td>
+                  </tr>
+                  <tr>
+                    <td class="mono">C</td>
+                    <td class="mono">/24</td>
+                    <td class="mono">254</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 12px; font-size: 17px; color: var(--ink-soft)">
+                Your <strong>only</strong> choices — and the jumps between them
+                are enormous.
+              </p>
+            </div>
+
+            <!-- RIGHT — the problems -->
+            <div
+              class="reveal"
+              style="--i: 3; display: flex; flex-direction: column; gap: 16px"
+            >
+              <div
+                class="card amber"
+                style="padding: 18px 24px; border-color: var(--amber)"
+              >
+                <div class="label" style="color: var(--amber)">
+                  Problem 1 · massive waste
+                </div>
+                <p style="margin-top: 8px; font-size: 19px; line-height: 1.55">
+                  Need <strong>300</strong> hosts? A Class C (254) is too small,
+                  so you take a Class B —
+                  <strong
+                    style="background: #fbeea2; padding: 1px 6px; border-radius: 4px"
+                    >~65,000 addresses wasted.</strong
+                  >
+                </p>
+              </div>
+              <div class="card" style="padding: 18px 24px">
+                <div class="label" style="color: var(--plum)">
+                  Problem 2 · exhaustion &amp; routing bloat
+                </div>
+                <p style="margin-top: 8px; font-size: 19px; line-height: 1.55">
+                  Handing out whole B's burned IPv4 fast, and millions of
+                  separate Class C routes swelled the internet's routing tables.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- the fix -->
+          <div
+            class="reveal"
+            style="
+              --i: 4;
+              margin-top: 24px;
+              padding: 18px 26px;
+              border: 1.5px solid var(--ink);
+              background: var(--cobalt-soft);
+              font-size: 20px;
+              line-height: 1.55;
+            "
+          >
+            <strong>The fix — CIDR (1993):</strong> drop the classes and let the
+            boundary fall on <em>any</em> bit. Need 300 hosts? A
+            <span class="mono">/23</span> gives 510; a
+            <span class="mono">/22</span> gives 1022 — <strong>right-sized.</strong>
+            Neighbouring blocks also <strong>aggregate</strong> into one route,
+            shrinking routing tables. ▸ next, how the notation works.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
              SUBNET MASKS & CIDR
              ========================================================= -->
         <section class="slide">
@@ -7923,13 +9189,23 @@
           <span class="eyebrow reveal" style="--i: 0"
             >Drawing the boundary</span
           >
-          <h2 class="reveal" style="--i: 1; font-size: 52px">
+          <h2 class="reveal" style="--i: 1; font-size: 48px">
             CIDR just counts the
             <em class="display">network bits.</em>
           </h2>
+          <p
+            class="reveal"
+            style="--i: 2; font-size: 20px; margin-top: 8px; max-width: 1540px"
+          >
+            <strong>CIDR — Classless Inter-Domain Routing.</strong> It replaced
+            the rigid Class A / B / C system: the mask is written as
+            <span class="mono">/n</span>, the count of leading
+            <span class="mono">1</span>-bits — that is, how many bits name the
+            network.
+          </p>
           <div
             class="grid-2"
-            style="margin-top: 32px; gap: 48px; align-items: start"
+            style="margin-top: 22px; gap: 48px; align-items: start"
           >
             <div>
               <div class="card reveal" style="--i: 2">
@@ -7996,6 +9272,47 @@
             <span class="mono">.1 – .62</span>, gateway usually
             <span class="mono">.1</span>.
           </p>
+
+          <!-- /26 mask shown bit-for-bit -->
+          <div
+            class="reveal"
+            style="
+              --i: 6;
+              margin-top: 20px;
+              display: flex;
+              gap: 30px;
+              align-items: center;
+              flex-wrap: wrap;
+            "
+          >
+            <div>
+              <div class="label" style="color: var(--cobalt-deep)">
+                /26 mask, bit for bit
+              </div>
+              <div class="bin-row" style="font-size: 22px; margin-top: 6px">
+                <span class="bn-net">11111111.11111111.11111111.11</span
+                ><span class="bn-host">000000</span>
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                font-size: 16px;
+                color: var(--ink-soft);
+              "
+            >
+              <span
+                ><span class="bn-net">&nbsp;&nbsp;</span> 26 network bits →
+                255.255.255.192</span
+              >
+              <span
+                ><span class="bn-host">&nbsp;&nbsp;</span> 6 host bits → 2⁶ − 2 =
+                62 usable hosts</span
+              >
+            </div>
+          </div>
           <div class="page-num"></div>
         </section>
 
@@ -8068,11 +9385,462 @@
             internet? It's spoofed or misconfigured — these never leave the LAN
             unaltered.
           </p>
+
+          <div
+            class="reveal"
+            style="
+              --i: 5;
+              margin-top: 26px;
+              display: grid;
+              grid-template-columns: 1fr 1fr 1fr;
+              gap: 22px;
+            "
+          >
+            <div class="card" style="padding: 16px 20px">
+              <div class="label" style="color: var(--cobalt-deep)">
+                NAT bridges them out
+              </div>
+              <p style="margin-top: 6px; font-size: 16px; line-height: 1.5">
+                <strong>Network Address Translation</strong> rewrites a private
+                source IP to the router's single public IP on the way out — and
+                reverses it on every reply.
+              </p>
+            </div>
+            <div class="card" style="padding: 16px 20px">
+              <div class="label" style="color: var(--amber)">Why they exist</div>
+              <p style="margin-top: 6px; font-size: 16px; line-height: 1.5">
+                IPv4 has only ~4.3 billion addresses. Private reuse + NAT let
+                billions of devices share a small pool of public ones.
+              </p>
+            </div>
+            <div class="card" style="padding: 16px 20px">
+              <div class="label" style="color: var(--moss)">
+                Two more reserved blocks
+              </div>
+              <p style="margin-top: 6px; font-size: 16px; line-height: 1.5">
+                <span class="mono">127.0.0.0/8</span> loopback (this machine) ·
+                <span class="mono">169.254.0.0/16</span> APIPA (link-local, when
+                no DHCP).
+              </p>
+            </div>
+          </div>
           <div class="page-num"></div>
         </section>
 
         <!-- =========================================================
              SUBNETTING QUICK-REFERENCE TABLE
+             ========================================================= -->
+        <!-- =========================================================
+             WHY SUBNET 1 — the broadcast-domain problem
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Why subnet</span
+              ><span>The cost of one flat network</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--plum)"
+            >Before we split anything — why bother?</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 56px">
+            One network is one
+            <em class="display">broadcast domain.</em>
+          </h2>
+
+          <div
+            class="grid-2"
+            style="
+              grid-template-columns: 1fr 1fr;
+              gap: 48px;
+              margin-top: 30px;
+              align-items: start;
+            "
+          >
+            <!-- LEFT — mixed-department network with a flooding broadcast -->
+            <div class="card reveal" style="--i: 2; padding: 24px 26px">
+              <div class="label">One LAN · 192.168.10.0/24 · 150 hosts</div>
+              <div
+                style="
+                  margin-top: 16px;
+                  display: grid;
+                  grid-template-columns: repeat(6, 1fr);
+                  gap: 9px;
+                "
+              >
+                <!-- Sales = cobalt · IT = moss · Accounting = amber -->
+                <span class="dept-pc s">S</span><span class="dept-pc i">I</span
+                ><span class="dept-pc a">A</span><span class="dept-pc s">S</span
+                ><span class="dept-pc i">I</span><span class="dept-pc a">A</span
+                ><span class="dept-pc i">I</span><span class="dept-pc a">A</span
+                ><span class="dept-pc s">S</span><span class="dept-pc s">S</span
+                ><span class="dept-pc a">A</span><span class="dept-pc i">I</span
+                ><span class="dept-pc a">A</span><span class="dept-pc s">S</span
+                ><span class="dept-pc i">I</span><span class="dept-pc s">S</span
+                ><span class="dept-pc a">A</span><span class="dept-pc i">I</span>
+              </div>
+              <div
+                style="
+                  margin-top: 18px;
+                  padding: 12px 16px;
+                  text-align: center;
+                  border: 1.5px dashed var(--amber);
+                  border-radius: 9px;
+                  background: var(--amber-soft);
+                  font-family: var(--font-mono);
+                  font-weight: 700;
+                  color: var(--amber);
+                "
+              >
+                ◀ ◀ &nbsp;ONE BROADCAST&nbsp; ▶ ▶
+                <div
+                  style="
+                    font-family: var(--font-body);
+                    font-weight: 400;
+                    font-size: 14px;
+                    color: var(--ink-soft);
+                    margin-top: 4px;
+                  "
+                >
+                  every host on the wire must process it
+                </div>
+              </div>
+              <div
+                style="
+                  margin-top: 14px;
+                  display: flex;
+                  gap: 18px;
+                  font-size: 14px;
+                  color: var(--muted);
+                "
+              >
+                <span><span class="dept-key s"></span> Sales</span>
+                <span><span class="dept-key i"></span> IT</span>
+                <span><span class="dept-key a"></span> Accounting</span>
+              </div>
+            </div>
+
+            <!-- RIGHT — consequences + the driving question -->
+            <div class="reveal" style="--i: 3">
+              <p style="font-size: 24px; line-height: 1.55">
+                150 PCs from <strong>Sales</strong>, <strong>IT</strong> and
+                <strong>Accounting</strong> all share the single network
+                <span class="mono">192.168.10.0/24</span>.
+              </p>
+              <ul
+                style="
+                  margin: 18px 0 0 24px;
+                  font-size: 22px;
+                  line-height: 1.7;
+                  color: var(--ink-soft);
+                "
+              >
+                <li>
+                  A broadcast meant for Sales (ARP, DHCP Discover…) is
+                  <strong>flooded to IT and Accounting too.</strong>
+                </li>
+                <li>Wasted bandwidth and CPU on every unrelated host.</li>
+                <li>
+                  No isolation — one noisy or compromised host touches everyone.
+                </li>
+              </ul>
+              <div
+                class="card plum"
+                style="margin-top: 22px; padding: 18px 22px"
+              >
+                <div class="label">The question</div>
+                <p style="margin-top: 6px; font-size: 25px; color: var(--ink)">
+                  How do we make a Sales broadcast reach
+                  <strong>Sales only?</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- what a broadcast actually is -->
+          <div
+            class="reveal"
+            style="
+              --i: 4;
+              margin-top: 24px;
+              padding: 16px 24px;
+              border: 1.5px solid var(--ink);
+              background: var(--paper-warm);
+              font-size: 20px;
+              line-height: 1.55;
+            "
+          >
+            <strong>What is a broadcast?</strong> A frame addressed to
+            <em>everyone</em> on the network (<span class="mono"
+              >ff:ff:ff:ff:ff:ff</span
+            >, or IP <span class="mono">.255</span>) that every host must receive
+            and process — ARP "who has this IP?", DHCP Discover, and more. The
+            more hosts share one network, the more of this traffic
+            <em>everybody</em> has to handle.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             WHY SUBNET 2 — naive split wastes addresses → subnetting
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Why subnet</span
+              ><span>Right-sizing the address space</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0"
+            >Answer — give each zone its own network</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 56px">
+            Split the network — but
+            <em class="display">don't waste addresses.</em>
+          </h2>
+
+          <!-- ROW 1 — the wasteful way -->
+          <div
+            class="card reveal"
+            style="--i: 2; margin-top: 26px; padding: 18px 26px; border-color: var(--amber)"
+          >
+            <div style="display: flex; align-items: center; gap: 16px">
+              <span
+                style="
+                  font-size: 26px;
+                  font-weight: 700;
+                  color: #fff;
+                  background: var(--amber);
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  flex: 0 0 auto;
+                "
+                >✕</span
+              >
+              <div>
+                <div style="font-size: 24px; font-weight: 700">
+                  Give each department a whole /24
+                </div>
+                <div style="font-size: 15px; color: var(--muted)">
+                  3 networks × 254 addresses — but only 50 hosts in each
+                </div>
+              </div>
+              <div style="margin-left: auto; text-align: right">
+                <div
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 42px;
+                    font-weight: 700;
+                    color: var(--amber);
+                    line-height: 1;
+                  "
+                >
+                  612
+                </div>
+                <div style="font-size: 15px; color: var(--muted)">
+                  addresses wasted
+                </div>
+              </div>
+            </div>
+            <div
+              style="
+                margin-top: 16px;
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 18px;
+              "
+            >
+              <div>
+                <div
+                  style="
+                    height: 26px;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    display: flex;
+                    border: 1.5px solid var(--rule);
+                  "
+                >
+                  <div style="width: 20%; background: var(--moss)"></div>
+                  <div
+                    style="
+                      flex: 1;
+                      background: repeating-linear-gradient(
+                        45deg,
+                        var(--amber-soft),
+                        var(--amber-soft) 7px,
+                        #f0c89c 7px,
+                        #f0c89c 14px
+                      );
+                    "
+                  ></div>
+                </div>
+                <div style="font-size: 15px; margin-top: 6px">
+                  <strong>Sales</strong> · 50 used /
+                  <span style="color: var(--amber)">254</span>
+                </div>
+              </div>
+              <div>
+                <div
+                  style="
+                    height: 26px;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    display: flex;
+                    border: 1.5px solid var(--rule);
+                  "
+                >
+                  <div style="width: 20%; background: var(--moss)"></div>
+                  <div
+                    style="
+                      flex: 1;
+                      background: repeating-linear-gradient(
+                        45deg,
+                        var(--amber-soft),
+                        var(--amber-soft) 7px,
+                        #f0c89c 7px,
+                        #f0c89c 14px
+                      );
+                    "
+                  ></div>
+                </div>
+                <div style="font-size: 15px; margin-top: 6px">
+                  <strong>IT</strong> · 50 used /
+                  <span style="color: var(--amber)">254</span>
+                </div>
+              </div>
+              <div>
+                <div
+                  style="
+                    height: 26px;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    display: flex;
+                    border: 1.5px solid var(--rule);
+                  "
+                >
+                  <div style="width: 20%; background: var(--moss)"></div>
+                  <div
+                    style="
+                      flex: 1;
+                      background: repeating-linear-gradient(
+                        45deg,
+                        var(--amber-soft),
+                        var(--amber-soft) 7px,
+                        #f0c89c 7px,
+                        #f0c89c 14px
+                      );
+                    "
+                  ></div>
+                </div>
+                <div style="font-size: 15px; margin-top: 6px">
+                  <strong>Accounting</strong> · 50 used /
+                  <span style="color: var(--amber)">254</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ROW 2 — the smart way -->
+          <div
+            class="card moss reveal"
+            style="--i: 3; margin-top: 18px; padding: 18px 26px"
+          >
+            <div style="display: flex; align-items: center; gap: 16px">
+              <span
+                style="
+                  font-size: 24px;
+                  font-weight: 700;
+                  color: #fff;
+                  background: var(--moss);
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  flex: 0 0 auto;
+                "
+                >✓</span
+              >
+              <div>
+                <div style="font-size: 24px; font-weight: 700">
+                  Split ONE /24 into three subnets
+                </div>
+                <div style="font-size: 15px; color: var(--muted)">
+                  Same 256 addresses, carved to fit each department
+                </div>
+              </div>
+              <div style="margin-left: auto; text-align: right">
+                <div
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 42px;
+                    font-weight: 700;
+                    color: var(--moss);
+                    line-height: 1;
+                  "
+                >
+                  ~104
+                </div>
+                <div style="font-size: 15px; color: var(--muted)">
+                  spare, still in the block
+                </div>
+              </div>
+            </div>
+            <div
+              style="
+                margin-top: 16px;
+                height: 30px;
+                border-radius: 7px;
+                overflow: hidden;
+                display: flex;
+                border: 1.5px solid var(--rule);
+                font-family: var(--font-mono);
+                font-size: 12px;
+                font-weight: 700;
+                color: #fff;
+                text-align: center;
+                line-height: 30px;
+              "
+            >
+              <div style="width: 19.5%; background: var(--cobalt)">Sales</div>
+              <div style="width: 19.5%; background: var(--moss)">IT</div>
+              <div style="width: 19.5%; background: var(--amber)">Accounting</div>
+              <div
+                style="flex: 1; background: var(--paper-warm); color: var(--muted)"
+              >
+                ~104 spare
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="reveal"
+            style="
+              --i: 4;
+              margin-top: 20px;
+              padding: 18px 28px;
+              border: 1.5px solid var(--ink);
+              background: var(--cobalt-soft);
+              text-align: center;
+              font-size: 24px;
+            "
+          >
+            <strong>Subnetting</strong> gives each department its own broadcast
+            domain <em>and</em> conserves addresses — more networks, far less
+            waste.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             SUBNETTING QUICK REFERENCE
              ========================================================= -->
         <section class="slide">
           <div class="masthead">
@@ -8243,6 +10011,84 @@
               </div>
             </div>
           </div>
+
+          <!-- the four moves as a flow diagram -->
+          <div
+            class="reveal"
+            style="--i: 5; margin-top: 30px; display: flex; align-items: stretch; gap: 8px"
+          >
+            <div
+              style="
+                flex: 1;
+                text-align: center;
+                border: 1.5px solid var(--cobalt);
+                background: var(--cobalt-soft);
+                color: var(--cobalt-deep);
+                border-radius: 12px;
+                padding: 14px 8px;
+              "
+            >
+              <div style="font-family: var(--font-mono); font-weight: 700; font-size: 12px">STEP 1</div>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d3fb8" stroke-width="2" stroke-linecap="round" style="margin: 6px 0">
+                <line x1="5" y1="21" x2="5" y2="13" /><line x1="12" y1="21" x2="12" y2="8" /><line x1="19" y1="21" x2="19" y2="4" />
+              </svg>
+              <div style="font-weight: 700; font-size: 17px">Count the need</div>
+            </div>
+            <div style="display: flex; align-items: center; font-size: 26px; color: var(--muted)">→</div>
+            <div
+              style="
+                flex: 1;
+                text-align: center;
+                border: 1.5px solid var(--amber);
+                background: var(--amber-soft);
+                color: var(--amber);
+                border-radius: 12px;
+                padding: 14px 8px;
+              "
+            >
+              <div style="font-family: var(--font-mono); font-weight: 700; font-size: 12px">STEP 2</div>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#d9621a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 6px 0">
+                <line x1="12" y1="3" x2="12" y2="21" /><polyline points="7,8 4,12 7,16" /><polyline points="17,8 20,12 17,16" />
+              </svg>
+              <div style="font-weight: 700; font-size: 17px">Pick the prefix</div>
+            </div>
+            <div style="display: flex; align-items: center; font-size: 26px; color: var(--muted)">→</div>
+            <div
+              style="
+                flex: 1;
+                text-align: center;
+                border: 1.5px solid var(--moss);
+                background: var(--moss-soft);
+                color: var(--moss);
+                border-radius: 12px;
+                padding: 14px 8px;
+              "
+            >
+              <div style="font-family: var(--font-mono); font-weight: 700; font-size: 12px">STEP 3</div>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3a7d44" stroke-width="2" style="margin: 6px 0">
+                <rect x="2" y="9" width="5.5" height="6" rx="1" /><rect x="9.25" y="9" width="5.5" height="6" rx="1" /><rect x="16.5" y="9" width="5.5" height="6" rx="1" />
+              </svg>
+              <div style="font-weight: 700; font-size: 17px">Walk the blocks</div>
+            </div>
+            <div style="display: flex; align-items: center; font-size: 26px; color: var(--muted)">→</div>
+            <div
+              style="
+                flex: 1;
+                text-align: center;
+                border: 1.5px solid var(--plum);
+                background: var(--plum-soft);
+                color: var(--plum);
+                border-radius: 12px;
+                padding: 14px 8px;
+              "
+            >
+              <div style="font-family: var(--font-mono); font-weight: 700; font-size: 12px">STEP 4</div>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#7a2057" stroke-width="2" stroke-linejoin="round" style="margin: 6px 0">
+                <path d="M3 5 h10 l8 7 -8 7 H3 Z" /><circle cx="8" cy="12" r="1.6" fill="#7a2057" stroke="none" />
+              </svg>
+              <div style="font-weight: 700; font-size: 17px">Name the edges</div>
+            </div>
+          </div>
           <div class="page-num"></div>
         </section>
 
@@ -8262,186 +10108,203 @@
           <span class="eyebrow moss reveal" style="--i: 0"
             >Live simulation · Press START</span
           >
-          <h2 class="reveal" style="--i: 1; font-size: 46px">
-            From one address, find
-            <em class="display">the whole subnet.</em>
+          <h2 class="reveal" style="--i: 1; font-size: 42px; margin-top: 2px">
+            Check your own IP —
+            <em class="display">find the whole subnet.</em>
           </h2>
 
-          <!-- ── Target address display ── -->
           <div
             style="
-              margin-top: 24px;
-              display: flex;
-              gap: 20px;
-              align-items: baseline;
-            "
-          >
-            <span
-              style="
-                font-family: var(--font-mono);
-                font-size: 44px;
-                font-weight: 700;
-                color: var(--ink);
-              "
-              >192.168.32.<span id="sc-host-dec" style="color: var(--amber)"
-                >89</span
-              ></span
-            >
-            <span
-              style="
-                font-family: var(--font-mono);
-                font-size: 36px;
-                color: var(--cobalt-deep);
-                font-weight: 700;
-              "
-              >/27</span
-            >
-            <span
-              style="
-                font-family: var(--font-mono);
-                font-size: 22px;
-                color: var(--muted);
-                margin-left: 8px;
-              "
-              >→ 3 network bits + 5 host bits in last octet</span
-            >
-          </div>
-
-          <!-- ── Bit strip for 4th octet ── -->
-          <div style="margin-top: 20px">
-            <div
-              style="
-                font-family: var(--font-mono);
-                font-size: 16px;
-                color: var(--muted);
-                margin-bottom: 8px;
-              "
-            >
-              4th octet · /27 splits into
-              <span style="color: var(--cobalt-deep)">3 net bits</span> +
-              <span style="color: var(--amber)">5 host bits</span>
-            </div>
-            <div
-              id="sc-bits"
-              style="
-                display: grid;
-                grid-template-columns: repeat(8, 72px);
-                gap: 5px;
-              "
-            ></div>
-            <div
-              id="sc-bit-label"
-              style="
-                margin-top: 6px;
-                font-family: var(--font-mono);
-                font-size: 17px;
-                color: var(--muted);
-                opacity: 0;
-                transition: opacity 0.4s;
-              "
-            >
-              decimal:
-              <strong id="sc-bit-val" style="color: var(--ink)">89</strong>
-            </div>
-          </div>
-
-          <!-- ── Three result rows ── -->
-          <div
-            id="sc-results"
-            style="
-              margin-top: 22px;
+              margin-top: 18px;
               display: grid;
-              grid-template-columns: 1fr 1fr 1fr;
-              gap: 16px;
+              grid-template-columns: 1.12fr 0.88fr;
+              gap: 40px;
+              align-items: start;
             "
           >
-            <div
-              class="card"
-              id="sc-net-card"
-              style="padding: 18px 22px; opacity: 0; transition: opacity 0.5s"
-            >
-              <div class="label">Network address</div>
+            <!-- ── LEFT: binary derivation ── -->
+            <div>
+              <span class="scz-chip" style="background: var(--moss); color: #fff"
+                >Subnet mask</span
+              >
               <div
                 style="
                   font-family: var(--font-mono);
                   font-size: 26px;
                   font-weight: 700;
                   color: var(--cobalt-deep);
-                  margin-top: 6px;
+                  margin-top: 8px;
                 "
-                id="sc-net-val"
               >
-                192.168.32.?
+                255.255.240.0
               </div>
               <div
+                class="bin-row"
+                id="sc-mask-bin"
+                style="font-size: 21px; margin-top: 5px; opacity: 0.22"
+              ></div>
+              <div style="display: flex; gap: 14px; margin-top: 12px">
+                <span
+                  class="scz-chip"
+                  id="sc-netbits"
+                  style="background: #fbeea2; color: #5a4a00; opacity: 0.22"
+                  >Network part · 20 bits</span
+                >
+                <span
+                  class="scz-chip"
+                  id="sc-hostbits"
+                  style="background: #bfeef0; color: #0a5e61; opacity: 0.22"
+                  >Host part · 12 bits</span
+                >
+              </div>
+
+              <div
                 style="
-                  font-family: var(--font-mono);
-                  font-size: 16px;
+                  margin-top: 22px;
+                  font-size: 14px;
                   color: var(--muted);
-                  margin-top: 4px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.09em;
                 "
               >
-                host bits all → 0
+                Your IP address
               </div>
-            </div>
-            <div
-              class="card amber"
-              id="sc-bc-card"
-              style="padding: 18px 22px; opacity: 0; transition: opacity 0.5s"
-            >
-              <div class="label">Broadcast address</div>
               <div
                 style="
                   font-family: var(--font-mono);
                   font-size: 26px;
                   font-weight: 700;
+                  color: var(--ink);
+                "
+              >
+                172.20.2.203
+              </div>
+              <div
+                class="bin-row"
+                id="sc-ip-bin"
+                style="font-size: 21px; margin-top: 4px; opacity: 0.22"
+              ></div>
+
+              <div
+                style="
+                  margin-top: 16px;
+                  font-size: 15px;
+                  color: var(--cobalt-deep);
+                  font-weight: 700;
+                "
+              >
+                ▸ Set every host bit to 0 → Network address
+              </div>
+              <div
+                class="bin-row"
+                id="sc-net-bin"
+                style="font-size: 21px; margin-top: 3px; opacity: 0.18"
+              ></div>
+
+              <div
+                style="
+                  margin-top: 13px;
+                  font-size: 15px;
                   color: var(--amber);
-                  margin-top: 6px;
+                  font-weight: 700;
                 "
-                id="sc-bc-val"
               >
-                192.168.32.?
+                ▸ Set every host bit to 1 → Broadcast address
               </div>
               <div
-                style="
-                  font-family: var(--font-mono);
-                  font-size: 16px;
-                  color: var(--muted);
-                  margin-top: 4px;
-                "
-              >
-                host bits all → 1
+                class="bin-row"
+                id="sc-bc-bin"
+                style="font-size: 21px; margin-top: 3px; opacity: 0.18"
+              ></div>
+            </div>
+
+            <!-- ── RIGHT: macOS network panel + result summary ── -->
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <div class="os-panel">
+                <div class="os-head">
+                  <span class="os-dot"></span>
+                  <div>
+                    <div style="font-weight: 700; font-size: 15px">
+                      01NITOC_X
+                    </div>
+                    <div style="font-size: 12px; color: var(--moss)">
+                      Connected
+                    </div>
+                  </div>
+                  <span
+                    style="
+                      margin-left: auto;
+                      font-size: 12px;
+                      color: var(--muted);
+                      font-family: var(--font-mono);
+                    "
+                    >Configure IPv4 · Using DHCP</span
+                  >
+                </div>
+                <div class="os-row">
+                  <span class="k">IP address</span
+                  ><span class="v">172.20.2.203</span>
+                </div>
+                <div class="os-row">
+                  <span class="k">Subnet mask</span
+                  ><span class="v">255.255.240.0</span>
+                </div>
+                <div class="os-row">
+                  <span class="k">Router</span
+                  ><span class="v">172.20.0.1</span>
+                </div>
+              </div>
+
+              <div class="res-box">
+                <div class="res-line" id="sc-r-net" style="opacity: 0.22">
+                  Network address: <span class="hl">172.20.0.0</span>
+                </div>
+                <div class="res-line" id="sc-r-bc" style="opacity: 0.22">
+                  Broadcast address: <span class="hl">172.20.15.255</span>
+                </div>
+                <div class="res-line" id="sc-r-cidr" style="opacity: 0.22">
+                  CIDR notation: <span class="hl">172.20.0.0/20</span>
+                </div>
+                <div class="res-line" id="sc-r-hosts" style="opacity: 0.22">
+                  Usable hosts: 2¹² − 2 = <span class="hl">4,094</span>
+                </div>
+                <div class="res-line" id="sc-r-range" style="opacity: 0.22">
+                  Usable range:
+                  <span class="hl">172.20.0.1 – 172.20.15.254</span>
+                </div>
               </div>
             </div>
-            <div
-              class="card moss"
-              id="sc-range-card"
-              style="padding: 18px 22px; opacity: 0; transition: opacity 0.5s"
+          </div>
+
+          <!-- ── Powers-of-two reference strip ── -->
+          <div
+            style="
+              margin-top: 18px;
+              display: flex;
+              align-items: center;
+              gap: 18px;
+            "
+          >
+            <span
+              style="
+                font-family: var(--font-display);
+                font-style: italic;
+                font-size: 19px;
+                color: var(--amber);
+                white-space: nowrap;
+                text-align: right;
+              "
+              >Tip — learn<br />these by heart</span
             >
-              <div class="label">Usable range</div>
-              <div
-                style="
-                  font-family: var(--font-mono);
-                  font-size: 26px;
-                  font-weight: 700;
-                  color: var(--moss);
-                  margin-top: 6px;
-                "
-                id="sc-range-val"
-              >
-                192.168.32.?–?
-              </div>
-              <div
-                style="
-                  font-family: var(--font-mono);
-                  font-size: 16px;
-                  color: var(--muted);
-                  margin-top: 4px;
-                "
-                id="sc-count-val"
-              >
-                ? usable hosts
-              </div>
+            <div class="pow-strip" style="flex: 1">
+              <div class="pow-cell"><div class="e">2⁷</div><div class="n">128</div></div>
+              <div class="pow-cell"><div class="e">2⁶</div><div class="n">64</div></div>
+              <div class="pow-cell"><div class="e">2⁵</div><div class="n">32</div></div>
+              <div class="pow-cell"><div class="e">2⁴</div><div class="n">16</div></div>
+              <div class="pow-cell"><div class="e">2³</div><div class="n">8</div></div>
+              <div class="pow-cell"><div class="e">2²</div><div class="n">4</div></div>
+              <div class="pow-cell"><div class="e">2¹</div><div class="n">2</div></div>
+              <div class="pow-cell"><div class="e">2⁰</div><div class="n">1</div></div>
             </div>
           </div>
 
@@ -8451,9 +10314,9 @@
                 >STATUS<span class="badge" id="scBadge">IDLE</span></span
               >
               <span class="narration" id="scNarration"
-                >Click START — see how 192.168.32.89/27 reveals its network
-                address, broadcast address, and the usable host range step by
-                step.</span
+                >Click START — watch 172.20.2.203 / 255.255.240.0 resolve into
+                its network address, broadcast address and usable host range,
+                one step at a time.</span
               >
             </div>
             <div class="btns">
@@ -8468,9 +10331,540 @@
         </section>
 
         <!-- =========================================================
-             IP DESIGN BEST PRACTICES
+             DESIGN 1 — sizing a department subnet plan (the brief)
              ========================================================= -->
         <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Design</span
+              ><span>Subnetting design challenge</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >Worked example · the design challenge</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 54px">
+            Design the optimal <em class="display">subnetting.</em>
+          </h2>
+
+          <div
+            class="grid-2"
+            style="
+              grid-template-columns: 0.82fr 1.18fr;
+              gap: 40px;
+              margin-top: 22px;
+              align-items: start;
+            "
+          >
+            <!-- LEFT — the company & its requirements -->
+            <div class="reveal" style="--i: 2">
+              <div style="display: flex; gap: 18px; align-items: flex-start">
+                <div class="bldg">
+                  <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i
+                  ><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div>
+                  <span
+                    style="
+                      font-family: var(--font-mono);
+                      font-weight: 700;
+                      font-size: 13px;
+                      color: #fff;
+                      background: var(--amber);
+                      padding: 5px 12px;
+                      border-radius: 6px;
+                    "
+                    >PROBLEM</span
+                  >
+                  <p
+                    style="
+                      margin-top: 12px;
+                      font-size: 19px;
+                      color: var(--ink-soft);
+                      line-height: 1.5;
+                    "
+                  >
+                    A company must split one Class B block into a separate
+                    network for every department.
+                  </p>
+                </div>
+              </div>
+              <ul class="req" style="margin-top: 16px">
+                <li>
+                  One Class B network —
+                  <span class="mono">172.16.0.0/16</span>
+                </li>
+                <li>At least <strong>30 departments</strong></li>
+                <li>One network per department</li>
+                <li>≤ <strong>1023 computers</strong> per department</li>
+              </ul>
+            </div>
+
+            <!-- RIGHT — baseline + the first sizing question -->
+            <div
+              class="reveal"
+              style="--i: 3; display: flex; flex-direction: column; gap: 18px"
+            >
+              <div
+                class="card"
+                style="padding: 18px 24px; border-color: var(--amber)"
+              >
+                <div class="label" style="color: var(--amber)">
+                  Without subnetting
+                </div>
+                <p style="margin-top: 12px; font-size: 23px; line-height: 1.55">
+                  One flat network holds
+                  <span class="mono">2¹⁶ − 2 =</span>
+                  <strong
+                    style="
+                      background: #fbeea2;
+                      padding: 1px 7px;
+                      border-radius: 4px;
+                    "
+                    >65,534</strong
+                  >
+                  hosts — all 30 departments share
+                  <strong>one broadcast domain</strong>. It works, but gives no
+                  separation at all.
+                </p>
+              </div>
+              <div class="card moss" style="padding: 20px 26px">
+                <div class="label">
+                  Step 1 — how many bits label ≥ 30 departments?
+                </div>
+                <div
+                  style="
+                    margin-top: 14px;
+                    display: flex;
+                    gap: 14px;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    font-family: var(--font-mono);
+                    font-size: 23px;
+                  "
+                >
+                  <span>2² = 4</span><span>2³ = 8</span><span>2⁴ = 16</span>
+                  <span
+                    style="
+                      font-weight: 700;
+                      color: var(--moss);
+                      border: 2px solid var(--moss);
+                      border-radius: 8px;
+                      padding: 5px 14px;
+                      background: var(--moss-soft);
+                    "
+                    >2⁵ = 32 ✓</span
+                  >
+                </div>
+                <div
+                  style="margin-top: 14px; font-size: 20px; color: var(--ink-soft)"
+                >
+                  <span class="mono">2⁴ = 16</span> is too few;
+                  <strong>2⁵ = 32 ≥ 30</strong> covers every department (with 2
+                  spare for growth).
+                </div>
+                <div
+                  style="
+                    margin-top: 12px;
+                    font-family: var(--font-mono);
+                    font-size: 30px;
+                    font-weight: 700;
+                    color: var(--cobalt-deep);
+                  "
+                >
+                  → 5 subnet bits
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- bridge: the structure starts to take shape -->
+          <div
+            class="reveal"
+            style="
+              --i: 5;
+              margin-top: 24px;
+              padding: 16px 26px;
+              border: 1.5px solid var(--ink);
+              background: var(--paper-warm);
+              display: flex;
+              gap: 22px;
+              align-items: center;
+              flex-wrap: wrap;
+              font-size: 19px;
+            "
+          >
+            <strong style="color: var(--cobalt-deep)">So far</strong>
+            <span
+              >those <strong>5 subnet bits</strong> are borrowed from the host
+              part of the Class B address:</span
+            >
+            <span style="font-family: var(--font-mono); font-weight: 700"
+              ><span class="bn-net">Network · 16</span> +
+              <span
+                style="
+                  background: #f6c6e6;
+                  color: #7a2057;
+                  padding: 1px 8px;
+                  border-radius: 3px;
+                "
+                >Subnet · 5</span
+              >
+              + Host · ?</span
+            >
+            <span
+              style="margin-left: auto; color: var(--amber); font-weight: 700"
+              >Next → how many bits are left for the hosts?</span
+            >
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             DESIGN 2 — host bits (why 2¹⁰ is one short)
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Design</span
+              ><span>Sizing a subnet plan · host bits</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >Worked example · sizing each department</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 54px">
+            Then — how many bits for the <em class="display">hosts?</em>
+          </h2>
+
+          <p class="reveal" style="--i: 2; font-size: 21px; margin-top: 18px">
+            Each department needs up to <strong>1023</strong> PCs. Count up the
+            powers of 2:
+          </p>
+          <div
+            class="reveal"
+            style="
+              --i: 2;
+              margin-top: 14px;
+              display: flex;
+              gap: 16px;
+              align-items: center;
+              flex-wrap: wrap;
+              font-family: var(--font-mono);
+              font-size: 24px;
+            "
+          >
+            <span>2⁷ = 128</span><span>2⁸ = 256</span><span>2⁹ = 512</span>
+            <span
+              style="
+                font-weight: 700;
+                border: 2px solid var(--amber);
+                border-radius: 8px;
+                padding: 6px 16px;
+                background: var(--amber-soft);
+                color: var(--amber);
+              "
+              >2¹⁰ = 1024 ?</span
+            >
+          </div>
+
+          <!-- the gotcha: −2 makes 2^10 one short -->
+          <div
+            class="grid-2"
+            style="
+              grid-template-columns: 1fr 1fr;
+              gap: 36px;
+              margin-top: 22px;
+              align-items: stretch;
+            "
+          >
+            <div
+              class="card reveal"
+              style="--i: 3; padding: 22px 28px; border-color: var(--amber)"
+            >
+              <div class="label" style="color: var(--amber)">
+                Why 2¹⁰ does NOT work
+              </div>
+              <p style="margin-top: 12px; font-size: 23px; line-height: 1.6">
+                Two addresses in every block are reserved — the
+                <strong>network</strong> (all host bits 0) and the
+                <strong>broadcast</strong> (all host bits 1). So 10 host bits
+                give only
+                <span class="mono">2¹⁰ − 2 =</span>
+                <strong
+                  style="background: #fbeea2; padding: 1px 7px; border-radius: 4px"
+                  >1022</strong
+                >
+                usable. We need 1023 →
+                <strong style="color: var(--amber)">one short!</strong>
+              </p>
+            </div>
+            <div class="card moss reveal" style="--i: 4; padding: 22px 28px">
+              <div class="label">So add one more bit</div>
+              <p style="margin-top: 12px; font-size: 23px; line-height: 1.6">
+                With 11 host bits:
+                <span class="mono">2¹¹ − 2 =</span>
+                <strong
+                  style="background: #bfeef0; padding: 1px 7px; border-radius: 4px"
+                  >2046</strong
+                >
+                usable ≥ 1023 ✓ — comfortably fits, with headroom.
+              </p>
+              <div
+                style="
+                  margin-top: 12px;
+                  font-family: var(--font-mono);
+                  font-size: 28px;
+                  font-weight: 700;
+                  color: var(--moss);
+                "
+              >
+                → 11 host bits
+              </div>
+            </div>
+          </div>
+
+          <!-- organize the result as a binary structure -->
+          <div class="reveal" style="--i: 5; margin-top: 24px">
+            <div class="label" style="margin-bottom: 8px; font-size: 16px">
+              Putting it together · 16 + 5 + 11 = 32 bits
+            </div>
+            <div
+              style="
+                font-family: var(--font-mono);
+                font-size: 27px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+              "
+            >
+              <span class="bn-net">10101100.00010000</span
+              ><span style="opacity: 0.5">.</span
+              ><span
+                style="
+                  background: #f6c6e6;
+                  color: #7a2057;
+                  padding: 2px 3px;
+                  border-radius: 3px;
+                "
+                >00000</span
+              ><span class="bn-host">000.00000000</span>
+            </div>
+            <div
+              style="
+                margin-top: 10px;
+                display: flex;
+                gap: 28px;
+                font-size: 18px;
+                align-items: center;
+                flex-wrap: wrap;
+              "
+            >
+              <span
+                ><span class="bn-net">&nbsp;&nbsp;</span> Network · 16 bits (Class
+                B)</span
+              >
+              <span
+                ><span
+                  style="
+                    background: #f6c6e6;
+                    padding: 0 8px;
+                    border-radius: 3px;
+                  "
+                  >&nbsp;</span
+                >
+                Subnet · 5 bits</span
+              >
+              <span><span class="bn-host">&nbsp;&nbsp;</span> Host · 11 bits</span>
+            </div>
+            <div
+              style="
+                margin-top: 14px;
+                font-family: var(--font-mono);
+                font-size: 20px;
+                color: var(--ink-soft);
+              "
+            >
+              The mask is 21 ones →
+              <span class="bn-net">11111111.11111111.11111</span
+              ><span class="bn-host">000.00000000</span> =
+              <strong>255.255.248.0</strong>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             DESIGN 2 — the finished 32 × /21 plan
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Design</span
+              ><span>The finished plan</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0"
+            >One /21 per department · 32 zones in total</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            172.16.0.0/16 splits into
+            <em class="display">32 subnets of /21.</em>
+          </h2>
+          <p
+            class="reveal"
+            style="--i: 2; font-size: 19px; margin-top: 10px; max-width: 1560px"
+          >
+            The <strong>5 subnet bits</strong> count off the zones —
+            <span class="mono">00000</span> is the 1st,
+            <span class="mono">00001</span> the 2nd … up to the 32nd. Each new
+            subnet starts <strong>8 higher</strong> in the 3rd octet
+            (<span class="mono">256 ÷ 32 = 8</span>).
+          </p>
+
+          <div
+            class="grid-2"
+            style="
+              grid-template-columns: 1fr 1fr;
+              gap: 40px;
+              margin-top: 22px;
+              align-items: start;
+            "
+          >
+            <!-- LEFT — the 32 subnets -->
+            <table class="data reveal" style="--i: 3; font-size: 20px">
+              <thead>
+                <tr>
+                  <th>Subnet #</th>
+                  <th>Subnet bits</th>
+                  <th>Network · /21</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono">1st</td>
+                  <td class="mono">00000</td>
+                  <td class="mono">172.16.0.0</td>
+                </tr>
+                <tr>
+                  <td class="mono">2nd</td>
+                  <td class="mono">00001</td>
+                  <td class="mono">172.16.8.0</td>
+                </tr>
+                <tr style="background: var(--cobalt-soft)">
+                  <td class="mono" style="font-weight: 700">3rd ◀</td>
+                  <td class="mono">00010</td>
+                  <td class="mono">172.16.16.0</td>
+                </tr>
+                <tr>
+                  <td class="mono">4th</td>
+                  <td class="mono">00011</td>
+                  <td class="mono">172.16.24.0</td>
+                </tr>
+                <tr>
+                  <td class="mono" style="color: var(--muted)">⋮</td>
+                  <td class="mono" style="color: var(--muted)">⋮</td>
+                  <td class="mono" style="color: var(--muted)">⋮</td>
+                </tr>
+                <tr>
+                  <td class="mono">31st</td>
+                  <td class="mono">11110</td>
+                  <td class="mono">172.16.240.0</td>
+                </tr>
+                <tr>
+                  <td class="mono">32nd</td>
+                  <td class="mono">11111</td>
+                  <td class="mono">172.16.248.0</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- RIGHT — the 3rd subnet, worked out in full -->
+            <div class="reveal" style="--i: 4">
+              <div class="card" style="padding: 22px 26px">
+                <div class="label" style="color: var(--cobalt-deep)">
+                  Worked example · the 3rd subnet
+                </div>
+                <p
+                  style="
+                    margin-top: 6px;
+                    font-size: 16px;
+                    color: var(--ink-soft);
+                  "
+                >
+                  Subnet bits <span class="mono">00010</span> = 2, so it begins
+                  at <span class="mono">2 × 8 = 16</span> in the 3rd octet:
+                </p>
+                <div
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 32px;
+                    font-weight: 700;
+                    color: var(--ink);
+                    margin-top: 8px;
+                  "
+                >
+                  172.16.16.0/21
+                </div>
+                <div class="bin-row" style="font-size: 16px; margin-top: 8px">
+                  <span class="bn-net">10101100.00010000</span
+                  ><span style="opacity: 0.5">.</span
+                  ><span
+                    style="
+                      background: #f6c6e6;
+                      color: #7a2057;
+                      border-radius: 3px;
+                      padding: 1px 2px;
+                    "
+                    >00010</span
+                  ><span class="bn-host">000.00000000</span>
+                </div>
+                <div
+                  style="
+                    margin-top: 14px;
+                    display: grid;
+                    grid-template-columns: auto 1fr;
+                    gap: 9px 18px;
+                    font-size: 18px;
+                  "
+                >
+                  <span style="color: var(--muted)">Network</span>
+                  <span class="mono" style="font-weight: 700">172.16.16.0</span>
+                  <span style="color: var(--muted)">Broadcast</span>
+                  <span class="mono" style="font-weight: 700"
+                    >172.16.23.255</span
+                  >
+                  <span style="color: var(--muted)">Subnet mask</span>
+                  <span class="mono" style="font-weight: 700"
+                    >255.255.248.0</span
+                  >
+                  <span style="color: var(--muted)">Usable range</span>
+                  <span class="mono" style="font-weight: 700"
+                    >172.16.16.1 – 172.16.23.254</span
+                  >
+                  <span style="color: var(--muted)">Usable hosts</span>
+                  <span class="mono" style="font-weight: 700; color: var(--moss)"
+                    >2,046</span
+                  >
+                </div>
+              </div>
+              <div class="card moss" style="margin-top: 16px; padding: 16px 22px">
+                <p style="font-size: 17px; line-height: 1.5">
+                  <strong>32 departments × 2,046 hosts</strong> each — every zone
+                  fully isolated, with room to grow and almost nothing wasted.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             IP DESIGN BEST PRACTICES
+             ========================================================= -->
+        <section class="slide" id="planSlide">
           <div class="masthead">
             <div class="left">
               <span class="tag">IP Design</span
@@ -8481,46 +10875,376 @@
           <span class="eyebrow moss reveal" style="--i: 0"
             >Design once, grow without renumbering</span
           >
-          <h2 class="reveal" style="--i: 1; font-size: 50px">
+          <h2 class="reveal" style="--i: 1; font-size: 56px">
             A good address plan is
             <em class="display">boring on purpose.</em>
           </h2>
-          <div class="grid-3" style="margin-top: 38px; gap: 32px">
-            <div class="card reveal" style="--i: 2">
-              <div class="label">01 / Plan by function</div>
-              <h3>One subnet per role</h3>
-              <p style="margin-top: 8px">
-                Give each department or device class its own subnet — Sales,
-                Engineering, servers, printers, management. Keep blocks
-                contiguous so routes and firewall rules stay simple.
-              </p>
+
+          <div
+            class="grid-2"
+            style="
+              grid-template-columns: 0.92fr 1.08fr;
+              gap: 44px;
+              margin-top: 26px;
+              align-items: start;
+            "
+          >
+            <!-- LEFT — the three principles (bigger) -->
+            <div
+              class="reveal"
+              style="--i: 2; display: flex; flex-direction: column; gap: 16px"
+            >
+              <div class="card" style="padding: 18px 24px">
+                <div class="label" style="font-size: 16px; color: var(--cobalt-deep)">
+                  01 · Plan by function
+                </div>
+                <h3 style="font-size: 25px; margin-top: 4px">One subnet per role</h3>
+                <p style="margin-top: 8px; font-size: 19px; line-height: 1.5">
+                  Each department or device class gets its own subnet — keep the
+                  blocks contiguous so routes &amp; firewall rules stay simple.
+                </p>
+              </div>
+              <div class="card amber" style="padding: 18px 24px">
+                <div class="label" style="font-size: 16px">02 · Size for growth</div>
+                <h3 style="font-size: 25px; margin-top: 4px">Round up, leave gaps</h3>
+                <p style="margin-top: 8px; font-size: 19px; line-height: 1.5">
+                  Pick a prefix above today's host count and reserve the next
+                  block — renumbering a live network is painful.
+                </p>
+              </div>
+              <div class="card plum" style="padding: 18px 24px">
+                <div class="label" style="font-size: 16px">03 · Document it</div>
+                <h3 style="font-size: 25px; margin-top: 4px">Write the plan down</h3>
+                <p style="margin-top: 8px; font-size: 19px; line-height: 1.5">
+                  Keep an IPAM sheet: every subnet, mask, VLAN, gateway and
+                  purpose. Undocumented space is how outages happen.
+                </p>
+              </div>
             </div>
-            <div class="card amber reveal" style="--i: 3">
-              <div class="label">02 / Size for growth</div>
-              <h3>Round up, leave gaps</h3>
-              <p style="margin-top: 8px">
-                Pick a prefix above today's host count and reserve the next
-                block. Renumbering a live network is painful — a /24 that only
-                holds 50 hosts is cheap insurance.
-              </p>
-            </div>
-            <div class="card plum reveal" style="--i: 4">
-              <div class="label">03 / Document it</div>
-              <h3>Write the plan down</h3>
-              <p style="margin-top: 8px">
-                Maintain an IPAM sheet: every subnet, its mask, VLAN, gateway,
-                DHCP range, and purpose. Undocumented IP space is how conflicts
-                and outages happen.
-              </p>
+
+            <!-- RIGHT — animated worked example of a plan being built -->
+            <div class="reveal" style="--i: 3">
+              <div
+                style="
+                  display: flex;
+                  align-items: baseline;
+                  justify-content: space-between;
+                "
+              >
+                <div class="label" style="font-size: 17px; color: var(--cobalt-deep)">
+                  Example · building one 172.16.0.0/16 plan
+                </div>
+                <button
+                  class="cm-mode-btn"
+                  id="plan-replay"
+                  style="font-size: 15px; padding: 7px 16px"
+                >
+                  ▶ Replay
+                </button>
+              </div>
+
+              <!-- the address-space bar (segments appear as they're allocated) -->
+              <div class="plan-bar" style="margin-top: 16px">
+                <div class="plan-seg" style="width: 22%; background: var(--cobalt)"></div>
+                <div class="plan-seg" style="width: 22%; background: var(--moss)"></div>
+                <div class="plan-seg" style="width: 11%; background: var(--amber)"></div>
+                <div class="plan-seg" style="width: 6%; background: var(--plum)"></div>
+                <div
+                  class="plan-seg"
+                  style="
+                    flex: 1;
+                    background: repeating-linear-gradient(
+                      45deg,
+                      var(--paper-warm),
+                      var(--paper-warm) 7px,
+                      #e6dcc4 7px,
+                      #e6dcc4 14px
+                    );
+                  "
+                ></div>
+              </div>
+
+              <!-- the IPAM rows fill in one by one -->
+              <div style="margin-top: 18px">
+                <div class="plan-row">
+                  <span class="stripe" style="background: var(--cobalt)"></span>
+                  <div style="font-size: 19px">
+                    <strong>Sales</strong> ·
+                    <span class="mono">172.16.0.0/22</span>
+                  </div>
+                  <div style="font-size: 16px; color: var(--muted)">
+                    1022 hosts · desktops
+                  </div>
+                </div>
+                <div class="plan-row">
+                  <span class="stripe" style="background: var(--moss)"></span>
+                  <div style="font-size: 19px">
+                    <strong>Engineering</strong> ·
+                    <span class="mono">172.16.4.0/22</span>
+                  </div>
+                  <div style="font-size: 16px; color: var(--muted)">
+                    1022 hosts · desktops + lab
+                  </div>
+                </div>
+                <div class="plan-row">
+                  <span class="stripe" style="background: var(--amber)"></span>
+                  <div style="font-size: 19px">
+                    <strong>Servers</strong> ·
+                    <span class="mono">172.16.8.0/24</span>
+                  </div>
+                  <div style="font-size: 16px; color: var(--muted)">
+                    254 · static, low addresses
+                  </div>
+                </div>
+                <div class="plan-row">
+                  <span class="stripe" style="background: var(--plum)"></span>
+                  <div style="font-size: 19px">
+                    <strong>Printers</strong> ·
+                    <span class="mono">172.16.9.0/26</span>
+                  </div>
+                  <div style="font-size: 16px; color: var(--muted)">
+                    62 · fixed devices
+                  </div>
+                </div>
+                <div class="plan-row">
+                  <span
+                    class="stripe"
+                    style="background: #e6dcc4; border: 1px dashed var(--muted)"
+                  ></span>
+                  <div style="font-size: 19px; color: var(--muted)">
+                    <em>reserved</em> ·
+                    <span class="mono">172.16.10.0/23</span>
+                  </div>
+                  <div style="font-size: 16px; color: var(--muted)">
+                    growth gap — left empty on purpose
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="reveal" style="--i: 5; margin-top: 30px">
-            <p style="font-size: 20px; color: var(--muted)">
-              <strong style="color: var(--ink)">Common conventions:</strong>
-              gateway on <span class="mono">.1</span> · servers on low static
-              addresses · DHCP pool in the upper range · same third octet ≈ same
-              VLAN. Consistency beats cleverness.
-            </p>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             NETWORK TOPOLOGY — how devices are wired (animated star)
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Network design</span
+              ><span>Topology · how devices connect</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)"
+            >The shape of the wiring</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 58px">
+            Four ways to wire a network —
+            <em class="display">topology.</em>
+          </h2>
+
+          <div
+            class="reveal"
+            style="
+              --i: 2;
+              margin-top: 28px;
+              display: grid;
+              grid-template-columns: repeat(4, 1fr);
+              gap: 26px;
+            "
+          >
+            <!-- STAR (animated signal pulse) -->
+            <div class="topo">
+              <h4>★ Star</h4>
+              <svg width="216" height="176" viewBox="0 0 160 130">
+                <g stroke="#c9bfa8" stroke-width="2">
+                  <line x1="80" y1="65" x2="80" y2="20" />
+                  <line x1="80" y1="65" x2="26" y2="46" />
+                  <line x1="80" y1="65" x2="134" y2="46" />
+                  <line x1="80" y1="65" x2="42" y2="110" />
+                  <line x1="80" y1="65" x2="118" y2="110" />
+                </g>
+                <circle
+                  class="topo-ping"
+                  cx="80"
+                  cy="65"
+                  r="4"
+                  fill="none"
+                  stroke="#1d3fb8"
+                  stroke-width="2"
+                />
+                <g fill="#d6deff" stroke="#1d3fb8" stroke-width="2">
+                  <circle cx="80" cy="20" r="9" /><circle
+                    cx="26"
+                    cy="46"
+                    r="9"
+                  /><circle cx="134" cy="46" r="9" /><circle
+                    cx="42"
+                    cy="110"
+                    r="9"
+                  /><circle cx="118" cy="110" r="9" />
+                </g>
+                <rect x="66" y="55" width="28" height="20" rx="3" fill="#1d3fb8" />
+              </svg>
+              <p>
+                Every device to one central switch. <strong>Today's standard.</strong>
+              </p>
+            </div>
+            <!-- BUS -->
+            <div class="topo">
+              <h4>Bus</h4>
+              <svg width="216" height="176" viewBox="0 0 160 130">
+                <line x1="12" y1="82" x2="148" y2="82" stroke="#0f2030" stroke-width="3" />
+                <g stroke="#c9bfa8" stroke-width="2">
+                  <line x1="35" y1="82" x2="35" y2="48" /><line x1="70" y1="82" x2="70" y2="48" /><line x1="105" y1="82" x2="105" y2="48" /><line x1="140" y1="82" x2="140" y2="48" />
+                </g>
+                <g fill="#cbe1ce" stroke="#3a7d44" stroke-width="2">
+                  <rect x="24" y="30" width="22" height="18" rx="3" /><rect x="59" y="30" width="22" height="18" rx="3" /><rect x="94" y="30" width="22" height="18" rx="3" /><rect x="129" y="30" width="22" height="18" rx="3" />
+                </g>
+              </svg>
+              <p>One shared backbone. Cheap, fragile, legacy.</p>
+            </div>
+            <!-- RING -->
+            <div class="topo">
+              <h4>Ring</h4>
+              <svg width="216" height="176" viewBox="0 0 160 130">
+                <polygon
+                  points="122,65 101,101 59,101 38,65 59,29 101,29"
+                  fill="none"
+                  stroke="#c9bfa8"
+                  stroke-width="2"
+                />
+                <g fill="#ecd5e2" stroke="#7a2057" stroke-width="2">
+                  <circle cx="122" cy="65" r="9" /><circle cx="101" cy="101" r="9" /><circle cx="59" cy="101" r="9" /><circle cx="38" cy="65" r="9" /><circle cx="59" cy="29" r="9" /><circle cx="101" cy="29" r="9" />
+                </g>
+              </svg>
+              <p>Each node to the next in a loop. Token-passing.</p>
+            </div>
+            <!-- MESH -->
+            <div class="topo">
+              <h4>Mesh</h4>
+              <svg width="216" height="176" viewBox="0 0 160 130">
+                <g stroke="#c9bfa8" stroke-width="1.5">
+                  <line x1="80" y1="22" x2="28" y2="60" /><line x1="80" y1="22" x2="132" y2="60" /><line x1="80" y1="22" x2="50" y2="112" /><line x1="80" y1="22" x2="110" y2="112" /><line x1="28" y1="60" x2="132" y2="60" /><line x1="28" y1="60" x2="50" y2="112" /><line x1="28" y1="60" x2="110" y2="112" /><line x1="132" y1="60" x2="50" y2="112" /><line x1="132" y1="60" x2="110" y2="112" /><line x1="50" y1="112" x2="110" y2="112" />
+                </g>
+                <g fill="#f5d9bf" stroke="#d9621a" stroke-width="2">
+                  <circle cx="80" cy="22" r="9" /><circle cx="28" cy="60" r="9" /><circle cx="132" cy="60" r="9" /><circle cx="50" cy="112" r="9" /><circle cx="110" cy="112" r="9" />
+                </g>
+              </svg>
+              <p>Many cross-links. Resilient, costly — backbones.</p>
+            </div>
+          </div>
+
+          <!-- relate to network design -->
+          <div
+            class="reveal"
+            style="
+              --i: 3;
+              margin-top: 34px;
+              padding: 22px 30px;
+              border: 1.5px solid var(--ink);
+              background: var(--cobalt-soft);
+              font-size: 23px;
+              line-height: 1.55;
+            "
+          >
+            <strong>Why it matters for design:</strong> a switch (or a VLAN on
+            it) joins all its ports into <strong>one broadcast domain</strong> —
+            exactly what a subnet maps to. Put each department on its own switch
+            / VLAN / subnet and you contain the broadcast traffic we sized in the
+            last slides.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             UNICAST / BROADCAST / MULTICAST — simulation
+             ========================================================= -->
+        <section class="slide" id="castSlide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Interactive</span
+              ><span>Addressing a frame · who receives it?</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >Live simulation · pick a delivery mode</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            One sender, <em class="display">three ways</em> to deliver.
+          </h2>
+
+          <div
+            class="reveal"
+            style="
+              --i: 2;
+              margin-top: 18px;
+              display: grid;
+              grid-template-columns: 1040px 1fr;
+              gap: 36px;
+              align-items: start;
+            "
+          >
+            <!-- the animated network stage -->
+            <div class="cm-stage" id="cm-stage">
+              <svg
+                width="1040"
+                height="448"
+                viewBox="0 0 1040 448"
+                style="position: absolute; inset: 0; z-index: 1"
+                id="cm-links"
+              >
+                <line x1="158" y1="226" x2="440" y2="226" stroke="#c9bfa8" stroke-width="3" />
+                <line class="cm-link" data-h="0" x1="620" y1="226" x2="800" y2="36" stroke="#c9bfa8" stroke-width="3" />
+                <line class="cm-link" data-h="1" x1="620" y1="226" x2="800" y2="110" stroke="#c9bfa8" stroke-width="3" />
+                <line class="cm-link" data-h="2" x1="620" y1="226" x2="800" y2="184" stroke="#c9bfa8" stroke-width="3" />
+                <line class="cm-link" data-h="3" x1="620" y1="226" x2="800" y2="258" stroke="#c9bfa8" stroke-width="3" />
+                <line class="cm-link" data-h="4" x1="620" y1="226" x2="800" y2="332" stroke="#c9bfa8" stroke-width="3" />
+                <line class="cm-link" data-h="5" x1="620" y1="226" x2="800" y2="406" stroke="#c9bfa8" stroke-width="3" />
+              </svg>
+
+              <div
+                class="cm-node"
+                id="cm-sender"
+                style="left: 0; top: 186px; width: 158px; height: 80px; flex-direction: column"
+              >
+                <span style="font-size: 19px">PC-A</span
+                ><span style="font-weight: 400; color: var(--muted)">sender</span>
+              </div>
+              <div
+                class="cm-node"
+                id="cm-switch"
+                style="left: 440px; top: 176px; width: 180px; height: 100px; font-size: 20px; background: var(--ink); color: var(--paper); border-color: var(--ink)"
+              >
+                SWITCH
+              </div>
+              <!-- hosts -->
+              <div class="cm-node cm-host" data-h="0" style="left: 800px; top: 8px; width: 240px; height: 56px; gap: 8px">PC-B</div>
+              <div class="cm-node cm-host" data-h="1" style="left: 800px; top: 82px; width: 240px; height: 56px; gap: 8px">PC-C&nbsp;<span style="color: var(--moss)">● group</span></div>
+              <div class="cm-node cm-host" data-h="2" style="left: 800px; top: 156px; width: 240px; height: 56px; gap: 8px">PC-D</div>
+              <div class="cm-node cm-host" data-h="3" style="left: 800px; top: 230px; width: 240px; height: 56px; gap: 8px">PC-E&nbsp;<span style="color: var(--moss)">● group</span></div>
+              <div class="cm-node cm-host" data-h="4" style="left: 800px; top: 304px; width: 240px; height: 56px; gap: 8px">PC-F&nbsp;<span style="color: var(--moss)">● group</span></div>
+              <div class="cm-node cm-host" data-h="5" style="left: 800px; top: 378px; width: 240px; height: 56px; gap: 8px">PC-G</div>
+            </div>
+
+            <!-- explanation panel -->
+            <div>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap">
+                <button class="cm-mode-btn" id="cm-uni">Unicast</button>
+                <button class="cm-mode-btn" id="cm-bcast">Broadcast</button>
+                <button class="cm-mode-btn" id="cm-mcast">Multicast</button>
+              </div>
+              <div class="card" id="cm-explain" style="margin-top: 18px; padding: 20px 24px; min-height: 250px">
+                <div class="label" style="color: var(--muted)">How a frame is addressed</div>
+                <p style="margin-top: 10px; font-size: 19px; line-height: 1.6">
+                  Pick a mode above. Watch the frame leave <strong>PC-A</strong>,
+                  reach the switch, and see <em>who</em> the switch forwards it
+                  to.
+                </p>
+              </div>
+            </div>
           </div>
           <div class="page-num"></div>
         </section>
@@ -10373,17 +13097,26 @@
         const slide = document.getElementById("subnetCalcSlide");
         if (!slide) return;
 
-        const HOST_DEC = 89; // .89
-        const NET_BITS = 3; // from /27: 3 bits borrowed in last octet
-        const HOST_BITS = 5;
+        const OCT = [172, 20, 2, 203];
+        const MASK = [255, 255, 240, 0];
+        const PREFIX = 20;
+        const HOST_BITS = 32 - PREFIX; // 12
+        const NET = [172, 20, 0, 0];
+        const BC = [172, 20, 15, 255];
 
-        const toBin8 = (n) => n.toString(2).padStart(8, "0");
-        const bin8 = toBin8(HOST_DEC); // "01011001"
-        const subnetPart = bin8.slice(0, NET_BITS); // "010"
-        const networkBin = subnetPart + "0".repeat(HOST_BITS); // "01000000" = 64
-        const broadcastBin = subnetPart + "1".repeat(HOST_BITS); // "01011111" = 95
-        const networkOct = parseInt(networkBin, 2); // 64
-        const broadcastOct = parseInt(broadcastBin, 2); // 95
+        const dotted = (o) =>
+          o.map((x) => x.toString(2).padStart(8, "0")).join(".");
+        // character index of the network/host boundary inside the dotted string
+        const splitIdx = (p) => p + Math.floor(p / 8) - (p % 8 === 0 ? 1 : 0);
+        // render a dotted-binary address: network half (yellow) + host half (cyan)
+        function colored(octets) {
+          const s = dotted(octets);
+          const i = splitIdx(PREFIX);
+          return (
+            `<span class="bn-net">${s.slice(0, i)}</span>` +
+            `<span class="bn-host">${s.slice(i)}</span>`
+          );
+        }
 
         let timer = null,
           stepIdx = 0,
@@ -10394,84 +13127,99 @@
         const startBtn = document.getElementById("scStart");
         const pauseBtn = document.getElementById("scPause");
         const stopBtn = document.getElementById("scStop");
-        const bitsDiv = document.getElementById("sc-bits");
-        const netCard = document.getElementById("sc-net-card");
-        const bcCard = document.getElementById("sc-bc-card");
-        const rangeCard = document.getElementById("sc-range-card");
-        const netVal = document.getElementById("sc-net-val");
-        const bcVal = document.getElementById("sc-bc-val");
-        const rangeVal = document.getElementById("sc-range-val");
-        const countVal = document.getElementById("sc-count-val");
-        const bitLabel = document.getElementById("sc-bit-label");
+
+        const maskBin = document.getElementById("sc-mask-bin");
+        const ipBin = document.getElementById("sc-ip-bin");
+        const netBin = document.getElementById("sc-net-bin");
+        const bcBin = document.getElementById("sc-bc-bin");
+        const netBits = document.getElementById("sc-netbits");
+        const hostBits = document.getElementById("sc-hostbits");
+        const rNet = document.getElementById("sc-r-net");
+        const rBc = document.getElementById("sc-r-bc");
+        const rCidr = document.getElementById("sc-r-cidr");
+        const rHosts = document.getElementById("sc-r-hosts");
+        const rRange = document.getElementById("sc-r-range");
+
+        // populate the binary rows once; they stay dim until each step lights them
+        maskBin.innerHTML = colored(MASK);
+        ipBin.innerHTML = colored(OCT);
+        netBin.innerHTML = colored(NET);
+        bcBin.innerHTML = colored(BC);
+
+        const DIM_ROWS = [
+          maskBin,
+          ipBin,
+          netBin,
+          bcBin,
+          netBits,
+          hostBits,
+          rNet,
+          rBc,
+          rCidr,
+          rHosts,
+          rRange,
+        ];
 
         function setBadge(t, c) {
           badge.textContent = t;
           badge.style.background = c || "var(--moss)";
         }
-
-        function buildBits(vals) {
-          bitsDiv.innerHTML = "";
-          vals.forEach((v, i) => {
-            const d = document.createElement("div");
-            d.className = "sc-bit";
-            d.textContent = v;
-            if (i < NET_BITS) d.classList.add("subnet");
-            else d.classList.add("host");
-            bitsDiv.appendChild(d);
-          });
-        }
+        // restore each element to its resting (dim) or lit opacity
+        const lit = (el, on) => {
+          el.style.opacity = on
+            ? "1"
+            : el === netBin || el === bcBin
+              ? "0.18"
+              : "0.22";
+        };
 
         function resetVisual() {
-          buildBits("????????".split(""));
-          [netCard, bcCard, rangeCard].forEach((c) => (c.style.opacity = "0"));
-          netVal.textContent = "192.168.32.?";
-          bcVal.textContent = "192.168.32.?";
-          rangeVal.textContent = "192.168.32.?–?";
-          countVal.textContent = "? usable hosts";
-          bitLabel.style.opacity = "0";
+          DIM_ROWS.forEach((el) => lit(el, false));
           narration.textContent =
-            "Click START — see how 192.168.32.89/27 reveals its network address, broadcast address, and the usable host range step by step.";
+            "Click START — watch 172.20.2.203 / 255.255.240.0 resolve into its network address, broadcast address and usable host range, one step at a time.";
           setBadge("IDLE", "var(--ink)");
         }
 
         const STEPS = [
           {
-            narr: "Step 1 — Take the last octet: 89. Write it in 8-bit binary.",
+            narr:
+              "Step 1 — Write the mask 255.255.240.0 in binary and count the 1-bits: 20 ones, so the prefix is /20.",
             fn() {
-              buildBits("????????".split(""));
-              [netCard, bcCard, rangeCard].forEach(
-                (c) => (c.style.opacity = "0"),
-              );
-              bitLabel.style.opacity = "0";
+              lit(maskBin, true);
+              lit(netBits, true);
+              lit(hostBits, true);
             },
           },
           {
-            narr: `Step 2 — 89 in binary = ${bin8}. Split by /27: first 3 bits = subnet part (${subnetPart}), last 5 = host part.`,
+            narr:
+              "Step 2 — That 20 / 12 split applies to the address too: the first 20 bits are the network, the last 12 are the host.",
             fn() {
-              buildBits(bin8.split(""));
-              bitLabel.style.opacity = "1";
+              lit(ipBin, true);
             },
           },
           {
-            narr: `Step 3 — Network address: keep subnet bits (${subnetPart}), set host bits to 0 → ${networkBin} = ${networkOct} → 192.168.32.${networkOct}`,
+            narr:
+              "Step 3 — Network address: keep the network bits, force every host bit to 0 → 172.20.0.0, i.e. 172.20.0.0/20.",
             fn() {
-              netVal.textContent = `192.168.32.${networkOct}`;
-              netCard.style.opacity = "1";
+              lit(netBin, true);
+              lit(rNet, true);
+              lit(rCidr, true);
             },
           },
           {
-            narr: `Step 4 — Broadcast address: keep subnet bits (${subnetPart}), set host bits to 1 → ${broadcastBin} = ${broadcastOct} → 192.168.32.${broadcastOct}`,
+            narr:
+              "Step 4 — Broadcast address: keep the network bits, force every host bit to 1 → 172.20.15.255.",
             fn() {
-              bcVal.textContent = `192.168.32.${broadcastOct}`;
-              bcCard.style.opacity = "1";
+              lit(bcBin, true);
+              lit(rBc, true);
             },
           },
           {
-            narr: `Step 5 — Usable range: network+1 to broadcast−1 = .${networkOct + 1} – .${broadcastOct - 1}. Total usable = 2⁵ − 2 = ${Math.pow(2, HOST_BITS) - 2} hosts.`,
+            narr:
+              "Step 5 — Host capacity = 2¹² − 2 = 4,094 usable addresses → range 172.20.0.1 to 172.20.15.254.",
             fn() {
-              rangeVal.textContent = `192.168.32.${networkOct + 1} – .${broadcastOct - 1}`;
-              countVal.textContent = `${Math.pow(2, HOST_BITS) - 2} usable hosts`;
-              rangeCard.style.opacity = "1";
+              lit(rHosts, true);
+              lit(rRange, true);
               setBadge("DONE", "var(--moss)");
             },
           },
@@ -10485,8 +13233,8 @@
           const s = STEPS[stepIdx++];
           narration.textContent = s.narr;
           s.fn();
-          if (stepIdx < STEPS.length) timer = setTimeout(runStep, 2200);
-          else timer = setTimeout(stopSim, 1800);
+          if (stepIdx < STEPS.length) timer = setTimeout(runStep, 2400);
+          else timer = setTimeout(stopSim, 2000);
         }
 
         function stopSim() {
@@ -10497,9 +13245,9 @@
           pauseBtn.disabled = true;
           stopBtn.disabled = true;
           pauseBtn.textContent = "❚❚ Pause";
+          // only wipe back to IDLE if the run was interrupted before the end
           if (stepIdx < STEPS.length) {
             resetVisual();
-            setBadge("IDLE", "var(--ink)");
           }
         }
 
@@ -10513,7 +13261,6 @@
           }
           stepIdx = 0;
           resetVisual();
-          buildBits("????????".split(""));
           startBtn.disabled = true;
           pauseBtn.disabled = false;
           stopBtn.disabled = false;
@@ -10536,6 +13283,541 @@
         });
 
         resetVisual();
+      })();
+
+      /* ===========================================================
+         ADDRESS-PLAN BUILDER ANIMATION
+         Reveals the IPAM rows + address-bar segments one by one
+         each time the slide becomes active (and on Replay).
+         =========================================================== */
+      (function () {
+        const slide = document.getElementById("planSlide");
+        if (!slide) return;
+        const rows = [...slide.querySelectorAll(".plan-row")];
+        const segs = [...slide.querySelectorAll(".plan-seg")];
+        const replay = document.getElementById("plan-replay");
+        let timers = [];
+        const clear = () => {
+          timers.forEach(clearTimeout);
+          timers = [];
+        };
+        function reset() {
+          clear();
+          rows.forEach((r) => r.classList.remove("show"));
+          segs.forEach((s) => s.classList.remove("show"));
+        }
+        function play() {
+          reset();
+          segs.forEach((s, i) =>
+            timers.push(setTimeout(() => s.classList.add("show"), 350 + i * 480)),
+          );
+          rows.forEach((r, i) =>
+            timers.push(setTimeout(() => r.classList.add("show"), 350 + i * 480)),
+          );
+        }
+        if (replay) replay.addEventListener("click", play);
+        // replay whenever the slide is navigated to
+        let was = false;
+        new MutationObserver(() => {
+          const a = slide.classList.contains("active");
+          if (a && !was) play();
+          was = a;
+        }).observe(slide, { attributes: true, attributeFilter: ["class"] });
+        if (slide.classList.contains("active")) play();
+      })();
+
+      /* ===========================================================
+         UNICAST / BROADCAST / MULTICAST SIMULATOR
+         A frame leaves PC-A, reaches the switch, then the switch
+         forwards it to one / all / a group of hosts — animated.
+         =========================================================== */
+      (function () {
+        const stage = document.getElementById("castSlide");
+        if (!stage) return;
+        const stageEl = document.getElementById("cm-stage");
+        const sender = document.getElementById("cm-sender");
+        const hosts = [...stage.querySelectorAll(".cm-host")];
+        const links = [...stage.querySelectorAll(".cm-link")];
+        const explain = document.getElementById("cm-explain");
+        const btnU = document.getElementById("cm-uni");
+        const btnB = document.getElementById("cm-bcast");
+        const btnM = document.getElementById("cm-mcast");
+        const hostMidY = [36, 110, 184, 258, 332, 406];
+
+        const MODES = {
+          uni: {
+            targets: [1],
+            color: "#1d3fb8",
+            btn: btnU,
+            html: `<div class="label" style="color:#112879">Unicast · one-to-one</div>
+              <div style="font-family:var(--font-mono); margin-top:8px; font-size:15px">dst MAC = PC-C's address</div>
+              <p style="margin-top:10px; font-size:18px; line-height:1.55">The switch has learned which port PC-C sits on, so it forwards the frame out <strong>only that one port</strong>. Just PC-C receives it.</p>
+              <p style="margin-top:10px; font-size:16px; color:var(--ink-soft)"><strong>Use:</strong> almost all traffic — web, file copy, SSH.<br><strong>Design:</strong> efficient; the switch keeps unicast off every other port.</p>`,
+          },
+          bcast: {
+            targets: [0, 1, 2, 3, 4, 5],
+            color: "#d9621a",
+            btn: btnB,
+            html: `<div class="label" style="color:#d9621a">Broadcast · one-to-all</div>
+              <div style="font-family:var(--font-mono); margin-top:8px; font-size:15px">dst MAC = ff:ff:ff:ff:ff:ff</div>
+              <p style="margin-top:10px; font-size:18px; line-height:1.55"><strong>Every</strong> host in the subnet receives it and must process it — ready or not.</p>
+              <p style="margin-top:10px; font-size:16px; color:var(--ink-soft)"><strong>Use:</strong> ARP "who has this IP?", DHCP Discover.<br><strong>Design:</strong> it floods the whole broadcast domain — subnetting &amp; VLANs limit how far it spreads.</p>`,
+          },
+          mcast: {
+            targets: [1, 3, 4],
+            color: "#3a7d44",
+            btn: btnM,
+            html: `<div class="label" style="color:#3a7d44">Multicast · one-to-group</div>
+              <div style="font-family:var(--font-mono); margin-top:8px; font-size:15px">dst = group address (224.0.0.0/4)</div>
+              <p style="margin-top:10px; font-size:18px; line-height:1.55">Only the hosts that <strong>joined the group</strong> (PC-C, PC-E, PC-F) receive it — the rest stay untouched.</p>
+              <p style="margin-top:10px; font-size:16px; color:var(--ink-soft)"><strong>Use:</strong> video / IPTV, OSPF routing updates.<br><strong>Design:</strong> one stream serves many without flooding everyone — bandwidth-efficient.</p>`,
+          },
+        };
+
+        // pool of dots (6 fan-out + 1 sender→switch)
+        const dots = [];
+        for (let i = 0; i < 7; i++) {
+          const d = document.createElement("div");
+          d.className = "cm-dot";
+          stageEl.appendChild(d);
+          dots.push(d);
+        }
+
+        let timers = [];
+        const clearTimers = () => {
+          timers.forEach(clearTimeout);
+          timers = [];
+        };
+        function reset() {
+          clearTimers();
+          hosts.forEach((h) => {
+            h.style.background = "";
+            h.style.borderColor = "";
+            h.style.color = "";
+          });
+          links.forEach((l) => {
+            l.setAttribute("stroke", "#c9bfa8");
+            l.setAttribute("stroke-width", "2.5");
+          });
+          sender.classList.remove("lit");
+          dots.forEach((d) => {
+            d.style.opacity = "0";
+            d.style.transition = "none";
+            d.style.transform = "translate(0,0)";
+          });
+        }
+        function fly(dot, x1, y1, x2, y2, color) {
+          dot.style.transition = "none";
+          dot.style.background = color;
+          dot.style.left = x1 - 12 + "px";
+          dot.style.top = y1 - 12 + "px";
+          dot.style.transform = "translate(0,0)";
+          dot.style.opacity = "1";
+          void dot.offsetWidth;
+          dot.style.transition = "transform .6s linear, opacity .3s";
+          dot.style.transform = `translate(${x2 - x1}px, ${y2 - y1}px)`;
+        }
+        function run(key) {
+          const m = MODES[key];
+          reset();
+          [btnU, btnB, btnM].forEach((b) => b.classList.remove("active"));
+          m.btn.classList.add("active");
+          sender.classList.add("lit");
+          explain.innerHTML = m.html;
+          // stage 1 — sender to switch
+          fly(dots[6], 158, 226, 530, 226, m.color);
+          // stage 2 — switch fans out to the target(s)
+          timers.push(
+            setTimeout(() => {
+              dots[6].style.opacity = "0";
+              m.targets.forEach((idx, k) => {
+                timers.push(
+                  setTimeout(() => {
+                    links[idx].setAttribute("stroke", m.color);
+                    links[idx].setAttribute("stroke-width", "4");
+                    fly(dots[k], 620, 226, 800, hostMidY[idx], m.color);
+                  }, k * 70),
+                );
+                timers.push(
+                  setTimeout(
+                    () => {
+                      const h = hosts[idx];
+                      h.style.background = m.color;
+                      h.style.borderColor = m.color;
+                      h.style.color = "#fff";
+                    },
+                    600 + k * 70,
+                  ),
+                );
+              });
+            }, 650),
+          );
+        }
+        btnU.addEventListener("click", () => run("uni"));
+        btnB.addEventListener("click", () => run("bcast"));
+        btnM.addEventListener("click", () => run("mcast"));
+      })();
+
+      /* ===========================================================
+         TCP SLIDING WINDOW SIMULATOR (byte-level, MSS = 1000)
+         Data is sliced into 1000-byte segments. The sender keeps a
+         window in flight; the receiver buffers, advertises its free
+         window, and ACKs each segment — so the window slides + resizes.
+         Mirrors the classic send/ACK ladder diagram.
+         =========================================================== */
+      (function () {
+        const slide = document.getElementById("windowSlide");
+        if (!slide) return;
+        const MSS = 1000,
+          CAP = 3; // receiver buffer capacity in segments (3000 B)
+        const stream = document.getElementById("sw-stream");
+        const frame = document.getElementById("sw-frame");
+        const frameLabel = document.getElementById("sw-frame-label");
+        const ackedOut = document.getElementById("sw-acked");
+        const wire = document.getElementById("sw-wire");
+        const packet = document.getElementById("sw-packet");
+        const buf = document.getElementById("sw-buf");
+        const slots = [...buf.querySelectorAll(".sw-slot")];
+        const rwndOut = document.getElementById("sw-rwnd");
+        const narration = document.getElementById("wsNarration");
+        const badge = document.getElementById("wsBadge");
+        const startBtn = document.getElementById("wsStart");
+        const pauseBtn = document.getElementById("wsPause");
+        const stopBtn = document.getElementById("wsStop");
+        const boxes = [...stream.querySelectorAll(".sw-box")];
+
+        // Authored event timeline, faithful to the classic ladder diagram.
+        // Each event carries the resulting state: base (lowest unacked seq),
+        // win (sender window bytes), acked (highest confirmed byte),
+        // sent (highest seq sent), bufUsed (receiver slots filled).
+        const EV = [
+          { kind: "note", base: 1, win: 3000, acked: 0, sent: 0, bufUsed: 0,
+            narr: "Receiver advertises a 3000-byte window → up to three 1000 B segments may be in flight at once." },
+          { kind: "send", seq: 1, base: 1, win: 3000, acked: 0, sent: 1, bufUsed: 1,
+            narr: "SEND seq=1 (bytes 1–1000). Receiver buffers it → free window 3000 → 2000." },
+          { kind: "send", seq: 1001, base: 1, win: 3000, acked: 0, sent: 1001, bufUsed: 2,
+            narr: "SEND seq=1001. Buffer 2 / 3 → free window 1000." },
+          { kind: "send", seq: 2001, base: 1, win: 3000, acked: 0, sent: 2001, bufUsed: 3,
+            narr: "SEND seq=2001. Buffer full (3 / 3) → window 0. The sender must wait." },
+          { kind: "proc", base: 1, win: 3000, acked: 0, sent: 2001, bufUsed: 1,
+            narr: "Receiver's app reads two segments from the buffer → frees 2000 B." },
+          { kind: "ack", ack: 1001, win: 2000, base: 1001, acked: 1000, sent: 2001, bufUsed: 1,
+            narr: "ACK 1001, window=2000 — bytes ≤ 1000 confirmed. The window slides to start at seq 1001." },
+          { kind: "ack", ack: 2001, win: 1000, base: 2001, acked: 2000, sent: 2001, bufUsed: 1,
+            narr: "ACK 2001, window=1000 — segment 1001 confirmed." },
+          { kind: "ack", ack: 3001, win: 2000, base: 3001, acked: 3000, sent: 2001, bufUsed: 1,
+            narr: "ACK 3001, window=2000 — segment 2001 confirmed; the buffer drained, so the window opens up again." },
+          { kind: "send", seq: 3001, base: 3001, win: 2000, acked: 3000, sent: 3001, bufUsed: 2,
+            narr: "SEND seq=3001 → buffer 2 / 3, free window 1000." },
+          { kind: "send", seq: 4001, base: 3001, win: 2000, acked: 3000, sent: 4001, bufUsed: 3,
+            narr: "SEND seq=4001 → buffer full again, window 0." },
+          { kind: "proc", base: 3001, win: 2000, acked: 3000, sent: 4001, bufUsed: 1,
+            narr: "App reads again → frees 2000 B." },
+          { kind: "ack", ack: 4001, win: 2000, base: 4001, acked: 4000, sent: 4001, bufUsed: 1,
+            narr: "ACK 4001, window=2000 — segment 3001 confirmed; the window slides on." },
+          { kind: "send", seq: 5001, base: 4001, win: 2000, acked: 4000, sent: 5001, bufUsed: 2,
+            narr: "SEND seq=5001 (the last segment) → in flight." },
+          { kind: "ack", ack: 6001, win: 3000, base: 6001, acked: 6000, sent: 5001, bufUsed: 0,
+            narr: "ACK 6001, window=3000 — segments 4001 & 5001 confirmed. All data delivered. Done." },
+        ];
+
+        let rafId = null,
+          paused = false,
+          idx = 0,
+          phase = "idle", // 'flight' | 'dwell' | 'idle'
+          prog = 0, // flight progress 0..1
+          dwellLeft = 0,
+          curE = null,
+          lastT = 0,
+          sx = 8,
+          ex = 8;
+        const SY = 8, // packet path start/end Y inside the wire
+          EY = 116,
+          FLIGHT_MS = 1500, // slower packet travel — easy to follow
+          DWELL_MS = 1600; // hold each step so the box data stays readable
+
+        function setBadge(t, c) {
+          badge.textContent = t;
+          badge.style.background = c || "var(--cobalt)";
+        }
+        // place / size the blue sender-window frame over the covered boxes
+        function positionFrame(base, win) {
+          const lo = base,
+            hi = base + win - 1;
+          const inWin = boxes.filter((b) => {
+            const s = +b.dataset.seq;
+            return s >= lo && s <= hi;
+          });
+          if (!inWin.length) {
+            frame.style.opacity = "0";
+            return;
+          }
+          frame.style.opacity = "1";
+          const a = inWin[0],
+            z = inWin[inWin.length - 1];
+          frame.style.left = a.offsetLeft - 6 + "px";
+          frame.style.width =
+            z.offsetLeft + z.offsetWidth - a.offsetLeft + 12 + "px";
+          frameLabel.textContent = `window = ${win} B`;
+        }
+        function paintState(e) {
+          boxes.forEach((b) => {
+            const s = +b.dataset.seq;
+            const sub = b.querySelector(".bx-sub");
+            b.classList.remove("inflight", "acked");
+            if (s <= e.acked) {
+              b.classList.add("acked");
+              sub.textContent = "ACK ✓";
+            } else if (s <= e.sent) {
+              b.classList.add("inflight");
+              sub.textContent = "in flight";
+            } else {
+              sub.textContent = "pending";
+            }
+          });
+          positionFrame(e.base, e.win);
+          ackedOut.textContent = `bytes confirmed up to: ${e.acked}`;
+          slots.forEach((sl, i) => {
+            if (i < e.bufUsed) {
+              sl.classList.add("filled");
+              sl.textContent = "data";
+            } else {
+              sl.classList.remove("filled");
+              sl.textContent = "free";
+            }
+          });
+          rwndOut.textContent = (CAP - e.bufUsed) * MSS + " B";
+          narration.textContent = e.narr;
+        }
+        // position a SEND/ACK packet at its start point (motion driven by rAF)
+        function setupPacket(e) {
+          const W = wire.clientWidth;
+          if (e.kind === "send") {
+            packet.className = "sw-packet send";
+            packet.textContent = `SEND  seq=${e.seq} · 1000 B  →`;
+          } else {
+            packet.className = "sw-packet ack";
+            packet.textContent = `←  ACK ${e.ack} · win=${e.win}`;
+          }
+          packet.style.transition = "opacity .3s"; // transform is set per frame
+          const pw = packet.offsetWidth || 200;
+          const maxX = Math.max(0, W - pw - 8);
+          sx = e.kind === "send" ? 8 : maxX;
+          ex = e.kind === "send" ? maxX : 8;
+          packet.style.transform = `translate(${sx}px, ${SY}px)`;
+          packet.style.opacity = "1";
+        }
+        // begin the event at the current idx (does not advance idx)
+        function beginStep() {
+          if (idx >= EV.length) {
+            finish();
+            return;
+          }
+          curE = EV[idx];
+          if (curE.kind === "send" || curE.kind === "ack") {
+            narration.textContent =
+              curE.kind === "send"
+                ? `Sending segment seq=${curE.seq} …  (press Pause to study it)`
+                : `ACK ${curE.ack} travelling back …`;
+            // light the sending box right away so its data is easy to see
+            if (curE.kind === "send") {
+              const bx = boxes.find((b) => +b.dataset.seq === curE.seq);
+              if (bx) {
+                bx.classList.add("inflight");
+                bx.querySelector(".bx-sub").textContent = "sending…";
+              }
+            }
+            setupPacket(curE);
+            prog = 0;
+            phase = "flight";
+          } else {
+            // note / process — no packet on the wire
+            if (curE.kind === "proc") {
+              buf.classList.add("flush");
+              setTimeout(() => buf.classList.remove("flush"), 600);
+            }
+            paintState(curE);
+            dwellLeft = DWELL_MS;
+            phase = "dwell";
+          }
+        }
+        // main loop — respects `paused` for both flight and dwell
+        function tick(now) {
+          rafId = requestAnimationFrame(tick);
+          if (paused) {
+            lastT = now;
+            return;
+          }
+          const dt = Math.min(now - lastT, 64);
+          lastT = now;
+          if (phase === "flight") {
+            prog += dt / FLIGHT_MS;
+            const k = prog < 1 ? prog : 1;
+            packet.style.transform = `translate(${sx + (ex - sx) * k}px, ${SY + (EY - SY) * k}px)`;
+            if (prog >= 1) {
+              packet.style.opacity = "0";
+              paintState(curE);
+              dwellLeft = DWELL_MS;
+              phase = "dwell";
+            }
+          } else if (phase === "dwell") {
+            dwellLeft -= dt;
+            if (dwellLeft <= 0) {
+              idx++;
+              beginStep();
+            }
+          }
+        }
+        function play() {
+          lastT = performance.now();
+          if (!rafId) rafId = requestAnimationFrame(tick);
+        }
+        function stopLoop() {
+          if (rafId) cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+        function finish() {
+          stopLoop();
+          phase = "idle";
+          setBadge("DONE", "var(--moss)");
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = false;
+          pauseBtn.textContent = "❚❚ Pause";
+        }
+        function resetVisual() {
+          packet.style.opacity = "0";
+          boxes.forEach((b) => {
+            b.classList.remove("inflight", "acked");
+            b.querySelector(".bx-sub").textContent = "pending";
+          });
+          slots.forEach((sl) => {
+            sl.classList.remove("filled");
+            sl.textContent = "1000 B";
+          });
+          rwndOut.textContent = "3000 B";
+          ackedOut.textContent = "bytes confirmed up to: 0";
+          positionFrame(1, 3000);
+          narration.textContent =
+            "Click START — the sender slices data into 1000-byte segments, fills the receiver's window, and slides forward as each ACK confirms delivery.";
+          setBadge("IDLE", "var(--ink)");
+        }
+        startBtn.addEventListener("click", () => {
+          if (paused) {
+            // resume (Start also un-pauses, like the other sims)
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            setBadge("RUNNING");
+            lastT = performance.now();
+            return;
+          }
+          idx = 0;
+          resetVisual();
+          startBtn.disabled = true;
+          pauseBtn.disabled = false;
+          stopBtn.disabled = false;
+          setBadge("RUNNING");
+          beginStep();
+          play();
+        });
+        pauseBtn.addEventListener("click", () => {
+          if (phase === "idle") return;
+          paused = !paused;
+          if (paused) {
+            pauseBtn.textContent = "▶ Resume";
+            setBadge("PAUSED", "var(--amber)");
+            startBtn.disabled = false;
+          } else {
+            pauseBtn.textContent = "❚❚ Pause";
+            setBadge("RUNNING");
+            startBtn.disabled = true;
+            lastT = performance.now();
+          }
+        });
+        stopBtn.addEventListener("click", () => {
+          stopLoop();
+          paused = false;
+          phase = "idle";
+          idx = 0;
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+          resetVisual();
+        });
+
+        requestAnimationFrame(() => resetVisual());
+      })();
+
+      /* ===========================================================
+         TEXT-SIZE CONTROL
+         A floating A− / A+ control scales the text on every slide
+         EXCEPT the excluded pages. Each element's original size is
+         recorded once, then multiplied by the chosen factor.
+         =========================================================== */
+      (function () {
+        // 1-indexed page numbers to leave at their original size
+        // (10 added — its animated layout can't take larger text)
+        const EXCLUDE = new Set([1, 2, 8, 10, 15, 21, 22, 37, 43]);
+        const slides = [...document.querySelectorAll(".slide")];
+        const targets = [];
+        slides.forEach((sl, i) => {
+          if (EXCLUDE.has(i + 1)) return;
+          sl.querySelectorAll("*").forEach((el) => {
+            // skip SVG (its text scales with the drawing) and the control itself
+            if (el.tagName === "svg" || el.closest("svg")) return;
+            const fs = parseFloat(getComputedStyle(el).fontSize);
+            if (fs) {
+              el.__baseFs = fs;
+              targets.push(el);
+            }
+          });
+        });
+
+        // build the floating control (sits outside the scaled stage)
+        const bar = document.createElement("div");
+        bar.id = "txt-ctl";
+        bar.style.cssText =
+          "position:fixed;right:10px;bottom:10px;z-index:3000;display:flex;align-items:center;gap:5px;" +
+          "background:rgba(244,239,228,.95);border:1px solid #0f2030;border-radius:7px;padding:3px 6px;" +
+          "font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#0f2030;" +
+          "box-shadow:0 3px 10px rgba(0,0,0,.15)";
+        const btnCss =
+          "font:inherit;cursor:pointer;border:1px solid #0f2030;background:#fff;color:#0f2030;" +
+          "border-radius:5px;width:21px;height:19px;line-height:1;padding:0";
+        bar.innerHTML =
+          '<span style="letter-spacing:.06em">TEXT</span>' +
+          '<button id="txt-dn" style="' + btnCss + '">A−</button>' +
+          '<span id="txt-pct" style="min-width:32px;text-align:center">100%</span>' +
+          '<button id="txt-up" style="' + btnCss + '">A+</button>' +
+          '<button id="txt-rst" style="' + btnCss + ';width:auto;padding:0 5px">reset</button>';
+        document.body.appendChild(bar);
+
+        const DEFAULT = 1.12;
+        let factor = parseFloat(localStorage.getItem("deckTextFactor"));
+        if (!factor || isNaN(factor)) factor = DEFAULT;
+
+        function apply() {
+          targets.forEach((el) => {
+            el.style.fontSize = (el.__baseFs * factor).toFixed(2) + "px";
+          });
+          document.getElementById("txt-pct").textContent =
+            Math.round(factor * 100) + "%";
+          localStorage.setItem("deckTextFactor", factor.toFixed(3));
+        }
+        document.getElementById("txt-up").addEventListener("click", () => {
+          factor = Math.min(1.7, factor + 0.04);
+          apply();
+        });
+        document.getElementById("txt-dn").addEventListener("click", () => {
+          factor = Math.max(0.8, factor - 0.04);
+          apply();
+        });
+        document.getElementById("txt-rst").addEventListener("click", () => {
+          factor = 1;
+          apply();
+        });
+        apply();
       })();
 
       /* ===========================================================
