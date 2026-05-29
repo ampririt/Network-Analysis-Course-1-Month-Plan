@@ -1,7 +1,7 @@
 # 🌎Network Analysis Course — 1-Month Plan
 
-> **Duration**: 4 Weeks | **Schedule**: 2 Classes/Week | **Class Length**: 3 Hours (including 10 min break)  
-> **Total Sessions**: 8 | **Total Contact Hours**: 24 Hours
+> **Duration**: 4 Weeks | **Schedule**: 1 Class/Week | **Class Length**: 3 Hours (including 10 min break)  
+> **Total Sessions**: 4 | **Total Contact Hours**: 12 Hours
 
 ---
 
@@ -26,19 +26,15 @@ This course introduces students to the fundamentals of network analysis — from
 - [Session 1 — Introduction to Network Analysis & The OSI Model](/S1/README.md)
 - [Session 2 — The Protocol Stack Deep Dive: Ethernet, IP, TCP & UDP](/S2/README.md)
 - [Session 3 — Network Services: DHCP, DNS & ARP](/S3/README.md)
-- [Session 4 — Application Layer Protocols: HTTP, HTTPS & FTP](/S4/README.md)
-- [Session 5 — Routing, Switching & VLANs](/S5/README.md)
-- [Session 6 — Network Troubleshooting Methodology](/S6/README.md)
-- [Session 7 — Network Security & Threat Detection](/S7/README.md)
-- [Session 8 — Capstone Project & Course Review](/S8/README.md)
+- [Session 4 — Routing, Switching & VLANs](/S4/README.md)
 
 ## Recommended Supplementary Tools
 
 | Tool | Purpose | When Introduced |
 |------|---------|-----------------|
-| **tcpdump / tshark** | CLI-based packet capture | Session 8 |
-| **Nmap** | Network scanning & discovery | Session 7 |
-| **NetworkMiner** | Network forensics & file extraction | Session 7 |
+| **tcpdump / tshark** | CLI-based packet capture | Session 4 |
+| **Nmap** | Network scanning & discovery | Session 3 |
+| **NetworkMiner** | Network forensics & file extraction | Session 3 |
 | **Scapy (Python)** | Custom packet crafting | Optional / Advanced |
 
 ---
@@ -63,8 +59,8 @@ This course introduces students to the fundamentals of network analysis — from
 |------------|--------|---------|
 | Class Participation & Labs | 30% | Every session |
 | Homework Assignments | 20% | Weekly |
-| Mini CTF Performance | 15% | Session 7 |
-| Capstone Project | 35% | Session 8 |
+| Mini CTF Performance | 15% | Session 3 |
+| Capstone Project | 35% | Session 4 |
 
 --- -->
 
