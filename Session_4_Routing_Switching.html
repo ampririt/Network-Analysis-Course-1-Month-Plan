@@ -6174,47 +6174,98 @@
 
       /* ---------- MAC LEARNING SIM ---------- */
       #macSim .mac-stage {
-        display: grid;
-        grid-template-columns: 1.55fr 0.95fr;
+        display: flex;
         gap: 40px;
-        margin-top: 26px;
+        margin-top: 24px;
         align-items: stretch;
       }
       #macSim .mac-net {
         position: relative;
+        flex: none;
+        width: 1040px;
+        height: 500px;
         border: 1.5px solid var(--rule);
         border-radius: 14px;
         background: rgba(255, 252, 244, 0.6);
-        padding: 30px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        gap: 18px 220px;
-        min-height: 470px;
+      }
+      /* the wires (host ↔ switch links) sit behind the boxes */
+      #macSim .mac-wires {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+      #macSim .mac-wire {
+        stroke: #c4ba9f;
+        stroke-width: 2.5;
+        transition: stroke 0.3s ease, stroke-width 0.3s ease;
+      }
+      #macSim .mac-wire.live {
+        stroke: var(--cobalt);
+        stroke-width: 4.5;
+        stroke-dasharray: 11 8;
+        animation: macFlow 0.55s linear infinite;
+      }
+      #macSim .mac-wire.flood {
+        stroke: var(--amber);
+        stroke-width: 4.5;
+        stroke-dasharray: 11 8;
+        animation: macFlow 0.55s linear infinite;
+      }
+      @keyframes macFlow {
+        to {
+          stroke-dashoffset: -19;
+        }
+      }
+      /* port tag where a wire meets the switch */
+      #macSim .mac-port {
+        position: absolute;
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        font-family: var(--font-mono);
+        font-size: 15px;
+        color: var(--muted);
+        background: var(--paper);
+        padding: 1px 7px;
+        border-radius: 5px;
+        border: 1px solid var(--rule);
+        transition: all 0.3s ease;
+      }
+      #macSim .mac-port.live {
+        color: var(--cobalt-deep);
+        border-color: var(--cobalt);
+        background: var(--cobalt-soft);
+      }
+      #macSim .mac-port.flood {
+        color: var(--amber);
+        border-color: var(--amber);
+        background: var(--amber-soft);
       }
       #macSim .mac-host {
+        position: absolute;
+        z-index: 2;
+        width: 190px;
         border: 1.5px solid var(--ink);
         border-radius: 10px;
         background: var(--paper);
-        padding: 16px 10px;
+        padding: 14px 10px;
         text-align: center;
-        align-self: center;
         transition:
           border-color 0.3s ease,
           box-shadow 0.3s ease,
           background 0.3s ease;
-        z-index: 2;
       }
       #macSim .mac-host .mac-pc {
         font-family: var(--font-display);
         font-weight: 700;
-        font-size: 28px;
+        font-size: 27px;
       }
       #macSim .mac-host .mac-mac {
         font-family: var(--font-mono);
-        font-size: 16px;
+        font-size: 15px;
         color: var(--muted);
-        margin-top: 4px;
+        margin-top: 3px;
       }
       #macSim .mac-host.send {
         border-color: var(--cobalt);
@@ -6235,8 +6286,8 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: 190px;
-        height: 130px;
+        width: 200px;
+        height: 132px;
         border: 2px solid var(--ink);
         border-radius: 12px;
         background: var(--ink);
@@ -6249,12 +6300,12 @@
         font-weight: 700;
         letter-spacing: 0.12em;
         font-size: 19px;
-        z-index: 3;
+        z-index: 4;
         transition: box-shadow 0.3s ease;
       }
       #macSim .mac-switch span {
         font-weight: 400;
-        font-size: 12px;
+        font-size: 14px;
         letter-spacing: 0.08em;
         opacity: 0.7;
         margin-top: 6px;
@@ -6264,23 +6315,49 @@
       }
       #macSim .mac-frame {
         position: absolute;
-        width: 26px;
-        height: 26px;
+        left: 0;
+        top: 0;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         background: var(--cobalt);
         border: 2px solid var(--paper);
         box-shadow: 0 2px 10px rgba(15, 32, 48, 0.4);
-        left: 50%;
-        top: 50%;
-        margin: -13px 0 0 -13px;
         opacity: 0;
+        z-index: 5;
         transition:
-          transform 0.6s var(--ease-out-expo),
+          left 0.6s var(--ease-out-expo),
+          top 0.6s var(--ease-out-expo),
           opacity 0.3s ease,
           background 0.3s ease;
-        z-index: 4;
       }
       #macSim .mac-frame.flood {
+        background: var(--amber);
+      }
+      /* small colour legend under the table */
+      #macSim .mac-legend {
+        display: flex;
+        gap: 20px;
+        margin-top: 16px;
+        font-family: var(--font-mono);
+        font-size: 14.5px;
+        color: var(--ink-soft);
+      }
+      #macSim .mac-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      #macSim .mac-legend i {
+        width: 22px;
+        height: 4px;
+        border-radius: 2px;
+        display: inline-block;
+      }
+      #macSim .mac-legend i.cob {
+        background: var(--cobalt);
+      }
+      #macSim .mac-legend i.amb {
         background: var(--amber);
       }
       #macSim .mac-side {
@@ -6307,7 +6384,7 @@
       }
       #macSim table.mac-table th {
         text-align: left;
-        font-size: 13px;
+        font-size: 14px;
         letter-spacing: 0.1em;
         text-transform: uppercase;
         color: var(--muted);
@@ -6412,7 +6489,7 @@
       }
       #walkSim .wn-sub {
         font-family: var(--font-mono);
-        font-size: 13px;
+        font-size: 14.5px;
         color: var(--muted);
       }
       #walkSim .walk-packet {
@@ -6592,7 +6669,7 @@
       }
       .stp-sw .bid {
         font-family: var(--font-mono);
-        font-size: 13px;
+        font-size: 14.5px;
         color: var(--muted);
         margin-top: 4px;
       }
@@ -6608,7 +6685,7 @@
         z-index: 3;
         font-family: var(--font-mono);
         font-weight: 700;
-        font-size: 13px;
+        font-size: 14.5px;
         letter-spacing: 0.06em;
         padding: 3px 9px;
         border-radius: 999px;
@@ -6634,7 +6711,7 @@
         position: absolute;
         z-index: 3;
         font-family: var(--font-mono);
-        font-size: 13px;
+        font-size: 15px;
         color: var(--ink-soft);
         background: var(--paper);
         padding: 1px 7px;
@@ -6689,6 +6766,1011 @@
         background: var(--cobalt);
       }
 
+      /* ===========================================
+           SESSION 4 — STP STEP-BY-STEP SIM (#stpSim)
+           Reuses .stp-topo / .stp-sw / .stp-pill and
+           reveals each role one decision at a time,
+           driven by a four-rung "decision ladder".
+           =========================================== */
+      #stpSim .stp-ladder {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        max-width: 1180px;
+        margin: 16px auto 0;
+      }
+      #stpSim .lstep {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        border: 1.5px solid var(--rule);
+        border-radius: 10px;
+        background: rgba(255, 252, 244, 0.5);
+        opacity: 0.5;
+        transition:
+          opacity 0.35s ease,
+          border-color 0.35s ease,
+          background 0.35s ease,
+          box-shadow 0.35s ease;
+      }
+      #stpSim .lstep .n {
+        flex: none;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1.5px solid var(--ink);
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--ink);
+        transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+      }
+      #stpSim .lstep .lx b {
+        display: block;
+        font-weight: 700;
+        font-size: 17px;
+        line-height: 1.15;
+      }
+      #stpSim .lstep .lx span {
+        font-family: var(--font-mono);
+        font-size: 13.5px;
+        color: var(--muted);
+      }
+      #stpSim .lstep.done {
+        opacity: 1;
+      }
+      #stpSim .lstep.done .n {
+        background: var(--moss);
+        color: var(--paper);
+        border-color: var(--moss);
+      }
+      #stpSim .lstep.active {
+        opacity: 1;
+        border-color: var(--cobalt);
+        background: var(--cobalt-soft);
+        box-shadow: 0 4px 14px rgba(29, 63, 184, 0.18);
+      }
+      #stpSim .lstep.active .n {
+        background: var(--cobalt);
+        color: var(--paper);
+        border-color: var(--cobalt-deep);
+      }
+      #stpSim .stp-topo {
+        margin: 12px auto 0;
+      }
+      #stpSim .stp-topo svg line {
+        transition: stroke 0.45s ease, stroke-dasharray 0.45s ease;
+      }
+      #stpSim .stp-sw {
+        transition: border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+      }
+      #stpSim .stp-sw.is-root {
+        box-shadow: 0 0 0 5px rgba(29, 63, 184, 0.16);
+      }
+      /* roles + crown start hidden, then spring in per step */
+      #stpSim .stp-pill,
+      #stpSim .stp-xmark,
+      #stpSim .stp-crown {
+        opacity: 0;
+        transform: scale(0.5);
+        transition: opacity 0.4s ease, transform 0.45s var(--ease-spring);
+      }
+      #stpSim .stp-pill.in,
+      #stpSim .stp-xmark.in,
+      #stpSim .stp-crown.in {
+        opacity: 1;
+        transform: scale(1);
+      }
+      #stpSim .stp-narr {
+        max-width: 1180px;
+        margin: 12px auto 0;
+        padding: 14px 22px;
+        border-left: 4px solid var(--cobalt);
+        background: var(--paper-warm);
+        font-size: 20px;
+        line-height: 1.5;
+        color: var(--ink);
+        border-radius: 0 8px 8px 0;
+        min-height: 62px;
+      }
+      #stpSim .sim-controls {
+        max-width: 1180px;
+        margin: 16px auto 0;
+      }
+      /* Root Path Cost badge that drops under each switch as it is computed */
+      #stpSim .rpc-tag {
+        display: block;
+        width: fit-content;
+        margin: 5px auto 0;
+        padding: 2px 10px;
+        border-radius: 999px;
+        background: var(--cobalt-soft);
+        border: 1px solid var(--cobalt);
+        color: var(--cobalt-deep);
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 13.5px;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+      #stpSim .rpc-tag.in {
+        opacity: 1;
+      }
+      /* tie-break annotation on the contested segment */
+      #stpSim .stp-tie {
+        position: absolute;
+        z-index: 4;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 14px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: var(--amber-soft);
+        border: 1.5px solid var(--amber);
+        color: var(--amber);
+        white-space: nowrap;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: opacity 0.4s ease, transform 0.45s var(--ease-spring);
+      }
+      #stpSim .stp-tie.in {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      /* ===========================================
+           SESSION 4 — STP PORT-STATE FLOW
+           Blocking → Listening → Learning → Forwarding
+           shown as a horizontal pipeline with timers.
+           =========================================== */
+      .pstate-flow {
+        display: flex;
+        align-items: stretch;
+        margin-top: 30px;
+      }
+      .pstate {
+        flex: 1;
+        border: 1.5px solid var(--ink);
+        border-radius: 12px;
+        padding: 18px 14px;
+        text-align: center;
+        background: var(--paper);
+      }
+      .pstate.blk {
+        background: var(--amber-soft);
+        border-color: var(--amber);
+      }
+      .pstate.fwd {
+        background: var(--moss-soft);
+        border-color: var(--moss);
+      }
+      .pstate .ps-n {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 25px;
+      }
+      .pstate .ps-s {
+        font-family: var(--font-mono);
+        font-size: 14.5px;
+        color: var(--muted);
+        margin-top: 5px;
+      }
+      .pstate-arrow {
+        flex: none;
+        width: 104px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+      }
+      .pstate-arrow .m-icon {
+        font-size: 26px;
+        color: var(--ink-soft);
+      }
+      .pstate-arrow .ps-t {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--amber);
+      }
+
+      /* ===========================================
+           SESSION 4 — ROUTING PROTOCOL SIM (#rtSim)
+           One triangle, three minds. Pick Static / RIP /
+           OSPF and watch the chosen path, the moving
+           packet, the routing-table entry and the config.
+           =========================================== */
+      #rtSim .rt-stage {
+        display: grid;
+        grid-template-columns: 1.45fr 1fr;
+        gap: 36px;
+        margin-top: 22px;
+        align-items: stretch;
+      }
+      #rtSim .rt-canvas {
+        position: relative;
+        border: 1.5px solid var(--rule);
+        border-radius: 14px;
+        background: rgba(255, 252, 244, 0.6);
+        height: 470px;
+      }
+      #rtSim .rt-canvas svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+      #rtSim .rt-canvas svg line {
+        transition: stroke 0.4s ease, stroke-width 0.4s ease;
+      }
+      #rtSim .rt-rtr {
+        position: absolute;
+        z-index: 2;
+        width: 168px;
+        padding: 13px 10px;
+        border: 2px solid var(--ink);
+        border-radius: 14px;
+        background: var(--paper);
+        text-align: center;
+        transition: box-shadow 0.35s ease, transform 0.35s ease;
+      }
+      #rtSim .rt-rtr .rn {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      #rtSim .rt-rtr .rn .m-icon {
+        font-size: 24px;
+        color: var(--ink-soft);
+      }
+      #rtSim .rt-rtr .ri {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      #rtSim .rt-rtr.on {
+        box-shadow: 0 0 0 4px rgba(29, 63, 184, 0.18);
+        transform: translateY(-3px);
+      }
+      #rtSim .rt-cloud {
+        position: absolute;
+        z-index: 2;
+        padding: 9px 14px;
+        border: 1.5px dashed var(--moss);
+        border-radius: 12px;
+        background: var(--moss-soft);
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--ink);
+        text-align: center;
+      }
+      #rtSim .rt-cloud b {
+        display: block;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--moss);
+        margin-bottom: 2px;
+      }
+      #rtSim .rt-lbl {
+        position: absolute;
+        z-index: 3;
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--ink-soft);
+        background: var(--paper);
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid var(--rule);
+        white-space: nowrap;
+      }
+      #rtSim .rt-packet {
+        position: absolute;
+        z-index: 5;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--cobalt);
+        border: 2px solid var(--paper);
+        box-shadow: 0 2px 10px rgba(15, 32, 48, 0.4);
+        opacity: 0;
+        margin: -13px 0 0 -13px;
+        transition:
+          left 0.7s var(--ease-out-expo),
+          top 0.7s var(--ease-out-expo),
+          opacity 0.3s ease,
+          background 0.3s ease;
+      }
+      #rtSim .rt-panel {
+        border: 1.5px solid var(--ink);
+        border-radius: 14px;
+        background: var(--paper-warm);
+        padding: 20px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+      }
+      #rtSim .rt-panel .pt {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--cobalt-deep);
+      }
+      #rtSim .rt-rt {
+        font-family: var(--font-mono);
+        font-size: 17px;
+        line-height: 1.6;
+        background: var(--ink);
+        color: var(--paper);
+        border-radius: 8px;
+        padding: 12px 14px;
+        min-height: 50px;
+        word-break: break-word;
+      }
+      #rtSim .rt-rt .none {
+        color: #8aa0b5;
+        font-style: italic;
+      }
+      #rtSim .rt-rt .hot {
+        color: #ffd9b8;
+        font-weight: 700;
+      }
+      #rtSim .rt-config {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        line-height: 1.65;
+        white-space: pre-wrap;
+        color: var(--ink-soft);
+        border-left: 3px solid var(--rule);
+        padding-left: 14px;
+        min-height: 74px;
+      }
+      #rtSim .rt-metric {
+        font-size: 17px;
+        line-height: 1.5;
+      }
+      #rtSim .sim-btn.active {
+        background: var(--cobalt);
+        color: var(--paper);
+        border-color: var(--cobalt-deep);
+      }
+      #rtSim .rt-narr {
+        margin-top: 20px;
+        padding: 14px 22px;
+        border-left: 4px solid var(--cobalt);
+        background: var(--paper-warm);
+        font-size: 19px;
+        line-height: 1.5;
+        border-radius: 0 8px 8px 0;
+        min-height: 58px;
+      }
+
+      /* ===========================================
+           SESSION 4 — "VLANs vs PHYSICAL" mini diagrams
+           Flex chips (no absolute pos, so they scale).
+           =========================================== */
+      .ncmp-box {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        margin-top: 22px;
+      }
+      .ncmp-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .ncmp-sw {
+        font-family: var(--font-mono);
+        font-size: 17px;
+        font-weight: 700;
+        padding: 14px 18px;
+        border-radius: 10px;
+        background: var(--ink);
+        color: var(--paper);
+        white-space: nowrap;
+        flex: none;
+      }
+      .ncmp-link {
+        flex: none;
+        width: 34px;
+        height: 3px;
+        background: var(--rule);
+      }
+      .ncmp-pc {
+        font-family: var(--font-mono);
+        font-size: 17px;
+        font-weight: 700;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 2px solid;
+        flex: none;
+      }
+      .ncmp-pc.v10 {
+        color: var(--cobalt-deep);
+        border-color: var(--cobalt);
+        background: var(--cobalt-soft);
+      }
+      .ncmp-pc.v20 {
+        color: var(--plum);
+        border-color: var(--plum);
+        background: var(--plum-soft);
+      }
+      .ncmp-pc.v30 {
+        color: var(--amber);
+        border-color: var(--amber);
+        background: var(--amber-soft);
+      }
+
+      /* ===========================================
+           SESSION 4 — VLAN COMMUNICATION SIM (#vlanSim)
+           Two switches + a trunk + a router. Watch intra-VLAN,
+           tagged trunking, a blocked cross-VLAN attempt, and
+           inter-VLAN routing through the router.
+           =========================================== */
+      #vlanSim .vlan-stage {
+        display: flex;
+        gap: 34px;
+        margin-top: 20px;
+        align-items: stretch;
+      }
+      #vlanSim .vlan-canvas {
+        position: relative;
+        flex: none;
+        width: 1040px;
+        height: 486px;
+        border: 1.5px solid var(--rule);
+        border-radius: 14px;
+        background: rgba(255, 252, 244, 0.6);
+      }
+      #vlanSim .vlan-canvas svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+      #vlanSim .vlan-wire {
+        stroke: #c4ba9f;
+        stroke-width: 3;
+        transition: stroke 0.3s ease, stroke-width 0.3s ease;
+      }
+      #vlanSim .vlan-wire.v10 {
+        stroke: var(--cobalt);
+        stroke-width: 5;
+        stroke-dasharray: 11 8;
+        animation: vlanFlow 0.55s linear infinite;
+      }
+      #vlanSim .vlan-wire.v20 {
+        stroke: var(--plum);
+        stroke-width: 5;
+        stroke-dasharray: 11 8;
+        animation: vlanFlow 0.55s linear infinite;
+      }
+      #vlanSim .vlan-wire.blocked {
+        stroke: var(--amber);
+        stroke-width: 5;
+      }
+      @keyframes vlanFlow {
+        to {
+          stroke-dashoffset: -19;
+        }
+      }
+      #vlanSim .vlan-node {
+        position: absolute;
+        z-index: 2;
+        transform: translate(-50%, -50%);
+        border: 2px solid var(--ink);
+        border-radius: 12px;
+        background: var(--ink);
+        color: var(--paper);
+        font-family: var(--font-mono);
+        font-weight: 700;
+        text-align: center;
+        padding: 12px 18px;
+        letter-spacing: 0.08em;
+        font-size: 18px;
+      }
+      #vlanSim .vlan-node .sub {
+        display: block;
+        font-weight: 400;
+        font-size: 13px;
+        opacity: 0.7;
+        margin-top: 3px;
+        letter-spacing: 0.05em;
+      }
+      #vlanSim .vlan-node.router {
+        background: var(--paper);
+        color: var(--ink);
+      }
+      #vlanSim .vlan-host {
+        position: absolute;
+        z-index: 2;
+        transform: translate(-50%, -50%);
+        width: 134px;
+        border: 1.5px solid;
+        border-radius: 10px;
+        padding: 10px 8px;
+        text-align: center;
+        background: var(--paper);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+      }
+      #vlanSim .vlan-host .hn {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 18px;
+      }
+      #vlanSim .vlan-host .hv {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        margin-top: 2px;
+      }
+      #vlanSim .vlan-host.v10 {
+        border-color: var(--cobalt);
+      }
+      #vlanSim .vlan-host.v10 .hv {
+        color: var(--cobalt-deep);
+      }
+      #vlanSim .vlan-host.v20 {
+        border-color: var(--plum);
+      }
+      #vlanSim .vlan-host.v20 .hv {
+        color: var(--plum);
+      }
+      #vlanSim .vlan-host.on {
+        box-shadow: 0 0 0 4px rgba(15, 32, 48, 0.12);
+        transform: translate(-50%, -50%) scale(1.05);
+      }
+      #vlanSim .vlan-lbl {
+        position: absolute;
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--ink-soft);
+        background: var(--paper);
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid var(--rule);
+        white-space: nowrap;
+      }
+      #vlanSim .vlan-lbl.trunk {
+        color: var(--amber);
+        border-color: var(--amber);
+        background: var(--amber-soft);
+        font-weight: 700;
+      }
+      #vlanSim .vlan-frame {
+        position: absolute;
+        z-index: 5;
+        left: 0;
+        top: 0;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--cobalt);
+        border: 2px solid var(--paper);
+        box-shadow: 0 2px 10px rgba(15, 32, 48, 0.4);
+        opacity: 0;
+        transition:
+          left 0.6s var(--ease-out-expo),
+          top 0.6s var(--ease-out-expo),
+          opacity 0.3s ease,
+          background 0.3s ease;
+      }
+      #vlanSim .vlan-frame.v20 {
+        background: var(--plum);
+      }
+      #vlanSim .vlan-tag {
+        position: absolute;
+        left: 50%;
+        top: -25px;
+        transform: translateX(-50%);
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 13px;
+        padding: 1px 6px;
+        border-radius: 4px;
+        white-space: nowrap;
+        background: var(--amber);
+        color: var(--paper);
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+      #vlanSim .vlan-tag.show {
+        opacity: 1;
+      }
+      #vlanSim .vlan-x {
+        position: absolute;
+        z-index: 6;
+        transform: translate(-50%, -50%) scale(0.5);
+        color: var(--amber);
+        font-size: 44px;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.4s var(--ease-spring);
+      }
+      #vlanSim .vlan-x.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      #vlanSim .vlan-panel {
+        flex: 1;
+        border: 1.5px solid var(--ink);
+        border-radius: 14px;
+        background: var(--paper-warm);
+        padding: 20px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      #vlanSim .vlan-panel .pt {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--cobalt-deep);
+      }
+      #vlanSim .vlan-insp {
+        font-family: var(--font-mono);
+        font-size: 15px;
+        background: var(--ink);
+        color: var(--paper);
+        border-radius: 8px;
+        padding: 12px 14px;
+      }
+      #vlanSim .vlan-insp .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 3px 0;
+      }
+      #vlanSim .vlan-insp .row span {
+        opacity: 0.6;
+      }
+      #vlanSim .vlan-insp .row b {
+        font-weight: 700;
+        text-align: right;
+      }
+      #vlanSim .vlan-insp .row b.ok {
+        color: #bfe0c4;
+      }
+      #vlanSim .vlan-insp .row b.no {
+        color: #ffb39c;
+      }
+      #vlanSim .vlan-insp .row b.tag {
+        color: #ffd9b8;
+      }
+      #vlanSim .vlan-key {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-family: var(--font-mono);
+        font-size: 14.5px;
+        color: var(--ink-soft);
+      }
+      #vlanSim .vlan-key span {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      #vlanSim .vlan-key i {
+        width: 20px;
+        height: 4px;
+        border-radius: 2px;
+        display: inline-block;
+      }
+      #vlanSim .vlan-key i.c {
+        background: var(--cobalt);
+      }
+      #vlanSim .vlan-key i.p {
+        background: var(--plum);
+      }
+      #vlanSim .vlan-key i.a {
+        background: var(--amber);
+      }
+      #vlanSim .sim-btn.active {
+        background: var(--cobalt);
+        color: var(--paper);
+        border-color: var(--cobalt-deep);
+      }
+      #vlanSim .vlan-narr {
+        margin-top: 18px;
+        padding: 14px 22px;
+        border-left: 4px solid var(--cobalt);
+        background: var(--paper-warm);
+        font-size: 19px;
+        line-height: 1.5;
+        border-radius: 0 8px 8px 0;
+        min-height: 58px;
+      }
+
+      /* ===========================================
+           SESSION 4 — UNICAST/BROADCAST/MULTICAST SIM (#castSim)
+           One source, a switch, four hosts. Pick a mode and watch
+           the frame reach one / all / a subscribed group.
+           =========================================== */
+      #castSim .cast-stage {
+        display: flex;
+        gap: 30px;
+        margin-top: 18px;
+        align-items: stretch;
+      }
+      #castSim .cast-canvas {
+        position: relative;
+        flex: none;
+        width: 1020px;
+        height: 432px;
+        border: 1.5px solid var(--rule);
+        border-radius: 14px;
+        background: rgba(255, 252, 244, 0.6);
+      }
+      #castSim .cast-canvas svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+      #castSim .cast-wire {
+        stroke: #c4ba9f;
+        stroke-width: 3;
+        transition: stroke 0.3s ease, stroke-width 0.3s ease;
+      }
+      #castSim .cast-wire.on.uni { stroke: var(--cobalt); }
+      #castSim .cast-wire.on.bcast { stroke: var(--amber); }
+      #castSim .cast-wire.on.mcast { stroke: var(--moss); }
+      #castSim .cast-wire.on {
+        stroke-width: 5;
+        stroke-dasharray: 11 8;
+        animation: castFlow 0.55s linear infinite;
+      }
+      @keyframes castFlow { to { stroke-dashoffset: -19; } }
+      #castSim .cast-node {
+        position: absolute;
+        z-index: 2;
+        transform: translate(-50%, -50%);
+        width: 150px;
+        border: 1.5px solid var(--ink);
+        border-radius: 11px;
+        background: var(--paper);
+        padding: 11px 8px;
+        text-align: center;
+        transition: box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+      }
+      #castSim .cast-node .nn {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 19px;
+      }
+      #castSim .cast-node .ns {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      #castSim .cast-node.grp { border-style: dashed; border-color: var(--moss); }
+      #castSim .cast-node.grp .ns { color: var(--moss); font-weight: 700; }
+      #castSim .cast-node.src { background: var(--ink); color: var(--paper); }
+      #castSim .cast-node.src .ns { color: rgba(244,239,228,.7); }
+      #castSim .cast-sw {
+        position: absolute;
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 17px;
+        letter-spacing: 0.1em;
+        padding: 16px 22px;
+        background: var(--ink);
+        color: var(--paper);
+        border-radius: 12px;
+      }
+      #castSim .cast-node.lit.uni { border-color: var(--cobalt); background: var(--cobalt-soft); box-shadow: 0 0 0 4px rgba(29,63,184,.18); }
+      #castSim .cast-node.lit.bcast { border-color: var(--amber); background: var(--amber-soft); box-shadow: 0 0 0 4px rgba(217,98,26,.18); }
+      #castSim .cast-node.lit.mcast { border-color: var(--moss); background: var(--moss-soft); box-shadow: 0 0 0 4px rgba(58,125,68,.18); }
+      #castSim .cast-frame {
+        position: absolute;
+        z-index: 5;
+        left: 0; top: 0;
+        width: 24px; height: 24px;
+        border-radius: 50%;
+        background: var(--cobalt);
+        border: 2px solid var(--paper);
+        box-shadow: 0 2px 10px rgba(15,32,48,.4);
+        opacity: 0;
+        transition: left 0.55s var(--ease-out-expo), top 0.55s var(--ease-out-expo), opacity 0.3s ease, background 0.3s ease;
+      }
+      #castSim .cast-frame.bcast { background: var(--amber); }
+      #castSim .cast-frame.mcast { background: var(--moss); }
+      #castSim .cast-side {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      #castSim .cast-card {
+        border: 1.5px solid var(--rule);
+        border-radius: 12px;
+        padding: 14px 18px;
+        background: rgba(255,252,244,.5);
+        opacity: 0.6;
+        transition: opacity 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+      }
+      #castSim .cast-card .ct {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+      #castSim .cast-card p { margin-top: 5px; font-size: 16px; line-height: 1.45; }
+      #castSim .cast-card.uni { border-left: 5px solid var(--cobalt); }
+      #castSim .cast-card.uni .ct { color: var(--cobalt-deep); }
+      #castSim .cast-card.bcast { border-left: 5px solid var(--amber); }
+      #castSim .cast-card.bcast .ct { color: var(--amber); }
+      #castSim .cast-card.mcast { border-left: 5px solid var(--moss); }
+      #castSim .cast-card.mcast .ct { color: var(--moss); }
+      #castSim .cast-card.active { opacity: 1; box-shadow: 0 4px 16px rgba(15,32,48,.12); background: var(--paper); }
+      #castSim .sim-btn.active { background: var(--cobalt); color: var(--paper); border-color: var(--cobalt-deep); }
+
+      /* ===========================================
+           SESSION 4 — DTP TRUNK-MODE NEGOTIATION (#dtpSim)
+           Pick a mode for each end; watch DTP decide whether
+           the link becomes a trunk, an access port, or a mismatch.
+           =========================================== */
+      #dtpSim .dtp-legend {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+      }
+      #dtpSim .dtp-mode {
+        border: 1.5px solid var(--rule);
+        border-radius: 10px;
+        padding: 12px 14px;
+        background: rgba(255, 252, 244, 0.5);
+      }
+      #dtpSim .dtp-mode .mn {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--cobalt-deep);
+      }
+      #dtpSim .dtp-mode p {
+        margin-top: 5px;
+        font-size: 14.5px;
+        line-height: 1.4;
+        color: var(--ink-soft);
+      }
+      #dtpSim .dtp-viz {
+        display: flex;
+        align-items: center;
+        margin-top: 30px;
+      }
+      #dtpSim .dtp-sw {
+        flex: none;
+        width: 210px;
+        text-align: center;
+        border: 2px solid var(--ink);
+        border-radius: 12px;
+        background: var(--ink);
+        color: var(--paper);
+        padding: 14px;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 19px;
+        letter-spacing: 0.08em;
+      }
+      #dtpSim .dtp-sw .swmode {
+        display: block;
+        font-weight: 400;
+        font-size: 14px;
+        opacity: 0.8;
+        margin-top: 5px;
+      }
+      #dtpSim .dtp-link {
+        position: relative;
+        flex: 1;
+        height: 9px;
+        margin: 0 6px;
+        border-radius: 5px;
+        background: var(--rule);
+        transition: background 0.4s ease;
+      }
+      #dtpSim .dtp-link.trunk { background: var(--moss); }
+      #dtpSim .dtp-link.access { background: var(--muted); }
+      #dtpSim .dtp-link.mismatch { background: var(--amber); }
+      #dtpSim .dtp-link .dot {
+        position: absolute;
+        top: 50%;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--cobalt);
+        border: 2px solid var(--paper);
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: left 0.7s ease, opacity 0.3s ease;
+      }
+      #dtpSim .dtp-linklabel {
+        position: absolute;
+        top: -32px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--muted);
+      }
+      #dtpSim .dtp-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 16px;
+      }
+      #dtpSim .dtp-row .lab {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 15px;
+        width: 52px;
+      }
+      #dtpSim .dtp-btn {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        padding: 9px 15px;
+        border: 1.5px solid var(--ink);
+        background: var(--paper);
+        color: var(--ink);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+      }
+      #dtpSim .dtp-btn:hover { transform: translateY(-2px); }
+      #dtpSim .dtp-btn.sel {
+        background: var(--cobalt);
+        color: var(--paper);
+        border-color: var(--cobalt-deep);
+      }
+      #dtpSim .dtp-result {
+        margin-top: 18px;
+        padding: 14px 22px;
+        border-left: 4px solid var(--cobalt);
+        background: var(--paper-warm);
+        font-size: 18px;
+        line-height: 1.5;
+        min-height: 62px;
+        border-radius: 0 8px 8px 0;
+      }
+
+      /* clickable device headers on the layer-compare slide */
+      #layerCompare .layer-dev {
+        border-radius: 10px;
+        padding: 8px 6px;
+        border: 2px solid transparent;
+        transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+      }
+      #layerCompare .layer-dev:hover {
+        background: rgba(15, 32, 48, 0.05);
+        transform: translateY(-2px);
+      }
+      #layerCompare .layer-dev.sel {
+        border-color: var(--ink);
+        background: var(--paper-warm);
+      }
+
     </style>
   </head>
   <body>
@@ -6696,7 +7778,7 @@
       <main class="deck-stage" id="deckStage">
 
         <!-- ========================================================= SLIDE 1 — TITLE ========================================================= -->
-        <section class="slide title-slide active">
+        <section class="slide title-slide active" data-noscale>
           <div class="radar"></div>
           <div class="meta-row reveal" style="--i: 0">
             <span>Network Analysis Course · 2026</span>
@@ -6815,33 +7897,64 @@
           <h2 class="reveal" style="--i: 1; font-size: 56px">
             Switches use <em class="display">MACs.</em> Routers use <em class="display">IPs.</em>
           </h2>
-          <p class="reveal" style="--i: 2; font-size: 22px; margin-top: 12px; max-width: 1520px">
-            A frame moving <em>inside</em> one network is a Layer-2 problem,
-            solved with MAC addresses. A packet crossing <em>between</em>
-            networks is a Layer-3 problem, solved with IP addresses. The two
-            jobs define two devices.
+          <p class="reveal" style="--i: 2; font-size: 21px; margin-top: 8px; max-width: 1580px">
+            Inside one network it's a <strong>Layer-2</strong> job (MACs); crossing <em>between</em> networks is a <strong>Layer-3</strong> job (IPs). Two jobs, two devices.
           </p>
-          <div class="grid-2" style="margin-top: 30px; gap: 44px">
-            <div class="card reveal" style="--i: 3">
+          <div class="grid-2" style="margin-top: 24px; gap: 44px; align-items: stretch">
+            <div class="card reveal" style="--i: 3; padding: 20px 26px">
               <div class="label" style="color: var(--cobalt-deep)">Layer 2 · Switch</div>
-              <h3>Same network, frame by frame</h3>
-              <p style="margin-top: 8px; font-size: 19px">
-                Forwards <strong>Ethernet frames</strong> by destination
-                <strong>MAC</strong>. One switch = one broadcast domain. No idea
-                what an IP subnet is.
-              </p>
+              <h3 style="font-size: 26px">Same network, frame by frame</h3>
+              <!-- switch diagram: four hosts wired into one switch -->
+              <div style="margin: 16px 0; padding: 16px; border: 1.5px solid var(--rule); border-radius: 12px; background: rgba(255, 252, 244, 0.6); text-align: center">
+                <svg viewBox="0 0 480 250" style="width: 100%; height: auto; display: block" aria-hidden="true">
+                  <g stroke="#6b7785" stroke-width="3">
+                    <line x1="64" y1="74" x2="192" y2="176" />
+                    <line x1="182" y1="74" x2="220" y2="176" />
+                    <line x1="300" y1="74" x2="260" y2="176" />
+                    <line x1="416" y1="74" x2="288" y2="176" />
+                  </g>
+                  <g font-family="'JetBrains Mono', monospace" font-size="21" font-weight="700">
+                    <rect x="16" y="24" width="96" height="50" rx="9" fill="#d6deff" stroke="#1d3fb8" stroke-width="2" /><text x="64" y="56" text-anchor="middle" fill="#112879">PC</text>
+                    <rect x="134" y="24" width="96" height="50" rx="9" fill="#d6deff" stroke="#1d3fb8" stroke-width="2" /><text x="182" y="56" text-anchor="middle" fill="#112879">PC</text>
+                    <rect x="252" y="24" width="96" height="50" rx="9" fill="#d6deff" stroke="#1d3fb8" stroke-width="2" /><text x="300" y="56" text-anchor="middle" fill="#112879">PC</text>
+                    <rect x="368" y="24" width="96" height="50" rx="9" fill="#d6deff" stroke="#1d3fb8" stroke-width="2" /><text x="416" y="56" text-anchor="middle" fill="#112879">PC</text>
+                  </g>
+                  <rect x="140" y="176" width="200" height="60" rx="11" fill="#0f2030" />
+                  <text x="240" y="213" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="700" fill="#f4efe4" letter-spacing="2">SWITCH</text>
+                </svg>
+                <div style="font-family: var(--font-mono); font-size: 15px; color: var(--muted); margin-top: 8px">all on <strong style="color: var(--ink-soft)">one broadcast domain</strong> · forwards by MAC</div>
+              </div>
+              <p style="font-size: 17px; margin-top: 2px">Forwards frames by destination <strong>MAC</strong>; one switch = one broadcast domain.</p>
             </div>
-            <div class="card amber reveal" style="--i: 4">
+            <div class="card amber reveal" style="--i: 4; padding: 20px 26px">
               <div class="label">Layer 3 · Router</div>
-              <h3>Network to network, hop by hop</h3>
-              <p style="margin-top: 8px; font-size: 19px">
-                Forwards <strong>IP packets</strong> by destination
-                <strong>subnet</strong>. Each interface is a different network;
-                a router is a <strong>broadcast-domain boundary</strong>.
-              </p>
+              <h3 style="font-size: 26px">Network to network, hop by hop</h3>
+              <!-- router diagram: a boundary between two networks -->
+              <div style="margin: 16px 0; padding: 16px; border: 1.5px solid var(--rule); border-radius: 12px; background: rgba(255, 252, 244, 0.6); text-align: center">
+                <svg viewBox="0 0 480 250" style="width: 100%; height: auto; display: block" aria-hidden="true">
+                  <line x1="240" y1="18" x2="240" y2="206" stroke="#d9621a" stroke-width="2.5" stroke-dasharray="9 7" />
+                  <text x="240" y="226" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="13" fill="#d9621a">broadcast-domain boundary</text>
+                  <g stroke="#6b7785" stroke-width="3">
+                    <line x1="130" y1="120" x2="190" y2="124" /><line x1="290" y1="124" x2="350" y2="120" />
+                    <line x1="75" y1="150" x2="48" y2="184" /><line x1="75" y1="150" x2="102" y2="184" />
+                    <line x1="405" y1="150" x2="378" y2="184" /><line x1="405" y1="150" x2="432" y2="184" />
+                  </g>
+                  <rect x="20" y="90" width="110" height="60" rx="10" fill="#d6deff" stroke="#1d3fb8" stroke-width="2" /><text x="75" y="116" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="700" fill="#112879">Net A</text><text x="75" y="136" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="12.5" fill="#1d3fb8">10.0.1.0/24</text>
+                  <rect x="350" y="90" width="110" height="60" rx="10" fill="#ecd5e2" stroke="#7a2057" stroke-width="2" /><text x="405" y="116" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="700" fill="#7a2057">Net B</text><text x="405" y="136" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="12.5" fill="#7a2057">10.0.2.0/24</text>
+                  <g font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700">
+                    <rect x="28" y="184" width="40" height="26" rx="5" fill="#fff" stroke="#1d3fb8" stroke-width="1.5" /><text x="48" y="201" text-anchor="middle" fill="#1d3fb8">PC</text>
+                    <rect x="82" y="184" width="40" height="26" rx="5" fill="#fff" stroke="#1d3fb8" stroke-width="1.5" /><text x="102" y="201" text-anchor="middle" fill="#1d3fb8">PC</text>
+                    <rect x="358" y="184" width="40" height="26" rx="5" fill="#fff" stroke="#7a2057" stroke-width="1.5" /><text x="378" y="201" text-anchor="middle" fill="#7a2057">PC</text>
+                    <rect x="412" y="184" width="40" height="26" rx="5" fill="#fff" stroke="#7a2057" stroke-width="1.5" /><text x="432" y="201" text-anchor="middle" fill="#7a2057">PC</text>
+                  </g>
+                  <rect x="188" y="94" width="104" height="62" rx="11" fill="#0f2030" /><text x="240" y="131" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#f4efe4" letter-spacing="1">ROUTER</text>
+                </svg>
+                <div style="font-family: var(--font-mono); font-size: 15px; color: var(--muted); margin-top: 8px">two networks · forwards by <strong style="color: var(--ink-soft)">IP</strong> · breaks the broadcast domain</div>
+              </div>
+              <p style="font-size: 17px; margin-top: 2px">Forwards packets by destination <strong>subnet</strong>; each interface is a different network.</p>
             </div>
           </div>
-          <div class="reveal" style="--i: 5; margin-top: 26px; padding: 16px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 19px">
+          <div class="reveal" style="--i: 5; margin-top: 22px; padding: 16px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 19px">
             <strong>Two domains to keep straight:</strong> a
             <strong>collision domain</strong> is a single shared-media segment
             (every switch port is its own); a <strong>broadcast domain</strong>
@@ -6851,31 +7964,49 @@
         </section>
 
         <!-- ========================================================= SLIDE 5 — HUB vs SWITCH vs ROUTER ========================================================= -->
-        <section class="slide">
+        <section class="slide" id="layerCompare">
           <div class="masthead">
             <div class="left"><span class="tag">Compare</span><span>Hub · Switch · Router</span></div>
             <div class="right"></div>
           </div>
           <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">Three boxes, three jobs</span>
-          <h2 class="reveal" style="--i: 1; font-size: 52px">
+          <h2 class="reveal" style="--i: 1; font-size: 48px">
             Not all boxes are <em class="display">equal.</em>
           </h2>
-          <div class="reveal" style="--i: 2; margin-top: 30px">
-            <table class="data">
-              <thead>
-                <tr><th>Device</th><th>Layer</th><th>Forwards by</th><th>Collision domains</th><th>Broadcast domains</th></tr>
-              </thead>
-              <tbody>
-                <tr><td><strong>Hub</strong></td><td>L1 · physical</td><td>Nothing — repeats bits to <em>all</em> ports</td><td class="mono">1 (shared)</td><td class="mono">1</td></tr>
-                <tr><td><strong>Switch</strong></td><td>L2 · data-link</td><td>Destination <span class="mono">MAC</span></td><td class="mono">1 per port</td><td class="mono">1 (per VLAN)</td></tr>
-                <tr><td><strong>Router</strong></td><td>L3 · network</td><td>Destination <span class="mono">IP</span> / subnet</td><td class="mono">1 per port</td><td class="mono">1 per port</td></tr>
-              </tbody>
-            </table>
+          <p class="reveal" style="--i: 2; font-size: 19px; margin-top: 8px; max-width: 1560px">
+            Each device works <strong>up to</strong> a different layer of the stack — and that single fact decides everything it can do.
+          </p>
+
+          <!-- which device operates at which OSI layer — fills build bottom-up -->
+          <div style="display: grid; grid-template-columns: 196px repeat(3, 1fr); gap: 11px; margin-top: 18px; max-width: 1280px">
+            <div></div>
+            <div class="layer-dev" data-dev="hub" style="text-align: center; cursor: pointer"><div style="font-family: var(--font-display); font-weight: 700; font-size: 25px">Hub</div><div style="font-family: var(--font-mono); font-size: 14px; color: var(--muted)">a dumb repeater&nbsp;▸</div></div>
+            <div class="layer-dev" data-dev="switch" style="text-align: center; cursor: pointer"><div style="font-family: var(--font-display); font-weight: 700; font-size: 25px">Switch</div><div style="font-family: var(--font-mono); font-size: 14px; color: var(--muted)">learns MACs&nbsp;▸</div></div>
+            <div class="layer-dev" data-dev="router" style="text-align: center; cursor: pointer"><div style="font-family: var(--font-display); font-weight: 700; font-size: 25px">Router</div><div style="font-family: var(--font-mono); font-size: 14px; color: var(--muted)">routes subnets&nbsp;▸</div></div>
+
+            <div style="display: flex; align-items: center; justify-content: flex-end; font-family: var(--font-mono); font-size: 16px; color: var(--ink-soft); padding-right: 8px">L3 · Network</div>
+            <div style="height: 68px; border-radius: 8px; border: 1.5px dashed var(--rule); background: rgba(201,191,168,.12)"></div>
+            <div style="height: 68px; border-radius: 8px; border: 1.5px dashed var(--rule); background: rgba(201,191,168,.12)"></div>
+            <div class="reveal-scale" style="--i: 7; height: 68px; border-radius: 8px; border: 2px solid var(--moss); background: var(--moss-soft); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-weight: 700; font-size: 16px; color: var(--moss)">routes by IP</div>
+
+            <div style="display: flex; align-items: center; justify-content: flex-end; font-family: var(--font-mono); font-size: 16px; color: var(--ink-soft); padding-right: 8px">L2 · Data-link</div>
+            <div style="height: 68px; border-radius: 8px; border: 1.5px dashed var(--rule); background: rgba(201,191,168,.12)"></div>
+            <div class="reveal-scale" style="--i: 5; height: 68px; border-radius: 8px; border: 2px solid var(--cobalt); background: var(--cobalt-soft); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-weight: 700; font-size: 16px; color: var(--cobalt-deep)">switches by MAC</div>
+            <div class="reveal-scale" style="--i: 6; height: 68px; border-radius: 8px; border: 2px solid var(--moss); background: var(--moss-soft)"></div>
+
+            <div style="display: flex; align-items: center; justify-content: flex-end; font-family: var(--font-mono); font-size: 16px; color: var(--ink-soft); padding-right: 8px">L1 · Physical</div>
+            <div class="reveal-scale" style="--i: 3; height: 68px; border-radius: 8px; border: 2px solid var(--amber); background: var(--amber-soft); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-weight: 700; font-size: 16px; color: var(--amber)">repeats bits</div>
+            <div class="reveal-scale" style="--i: 3; height: 68px; border-radius: 8px; border: 2px solid var(--cobalt); background: var(--cobalt-soft)"></div>
+            <div class="reveal-scale" style="--i: 3; height: 68px; border-radius: 8px; border: 2px solid var(--moss); background: var(--moss-soft)"></div>
+
+            <div style="display: flex; align-items: center; justify-content: flex-end; font-family: var(--font-mono); font-size: 14px; color: var(--muted); padding-right: 8px; padding-top: 8px">domains</div>
+            <div style="text-align: center; font-family: var(--font-mono); font-size: 14px; color: var(--ink-soft); padding-top: 8px; line-height: 1.5">1 collision (shared)<br />1 broadcast</div>
+            <div style="text-align: center; font-family: var(--font-mono); font-size: 14px; color: var(--ink-soft); padding-top: 8px; line-height: 1.5">1 collision / port<br />1 broadcast (per VLAN)</div>
+            <div style="text-align: center; font-family: var(--font-mono); font-size: 14px; color: var(--ink-soft); padding-top: 8px; line-height: 1.5">1 collision / port<br />1 broadcast / port</div>
           </div>
-          <div class="reveal" style="--i: 3; margin-top: 28px; padding: 16px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 20px">
-            A hub is "dumb" — everyone hears everything and collides. A switch
-            gives every port its own collision domain. A router is the only one
-            of the three that breaks a <strong>broadcast domain</strong>.
+
+          <div class="reveal" id="layerDetail" style="--i: 4; margin-top: 22px; padding: 16px 26px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 19px; line-height: 1.5; min-height: 92px">
+            <strong>Click Hub, Switch or Router above</strong> to see what each one does — a hub is "dumb" (everyone hears everything and collides), a switch gives every port its own collision domain, and a router is the only one that breaks a <strong>broadcast domain</strong>.
           </div>
           <div class="page-num"></div>
         </section>
@@ -6909,7 +8040,7 @@
             mapping each known MAC to the port it lives behind. For every
             incoming frame it does two things — <em>learn</em>, then <em>forward</em>.
           </p>
-          <div class="grid-3" style="margin-top: 28px">
+          <div class="grid-3" style="margin-top: 16px">
             <div class="card reveal" style="--i: 3">
               <div class="label" style="color: var(--cobalt-deep)">1 · Learn</div>
               <h3>Source MAC → port</h3>
@@ -6926,16 +8057,52 @@
               <p style="margin-top: 8px; font-size: 18px">If the destination is unknown (or a broadcast), <strong>flood</strong> it out all ports except the one it came in on.</p>
             </div>
           </div>
-          <div class="reveal" style="--i: 6; margin-top: 24px; padding: 14px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 19px">
-            <strong>Aging:</strong> entries expire after an idle timeout
-            (default <span class="mono">300 s</span> on Cisco) so the table
-            tracks devices that move. <span class="mono">show mac address-table</span> shows it live.
+          <div class="reveal" style="--i: 6; margin-top: 14px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 26px; align-items: stretch">
+            <div style="border: 1.5px solid var(--rule); border-radius: 12px; padding: 12px 22px; background: rgba(255, 252, 244, 0.6)">
+              <div style="font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cobalt-deep); margin-bottom: 10px">Worked example · A (aa:aa) ↔ B (bb:bb)</div>
+              <svg viewBox="0 0 520 210" style="width: 100%; height: auto; display: block; margin-top: 6px" aria-hidden="true">
+                <g stroke="#6b7785" stroke-width="2.5">
+                  <line x1="128" y1="50" x2="206" y2="96" /><line x1="392" y1="50" x2="314" y2="96" />
+                  <line x1="128" y1="170" x2="206" y2="128" /><line x1="392" y1="170" x2="314" y2="128" />
+                </g>
+                <!-- port labels -->
+                <g font-family="'JetBrains Mono', monospace" font-size="13" fill="#6b7785">
+                  <text x="150" y="66">Fa0/1</text><text x="338" y="66">Fa0/2</text>
+                  <text x="150" y="156">Fa0/3</text><text x="338" y="156">Fa0/4</text>
+                </g>
+                <!-- active hosts -->
+                <g font-family="'JetBrains Mono', monospace" font-weight="700">
+                  <rect x="20" y="28" width="108" height="44" rx="7" fill="#d6deff" stroke="#1d3fb8" stroke-width="1.5" /><text x="74" y="48" text-anchor="middle" font-size="16" fill="#112879">PC-A</text><text x="74" y="65" text-anchor="middle" font-size="12" fill="#1d3fb8">aa:aa</text>
+                  <rect x="392" y="28" width="108" height="44" rx="7" fill="#cbe1ce" stroke="#3a7d44" stroke-width="1.5" /><text x="446" y="48" text-anchor="middle" font-size="16" fill="#0f2030">PC-B</text><text x="446" y="65" text-anchor="middle" font-size="12" fill="#3a7d44">bb:bb</text>
+                </g>
+                <!-- idle hosts -->
+                <g font-family="'JetBrains Mono', monospace" font-weight="700" opacity="0.45">
+                  <rect x="20" y="148" width="108" height="44" rx="7" fill="#ebe4d2" stroke="#c9bfa8" stroke-width="1.5" /><text x="74" y="175" text-anchor="middle" font-size="16" fill="#6b7785">PC-C</text>
+                  <rect x="392" y="148" width="108" height="44" rx="7" fill="#ebe4d2" stroke="#c9bfa8" stroke-width="1.5" /><text x="446" y="175" text-anchor="middle" font-size="16" fill="#6b7785">PC-D</text>
+                </g>
+                <!-- switch -->
+                <rect x="200" y="92" width="120" height="44" rx="9" fill="#0f2030" /><text x="260" y="119" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#f4efe4" letter-spacing="1">SWITCH</text>
+              </svg>
+              <div style="margin-top: 8px; font-size: 16px; line-height: 1.5"><strong>A→B:</strong> learn <span class="mono">aa:aa</span>@Fa0/1, then <span style="color: var(--amber); font-weight: 700">flood</span>. <strong>B replies:</strong> learn <span class="mono">bb:bb</span>@Fa0/2 → <span style="color: var(--moss); font-weight: 700">unicast</span> back. Now both known → clean unicast.</div>
+              <div style="margin-top: 12px; font-size: 15px; color: var(--ink-soft)"><strong>Aging:</strong> entries expire after an idle timeout (default <span class="mono">300 s</span>) so the table follows devices that move.</div>
+            </div>
+            <div style="border: 1.5px solid var(--ink); border-radius: 12px; padding: 16px 20px; background: var(--paper-warm)">
+              <div style="font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px">MAC address table</div>
+              <table style="width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 18px">
+                <thead><tr><th style="text-align: left; font-size: 13px; letter-spacing: 0.1em; color: var(--muted); border-bottom: 2px solid var(--ink); padding: 6px 4px">MAC</th><th style="text-align: left; font-size: 13px; letter-spacing: 0.1em; color: var(--muted); border-bottom: 2px solid var(--ink); padding: 6px 4px">Port</th></tr></thead>
+                <tbody>
+                  <tr><td style="padding: 8px 4px; border-bottom: 1px solid var(--rule)">aa:aa</td><td style="padding: 8px 4px; border-bottom: 1px solid var(--rule)">Fa0/1</td></tr>
+                  <tr><td style="padding: 8px 4px; border-bottom: 1px solid var(--rule)">bb:bb</td><td style="padding: 8px 4px; border-bottom: 1px solid var(--rule)">Fa0/2</td></tr>
+                </tbody>
+              </table>
+              <div style="font-size: 14px; color: var(--muted); margin-top: 10px"><span class="mono">show mac address-table</span></div>
+            </div>
           </div>
           <div class="page-num"></div>
         </section>
 
         <!-- ========================================================= SLIDE 8 — INTERACTIVE: MAC LEARNING SIM ========================================================= -->
-        <section class="slide" id="macSim">
+        <section class="slide" id="macSim" data-noscale>
           <div class="masthead">
             <div class="left"><span class="tag">Interactive</span><span>MAC learning &amp; flooding</span></div>
             <div class="right"></div>
@@ -6945,13 +8112,33 @@
             Watch the table <em class="display">fill up.</em>
           </h2>
           <div class="mac-stage reveal" style="--i: 2">
-            <div class="mac-net">
-              <div class="mac-host" data-host="A"><div class="mac-pc">PC&nbsp;A</div><div class="mac-mac">aa:aa</div></div>
-              <div class="mac-host" data-host="B"><div class="mac-pc">PC&nbsp;B</div><div class="mac-mac">bb:bb</div></div>
+            <div class="mac-net" id="macNet">
+              <!-- physical links: each host has its own wire into a switch port -->
+              <svg class="mac-wires" viewBox="0 0 1040 500" preserveAspectRatio="none" aria-hidden="true">
+                <line class="mac-wire" data-host="A" x1="170" y1="118" x2="520" y2="250" />
+                <line class="mac-wire" data-host="B" x1="870" y1="118" x2="520" y2="250" />
+                <line class="mac-wire" data-host="C" x1="170" y1="382" x2="520" y2="250" />
+                <line class="mac-wire" data-host="D" x1="870" y1="382" x2="520" y2="250" />
+              </svg>
+
+              <div class="mac-host" data-host="A" style="left: 75px; top: 76px"><div class="mac-pc">PC&nbsp;A</div><div class="mac-mac">aa:aa</div></div>
+              <div class="mac-host" data-host="B" style="left: 775px; top: 76px"><div class="mac-pc">PC&nbsp;B</div><div class="mac-mac">bb:bb</div></div>
+              <div class="mac-host" data-host="C" style="left: 75px; top: 340px"><div class="mac-pc">PC&nbsp;C</div><div class="mac-mac">cc:cc</div></div>
+              <div class="mac-host" data-host="D" style="left: 775px; top: 340px"><div class="mac-pc">PC&nbsp;D</div><div class="mac-mac">dd:dd</div></div>
+
               <div class="mac-switch" id="macSwitch">SWITCH<span>CAM forwarding</span></div>
-              <div class="mac-host" data-host="C"><div class="mac-pc">PC&nbsp;C</div><div class="mac-mac">cc:cc</div></div>
-              <div class="mac-host" data-host="D"><div class="mac-pc">PC&nbsp;D</div><div class="mac-mac">dd:dd</div></div>
-              <div class="mac-frame" id="macFrame"></div>
+
+              <!-- port tags sit on each wire just outside the switch -->
+              <div class="mac-port" data-host="A" style="left: 360px; top: 186px">Fa0/1</div>
+              <div class="mac-port" data-host="B" style="left: 680px; top: 186px">Fa0/2</div>
+              <div class="mac-port" data-host="C" style="left: 360px; top: 314px">Fa0/3</div>
+              <div class="mac-port" data-host="D" style="left: 680px; top: 314px">Fa0/4</div>
+
+              <!-- one reusable frame per port -->
+              <div class="mac-frame" data-f="A"></div>
+              <div class="mac-frame" data-f="B"></div>
+              <div class="mac-frame" data-f="C"></div>
+              <div class="mac-frame" data-f="D"></div>
             </div>
             <div class="mac-side">
               <div class="mac-table-title">MAC ADDRESS TABLE</div>
@@ -6959,7 +8146,11 @@
                 <thead><tr><th>MAC</th><th>Port</th></tr></thead>
                 <tbody><tr class="mac-empty"><td colspan="2">— empty —</td></tr></tbody>
               </table>
-              <div class="mac-narr" id="macNarr">Press <strong>START</strong> to send a frame from PC&nbsp;A to PC&nbsp;D.</div>
+              <div class="mac-legend">
+                <span><i class="cob"></i> unicast / learn</span>
+                <span><i class="amb"></i> flood (all ports)</span>
+              </div>
+              <div class="mac-narr" id="macNarr">Press <strong>START</strong> to send a frame from PC&nbsp;A to PC&nbsp;D — watch the link light up and the table fill in.</div>
             </div>
           </div>
           <div class="sim-controls reveal" style="--i: 3">
@@ -6970,38 +8161,63 @@
           <div class="page-num"></div>
         </section>
 
-        <!-- ========================================================= SLIDE 9 — BROADCAST/UNICAST/MULTICAST ========================================================= -->
-        <section class="slide">
+        <!-- ========================================================= SLIDE 9 — INTERACTIVE: UNICAST/BROADCAST/MULTICAST ========================================================= -->
+        <section class="slide" id="castSim" data-noscale>
           <div class="masthead">
-            <div class="left"><span class="tag">Switching</span><span>Unicast · Broadcast · Multicast</span></div>
+            <div class="left"><span class="tag">Interactive</span><span>Unicast · Broadcast · Multicast</span></div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">One frame, three audiences</span>
-          <h2 class="reveal" style="--i: 1; font-size: 50px">
+          <span class="eyebrow amber reveal" style="--i: 0">Live simulation · pick how the frame is addressed</span>
+          <h2 class="reveal" style="--i: 1; font-size: 40px">
             Who is this frame <em class="display">for?</em>
           </h2>
-          <div class="grid-3" style="margin-top: 32px">
-            <div class="card reveal" style="--i: 2">
-              <div class="label" style="color: var(--cobalt-deep)">Unicast</div>
-              <h3>Exactly one</h3>
-              <p style="margin-top: 8px; font-size: 18px">A specific destination MAC. Once learned, the switch sends it to a <strong>single port</strong>.</p>
+
+          <div class="cast-stage reveal" style="--i: 2">
+            <div class="cast-canvas" id="castCanvas">
+              <svg viewBox="0 0 1020 432" preserveAspectRatio="none" aria-hidden="true">
+                <line class="cast-wire" id="cwAS" x1="120" y1="216" x2="430" y2="216" />
+                <line class="cast-wire" data-h="B" x1="430" y1="216" x2="820" y2="66" />
+                <line class="cast-wire" data-h="C" x1="430" y1="216" x2="820" y2="172" />
+                <line class="cast-wire" data-h="D" x1="430" y1="216" x2="820" y2="280" />
+                <line class="cast-wire" data-h="E" x1="430" y1="216" x2="820" y2="388" />
+              </svg>
+
+              <div class="cast-node src" style="left: 120px; top: 216px"><div class="nn">PC&nbsp;A</div><div class="ns">sender</div></div>
+              <div class="cast-sw" style="left: 430px; top: 216px">SWITCH</div>
+
+              <div class="cast-node grp" data-h="B" style="left: 820px; top: 66px"><div class="nn">PC&nbsp;B</div><div class="ns">★ in group</div></div>
+              <div class="cast-node" data-h="C" style="left: 820px; top: 172px"><div class="nn">PC&nbsp;C</div><div class="ns">—</div></div>
+              <div class="cast-node grp" data-h="D" style="left: 820px; top: 280px"><div class="nn">PC&nbsp;D</div><div class="ns">★ in group</div></div>
+              <div class="cast-node" data-h="E" style="left: 820px; top: 388px"><div class="nn">PC&nbsp;E</div><div class="ns">—</div></div>
+
+              <div class="cast-frame" data-f="A"></div>
+              <div class="cast-frame" data-f="B"></div>
+              <div class="cast-frame" data-f="C"></div>
+              <div class="cast-frame" data-f="D"></div>
+              <div class="cast-frame" data-f="E"></div>
             </div>
-            <div class="card amber reveal" style="--i: 3">
-              <div class="label">Broadcast</div>
-              <h3>Everyone on the LAN</h3>
-              <p style="margin-top: 8px; font-size: 18px">Destination <span class="mono">ff:ff:ff:ff:ff:ff</span>. Flooded to the <strong>whole broadcast domain</strong> — ARP, DHCP Discover.</p>
-            </div>
-            <div class="card moss reveal" style="--i: 4">
-              <div class="label">Multicast</div>
-              <h3>A subscribed group</h3>
-              <p style="margin-top: 8px; font-size: 18px">One-to-many for those who opted in — video, routing protocols (OSPF <span class="mono">224.0.0.5</span>).</p>
+
+            <div class="cast-side">
+              <div class="cast-card uni" data-m="uni">
+                <div class="ct">Unicast → one</div>
+                <p>A specific destination <span class="mono">MAC</span>. Once learned, the switch sends it out a <strong>single port</strong>.</p>
+              </div>
+              <div class="cast-card bcast" data-m="bcast">
+                <div class="ct">Broadcast → all</div>
+                <p>Destination <span class="mono">ff:ff:ff:ff:ff:ff</span> — flooded to the <strong>whole broadcast domain</strong> (ARP, DHCP Discover).</p>
+              </div>
+              <div class="cast-card mcast" data-m="mcast">
+                <div class="ct">Multicast → a group</div>
+                <p>One-to-many, only for those who <strong>opted in</strong> — video, OSPF <span class="mono">224.0.0.5</span>. Here: B&nbsp;&amp;&nbsp;D.</p>
+              </div>
             </div>
           </div>
-          <div class="reveal" style="--i: 5; margin-top: 26px; padding: 16px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 20px">
-            <strong>Unknown-unicast flooding:</strong> a unicast frame whose
-            destination isn't in the table yet is treated like a broadcast —
-            flooded everywhere until the switch learns the reply. Too many of
-            these is a red flag in a capture.
+
+          <div class="sim-controls reveal" style="--i: 3">
+            <button class="sim-btn" data-mode="uni">Unicast → B</button>
+            <button class="sim-btn" data-mode="bcast">Broadcast → all</button>
+            <button class="sim-btn" data-mode="mcast">Multicast → group</button>
+            <button class="sim-btn" id="castReset">↺ Reset</button>
           </div>
           <div class="page-num"></div>
         </section>
@@ -7027,35 +8243,74 @@
             <div class="left"><span class="tag">VLANs</span><span>Why segment a network?</span></div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow moss reveal" style="--i: 0">A VLAN = a broadcast domain you define in software</span>
-          <h2 class="reveal" style="--i: 1; font-size: 50px">
+          <span class="eyebrow moss reveal" style="--i: 0; font-size: 18px">A VLAN = a broadcast domain you define in software</span>
+          <h2 class="reveal" style="--i: 1; font-size: 58px">
             One wire, separate <em class="display">worlds.</em>
           </h2>
-          <p class="reveal" style="--i: 2; font-size: 21px; margin-top: 10px; max-width: 1520px">
+          <p class="reveal" style="--i: 2; font-size: 23px; margin-top: 14px; max-width: 1600px; line-height: 1.5">
             Without VLANs, every port on a switch shares one broadcast domain.
             A <strong>VLAN</strong> lets you group ports logically — Admin,
             Sales, IT — even though they share the same hardware.
           </p>
-          <div class="grid-3" style="margin-top: 30px">
-            <div class="card reveal" style="--i: 3">
-              <div class="label" style="color: var(--cobalt-deep)">Security</div>
-              <h3>Isolation by design</h3>
-              <p style="margin-top: 8px; font-size: 18px">Devices in VLAN 10 can't reach VLAN 20 at Layer 2 at all — traffic must go through a router that can filter it.</p>
+          <div class="grid-3" style="margin-top: 34px; gap: 34px">
+            <div class="card reveal" style="--i: 3; padding: 26px 30px">
+              <div class="label" style="color: var(--cobalt-deep); font-size: 16px">Security</div>
+              <h3 style="font-size: 28px; margin-top: 4px">Isolation by design</h3>
+              <p style="margin-top: 12px; font-size: 21px; line-height: 1.5">Devices in VLAN 10 can't reach VLAN 20 at Layer 2 at all — traffic must go through a router that can filter it.</p>
             </div>
-            <div class="card amber reveal" style="--i: 4">
-              <div class="label">Performance</div>
-              <h3>Smaller broadcast domains</h3>
-              <p style="margin-top: 8px; font-size: 18px">A broadcast in Sales never floods Admin. Less noise, less wasted bandwidth on every host.</p>
+            <div class="card amber reveal" style="--i: 4; padding: 26px 30px">
+              <div class="label" style="font-size: 16px">Performance</div>
+              <h3 style="font-size: 28px; margin-top: 4px">Smaller broadcast domains</h3>
+              <p style="margin-top: 12px; font-size: 21px; line-height: 1.5">A broadcast in Sales never floods Admin. Less noise, less wasted bandwidth on every host.</p>
             </div>
-            <div class="card plum reveal" style="--i: 5">
-              <div class="label">Organisation</div>
-              <h3>Logical, not physical</h3>
-              <p style="margin-top: 8px; font-size: 18px">Group by role or department regardless of which floor or switch a user is plugged into.</p>
+            <div class="card plum reveal" style="--i: 5; padding: 26px 30px">
+              <div class="label" style="font-size: 16px">Organisation</div>
+              <h3 style="font-size: 28px; margin-top: 4px">Logical, not physical</h3>
+              <p style="margin-top: 12px; font-size: 21px; line-height: 1.5">Group by role or department regardless of which floor or switch a user is plugged into.</p>
             </div>
           </div>
-          <div class="reveal" style="--i: 6; margin-top: 24px; padding: 14px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 19px">
+          <div class="reveal" style="--i: 6; margin-top: 30px; padding: 18px 28px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 21px">
             <strong>In the lab:</strong> VLAN 10 = Admin, VLAN 20 = Sales,
             VLAN 30 = IT — three isolated networks on two shared switches.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 11a2 — WHY VLANs, NOT PHYSICAL SEPARATION ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">VLANs</span><span>Why not just split by physical network?</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt); font-size: 18px">The same isolation — without the cabling bill</span>
+          <h2 class="reveal" style="--i: 1; font-size: 58px">
+            One switch beats <em class="display">three.</em>
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 24px; margin-top: 14px; max-width: 1620px; line-height: 1.5">
+            You <em>could</em> give every department its own switch and cabling. It works — but it's rigid and expensive. A VLAN gives the same separation as a separate physical network, defined in software on shared hardware.
+          </p>
+          <div class="grid-2" style="margin-top: 34px; gap: 48px; align-items: stretch">
+            <div class="card amber reveal" style="--i: 3; padding: 30px 32px">
+              <div class="label" style="font-size: 16px">The old way · physical separation</div>
+              <h3 style="font-size: 30px; margin-top: 4px">A switch per department</h3>
+              <div class="ncmp-box">
+                <div class="ncmp-row"><span class="ncmp-sw">SW · Sales</span><span class="ncmp-link"></span><span class="ncmp-pc v10">PC</span><span class="ncmp-pc v10">PC</span></div>
+                <div class="ncmp-row"><span class="ncmp-sw">SW · Eng</span><span class="ncmp-link"></span><span class="ncmp-pc v20">PC</span><span class="ncmp-pc v20">PC</span></div>
+                <div class="ncmp-row"><span class="ncmp-sw">SW · IT</span><span class="ncmp-link"></span><span class="ncmp-pc v30">PC</span><span class="ncmp-pc v30">PC</span></div>
+              </div>
+              <p style="margin-top: 22px; font-size: 20px; line-height: 1.5">Three boxes, three sets of cabling. Moving someone between teams means <strong>re-plugging them into a different switch</strong>. Ports sit empty on one switch while another is full.</p>
+            </div>
+            <div class="card reveal" style="--i: 4; padding: 30px 32px">
+              <div class="label" style="color: var(--cobalt-deep); font-size: 16px">The VLAN way · logical separation</div>
+              <h3 style="font-size: 30px; margin-top: 4px">One switch, many VLANs</h3>
+              <div class="ncmp-box">
+                <div class="ncmp-row" style="flex-wrap: wrap"><span class="ncmp-sw">SW · shared</span><span class="ncmp-link"></span><span class="ncmp-pc v10">V10</span><span class="ncmp-pc v20">V20</span><span class="ncmp-pc v10">V10</span><span class="ncmp-pc v30">V30</span><span class="ncmp-pc v20">V20</span></div>
+              </div>
+              <p style="margin-top: 22px; font-size: 20px; line-height: 1.5">One switch carries all three groups, still <strong>isolated</strong>. Moving a user between teams is a <strong>one-line config</strong> — <span class="mono">switchport access vlan 20</span> — no recabling, no new hardware.</p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 5; margin-top: 30px; padding: 18px 28px; border-left: 5px solid var(--cobalt); background: var(--paper-warm); font-size: 21px; line-height: 1.5">
+            <strong>The trade:</strong> physical separation is simple but inflexible and wasteful; VLANs give the same security and broadcast isolation while letting one shared fabric serve every department — and scale across many switches over a trunk.
           </div>
           <div class="page-num"></div>
         </section>
@@ -7066,37 +8321,37 @@
             <div class="left"><span class="tag">VLANs</span><span>Why segment — in depth</span></div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">One flat network becomes a liability as it grows</span>
-          <h2 class="reveal" style="--i: 1; font-size: 48px">
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt); font-size: 18px">One flat network becomes a liability as it grows</span>
+          <h2 class="reveal" style="--i: 1; font-size: 54px">
             Six reasons to <em class="display">segment.</em>
           </h2>
-          <div class="grid-3" style="margin-top: 26px; gap: 26px">
-            <div class="card reveal" style="--i: 2">
-              <div class="label" style="color: var(--cobalt-deep); display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 24px">shield</span>Security &amp; isolation</div>
-              <p style="margin-top: 6px; font-size: 17px">L2 traffic can't cross VLANs at all. Finance, servers and guests are walled off — inter-VLAN traffic must pass a router/firewall where it can be <strong>filtered</strong>.</p>
+          <div class="grid-3" style="margin-top: 30px; gap: 30px">
+            <div class="card reveal" style="--i: 2; padding: 22px 26px">
+              <div class="label" style="color: var(--cobalt-deep); font-size: 17px; display: flex; align-items: center; gap: 10px"><span class="m-icon" style="font-size: 27px">shield</span>Security &amp; isolation</div>
+              <p style="margin-top: 10px; font-size: 20px; line-height: 1.5">L2 traffic can't cross VLANs at all. Finance, servers and guests are walled off — inter-VLAN traffic must pass a router/firewall where it can be <strong>filtered</strong>.</p>
             </div>
-            <div class="card amber reveal" style="--i: 3">
-              <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 24px">cell_tower</span>Broadcast containment</div>
-              <p style="margin-top: 6px; font-size: 17px">Each VLAN is its own <strong>broadcast domain</strong>. An ARP or DHCP storm in Sales never touches Admin, and every host wastes less CPU on broadcasts.</p>
+            <div class="card amber reveal" style="--i: 3; padding: 22px 26px">
+              <div class="label" style="font-size: 17px; display: flex; align-items: center; gap: 10px"><span class="m-icon" style="font-size: 27px">cell_tower</span>Broadcast containment</div>
+              <p style="margin-top: 10px; font-size: 20px; line-height: 1.5">Each VLAN is its own <strong>broadcast domain</strong>. An ARP or DHCP storm in Sales never touches Admin, and every host wastes less CPU on broadcasts.</p>
             </div>
-            <div class="card moss reveal" style="--i: 4">
-              <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 24px">speed</span>Performance</div>
-              <p style="margin-top: 6px; font-size: 17px">Smaller domains mean less flooding and less unknown-unicast noise — more of the wire is left for real traffic.</p>
+            <div class="card moss reveal" style="--i: 4; padding: 22px 26px">
+              <div class="label" style="font-size: 17px; display: flex; align-items: center; gap: 10px"><span class="m-icon" style="font-size: 27px">speed</span>Performance</div>
+              <p style="margin-top: 10px; font-size: 20px; line-height: 1.5">Smaller domains mean less flooding and less unknown-unicast noise — more of the wire is left for real traffic.</p>
             </div>
-            <div class="card plum reveal" style="--i: 5">
-              <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 24px">groups</span>Grouping &amp; mobility</div>
-              <p style="margin-top: 6px; font-size: 17px">Group by <strong>role, not location</strong>. A user keeps their VLAN when they move desks or floors — no recabling, just a port config.</p>
+            <div class="card plum reveal" style="--i: 5; padding: 22px 26px">
+              <div class="label" style="font-size: 17px; display: flex; align-items: center; gap: 10px"><span class="m-icon" style="font-size: 27px">groups</span>Grouping &amp; mobility</div>
+              <p style="margin-top: 10px; font-size: 20px; line-height: 1.5">Group by <strong>role, not location</strong>. A user keeps their VLAN when they move desks or floors — no recabling, just a port config.</p>
             </div>
-            <div class="card reveal" style="--i: 6">
-              <div class="label" style="color: var(--cobalt-deep); display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 24px">savings</span>Cost &amp; simplicity</div>
-              <p style="margin-top: 6px; font-size: 17px">One physical switch does the work of many separate ones — no extra hardware per department.</p>
+            <div class="card reveal" style="--i: 6; padding: 22px 26px">
+              <div class="label" style="color: var(--cobalt-deep); font-size: 17px; display: flex; align-items: center; gap: 10px"><span class="m-icon" style="font-size: 27px">savings</span>Cost &amp; simplicity</div>
+              <p style="margin-top: 10px; font-size: 20px; line-height: 1.5">One physical switch does the work of many separate ones — no extra hardware per department.</p>
             </div>
-            <div class="card amber reveal" style="--i: 7">
-              <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 24px">tune</span>Policy &amp; QoS</div>
-              <p style="margin-top: 6px; font-size: 17px">Apply ACLs, QoS and monitoring per VLAN — e.g. prioritise a <strong>Voice</strong> VLAN, throttle a <strong>Guest</strong> one.</p>
+            <div class="card amber reveal" style="--i: 7; padding: 22px 26px">
+              <div class="label" style="font-size: 17px; display: flex; align-items: center; gap: 10px"><span class="m-icon" style="font-size: 27px">tune</span>Policy &amp; QoS</div>
+              <p style="margin-top: 10px; font-size: 20px; line-height: 1.5">Apply ACLs, QoS and monitoring per VLAN — e.g. prioritise a <strong>Voice</strong> VLAN, throttle a <strong>Guest</strong> one.</p>
             </div>
           </div>
-          <div class="reveal" style="--i: 8; margin-top: 20px; padding: 13px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 19px">
+          <div class="reveal" style="--i: 8; margin-top: 26px; padding: 16px 26px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 21px">
             A VLAN is a <strong>broadcast domain you draw in software</strong> —
             but remember: a router (or L3 switch) is still required for two VLANs to talk.
           </div>
@@ -7110,33 +8365,53 @@
             <div class="right"></div>
           </div>
           <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">How a frame remembers its VLAN</span>
-          <h2 class="reveal" style="--i: 1; font-size: 50px">
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
             A 4-byte tag, <em class="display">inserted.</em>
           </h2>
-          <p class="reveal" style="--i: 2; font-size: 21px; margin-top: 10px; max-width: 1520px">
-            When a frame crosses a link shared by several VLANs, the switch
-            inserts an <strong>802.1Q tag</strong> after the source MAC so the
-            other end knows which VLAN it belongs to.
+          <p class="reveal" style="--i: 2; font-size: 20px; margin-top: 8px; max-width: 1580px">
+            On a trunk the switch slips a <strong>4-byte 802.1Q tag</strong> in
+            <strong>between the Source MAC and the EtherType</strong>. The far end
+            reads it to learn the VLAN, then strips it before handing the frame to an access port.
           </p>
-          <div class="reveal" style="--i: 3; margin-top: 26px">
-            <div class="label" style="color: var(--cobalt-deep); margin-bottom: 12px; font-family: var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; font-size: 14px">Tagged Ethernet frame</div>
+          <div class="reveal" style="--i: 3; margin-top: 18px">
+            <div class="label" style="color: var(--cobalt-deep); margin-bottom: 9px; font-family: var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; font-size: 14px">Tagged Ethernet frame — the tag is added after SRC MAC</div>
             <div style="display: flex; align-items: stretch; gap: 6px; font-family: var(--font-mono)">
-              <div style="flex: 1.1; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 14px 8px"><div style="font-size: 13px; color: var(--muted)">DST MAC</div><div style="font-size: 18px; font-weight: 700; margin-top: 4px">6 B</div></div>
-              <div style="flex: 1.1; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 14px 8px"><div style="font-size: 13px; color: var(--muted)">SRC MAC</div><div style="font-size: 18px; font-weight: 700; margin-top: 4px">6 B</div></div>
-              <div style="flex: 1.7; text-align: center; border: 2px solid var(--amber); background: var(--amber-soft); color: var(--amber); border-radius: 8px; padding: 14px 8px"><div style="font-size: 13px; font-weight: 700">802.1Q TAG</div><div style="font-size: 16px; font-weight: 700; margin-top: 4px">TPID 0x8100 · VID</div></div>
-              <div style="flex: 1; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 14px 8px"><div style="font-size: 13px; color: var(--muted)">TYPE</div><div style="font-size: 18px; font-weight: 700; margin-top: 4px">2 B</div></div>
-              <div style="flex: 2; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 14px 8px"><div style="font-size: 13px; color: var(--muted)">PAYLOAD</div><div style="font-size: 18px; font-weight: 700; margin-top: 4px">46–1500 B</div></div>
-              <div style="flex: 0.8; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 14px 8px"><div style="font-size: 13px; color: var(--muted)">FCS</div><div style="font-size: 18px; font-weight: 700; margin-top: 4px">4 B</div></div>
+              <div style="flex: 1.1; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 11px 8px"><div style="font-size: 14px; color: var(--muted)">DST MAC</div><div style="font-size: 17px; font-weight: 700; margin-top: 3px">6 B</div></div>
+              <div style="flex: 1.1; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 11px 8px"><div style="font-size: 14px; color: var(--muted)">SRC MAC</div><div style="font-size: 17px; font-weight: 700; margin-top: 3px">6 B</div></div>
+              <div style="flex: 1.7; text-align: center; border: 2px solid var(--amber); background: var(--amber-soft); color: var(--amber); border-radius: 8px; padding: 11px 8px"><div style="font-size: 15px; font-weight: 700">802.1Q TAG</div><div style="font-size: 15px; font-weight: 700; margin-top: 3px">4 B</div></div>
+              <div style="flex: 1; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 11px 8px"><div style="font-size: 14px; color: var(--muted)">TYPE</div><div style="font-size: 17px; font-weight: 700; margin-top: 3px">2 B</div></div>
+              <div style="flex: 2; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 11px 8px"><div style="font-size: 14px; color: var(--muted)">PAYLOAD</div><div style="font-size: 17px; font-weight: 700; margin-top: 3px">46–1500 B</div></div>
+              <div style="flex: 0.8; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 11px 8px"><div style="font-size: 14px; color: var(--muted)">FCS</div><div style="font-size: 17px; font-weight: 700; margin-top: 3px">4 B</div></div>
             </div>
           </div>
-          <div class="grid-2" style="margin-top: 26px; gap: 36px">
-            <div class="card amber reveal" style="--i: 4; padding: 16px 22px">
-              <div class="label">Find it in Wireshark</div>
-              <p style="margin-top: 6px; font-size: 18px">Look for <span class="mono">TPID 0x8100</span> in the Ethernet II header; the 12-bit <strong>VID</strong> is the VLAN ID. Filter: <span class="mono">vlan</span>.</p>
+
+          <!-- exploded: what the 4 bytes actually contain -->
+          <div class="reveal" style="--i: 4; margin-top: 16px">
+            <div class="label" style="color: var(--amber); margin-bottom: 9px; font-family: var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; font-size: 14px">↳ Inside the 4-byte tag</div>
+            <div style="display: flex; align-items: stretch; gap: 6px; font-family: var(--font-mono)">
+              <div style="flex: 2.2; text-align: center; border: 2px solid var(--amber); background: var(--amber-soft); border-radius: 8px; padding: 12px 8px"><div style="font-size: 17px; font-weight: 700; color: var(--amber)">TPID</div><div style="font-size: 14.5px; color: var(--ink-soft); margin-top: 3px">16 bits · <strong>0x8100</strong></div><div style="font-size: 14px; color: var(--muted); margin-top: 2px">"this frame is tagged"</div></div>
+              <div style="flex: 1.2; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 12px 8px"><div style="font-size: 17px; font-weight: 700; color: var(--ink)">PCP</div><div style="font-size: 14.5px; color: var(--ink-soft); margin-top: 3px">3 bits</div><div style="font-size: 14px; color: var(--muted); margin-top: 2px">priority · QoS</div></div>
+              <div style="flex: 0.9; text-align: center; border: 1.5px solid var(--muted); background: rgba(255,252,244,.7); border-radius: 8px; padding: 12px 8px"><div style="font-size: 17px; font-weight: 700; color: var(--ink)">DEI</div><div style="font-size: 14.5px; color: var(--ink-soft); margin-top: 3px">1 bit</div><div style="font-size: 14px; color: var(--muted); margin-top: 2px">drop-eligible</div></div>
+              <div style="flex: 2.6; text-align: center; border: 2px solid var(--cobalt); background: var(--cobalt-soft); border-radius: 8px; padding: 12px 8px"><div style="font-size: 17px; font-weight: 700; color: var(--cobalt-deep)">VID</div><div style="font-size: 14.5px; color: var(--ink-soft); margin-top: 3px">12 bits · the <strong>VLAN ID</strong></div><div style="font-size: 14px; color: var(--muted); margin-top: 2px">0 – 4095</div></div>
             </div>
-            <div class="card moss reveal" style="--i: 5; padding: 16px 22px">
-              <div class="label">The native VLAN</div>
-              <p style="margin-top: 6px; font-size: 18px">One VLAN per trunk travels <strong>untagged</strong> (default VLAN 1). Both ends must agree — a mismatch is a classic misconfig.</p>
+            <div style="display: flex; gap: 6px; margin-top: 6px">
+              <div style="flex: 2.2"></div>
+              <div style="flex: 4.7; text-align: center; border-top: 2px solid var(--cobalt); padding-top: 5px; font-family: var(--font-mono); font-size: 14.5px; color: var(--cobalt-deep)">PCP + DEI + VID = the 2-byte <strong>TCI</strong> (Tag Control Information)</div>
+            </div>
+          </div>
+
+          <div class="grid-3" style="margin-top: 20px; gap: 26px">
+            <div class="card reveal" style="--i: 5; padding: 15px 20px">
+              <div class="label" style="color: var(--cobalt-deep)">VID — 12 bits</div>
+              <p style="margin-top: 6px; font-size: 17px">2<sup>12</sup> = <strong>4096</strong> IDs, but <span class="mono">0</span> and <span class="mono">4095</span> are reserved → <strong>4094 usable</strong> VLANs. <span class="mono">VLAN 1</span> is the default.</p>
+            </div>
+            <div class="card amber reveal" style="--i: 6; padding: 15px 20px">
+              <div class="label">PCP &amp; DEI</div>
+              <p style="margin-top: 6px; font-size: 17px"><strong>PCP</strong> carries the 802.1p <strong>priority</strong> (class of service for QoS); <strong>DEI</strong> flags a frame as droppable first under congestion.</p>
+            </div>
+            <div class="card moss reveal" style="--i: 7; padding: 15px 20px">
+              <div class="label">Native VLAN &amp; capture</div>
+              <p style="margin-top: 6px; font-size: 17px">One VLAN per trunk rides <strong>untagged</strong> (default <span class="mono">1</span>) — both ends must match. In Wireshark filter <span class="mono">vlan</span> or look for <span class="mono">0x8100</span>.</p>
             </div>
           </div>
           <div class="page-num"></div>
@@ -7149,36 +8424,216 @@
             <div class="right"></div>
           </div>
           <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">Two kinds of switch port</span>
-          <h2 class="reveal" style="--i: 1; font-size: 50px">
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
             One VLAN, or <em class="display">all of them.</em>
           </h2>
-          <div class="grid-2" style="margin-top: 32px; gap: 44px">
-            <div class="card reveal" style="--i: 2">
-              <div class="label" style="color: var(--cobalt-deep)">Access port</div>
-              <h3>Faces an end device</h3>
-              <p style="margin-top: 10px; font-size: 19px">
-                Belongs to exactly <strong>one VLAN</strong>. The PC plugged in
-                knows nothing about VLANs — frames arrive and leave
-                <strong>untagged</strong>. This is where laptops, printers and
-                servers connect.
-              </p>
-              <p style="margin-top: 12px; font-family: var(--font-mono); font-size: 16px; color: var(--ink-soft)">switchport mode access<br />switchport access vlan 10</p>
+
+          <!-- diagram: access ports (untagged, one VLAN) vs a trunk (tagged, many VLANs) -->
+          <div class="reveal" style="--i: 2; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 18px; padding: 20px 24px; border: 1.5px solid var(--rule); border-radius: 14px; background: rgba(255, 252, 244, 0.6)">
+            <div style="display: flex; flex-direction: column; gap: 9px">
+              <span style="font-family: var(--font-mono); font-weight: 700; font-size: 15px; padding: 9px 13px; border-radius: 8px; border: 2px solid var(--cobalt); background: var(--cobalt-soft); color: var(--cobalt-deep)">PC · VLAN 10</span>
+              <span style="font-family: var(--font-mono); font-weight: 700; font-size: 15px; padding: 9px 13px; border-radius: 8px; border: 2px solid var(--plum); background: var(--plum-soft); color: var(--plum)">PC · VLAN 20</span>
+              <span style="font-family: var(--font-mono); font-weight: 700; font-size: 15px; padding: 9px 13px; border-radius: 8px; border: 2px solid var(--amber); background: var(--amber-soft); color: var(--amber)">PC · VLAN 30</span>
             </div>
-            <div class="card amber reveal" style="--i: 3">
-              <div class="label">Trunk port</div>
-              <h3>Carries many VLANs</h3>
-              <p style="margin-top: 10px; font-size: 19px">
-                Links switch-to-switch or switch-to-router. Frames cross
-                <strong>802.1Q-tagged</strong> so multiple VLANs share one
-                cable. This is how VLAN 10 on switch&nbsp;1 reaches VLAN 10 on
-                switch&nbsp;2.
+            <div style="text-align: center; font-family: var(--font-mono); font-size: 14px; color: var(--muted); line-height: 1.5">access<br /><span style="color: var(--ink-soft); font-weight: 700">untagged</span><br />one VLAN<br />each</div>
+            <div style="font-family: var(--font-mono); font-weight: 700; font-size: 17px; letter-spacing: 0.08em; padding: 18px 22px; border-radius: 12px; background: var(--ink); color: var(--paper); text-align: center">SWITCH A<span style="display: block; font-weight: 400; font-size: 13px; opacity: 0.7; margin-top: 4px">access + trunk</span></div>
+            <div style="flex: 1; min-width: 220px; text-align: center">
+              <div style="font-family: var(--font-mono); font-weight: 700; font-size: 14px; color: var(--amber); letter-spacing: 0.1em">802.1Q TRUNK</div>
+              <div style="border-top: 3px double var(--amber); margin: 8px 0"></div>
+              <div style="font-family: var(--font-mono); font-size: 14px; color: var(--ink-soft)">tagged 10,20,30 · native 1 untagged</div>
+            </div>
+            <div style="font-family: var(--font-mono); font-weight: 700; font-size: 17px; letter-spacing: 0.08em; padding: 18px 22px; border-radius: 12px; background: var(--ink); color: var(--paper); text-align: center">SWITCH B<span style="display: block; font-weight: 400; font-size: 13px; opacity: 0.7; margin-top: 4px">/ or router</span></div>
+          </div>
+
+          <div class="grid-2" style="margin-top: 22px; gap: 44px">
+            <div class="card reveal" style="--i: 3; padding: 18px 24px">
+              <div class="label" style="color: var(--cobalt-deep)">Access port → toward a host</div>
+              <h3>One VLAN, untagged</h3>
+              <p style="margin-top: 8px; font-size: 18px">
+                Belongs to exactly <strong>one VLAN</strong>. The PC knows nothing about VLANs — frames arrive and leave <strong>untagged</strong>. Laptops, printers and servers live here.
               </p>
-              <p style="margin-top: 12px; font-family: var(--font-mono); font-size: 16px; color: var(--ink-soft)">switchport mode trunk<br />switchport trunk allowed vlan 10,20,30</p>
+              <p style="margin-top: 10px; font-family: var(--font-mono); font-size: 15px; color: var(--ink-soft)">switchport mode access<br />switchport access vlan 10</p>
+            </div>
+            <div class="card amber reveal" style="--i: 4; padding: 18px 24px">
+              <div class="label">Trunk port → between switches</div>
+              <h3>Many VLANs, tagged</h3>
+              <p style="margin-top: 8px; font-size: 18px">
+                Links switch-to-switch or switch-to-router. Frames cross <strong>802.1Q-tagged</strong> so many VLANs share one cable — this is how VLAN 10 on SW1 reaches VLAN 10 on SW2.
+              </p>
+              <p style="margin-top: 10px; font-family: var(--font-mono); font-size: 15px; color: var(--ink-soft)">switchport mode trunk<br />switchport trunk allowed vlan 10,20,30</p>
             </div>
           </div>
-          <div class="reveal" style="--i: 4; margin-top: 26px; padding: 16px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 20px">
-            Rule of thumb: <strong>access toward hosts, trunk between
-            switches.</strong> Verify with <span class="mono">show interfaces trunk</span>.
+          <div class="reveal" style="--i: 5; margin-top: 20px; padding: 14px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 18px">
+            On a trunk every VLAN is tagged <strong>except the native VLAN</strong> (it crosses untagged). The <span class="mono">allowed vlan</span> list <strong>prunes</strong> which VLANs may cross — a frame for any other VLAN is dropped. Rule of thumb: <strong>access toward hosts, trunk between switches.</strong> Verify with <span class="mono">show interfaces trunk</span>.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 13b — INTERACTIVE: VLAN COMMUNICATION ========================================================= -->
+        <section class="slide" id="vlanSim" data-noscale>
+          <div class="masthead">
+            <div class="left"><span class="tag">Interactive</span><span>VLAN communication · same VLAN, cross-VLAN, inter-VLAN</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">Live simulation · pick a scenario</span>
+          <h2 class="reveal" style="--i: 1; font-size: 40px">
+            Can these two PCs <em class="display">talk?</em>
+          </h2>
+
+          <div class="vlan-stage reveal" style="--i: 2">
+            <div class="vlan-canvas" id="vlanCanvas">
+              <svg viewBox="0 0 1040 486" preserveAspectRatio="none" aria-hidden="true">
+                <line class="vlan-wire" id="wR" x1="520" y1="50" x2="300" y2="250" />
+                <line class="vlan-wire" id="wT" x1="300" y1="250" x2="740" y2="250" />
+                <line class="vlan-wire" id="wA" x1="300" y1="250" x2="200" y2="420" />
+                <line class="vlan-wire" id="wB" x1="300" y1="250" x2="400" y2="420" />
+                <line class="vlan-wire" id="wC" x1="740" y1="250" x2="640" y2="420" />
+                <line class="vlan-wire" id="wD" x1="740" y1="250" x2="840" y2="420" />
+              </svg>
+
+              <div class="vlan-node router" style="left: 520px; top: 50px">ROUTER<span class="sub">sub-interface per VLAN</span></div>
+              <div class="vlan-node" style="left: 300px; top: 250px">SW1<span class="sub">access + trunk</span></div>
+              <div class="vlan-node" style="left: 740px; top: 250px">SW2<span class="sub">access + trunk</span></div>
+
+              <div class="vlan-host v10" data-node="SalesA" style="left: 200px; top: 422px"><div class="hn">Sales-A</div><div class="hv">VLAN 10</div></div>
+              <div class="vlan-host v20" data-node="EngB" style="left: 400px; top: 422px"><div class="hn">Eng-B</div><div class="hv">VLAN 20</div></div>
+              <div class="vlan-host v10" data-node="SalesC" style="left: 640px; top: 422px"><div class="hn">Sales-C</div><div class="hv">VLAN 10</div></div>
+              <div class="vlan-host v20" data-node="EngD" style="left: 840px; top: 422px"><div class="hn">Eng-D</div><div class="hv">VLAN 20</div></div>
+
+              <div class="vlan-lbl trunk" style="left: 520px; top: 228px">802.1Q trunk · 10,20</div>
+              <div class="vlan-lbl trunk" style="left: 432px; top: 138px">trunk · tagged</div>
+              <div class="vlan-lbl" style="left: 232px; top: 340px">access V10</div>
+              <div class="vlan-lbl" style="left: 368px; top: 340px">access V20</div>
+              <div class="vlan-lbl" style="left: 672px; top: 340px">access V10</div>
+              <div class="vlan-lbl" style="left: 808px; top: 340px">access V20</div>
+
+              <div class="vlan-frame" id="vlanFrame"><span class="vlan-tag" id="vlanTag">VLAN 10</span></div>
+              <div class="vlan-x" id="vlanX"><span class="m-icon">block</span></div>
+            </div>
+
+            <div class="vlan-panel">
+              <div>
+                <div class="pt">Frame inspector</div>
+                <div class="vlan-insp">
+                  <div class="row"><span>Source</span><b id="vlanSrc">—</b></div>
+                  <div class="row"><span>Destination</span><b id="vlanDst">—</b></div>
+                  <div class="row"><span>On the wire</span><b id="vlanWire">—</b></div>
+                  <div class="row"><span>Result</span><b id="vlanResult">—</b></div>
+                </div>
+              </div>
+              <div>
+                <div class="pt">VLAN key</div>
+                <div class="vlan-key">
+                  <span><i class="c"></i> VLAN 10 · Sales</span>
+                  <span><i class="p"></i> VLAN 20 · Engineering</span>
+                  <span><i class="a"></i> 802.1Q tag (only on a trunk)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="vlan-narr" id="vlanNarr">
+            Pick a scenario. <strong>Same VLAN</strong> works across the trunk; a <strong>different VLAN</strong> is blocked at Layer 2 — unless it goes <strong>through the router</strong>.
+          </div>
+
+          <div class="sim-controls reveal" style="--i: 3">
+            <button class="sim-btn" data-scn="same">Same VLAN</button>
+            <button class="sim-btn" data-scn="block">Different VLAN ✗</button>
+            <button class="sim-btn" data-scn="route">Via router ✓</button>
+            <button class="sim-btn" id="vlanStep">Step ▸</button>
+            <button class="sim-btn" id="vlanReset">↺ Reset</button>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 13c — TRUNKING IN PRACTICE ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">VLANs</span><span>Trunking in practice · DTP · VTP · voice · safety</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt); font-size: 18px">Negotiation, propagation and the security gotchas</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Trunks, <em class="display">in practice.</em>
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 19px; margin-top: 8px; max-width: 1580px">
+            Beyond "tag the frame", real trunks negotiate themselves, can sync VLANs automatically, carry phones, and have a sharp security edge if the native VLAN is sloppy.
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 22px">
+            <div class="card reveal" style="--i: 3; padding: 18px 24px">
+              <div class="label" style="color: var(--cobalt-deep)">DTP — auto-trunking</div>
+              <h3 style="font-size: 24px">Let the link negotiate?</h3>
+              <p style="margin-top: 8px; font-size: 17.5px">Cisco's <strong>Dynamic Trunking Protocol</strong> lets two ports agree to become a trunk by themselves. Handy, but abusable — best practice is to set the mode by hand and turn it off: <span class="mono">switchport nonegotiate</span>.</p>
+            </div>
+            <div class="card moss reveal" style="--i: 4; padding: 18px 24px">
+              <div class="label">VTP — VLAN propagation</div>
+              <h3 style="font-size: 24px">One VLAN database, shared</h3>
+              <p style="margin-top: 8px; font-size: 17.5px">The <strong>VLAN Trunking Protocol</strong> syncs the VLAN list across switches (<span class="mono">server / client / transparent</span>). Powerful, but a stale switch can <strong>wipe the domain</strong> — many shops run <span class="mono">transparent</span> to be safe.</p>
+            </div>
+            <div class="card amber reveal" style="--i: 5; padding: 18px 24px">
+              <div class="label">Voice VLAN</div>
+              <h3 style="font-size: 24px">A phone <em>and</em> a PC on one port</h3>
+              <p style="margin-top: 8px; font-size: 17.5px">An IP phone and the PC behind it share one access port: voice frames ride the <strong>tagged</strong> voice VLAN, the PC's data stays <strong>untagged</strong> on the access VLAN. One cable, two VLANs.</p>
+            </div>
+            <div class="card plum reveal" style="--i: 6; padding: 18px 24px">
+              <div class="label">Native-VLAN safety</div>
+              <h3 style="font-size: 24px">The double-tagging trap</h3>
+              <p style="margin-top: 8px; font-size: 17.5px">The native VLAN rides <strong>untagged</strong>; a mismatch (or VLAN 1 left as native) opens <strong>VLAN-hopping</strong> attacks. Fix: native = an unused VLAN, and <span class="mono">vlan dot1q tag native</span>.</p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 7; margin-top: 22px; padding: 15px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 18px">
+            <strong>Prune what you carry:</strong> <span class="mono">switchport trunk allowed vlan 10,20</span> lets a trunk carry only the VLANs that link actually needs — less flooding, smaller failure domain.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 13d — INTERACTIVE: DTP TRUNK-MODE NEGOTIATION ========================================================= -->
+        <section class="slide" id="dtpSim">
+          <div class="masthead">
+            <div class="left"><span class="tag">Interactive</span><span>Trunking modes in Cisco IOS · DTP negotiation</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0; font-size: 18px">Dynamic Trunking Protocol · pick a mode for each end</span>
+          <h2 class="reveal" style="--i: 1; font-size: 42px">
+            Will this link become a <em class="display">trunk?</em>
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 18px; margin-top: 6px; max-width: 1600px">
+            On Cisco switches, <strong>DTP</strong> lets two ports negotiate whether the link is an access port or a trunk. The result depends on <strong>both</strong> ends — try the combinations below.
+          </p>
+
+          <div class="dtp-legend reveal" style="--i: 3">
+            <div class="dtp-mode"><div class="mn">Access</div><p>Permanent <strong>non-trunk</strong> — carries one VLAN.</p></div>
+            <div class="dtp-mode"><div class="mn">Dynamic Auto</div><p>Passive — trunks <strong>only if asked</strong> (older default).</p></div>
+            <div class="dtp-mode"><div class="mn">Dynamic Desirable</div><p>Active — <strong>asks</strong> the neighbour to trunk.</p></div>
+            <div class="dtp-mode"><div class="mn">Trunk</div><p>Permanent <strong>trunk</strong> — regardless of neighbour.</p></div>
+            <div class="dtp-mode"><div class="mn">Nonegotiate</div><p>DTP <strong>off</strong> — set both ends by hand.</p></div>
+          </div>
+
+          <div class="dtp-viz reveal" style="--i: 4">
+            <div class="dtp-sw">SW1<span class="swmode" id="dtpM1">— pick a mode —</span></div>
+            <div class="dtp-link" id="dtpLink"><div class="dtp-linklabel" id="dtpLinkLabel"></div><div class="dot" id="dtpDot1"></div><div class="dot" id="dtpDot2"></div></div>
+            <div class="dtp-sw">SW2<span class="swmode" id="dtpM2">— pick a mode —</span></div>
+          </div>
+
+          <div class="dtp-row reveal" style="--i: 5">
+            <span class="lab">SW1</span>
+            <button class="dtp-btn" data-end="1" data-mode="access">Access</button>
+            <button class="dtp-btn" data-end="1" data-mode="auto">Dyn Auto</button>
+            <button class="dtp-btn" data-end="1" data-mode="desirable">Dyn Desirable</button>
+            <button class="dtp-btn" data-end="1" data-mode="trunk">Trunk</button>
+            <button class="dtp-btn" data-end="1" data-mode="noneg">Nonegotiate</button>
+          </div>
+          <div class="dtp-row reveal" style="--i: 6">
+            <span class="lab">SW2</span>
+            <button class="dtp-btn" data-end="2" data-mode="access">Access</button>
+            <button class="dtp-btn" data-end="2" data-mode="auto">Dyn Auto</button>
+            <button class="dtp-btn" data-end="2" data-mode="desirable">Dyn Desirable</button>
+            <button class="dtp-btn" data-end="2" data-mode="trunk">Trunk</button>
+            <button class="dtp-btn" data-end="2" data-mode="noneg">Nonegotiate</button>
+          </div>
+
+          <div class="dtp-result reveal" id="dtpResult" style="--i: 7">
+            Pick a mode for <strong>SW1</strong> and <strong>SW2</strong> — DTP will negotiate and the link will turn <span style="color: var(--moss); font-weight: 700">green (trunk)</span>, grey (access), or <span style="color: var(--amber); font-weight: 700">amber (mismatch)</span>.
           </div>
           <div class="page-num"></div>
         </section>
@@ -7241,7 +8696,7 @@
         </section>
 
         <!-- ========================================================= SLIDE 14b — STP ROLE-FINDING DIAGRAM ========================================================= -->
-        <section class="slide">
+        <section class="slide" data-noscale>
           <div class="masthead">
             <div class="left"><span class="tag">VLANs</span><span>Spanning Tree · finding the roles</span></div>
             <div class="right"></div>
@@ -7345,6 +8800,206 @@
             cost 19 → Root Ports. On SW2–SW3 the cost is tied, so SW2's lower
             Bridge ID makes it Designated and SW3 blocks. RSTP (802.1w) is the
             faster modern version.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14d — STP STEP-BY-STEP SIM ========================================================= -->
+        <section class="slide" id="stpSim" data-noscale>
+          <div class="masthead">
+            <div class="left"><span class="tag">Interactive</span><span>Spanning Tree · find the answer, step by step</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">Live simulation · Press START or step through</span>
+          <h2 class="reveal" style="--i: 1; font-size: 40px">
+            Watch STP <em class="display">block the loop.</em>
+          </h2>
+
+          <!-- four-rung decision ladder -->
+          <div class="stp-ladder reveal" style="--i: 2">
+            <div class="lstep" data-rung="0"><span class="n">1</span><span class="lx"><b>Root Bridge</b><span>lowest Bridge&nbsp;ID</span></span></div>
+            <div class="lstep" data-rung="1"><span class="n">2</span><span class="lx"><b>Root Ports</b><span>lowest cost to root</span></span></div>
+            <div class="lstep" data-rung="2"><span class="n">3</span><span class="lx"><b>Designated</b><span>one per segment</span></span></div>
+            <div class="lstep" data-rung="3"><span class="n">4</span><span class="lx"><b>Block</b><span>the loser port</span></span></div>
+          </div>
+
+          <!-- topology (same geometry as the role diagram, roles revealed per step) -->
+          <div class="stp-topo reveal" style="--i: 3">
+            <svg viewBox="0 0 1180 396" aria-hidden="true">
+              <line id="sl12" x1="590" y1="44" x2="150" y2="338" stroke="#c9bfa8" stroke-width="3" />
+              <line id="sl13" x1="590" y1="44" x2="1030" y2="338" stroke="#c9bfa8" stroke-width="3" />
+              <line id="sl23" x1="150" y1="338" x2="1030" y2="338" stroke="#c9bfa8" stroke-width="3" />
+            </svg>
+
+            <div class="stp-sw" id="ssw1" style="left: 480px; top: 6px">
+              <div class="nm"><span class="m-icon stp-crown" id="sswCrown">workspace_premium</span> SW1</div>
+              <div class="bid">priority 4096<span class="rpc-tag" id="rpc1">RPC 0 · root</span></div>
+            </div>
+            <div class="stp-sw" style="left: 40px; top: 300px">
+              <div class="nm"><span class="m-icon">lan</span> SW2</div>
+              <div class="bid">priority 32768<span class="rpc-tag" id="rpc2">RPC 19</span></div>
+            </div>
+            <div class="stp-sw" style="left: 920px; top: 300px">
+              <div class="nm"><span class="m-icon">lan</span> SW3</div>
+              <div class="bid">priority 32768<span class="rpc-tag" id="rpc3">RPC 19</span></div>
+            </div>
+
+            <div class="stp-cost" style="left: 346px; top: 178px">cost 19</div>
+            <div class="stp-cost" style="left: 786px; top: 178px">cost 19</div>
+            <div class="stp-cost" style="left: 560px; top: 350px">cost 19</div>
+
+            <div class="stp-pill dp" id="sp_dp1l" style="left: 386px; top: 150px">DP</div>
+            <div class="stp-pill dp" id="sp_dp1r" style="left: 742px; top: 150px">DP</div>
+            <div class="stp-pill rp" id="sp_rp2" style="left: 260px; top: 238px">RP</div>
+            <div class="stp-pill rp" id="sp_rp3" style="left: 882px; top: 238px">RP</div>
+            <div class="stp-pill dp" id="sp_dp2" style="left: 346px; top: 310px">DP</div>
+            <div class="stp-pill blk" id="sp_blk3" style="left: 800px; top: 310px">BLK</div>
+            <div class="stp-xmark" id="sp_x" style="left: 960px; top: 322px"><span class="m-icon">block</span></div>
+            <div class="stp-tie" id="stpTie" style="left: 458px; top: 262px">tie 19 = 19 → lower BID (SW2) wins DP</div>
+          </div>
+
+          <div class="stp-narr" id="stpNarr">
+            Three switches wired in a triangle — a physical <strong>loop</strong>. STP runs four decisions to pick the single port to block. Press <strong>Start</strong>.
+          </div>
+
+          <div class="sim-controls reveal" style="--i: 4">
+            <button class="sim-btn primary" id="stpStart">▶ Start</button>
+            <button class="sim-btn" id="stpNext">Step ▸</button>
+            <button class="sim-btn" id="stpReset">↺ Reset</button>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14e — STP PORT ROLES (RP / DP / BLK) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">VLANs</span><span>Spanning Tree · the three port roles</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">Every switch port ends up as exactly one of these</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Root, Designated, or <em class="display">blocked.</em>
+          </h2>
+          <div class="grid-3" style="margin-top: 24px; gap: 30px; align-items: start">
+            <div class="card moss reveal" style="--i: 2">
+              <div class="label">RP · Root Port</div>
+              <h3>The way up to root</h3>
+              <table class="data" style="margin-top: 12px; font-size: 16.5px; width: 100%">
+                <tbody>
+                  <tr><td style="color: var(--muted)">Scope</td><td>one per switch <em>(root: none)</em></td></tr>
+                  <tr><td style="color: var(--muted)">Chosen by</td><td>lowest <strong>Root Path Cost</strong></td></tr>
+                  <tr><td style="color: var(--muted)">State</td><td>forwarding</td></tr>
+                  <tr><td style="color: var(--muted)">Tie-break</td><td>nbr BID → nbr port → local port</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card reveal" style="--i: 3">
+              <div class="label" style="color: var(--cobalt-deep)">DP · Designated Port</div>
+              <h3>Serves one segment</h3>
+              <table class="data" style="margin-top: 12px; font-size: 16.5px; width: 100%">
+                <tbody>
+                  <tr><td style="color: var(--muted)">Scope</td><td>one per <strong>segment</strong> / link</td></tr>
+                  <tr><td style="color: var(--muted)">Chosen by</td><td>lowest RPC <em>onto</em> that link</td></tr>
+                  <tr><td style="color: var(--muted)">Always</td><td>every root-bridge port is DP</td></tr>
+                  <tr><td style="color: var(--muted)">Tie-break</td><td>lower <strong>Bridge ID</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card amber reveal" style="--i: 4">
+              <div class="label">BLK · Blocking</div>
+              <h3>Everything else</h3>
+              <table class="data" style="margin-top: 12px; font-size: 16.5px; width: 100%">
+                <tbody>
+                  <tr><td style="color: var(--muted)">Scope</td><td>not RP and not DP</td></tr>
+                  <tr><td style="color: var(--muted)">Does</td><td>no data — but <strong>hears BPDUs</strong></td></tr>
+                  <tr><td style="color: var(--muted)">State</td><td>blocking (loop removed)</td></tr>
+                  <tr><td style="color: var(--muted)">Backup</td><td>unblocks if the tree breaks</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 5; margin-top: 22px; padding: 15px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 19px">
+            <strong>The per-link rule:</strong> on every link exactly one end is the <strong>DP</strong>; the far end is the <strong>RP</strong> (if it is that switch's best path up) or <strong>BLK</strong>. A port is never both. <span class="mono" style="margin-left: 10px; color: var(--ink-soft)">DP ●━━━● RP &nbsp;·&nbsp; DP ●╌╌╌○ BLK</span>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14f — STP PORT STATES (state machine) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">VLANs</span><span>Spanning Tree · port states &amp; convergence</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">A role is reached by walking through states (802.1D)</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Blocking to <em class="display">forwarding.</em>
+          </h2>
+
+          <div class="pstate-flow reveal" style="--i: 2">
+            <div class="pstate blk"><div class="ps-n">Blocking</div><div class="ps-s">drops data</div></div>
+            <div class="pstate-arrow"><span class="ps-t">max-age 20 s</span><span class="m-icon">east</span></div>
+            <div class="pstate"><div class="ps-n">Listening</div><div class="ps-s">no learning yet</div></div>
+            <div class="pstate-arrow"><span class="ps-t">fwd delay 15 s</span><span class="m-icon">east</span></div>
+            <div class="pstate"><div class="ps-n">Learning</div><div class="ps-s">builds CAM</div></div>
+            <div class="pstate-arrow"><span class="ps-t">fwd delay 15 s</span><span class="m-icon">east</span></div>
+            <div class="pstate fwd"><div class="ps-n">Forwarding</div><div class="ps-s">passes traffic</div></div>
+          </div>
+
+          <div class="reveal" style="--i: 3; margin-top: 28px">
+            <table class="data" style="font-size: 18px">
+              <thead><tr><th>State</th><th>Forwards data</th><th>Learns MACs</th><th>Hears BPDUs</th><th>Time</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Blocking</strong></td><td>✗</td><td>✗</td><td>✓</td><td class="mono">—</td></tr>
+                <tr><td><strong>Listening</strong></td><td>✗</td><td>✗</td><td>✓</td><td class="mono">15 s</td></tr>
+                <tr><td><strong>Learning</strong></td><td>✗</td><td>✓</td><td>✓</td><td class="mono">15 s</td></tr>
+                <tr><td><strong>Forwarding</strong></td><td>✓</td><td>✓</td><td>✓</td><td class="mono">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="reveal" style="--i: 4; margin-top: 22px; padding: 15px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 19px">
+            That's <strong>~30–50 s</strong> from blocking to forwarding — which is exactly why <strong>RSTP (802.1w)</strong> collapses these into <span class="mono">Discarding / Learning / Forwarding</span> and converges in <strong>seconds</strong>. RSTP is the modern default.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14g — RSTP (802.1w) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">VLANs</span><span>Spanning Tree · RSTP (802.1w)</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0; font-size: 18px">STP's faster successor — the modern default</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            RSTP: <em class="display">seconds</em>, not minutes.
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 19px; margin-top: 8px; max-width: 1580px">
+            RSTP keeps the same loop-free goal but converges in well under a second — by replacing STP's timers with a handshake, and by giving every blocked port a pre-computed backup role ready to take over.
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 22px">
+            <div class="card reveal" style="--i: 3; padding: 18px 24px">
+              <div class="label" style="color: var(--cobalt-deep)">New backup roles</div>
+              <h3 style="font-size: 24px">Alternate &amp; Backup</h3>
+              <p style="margin-top: 8px; font-size: 17.5px">Root and Designated stay. RSTP adds <strong>Alternate</strong> (a ready backup path to the root) and <strong>Backup</strong> (a backup for a Designated port on the same segment). A failed Root Port is replaced by its Alternate <strong>instantly</strong>.</p>
+            </div>
+            <div class="card moss reveal" style="--i: 4; padding: 18px 24px">
+              <div class="label">Three states, not five</div>
+              <h3 style="font-size: 24px">Discarding · Learning · Forwarding</h3>
+              <p style="margin-top: 8px; font-size: 17.5px">STP's Disabled, Blocking and Listening all collapse into one <strong>Discarding</strong> state — so a port is only ever Discarding, Learning, or Forwarding.</p>
+            </div>
+            <div class="card amber reveal" style="--i: 5; padding: 18px 24px">
+              <div class="label">Proposal / agreement</div>
+              <h3 style="font-size: 24px">A handshake, not a timer</h3>
+              <p style="margin-top: 8px; font-size: 17.5px">Instead of waiting out ~50 s of timers, neighbouring switches do a quick <strong>proposal–agreement</strong> exchange on point-to-point links and go active at once → <strong>sub-second</strong> convergence.</p>
+            </div>
+            <div class="card plum reveal" style="--i: 6; padding: 18px 24px">
+              <div class="label">Edge ports</div>
+              <h3 style="font-size: 24px">PortFast &amp; BPDU Guard</h3>
+              <p style="margin-top: 8px; font-size: 17.5px"><strong>PortFast</strong> sends host ports straight to Forwarding. <strong>BPDU Guard</strong> err-disables an edge port the instant a BPDU appears — protecting the tree from a rogue switch plugged into a desk port.</p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 7; margin-top: 22px; padding: 15px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 18px">
+            <strong>Inside a BPDU</strong> (sent every 2 s): root Bridge ID · sender Bridge ID · root path cost · sender port ID · the timers. That handful of fields is all the election needs.
           </div>
           <div class="page-num"></div>
         </section>
@@ -7472,6 +9127,176 @@
           <div class="page-num"></div>
         </section>
 
+        <!-- ========================================================= SLIDE 18b — STATIC / RIP / OSPF COMPARISON ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Routing</span><span>Static · RIP · OSPF — head to head</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">Same job — "reach that network" — three different minds</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Who decides the <em class="display">path?</em>
+          </h2>
+          <div class="grid-3" style="margin-top: 26px; gap: 32px; align-items: start">
+            <div class="card reveal" style="--i: 2">
+              <div class="label" style="color: var(--cobalt-deep)">Static</div>
+              <h3>You decide</h3>
+              <table class="data" style="margin-top: 12px; font-size: 17px; width: 100%">
+                <tbody>
+                  <tr><td style="color: var(--muted)">Learns</td><td>you type each route</td></tr>
+                  <tr><td style="color: var(--muted)">Metric</td><td>none (AD&nbsp;1)</td></tr>
+                  <tr><td style="color: var(--muted)">Converges</td><td><strong>never auto</strong> — you fix it</td></tr>
+                  <tr><td style="color: var(--muted)">Best for</td><td>small / stub nets</td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 12px; font-family: var(--font-mono); font-size: 14px; color: var(--ink-soft)">ip route 10.0.3.0<br />&nbsp;&nbsp;255.255.255.0 10.12.0.2</p>
+            </div>
+            <div class="card amber reveal" style="--i: 3">
+              <div class="label">RIP · distance-vector</div>
+              <h3>Fewest hops wins</h3>
+              <table class="data" style="margin-top: 12px; font-size: 17px; width: 100%">
+                <tbody>
+                  <tr><td style="color: var(--muted)">Learns</td><td>neighbours' tables / 30&nbsp;s</td></tr>
+                  <tr><td style="color: var(--muted)">Metric</td><td><strong>hop count</strong> (max&nbsp;15)</td></tr>
+                  <tr><td style="color: var(--muted)">Converges</td><td>slow (minutes)</td></tr>
+                  <tr><td style="color: var(--muted)">Best for</td><td>tiny / legacy nets</td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 12px; font-family: var(--font-mono); font-size: 14px; color: var(--ink-soft)">router rip<br />&nbsp;version 2<br />&nbsp;network 10.0.0.0</p>
+            </div>
+            <div class="card moss reveal" style="--i: 4">
+              <div class="label">OSPF · link-state</div>
+              <h3>Lowest cost wins</h3>
+              <table class="data" style="margin-top: 12px; font-size: 17px; width: 100%">
+                <tbody>
+                  <tr><td style="color: var(--muted)">Learns</td><td>floods the whole map</td></tr>
+                  <tr><td style="color: var(--muted)">Metric</td><td><strong>cost</strong> (bandwidth)</td></tr>
+                  <tr><td style="color: var(--muted)">Converges</td><td><strong>fast</strong> (seconds)</td></tr>
+                  <tr><td style="color: var(--muted)">Best for</td><td>medium / large nets</td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 12px; font-family: var(--font-mono); font-size: 14px; color: var(--ink-soft)">router ospf 1<br />&nbsp;network 10.0.0.0<br />&nbsp;&nbsp;0.255.255.255 area 0</p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 5; margin-top: 22px; padding: 14px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 19px">
+            The metric is everything: on the same wires, <strong>RIP and OSPF can pick different paths</strong>. The next slide lets you try all three on one network.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 18c — ROUTING PROTOCOL SIM ========================================================= -->
+        <section class="slide" id="rtSim" data-noscale>
+          <div class="masthead">
+            <div class="left"><span class="tag">Interactive</span><span>Static vs. RIP vs. OSPF · same network, different path</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">Live simulation · pick a protocol</span>
+          <h2 class="reveal" style="--i: 1; font-size: 40px">
+            Which way to <em class="display">10.0.3.0/24?</em>
+          </h2>
+
+          <div class="rt-stage reveal" style="--i: 2">
+            <div class="rt-canvas">
+              <svg viewBox="0 0 1000 470" aria-hidden="true">
+                <line id="rl12" x1="108" y1="242" x2="500" y2="70" stroke="#c9bfa8" stroke-width="3" />
+                <line id="rl23" x1="500" y1="70" x2="892" y2="242" stroke="#c9bfa8" stroke-width="3" />
+                <line id="rl13" x1="108" y1="250" x2="892" y2="250" stroke="#c9bfa8" stroke-width="3" />
+                <line x1="892" y1="284" x2="892" y2="350" stroke="#c9bfa8" stroke-width="3" />
+              </svg>
+
+              <div class="rt-rtr" style="left: 24px; top: 200px">
+                <div class="rn"><span class="m-icon">router</span> R1</div>
+                <div class="ri">source · 10.0.1.1</div>
+              </div>
+              <div class="rt-rtr" style="left: 416px; top: 28px">
+                <div class="rn"><span class="m-icon">router</span> R2</div>
+                <div class="ri">transit</div>
+              </div>
+              <div class="rt-rtr" style="left: 808px; top: 200px">
+                <div class="rn"><span class="m-icon">router</span> R3</div>
+                <div class="ri">gateway · 10.0.3.1</div>
+              </div>
+              <div class="rt-cloud" style="left: 812px; top: 352px"><b>Target</b>10.0.3.0/24</div>
+
+              <div class="rt-lbl" style="left: 232px; top: 120px">GigE · cost 1</div>
+              <div class="rt-lbl" style="left: 632px; top: 120px">GigE · cost 1</div>
+              <div class="rt-lbl" style="left: 392px; top: 262px">Serial T1 · cost 64 · 1 hop</div>
+
+              <div class="rt-packet" id="rtPacket"></div>
+            </div>
+
+            <div class="rt-panel">
+              <div>
+                <div class="pt">R1 routing table</div>
+                <div class="rt-rt" id="rtTable"><span class="none">— pick a protocol —</span></div>
+              </div>
+              <div>
+                <div class="pt">Config on R1</div>
+                <div class="rt-config" id="rtConfig"></div>
+              </div>
+              <div>
+                <div class="pt">Why this path</div>
+                <div class="rt-metric" id="rtMetric"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rt-narr" id="rtNarr">
+            Pick <strong>Static</strong>, <strong>RIP</strong> or <strong>OSPF</strong> to see which path R1 chooses to reach 10.0.3.0/24 — and why the metric makes them disagree.
+          </div>
+
+          <div class="sim-controls reveal" style="--i: 3">
+            <button class="sim-btn" data-mode="static">Static</button>
+            <button class="sim-btn" data-mode="rip">RIP</button>
+            <button class="sim-btn" data-mode="ospf">OSPF</button>
+            <button class="sim-btn" id="rtReset">↺ Reset</button>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 18d — INSIDE OSPF & RIP ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Routing</span><span>Dynamic protocols · the internals</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt); font-size: 18px">What the protocols actually do under the hood</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Inside <em class="display">OSPF</em> &amp; RIP.
+          </h2>
+          <div class="grid-2" style="margin-top: 22px; gap: 40px; align-items: stretch">
+            <div class="card reveal" style="--i: 2; padding: 20px 26px">
+              <div class="label" style="color: var(--cobalt-deep)">OSPF · link-state</div>
+              <h3 style="font-size: 25px">Everyone builds the same map</h3>
+              <!-- mini area diagram -->
+              <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0 4px">
+                <span style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; padding: 10px 14px; border-radius: 8px; border: 2px solid var(--moss); background: var(--moss-soft); color: var(--moss)">Area 1</span>
+                <span style="flex: none; width: 26px; height: 3px; background: var(--rule)"></span>
+                <span style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; padding: 12px 16px; border-radius: 8px; background: var(--ink); color: var(--paper)">Area 0 · backbone</span>
+                <span style="flex: none; width: 26px; height: 3px; background: var(--rule)"></span>
+                <span style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; padding: 10px 14px; border-radius: 8px; border: 2px solid var(--plum); background: var(--plum-soft); color: var(--plum)">Area 2</span>
+              </div>
+              <p style="margin-top: 10px; font-size: 17px"><strong>Hello/Dead</strong> timers form adjacencies; on Ethernet a <strong>DR/BDR</strong> is elected to cut flooding; routers exchange <strong>LSAs</strong> and each runs <strong>Dijkstra (SPF)</strong>. Cost = <span class="mono">100 Mbps ÷ link bandwidth</span> — every area touches <strong>Area 0</strong>.</p>
+            </div>
+            <div class="stack reveal" style="--i: 3; gap: 18px">
+              <div class="card amber" style="padding: 16px 22px">
+                <div class="label">RIP · distance-vector</div>
+                <h3 style="font-size: 22px">Rumour, with guardrails</h3>
+                <p style="margin-top: 6px; font-size: 17px">Hop count only (<strong>max 15</strong>, 16 = unreachable), full table every 30 s. Loops are fought with <strong>split horizon</strong>, <strong>route poisoning</strong> and <strong>holddown</strong> — but it's still slow to converge.</p>
+              </div>
+              <div class="card moss" style="padding: 16px 22px">
+                <div class="label">Choosing the winner</div>
+                <h3 style="font-size: 22px">Prefix → distance → metric</h3>
+                <p style="margin-top: 6px; font-size: 17px">Per packet: <strong>longest-prefix match</strong> first. If two protocols offer the same prefix, <strong>administrative distance</strong> breaks the tie (<span class="mono">OSPF 110 &lt; RIP 120</span>); within one protocol, the <strong>metric</strong> decides.</p>
+              </div>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 4; margin-top: 20px; padding: 15px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 18px">
+            Rule of thumb: <strong>RIP knows only "how far"; OSPF knows "the whole shape".</strong> That topology view is why OSPF reroutes in seconds and scales to large networks.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
         <!-- ========================================================= SLIDE 19 — INTER-VLAN ROUTING ========================================================= -->
         <section class="slide">
           <div class="masthead">
@@ -7588,7 +9413,7 @@
         </section>
 
         <!-- ========================================================= SLIDE 22 — INTERACTIVE: PACKET WALK ========================================================= -->
-        <section class="slide" id="walkSim">
+        <section class="slide" id="walkSim" data-noscale>
           <div class="masthead">
             <div class="left"><span class="tag">Interactive</span><span>Packet walk · MAC rewrite &amp; TTL</span></div>
             <div class="right"></div>
@@ -7618,6 +9443,52 @@
             <button class="sim-btn primary" id="walkStart">▶ Start</button>
             <button class="sim-btn" id="walkNext">Step ▸</button>
             <button class="sim-btn" id="walkReset">↺ Reset</button>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 21b — DHCP / ARP / FIRST-HOP DETAIL ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Glue</span><span>How a host gets on — and finds the exit</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt); font-size: 18px">An address, a MAC, and the right next hop</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            DHCP, ARP, <em class="display">first hop.</em>
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 19px; margin-top: 8px; max-width: 1580px">
+            Before any data flows, a host needs three things: an IP (DHCP), the MAC behind an IP (ARP), and a decision about whether the destination is local or off-subnet.
+          </p>
+
+          <!-- DHCP DORA flow -->
+          <div class="label reveal" style="--i: 3; color: var(--cobalt-deep); font-family: var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; font-size: 14px; margin-top: 20px">DHCP lease · the DORA exchange</div>
+          <div class="pstate-flow reveal" style="--i: 4; margin-top: 10px">
+            <div class="pstate"><div class="ps-n">Discover</div><div class="ps-s">client broadcasts "anyone?"</div></div>
+            <div class="pstate-arrow"><span class="ps-t">broadcast</span><span class="m-icon">east</span></div>
+            <div class="pstate"><div class="ps-n">Offer</div><div class="ps-s">server proposes a lease</div></div>
+            <div class="pstate-arrow"><span class="ps-t">offer</span><span class="m-icon">east</span></div>
+            <div class="pstate"><div class="ps-n">Request</div><div class="ps-s">client asks for that one</div></div>
+            <div class="pstate-arrow"><span class="ps-t">request</span><span class="m-icon">east</span></div>
+            <div class="pstate fwd"><div class="ps-n">Ack</div><div class="ps-s">server confirms — yours</div></div>
+          </div>
+
+          <div class="grid-3" style="margin-top: 22px; gap: 28px">
+            <div class="card reveal" style="--i: 5; padding: 16px 22px">
+              <div class="label" style="color: var(--cobalt-deep)">ARP · IP → MAC</div>
+              <p style="margin-top: 6px; font-size: 17px">"<span class="mono">Who has 10.0.0.1?</span>" goes out as a <strong>broadcast</strong>; the owner replies "<span class="mono">is-at aa:bb…</span>". The pair is cached in the <strong>ARP table</strong> so it isn't asked again.</p>
+            </div>
+            <div class="card amber reveal" style="--i: 6; padding: 16px 22px">
+              <div class="label">First-hop decision</div>
+              <p style="margin-top: 6px; font-size: 17px">The host <strong>ANDs</strong> the destination with its mask. <strong>Same subnet</strong> → ARP the destination directly. <strong>Different subnet</strong> → ARP the <strong>default gateway</strong> and send there (dest IP stays, dest MAC = gateway).</p>
+            </div>
+            <div class="card moss reveal" style="--i: 7; padding: 16px 22px">
+              <div class="label">DHCP relay</div>
+              <p style="margin-top: 6px; font-size: 17px">A broadcast can't cross a router — so <span class="mono">ip helper-address</span> on the gateway <strong>relays</strong> the Discover as a <strong>unicast</strong> to a central DHCP server, then returns the offer.</p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 8; margin-top: 20px; padding: 14px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 18px">
+            That gateway is a single point of failure — <strong>HSRP / VRRP</strong> let two routers share one virtual gateway IP so the first hop survives a failure. This is exactly the MAC the packet-walk sim used.
           </div>
           <div class="page-num"></div>
         </section>
@@ -8200,34 +10071,27 @@
         const slide = document.getElementById("macSim");
         if (!slide) return;
 
-        const net = slide.querySelector(".mac-net");
         const sw = slide.querySelector("#macSwitch");
-        const frame = slide.querySelector("#macFrame");
         const tbody = slide.querySelector("#macTable tbody");
         const narr = slide.querySelector("#macNarr");
         const startBtn = slide.querySelector("#macStart");
         const nextBtn = slide.querySelector("#macNext");
         const resetBtn = slide.querySelector("#macReset");
-        const hosts = {};
-        slide
-          .querySelectorAll(".mac-host")
-          .forEach((h) => (hosts[h.dataset.host] = h));
 
-        // smooth left/top animation for the travelling frame
-        frame.style.transition =
-          "left .55s cubic-bezier(.16,1,.3,1), top .55s cubic-bezier(.16,1,.3,1), opacity .3s ease, background .3s ease";
+        // collect hosts, wires, port-tags and the per-port frame dots by host id
+        const hosts = {}, wires = {}, ports = {}, frames = {};
+        slide.querySelectorAll(".mac-host").forEach((h) => (hosts[h.dataset.host] = h));
+        slide.querySelectorAll(".mac-wire").forEach((w) => (wires[w.dataset.host] = w));
+        slide.querySelectorAll(".mac-port").forEach((p) => (ports[p.dataset.host] = p));
+        slide.querySelectorAll(".mac-frame").forEach((f) => (frames[f.dataset.f] = f));
 
         const PORT = { A: "Fa0/1", B: "Fa0/2", C: "Fa0/3", D: "Fa0/4" };
         const MAC = { A: "aa:aa", B: "bb:bb", C: "cc:cc", D: "dd:dd" };
-
-        // centre of an element, in coordinates of the .mac-net box
-        const centre = (el) => ({
-          x: el.offsetLeft + el.offsetWidth / 2,
-          y: el.offsetTop + el.offsetHeight / 2,
-        });
-        const place = (pt) => {
-          frame.style.left = pt.x - 13 + "px";
-          frame.style.top = pt.y - 13 + "px";
+        // node centres in net-box pixels (match the SVG viewBox 1040×500)
+        const P = {
+          A: { x: 170, y: 118 }, B: { x: 870, y: 118 },
+          C: { x: 170, y: 382 }, D: { x: 870, y: 382 },
+          S: { x: 520, y: 250 },
         };
 
         let table = []; // [{host, mac, port}]
@@ -8237,6 +10101,24 @@
           timers = [];
         };
         const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+        const placeFrame = (f, pt) => {
+          f.style.left = pt.x - 12 + "px";
+          f.style.top = pt.y - 12 + "px";
+        };
+        const hideFrames = () =>
+          Object.values(frames).forEach((f) => {
+            f.style.opacity = "0";
+            f.classList.remove("flood");
+          });
+        const clearWires = () => {
+          Object.values(wires).forEach((w) => w.classList.remove("live", "flood"));
+          Object.values(ports).forEach((p) => p.classList.remove("live", "flood"));
+        };
+        const clearHosts = () =>
+          Object.values(hosts).forEach((h) =>
+            h.classList.remove("send", "recv", "flood"),
+          );
 
         function renderTable(freshHost) {
           if (!table.length) {
@@ -8255,73 +10137,85 @@
           if (!table.find((e) => e.host === host))
             table.push({ host, mac: MAC[host], port: PORT[host] });
         };
-        const clearHosts = () =>
-          Object.values(hosts).forEach((h) =>
-            h.classList.remove("send", "recv", "flood"),
-          );
 
-        // Each step: narration + choreography. Frame animates source→switch→dest.
+        // ingress: a frame rides up one host's wire into the switch port
+        const ingress = (h, kind) => {
+          const f = frames[h];
+          f.classList.toggle("flood", kind === "flood");
+          placeFrame(f, P[h]);
+          f.style.opacity = "1";
+          wires[h].classList.add(kind);
+          ports[h].classList.add(kind);
+          later(() => placeFrame(f, P.S), 40);
+        };
+        // egress: a frame leaves the switch down each listed wire to its host
+        const egress = (list, kind) =>
+          list.forEach((h) => {
+            const f = frames[h];
+            f.classList.toggle("flood", kind === "flood");
+            placeFrame(f, P.S);
+            f.style.opacity = "1";
+            wires[h].classList.add(kind);
+            ports[h].classList.add(kind);
+            later(() => placeFrame(f, P[h]), 40);
+          });
+
+        // Each step clears the previous lighting, then choreographs frames
+        // along the wires while the CAM table fills in.
         const steps = [
-          // 0 — A sends to D, switch learns A
+          // 0 — A → switch; switch learns the SOURCE mac on the arrival port
           () => {
-            clearHosts();
+            clearHosts(); clearWires(); hideFrames();
             sw.classList.add("busy");
             hosts.A.classList.add("send");
             narr.innerHTML =
-              "<strong>PC A → PC D.</strong> The frame hits the switch, which records <strong>aa:aa on Fa0/1</strong>.";
-            place(centre(hosts.A));
-            frame.classList.remove("flood");
-            frame.style.opacity = "1";
-            later(() => place(centre(sw)), 40);
+              "<strong>PC A → PC D.</strong> The frame rides up its link into <strong>Fa0/1</strong>. The switch reads the <em>source</em> address and records <strong>aa:aa → Fa0/1</strong> in the table.";
+            ingress("A", "live");
             later(() => {
               learn("A");
               renderTable("A");
-            }, 500);
+            }, 580);
           },
-          // 1 — unknown destination → flood
+          // 1 — destination unknown → flood out every OTHER port
           () => {
-            clearHosts();
+            clearHosts(); clearWires(); hideFrames();
+            sw.classList.add("busy");
             narr.innerHTML =
-              "Destination <strong>dd:dd is unknown</strong>, so the switch <strong>floods</strong> the frame out every other port.";
-            frame.classList.add("flood");
+              "Destination <strong>dd:dd is not in the table</strong>, so the switch <strong>floods</strong> a copy out <strong>every other port</strong> — Fa0/2, Fa0/3 and Fa0/4. B, C and D all receive it.";
             ["B", "C", "D"].forEach((h) => hosts[h].classList.add("flood"));
-            place(centre(sw));
-            later(() => (frame.style.opacity = "0"), 650);
+            egress(["B", "C", "D"], "flood");
           },
-          // 2 — D replies, switch learns D, unicasts to A (known)
+          // 2 — D replies; learn D, then unicast back to the known A
           () => {
-            clearHosts();
-            frame.classList.remove("flood");
+            clearHosts(); clearWires(); hideFrames();
             sw.classList.add("busy");
             hosts.D.classList.add("send");
             narr.innerHTML =
-              "<strong>PC D replies.</strong> Switch learns <strong>dd:dd on Fa0/4</strong>; aa:aa is known, so it <strong>unicasts</strong> back to Fa0/1 only.";
-            place(centre(hosts.D));
-            frame.style.opacity = "1";
-            later(() => place(centre(sw)), 40);
+              "<strong>PC D replies.</strong> Its frame arrives on <strong>Fa0/4</strong>, so the switch learns <strong>dd:dd → Fa0/4</strong>. <strong>aa:aa is already known</strong>, so it <strong>unicasts</strong> the reply out Fa0/1 only.";
+            ingress("D", "live");
             later(() => {
               learn("D");
               renderTable("D");
-            }, 450);
+            }, 560);
             later(() => {
+              clearWires();
+              hideFrames();
               hosts.A.classList.add("recv");
-              place(centre(hosts.A));
-            }, 850);
+              egress(["A"], "live");
+            }, 1150);
           },
-          // 3 — both known → pure unicast
+          // 3 — both known → clean unicast, only two ports light
           () => {
-            clearHosts();
-            sw.classList.remove("busy");
+            clearHosts(); clearWires(); hideFrames();
+            sw.classList.add("busy");
             hosts.A.classList.add("send");
-            hosts.D.classList.add("recv");
             narr.innerHTML =
-              "Now <strong>both MACs are known</strong>: A→D is a clean <strong>unicast</strong> — no flooding, no noise on B and C.";
-            place(centre(hosts.A));
-            frame.style.opacity = "1";
-            later(() => place(centre(sw)), 40);
-            later(() => place(centre(hosts.D)), 520);
-            later(() => sw.classList.add("busy"), 60);
-            later(() => sw.classList.remove("busy"), 1100);
+              "Both MACs are now known, so <strong>A → D is a clean unicast</strong>. Only <strong>Fa0/1 and Fa0/4</strong> light up — B and C never see the frame, no flooding.";
+            ingress("A", "live");
+            later(() => {
+              hosts.D.classList.add("recv");
+              egress(["D"], "live");
+            }, 720);
           },
         ];
 
@@ -8338,11 +10232,11 @@
           table = [];
           renderTable();
           clearHosts();
+          clearWires();
+          hideFrames();
           sw.classList.remove("busy");
-          frame.style.opacity = "0";
-          frame.classList.remove("flood");
           narr.innerHTML =
-            "Press <strong>START</strong> to send a frame from PC&nbsp;A to PC&nbsp;D.";
+            "Press <strong>START</strong> to send a frame from PC&nbsp;A to PC&nbsp;D — watch the link light up and the table fill in.";
           nextBtn.disabled = false;
         }
 
@@ -8355,7 +10249,7 @@
               later(() => {
                 i++;
                 tick();
-              }, 2400);
+              }, 2900);
             }
           };
           tick();
@@ -8518,21 +10412,725 @@
       })();
 
       /* ===========================================================
+   SESSION 4 · SIM 3 — STP STEP-BY-STEP
+   Reveals the four STP decisions one at a time on the triangle
+   topology: elect the Root, pick each Root Port, choose the
+   Designated Port per segment, then block the loser. Start
+   auto-plays; Step advances one rung; Reset clears all roles.
+   =========================================================== */
+      (function () {
+        const slide = document.getElementById("stpSim");
+        if (!slide) return;
+
+        const ladder = [...slide.querySelectorAll(".lstep")];
+        const narr = slide.querySelector("#stpNarr");
+        const startBtn = slide.querySelector("#stpStart");
+        const nextBtn = slide.querySelector("#stpNext");
+        const resetBtn = slide.querySelector("#stpReset");
+        const sw1 = slide.querySelector("#ssw1");
+        const crown = slide.querySelector("#sswCrown");
+        const rpc = {
+          1: slide.querySelector("#rpc1"),
+          2: slide.querySelector("#rpc2"),
+          3: slide.querySelector("#rpc3"),
+        };
+        const tie = slide.querySelector("#stpTie");
+        const lines = {
+          l12: slide.querySelector("#sl12"),
+          l13: slide.querySelector("#sl13"),
+          l23: slide.querySelector("#sl23"),
+        };
+        const pills = {
+          rp2: slide.querySelector("#sp_rp2"),
+          rp3: slide.querySelector("#sp_rp3"),
+          dp1l: slide.querySelector("#sp_dp1l"),
+          dp1r: slide.querySelector("#sp_dp1r"),
+          dp2: slide.querySelector("#sp_dp2"),
+          blk3: slide.querySelector("#sp_blk3"),
+        };
+        const xmark = slide.querySelector("#sp_x");
+
+        const GREY = "#c9bfa8",
+          COB = "#1d3fb8",
+          AMB = "#d9621a";
+        let timers = [];
+        const clearTimers = () => {
+          timers.forEach(clearTimeout);
+          timers = [];
+        };
+
+        // ladder: rung i active, everything before it "done"
+        const setLadder = (active) =>
+          ladder.forEach((l, i) => {
+            l.classList.toggle("active", i === active);
+            l.classList.toggle("done", i < active);
+          });
+        const show = (el) => el.classList.add("in");
+
+        // Each entry is one decision; roles accumulate (no clearing between steps).
+        const steps = [
+          // 1 — elect the Root Bridge
+          () => {
+            setLadder(0);
+            sw1.classList.add("root", "is-root");
+            show(crown);
+            show(rpc[1]);
+            lines.l12.setAttribute("stroke", COB);
+            lines.l13.setAttribute("stroke", COB);
+            narr.innerHTML =
+              "<strong>1 · Root Bridge.</strong> Compare every switch's <strong>Bridge ID</strong> (priority + MAC). SW1's priority <strong>4096</strong> is the lowest, so SW1 becomes the <strong>Root</strong> — its Root Path Cost is <strong>0</strong> and every other switch now builds its tree toward it.";
+          },
+          // 2 — each non-root switch picks its Root Port
+          () => {
+            setLadder(1);
+            show(pills.rp2);
+            show(pills.rp3);
+            show(rpc[2]);
+            show(rpc[3]);
+            narr.innerHTML =
+              "<strong>2 · Root Port</strong> (one per non-root switch). SW2's direct link to the Root costs <strong>19</strong> (Root Path Cost = 19); reaching it via SW3 would cost 38. Lowest RPC wins, so that up-link is SW2's <strong>Root Port</strong> — and the same is true for SW3.";
+          },
+          // 3 — Designated Port per segment
+          () => {
+            setLadder(2);
+            show(pills.dp1l);
+            show(pills.dp1r);
+            show(pills.dp2);
+            show(tie);
+            narr.innerHTML =
+              "<strong>3 · Designated Port</strong> (one per segment — the side advertising the <strong>lowest cost to root</strong> forwards). The Root's two ports are always Designated. On the SW2–SW3 link both sides reach root at cost 19 — a <strong>tie</strong>, broken by the lower Bridge&nbsp;ID, so <strong>SW2</strong> is Designated.";
+          },
+          // 4 — block the loser
+          () => {
+            setLadder(3);
+            show(pills.blk3);
+            show(xmark);
+            lines.l23.setAttribute("stroke", AMB);
+            lines.l23.setAttribute("stroke-dasharray", "11 8");
+            narr.innerHTML =
+              "<strong>4 · Block.</strong> SW3's port on that segment lost, so it moves to <strong>Blocking</strong>. The physical loop is gone — yet the link stays up, waiting as an <strong>instant backup</strong> if the active tree ever breaks.";
+          },
+          // 5 — summary
+          () => {
+            ladder.forEach((l) => {
+              l.classList.remove("active");
+              l.classList.add("done");
+            });
+            narr.innerHTML =
+              "<strong>Done.</strong> One Root, one Root Port per switch, one Designated Port per segment — and exactly <strong>one Blocking port</strong> removes the loop. That is the loop-free spanning tree. (RSTP / 802.1w reaches the same result, just faster.)";
+          },
+        ];
+
+        let idx = -1;
+        function runStep(i) {
+          clearTimers();
+          idx = i;
+          steps[i]();
+          nextBtn.disabled = i >= steps.length - 1;
+        }
+        function reset() {
+          clearTimers();
+          idx = -1;
+          setLadder(-1);
+          ladder.forEach((l) => l.classList.remove("done"));
+          sw1.classList.remove("root", "is-root");
+          crown.classList.remove("in");
+          Object.values(pills).forEach((p) => p.classList.remove("in"));
+          Object.values(rpc).forEach((r) => r.classList.remove("in"));
+          tie.classList.remove("in");
+          xmark.classList.remove("in");
+          lines.l12.setAttribute("stroke", GREY);
+          lines.l13.setAttribute("stroke", GREY);
+          lines.l23.setAttribute("stroke", GREY);
+          lines.l23.removeAttribute("stroke-dasharray");
+          narr.innerHTML =
+            "Three switches wired in a triangle — a physical <strong>loop</strong>. STP runs four decisions to pick the single port to block. Press <strong>Start</strong>.";
+          nextBtn.disabled = false;
+        }
+
+        startBtn.addEventListener("click", () => {
+          reset();
+          let i = 0;
+          const tick = () => {
+            runStep(i);
+            if (i < steps.length - 1)
+              timers.push(
+                setTimeout(() => {
+                  i++;
+                  tick();
+                }, 2600),
+              );
+          };
+          tick();
+        });
+        nextBtn.addEventListener("click", () => {
+          if (idx < steps.length - 1) runStep(idx + 1);
+        });
+        resetBtn.addEventListener("click", reset);
+        reset();
+      })();
+
+      /* ===========================================================
+   SESSION 4 · SIM 4 — ROUTING PROTOCOL PATH PICKER
+   One triangle (R1–R2–R3) with a slow direct serial and a fast
+   two-hop Gigabit path to 10.0.3.0/24. Static, RIP and OSPF each
+   choose a different next hop; selecting one highlights its path,
+   animates a packet along it, and shows the route + config.
+   =========================================================== */
+      (function () {
+        const slide = document.getElementById("rtSim");
+        if (!slide) return;
+
+        const packet = slide.querySelector("#rtPacket");
+        const rtrs = [...slide.querySelectorAll(".rt-rtr")]; // 0=R1, 1=R2, 2=R3
+        const lines = {
+          l12: slide.querySelector("#rl12"),
+          l23: slide.querySelector("#rl23"),
+          l13: slide.querySelector("#rl13"),
+        };
+        const tableEl = slide.querySelector("#rtTable");
+        const cfgEl = slide.querySelector("#rtConfig");
+        const metricEl = slide.querySelector("#rtMetric");
+        const narr = slide.querySelector("#rtNarr");
+        const modeBtns = [...slide.querySelectorAll(".sim-btn[data-mode]")];
+        const resetBtn = slide.querySelector("#rtReset");
+
+        // router centres in canvas coordinates (matches the SVG viewBox 1000×470)
+        const C = [
+          { x: 108, y: 242 },
+          { x: 500, y: 70 },
+          { x: 892, y: 242 },
+        ];
+
+        let timers = [];
+        const clearTimers = () => {
+          timers.forEach(clearTimeout);
+          timers = [];
+        };
+        const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+        const data = {
+          static: {
+            stroke: "#1d3fb8",
+            path: [0, 1, 2],
+            links: ["l12", "l23"],
+            table:
+              '<span class="hot">S</span>&nbsp;&nbsp;10.0.3.0/24 <span class="hot">[1/0]</span> via 10.12.0.2',
+            cfg: "R1(config)# ip route 10.0.3.0\n           255.255.255.0 10.12.0.2",
+            metric:
+              "<strong>No metric</strong> — the admin picked the next hop (R2, the fast path) by hand.",
+            narr:
+              "<strong>Static.</strong> You type the next hop yourself. Here the admin points 10.0.3.0/24 at <strong>R2</strong> — the fast Gigabit path. Predictable and cheap, but if that link fails the route just black-holes; nothing reroutes on its own.",
+          },
+          rip: {
+            stroke: "#d9621a",
+            path: [0, 2],
+            links: ["l13"],
+            table:
+              '<span class="hot">R</span>&nbsp;&nbsp;10.0.3.0/24 <span class="hot">[120/1]</span> via 10.13.0.2',
+            cfg: "R1(config)# router rip\nR1(config-router)# version 2\nR1(config-router)# network 10.0.0.0",
+            metric:
+              "<strong>Metric = hop count.</strong> Direct serial = <strong>1 hop</strong>; via R2 = 2 hops — so RIP takes the serial.",
+            narr:
+              "<strong>RIP.</strong> The metric is just <strong>hop count</strong>. The direct T1 serial is 1 hop; the Gigabit path through R2 is 2 hops — so RIP picks the <strong>slow serial</strong>. Quick to configure, but blind to bandwidth.",
+          },
+          ospf: {
+            stroke: "#3a7d44",
+            path: [0, 1, 2],
+            links: ["l12", "l23"],
+            table:
+              '<span class="hot">O</span>&nbsp;&nbsp;10.0.3.0/24 <span class="hot">[110/2]</span> via 10.12.0.2',
+            cfg: "R1(config)# router ospf 1\nR1(config-router)# network 10.0.0.0\n           0.255.255.255 area 0",
+            metric:
+              "<strong>Metric = cost (bandwidth).</strong> Gigabit path = 1+1 = <strong>2</strong>; serial = <strong>64</strong>.",
+            narr:
+              "<strong>OSPF.</strong> Cost comes from bandwidth, so it runs Dijkstra over the whole map. The Gigabit path costs 1+1=2; the serial costs 64 — OSPF takes the <strong>fast 2-hop path</strong>. Same wires, smarter choice, and it reroutes in seconds if a link drops.",
+          },
+        };
+
+        function resetLinks() {
+          Object.values(lines).forEach((l) => {
+            l.setAttribute("stroke", "#c9bfa8");
+            l.setAttribute("stroke-width", "3");
+          });
+          rtrs.forEach((r) => r.classList.remove("on"));
+        }
+        function reset() {
+          clearTimers();
+          resetLinks();
+          modeBtns.forEach((b) => b.classList.remove("active"));
+          packet.style.opacity = "0";
+          packet.style.left = C[0].x + "px";
+          packet.style.top = C[0].y + "px";
+          tableEl.innerHTML = '<span class="none">— pick a protocol —</span>';
+          cfgEl.textContent = "";
+          metricEl.innerHTML = "";
+          narr.innerHTML =
+            "Pick <strong>Static</strong>, <strong>RIP</strong> or <strong>OSPF</strong> to see which path R1 chooses to reach 10.0.3.0/24 — and why the metric makes them disagree.";
+        }
+
+        function run(mode) {
+          clearTimers();
+          const d = data[mode];
+          modeBtns.forEach((b) =>
+            b.classList.toggle("active", b.dataset.mode === mode),
+          );
+          resetLinks();
+          d.links.forEach((k) => {
+            lines[k].setAttribute("stroke", d.stroke);
+            lines[k].setAttribute("stroke-width", "6");
+          });
+          tableEl.innerHTML = d.table;
+          cfgEl.textContent = d.cfg;
+          metricEl.innerHTML = d.metric;
+          narr.innerHTML = d.narr;
+          packet.style.background = d.stroke;
+          packet.style.opacity = "0";
+          packet.style.left = C[0].x + "px";
+          packet.style.top = C[0].y + "px";
+          rtrs.forEach((r) => r.classList.remove("on"));
+          later(() => {
+            packet.style.opacity = "1";
+            rtrs[d.path[0]].classList.add("on");
+          }, 60);
+          d.path.slice(1).forEach((n, i) => {
+            later(
+              () => {
+                packet.style.left = C[n].x + "px";
+                packet.style.top = C[n].y + "px";
+                rtrs[n].classList.add("on");
+              },
+              520 + i * 820,
+            );
+          });
+        }
+
+        modeBtns.forEach((b) =>
+          b.addEventListener("click", () => run(b.dataset.mode)),
+        );
+        resetBtn.addEventListener("click", reset);
+        reset();
+      })();
+
+      /* ===========================================================
+   SESSION 4 · SIM 5 — VLAN COMMUNICATION
+   Two switches + a trunk + a router. Three scenarios:
+   (1) same VLAN across the trunk (frame is 802.1Q-tagged so the
+   far switch tracks the VLAN), (2) a cross-VLAN attempt that is
+   blocked at Layer 2, (3) inter-VLAN routing through the router.
+   =========================================================== */
+      (function () {
+        const slide = document.getElementById("vlanSim");
+        if (!slide) return;
+
+        const frame = slide.querySelector("#vlanFrame");
+        const tag = slide.querySelector("#vlanTag");
+        const xMark = slide.querySelector("#vlanX");
+        const narr = slide.querySelector("#vlanNarr");
+        const insp = {
+          src: slide.querySelector("#vlanSrc"),
+          dst: slide.querySelector("#vlanDst"),
+          wire: slide.querySelector("#vlanWire"),
+          result: slide.querySelector("#vlanResult"),
+        };
+        const wires = {};
+        slide.querySelectorAll(".vlan-wire").forEach((w) => (wires[w.id] = w));
+        const hosts = {};
+        slide.querySelectorAll(".vlan-host").forEach((h) => (hosts[h.dataset.node] = h));
+        const modeBtns = [...slide.querySelectorAll(".sim-btn[data-scn]")];
+        const resetBtn = slide.querySelector("#vlanReset");
+
+        // node centres, in the canvas's 1040×486 pixel space
+        const N = {
+          Router: { x: 520, y: 50 }, SW1: { x: 300, y: 250 }, SW2: { x: 740, y: 250 },
+          SalesA: { x: 200, y: 420 }, EngB: { x: 400, y: 420 },
+          SalesC: { x: 640, y: 420 }, EngD: { x: 840, y: 420 },
+        };
+
+        let timers = [];
+        const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
+        const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+        const placeFrame = (pt) => {
+          frame.style.left = pt.x - 13 + "px";
+          frame.style.top = pt.y - 13 + "px";
+        };
+        const clearWires = () =>
+          Object.values(wires).forEach((w) => w.classList.remove("v10", "v20", "blocked"));
+        const clearHosts = () =>
+          Object.values(hosts).forEach((h) => h.classList.remove("on"));
+        const showX = (pt) => {
+          xMark.style.left = pt.x + "px";
+          xMark.style.top = pt.y + "px";
+          xMark.classList.add("show");
+        };
+        function setInsp(o) {
+          if (!o) return;
+          if (o.wire !== undefined) {
+            insp.wire.textContent = o.wire;
+            insp.wire.className = /VLAN|routed|tagged/.test(o.wire) ? "tag" : "";
+          }
+          if (o.result !== undefined) {
+            insp.result.textContent = o.result;
+            insp.result.className = o.result.includes("✓")
+              ? "ok"
+              : o.result.includes("✗")
+                ? "no"
+                : "";
+          }
+        }
+
+        // VLAN colours: 10 = cobalt (v10), 20 = plum (v20)
+        const stepBtn = slide.querySelector("#vlanStep");
+
+        // Each scenario is a list of narrated steps. tag: "10"/"20" shows that
+        // tag, "off" hides it, undefined leaves it unchanged. A step with no
+        // "to" is a pure explanation beat (the frame stays put).
+        const scenarios = {
+          same: {
+            src: "Sales-A · VLAN 10",
+            dst: "Sales-C · VLAN 10",
+            start: "SalesA",
+            legs: [
+              { host: "SalesA", fcolor: "v10", tag: "off", insp: { wire: "—", result: "ready" },
+                narr: "<strong>Goal — Sales-A → Sales-C, both in VLAN 10</strong>, but on different switches. Step through and watch the frame stay inside VLAN 10 the whole way. <em>(Use Step ▸ to go one stage at a time.)</em>" },
+              { to: "SW1", wire: "wA", wclass: "v10", fcolor: "v10", tag: "off",
+                insp: { wire: "plain · access", result: "in transit" },
+                narr: "<strong>1 · Access link.</strong> Sales-A sits on an <strong>access port</strong> assigned to VLAN 10, so it sends ordinary <strong>untagged</strong> Ethernet up to SW1." },
+              { insp: { wire: "lookup…" },
+                narr: "<strong>2 · SW1 decides.</strong> Sales-C is reached over the <strong>trunk</strong> toward SW2. Because that one cable carries several VLANs, SW1 must <strong>label</strong> the frame so the other end can tell them apart." },
+              { to: "SW2", wire: "wT", wclass: "v10", tag: "10",
+                insp: { wire: "tagged · VLAN 10" },
+                narr: "<strong>3 · 802.1Q tag added.</strong> SW1 inserts a 4-byte tag with <strong>VID = 10</strong> and sends it across the trunk. This tag is exactly how a VLAN is <strong>tracked between switches</strong>." },
+              { insp: { wire: "tag read → VLAN 10" },
+                narr: "<strong>4 · SW2 reads the tag.</strong> SW2 sees <strong>VID 10</strong>, so it knows the frame belongs to VLAN 10 and looks Sales-C up in its <strong>VLAN-10</strong> forwarding table." },
+              { to: "SalesC", wire: "wC", wclass: "v10", tag: "off", host: "SalesC",
+                insp: { wire: "plain · access", result: "delivered ✓" },
+                narr: "<strong>5 · Delivered.</strong> Sales-C is on an access port, so SW2 <strong>strips the tag</strong> and hands over plain Ethernet. Same VLAN end to end — no router needed." },
+            ],
+          },
+          block: {
+            src: "Sales-A · VLAN 10",
+            dst: "Eng-D · VLAN 20",
+            start: "SalesA",
+            legs: [
+              { host: "SalesA", fcolor: "v10", tag: "off", insp: { wire: "—", result: "ready" },
+                narr: "<strong>Goal — Sales-A (VLAN 10) → Eng-D (VLAN 20)</strong>, two <em>different</em> VLANs. Step through to see what a switch does on its own." },
+              { to: "SW1", wire: "wA", wclass: "v10", fcolor: "v10", tag: "off",
+                insp: { wire: "plain · access", result: "in transit" },
+                narr: "<strong>1 · Access link.</strong> The frame reaches SW1 untagged, exactly like the same-VLAN case." },
+              { insp: { wire: "lookup…" },
+                narr: "<strong>2 · SW1 looks up Eng-D.</strong> But Eng-D lives in <strong>VLAN 20</strong>, and a switch <strong>only forwards within one VLAN</strong>. VLAN 10 simply has no member called Eng-D." },
+              { wire: "wA", wclass: "blocked", block: "SW1", host: "EngD",
+                insp: { wire: "dropped", result: "blocked ✗" },
+                narr: "<strong>3 · Dropped.</strong> There is <strong>no Layer-2 path</strong> from VLAN 10 to VLAN 20, so SW1 discards the frame. On their own, different VLANs <strong>cannot talk</strong> — that is the isolation VLANs are for." },
+            ],
+          },
+          route: {
+            src: "Sales-A · VLAN 10",
+            dst: "Eng-D · VLAN 20",
+            start: "SalesA",
+            legs: [
+              { host: "SalesA", fcolor: "v10", tag: "off", insp: { wire: "—", result: "ready" },
+                narr: "<strong>Goal — the same two PCs, now through the router.</strong> Crossing VLANs is a Layer-3 job. Step through the round trip." },
+              { to: "SW1", wire: "wA", wclass: "v10", fcolor: "v10", tag: "off",
+                insp: { wire: "plain · access", result: "in transit" },
+                narr: "<strong>1 · To its gateway.</strong> Sales-A can't reach VLAN 20 itself, so it sends the frame to its <strong>default gateway</strong> (the router) — untagged up to SW1." },
+              { to: "Router", wire: "wR", wclass: "v10", tag: "10",
+                insp: { wire: "tagged · VLAN 10" },
+                narr: "<strong>2 · Up to the router.</strong> SW1 trunks the frame to the router <strong>tagged VLAN 10</strong>. The router has a <strong>sub-interface in every VLAN</strong> — this is <em>router-on-a-stick</em>." },
+              { fcolor: "v20", tag: "20",
+                insp: { wire: "routed → VLAN 20" },
+                narr: "<strong>3 · Routed (the Layer-3 hop).</strong> The router receives on its VLAN-10 sub-interface, looks up the VLAN-20 subnet, <strong>rewrites the frame</strong> and re-tags it <strong>VLAN 20</strong>." },
+              { to: "SW1", wire: "wR", wclass: "v20", tag: "20",
+                insp: { wire: "tagged · VLAN 20" },
+                narr: "<strong>4 · Back down.</strong> The router sends it back to SW1, now <strong>tagged VLAN 20</strong> — a brand-new broadcast domain." },
+              { to: "SW2", wire: "wT", wclass: "v20", tag: "20",
+                narr: "<strong>5 · Across the trunk.</strong> SW1 forwards it over the trunk to SW2, still <strong>VLAN 20</strong>." },
+              { to: "EngD", wire: "wD", wclass: "v20", tag: "off", host: "EngD",
+                insp: { wire: "plain · access", result: "delivered ✓" },
+                narr: "<strong>6 · Delivered.</strong> SW2 strips the tag and hands it to Eng-D. Different VLANs <em>can</em> talk — but every cross-VLAN frame must detour <strong>through the router</strong>." },
+            ],
+          },
+        };
+
+        const GAP = 2600; // ms between auto-advanced steps — slow enough to read
+        let curScn = null;
+        let curLeg = -1;
+
+        function applyLeg(leg) {
+          if (leg.wire || leg.block) clearWires();
+          clearHosts();
+          if (leg.fcolor) frame.classList.toggle("v20", leg.fcolor === "v20");
+          if (leg.tag === "off") tag.classList.remove("show");
+          else if (leg.tag) {
+            tag.textContent = "VLAN " + leg.tag;
+            tag.classList.add("show");
+          }
+          if (leg.wire) wires[leg.wire].classList.add(leg.wclass);
+          if (leg.to) placeFrame(N[leg.to]);
+          if (leg.block) later(() => showX(N[leg.block]), 480);
+          if (leg.host) later(() => hosts[leg.host].classList.add("on"), leg.to ? 560 : 0);
+          if (leg.insp) setInsp(leg.insp);
+          if (leg.narr) narr.innerHTML = leg.narr;
+        }
+
+        function nextLeg(auto) {
+          if (!curScn) return;
+          const scn = scenarios[curScn];
+          if (curLeg >= scn.legs.length - 1) {
+            stepBtn.disabled = true;
+            return;
+          }
+          curLeg += 1;
+          applyLeg(scn.legs[curLeg]);
+          const last = curLeg >= scn.legs.length - 1;
+          stepBtn.disabled = last;
+          if (auto && !last) later(() => nextLeg(true), GAP);
+        }
+
+        function softReset() {
+          clearTimers();
+          clearWires();
+          clearHosts();
+          xMark.classList.remove("show");
+          tag.classList.remove("show");
+          frame.classList.remove("v20");
+        }
+        function reset() {
+          softReset();
+          curScn = null;
+          curLeg = -1;
+          frame.style.opacity = "0";
+          stepBtn.disabled = true;
+          modeBtns.forEach((b) => b.classList.remove("active"));
+          insp.src.textContent = "—";
+          insp.dst.textContent = "—";
+          setInsp({ wire: "—", result: "—" });
+          narr.innerHTML =
+            "Pick a scenario, then press <strong>Step ▸</strong> to walk through it one stage at a time (or just watch it auto-play). <strong>Same VLAN</strong> works across the trunk; a <strong>different VLAN</strong> is blocked unless it goes <strong>through the router</strong>.";
+        }
+
+        function selectScenario(key) {
+          softReset();
+          curScn = key;
+          curLeg = -1;
+          const scn = scenarios[key];
+          modeBtns.forEach((b) => b.classList.toggle("active", b.dataset.scn === key));
+          insp.src.textContent = scn.src;
+          insp.dst.textContent = scn.dst;
+          setInsp({ wire: "—", result: "ready" });
+          frame.classList.remove("v20");
+          frame.style.opacity = "1";
+          placeFrame(N[scn.start]);
+          stepBtn.disabled = false;
+          later(() => nextLeg(true), 120); // begin auto-play (Step pauses it)
+        }
+
+        modeBtns.forEach((b) =>
+          b.addEventListener("click", () => selectScenario(b.dataset.scn)),
+        );
+        stepBtn.addEventListener("click", () => {
+          if (!curScn) return;
+          clearTimers(); // pause auto-play; advance manually
+          nextLeg(false);
+        });
+        resetBtn.addEventListener("click", reset);
+        reset();
+      })();
+
+      /* ===========================================================
+   SESSION 4 · SIM 7 — DTP TRUNK-MODE NEGOTIATION
+   Pick a mode for each end; the canonical DTP outcome matrix
+   decides trunk / access / mismatch, with a short DTP exchange
+   animation and a plain-language reason.
+   =========================================================== */
+      (function () {
+        const slide = document.getElementById("dtpSim");
+        if (!slide) return;
+
+        // canonical, symmetric DTP outcome matrix: T=trunk, A=access, M=mismatch
+        const M = {
+          access:    { access: "A", auto: "A", desirable: "A", trunk: "M", noneg: "M" },
+          auto:      { access: "A", auto: "A", desirable: "T", trunk: "T", noneg: "M" },
+          desirable: { access: "A", auto: "T", desirable: "T", trunk: "T", noneg: "M" },
+          trunk:     { access: "M", auto: "T", desirable: "T", trunk: "T", noneg: "T" },
+          noneg:     { access: "M", auto: "M", desirable: "M", trunk: "T", noneg: "T" },
+        };
+        const labels = { access: "Access", auto: "Dynamic Auto", desirable: "Dynamic Desirable", trunk: "Trunk", noneg: "Nonegotiate" };
+
+        const link = slide.querySelector("#dtpLink");
+        const label = slide.querySelector("#dtpLinkLabel");
+        const m1 = slide.querySelector("#dtpM1");
+        const m2 = slide.querySelector("#dtpM2");
+        const result = slide.querySelector("#dtpResult");
+        const dot1 = slide.querySelector("#dtpDot1");
+        const dot2 = slide.querySelector("#dtpDot2");
+        let a = null, b = null, timers = [];
+        const clr = () => { timers.forEach(clearTimeout); timers = []; };
+
+        function reason(a, b, r) {
+          const A = labels[a], B = labels[b];
+          if (r === "T") {
+            let why;
+            if ((a === "noneg" || a === "trunk") && (b === "noneg" || b === "trunk")) why = "both ends are forced to trunk";
+            else if (a === "desirable" || b === "desirable") why = "Dynamic Desirable actively negotiates the trunk and the neighbour accepts";
+            else why = "one side requests a trunk and the other agrees";
+            return `<strong>${A} + ${B} → TRUNK.</strong> ${why} — the link now carries <strong>all allowed VLANs, 802.1Q-tagged</strong>.`;
+          }
+          if (r === "A") {
+            const why = a === "auto" && b === "auto"
+              ? "both ends are passive (Auto), so neither one ever asks"
+              : "an Access end refuses to trunk";
+            return `<strong>${A} + ${B} → ACCESS.</strong> ${why} — the link stays a single-VLAN <strong>access</strong> port (untagged).`;
+          }
+          const why = a === "noneg" || b === "noneg"
+            ? "Nonegotiate sends no DTP, so the dynamic neighbour never trunks"
+            : "one side is a hard Trunk while the other is Access";
+          return `<strong>${A} + ${B} → MISMATCH&nbsp;⚠.</strong> ${why}. One end trunks and the other doesn't, so VLANs leak or traffic is dropped — set <strong>both</strong> ends explicitly.`;
+        }
+
+        function evaluate() {
+          if (!a || !b) return;
+          clr();
+          link.className = "dtp-link";
+          label.textContent = "negotiating…";
+          label.style.color = "var(--muted)";
+          dot1.style.opacity = "0"; dot2.style.opacity = "0";
+          dot1.style.left = "0%"; dot2.style.left = "100%";
+          // DTP frames cross the link
+          timers.push(setTimeout(() => {
+            dot1.style.opacity = "1"; dot2.style.opacity = "1";
+            dot1.style.left = "100%"; dot2.style.left = "0%";
+          }, 60));
+          // settle on the result
+          timers.push(setTimeout(() => {
+            dot1.style.opacity = "0"; dot2.style.opacity = "0";
+            const r = M[a][b];
+            if (r === "T") { link.classList.add("trunk"); label.textContent = "TRUNK · 802.1Q"; label.style.color = "var(--moss)"; }
+            else if (r === "A") { link.classList.add("access"); label.textContent = "ACCESS · 1 VLAN"; label.style.color = "var(--ink-soft)"; }
+            else { link.classList.add("mismatch"); label.textContent = "⚠ MISMATCH"; label.style.color = "var(--amber)"; }
+            result.innerHTML = reason(a, b, r);
+          }, 850));
+        }
+
+        slide.querySelectorAll(".dtp-btn").forEach((btn) =>
+          btn.addEventListener("click", () => {
+            const end = btn.dataset.end, mode = btn.dataset.mode;
+            slide.querySelectorAll(`.dtp-btn[data-end="${end}"]`).forEach((x) => x.classList.toggle("sel", x === btn));
+            if (end === "1") { a = mode; m1.textContent = labels[mode]; }
+            else { b = mode; m2.textContent = labels[mode]; }
+            evaluate();
+          }),
+        );
+      })();
+
+      /* ===========================================================
+   SESSION 4 — LAYER-COMPARE: click a device for a deeper note
+   =========================================================== */
+      (function () {
+        const slide = document.getElementById("layerCompare");
+        if (!slide) return;
+        const detail = slide.querySelector("#layerDetail");
+        const info = {
+          hub: "<strong>Hub · Layer 1 only.</strong> A multiport <strong>repeater</strong> — bits arriving on one port are blasted out <strong>every</strong> other port, with no idea of addresses. All ports share <strong>one collision domain</strong>, so two hosts talking at once collide. Half-duplex and effectively obsolete — replaced by switches.",
+          switch: "<strong>Switch · Layers 1–2.</strong> Reads the destination <strong>MAC</strong> and forwards each frame out <strong>only</strong> the port where that MAC lives (learned in its <strong>CAM table</strong>). Every port is its own collision domain; the whole switch is one broadcast domain (one per VLAN). The workhorse of every LAN.",
+          router: "<strong>Router · Layers 1–3.</strong> Reads the destination <strong>IP</strong> and forwards between different <strong>networks / subnets</strong>, choosing the next hop from its <strong>routing table</strong>. Each interface is a separate network and a <strong>broadcast-domain boundary</strong> — broadcasts stop here. This is how LANs join into the internet.",
+        };
+        slide.querySelectorAll(".layer-dev").forEach((d) =>
+          d.addEventListener("click", () => {
+            slide.querySelectorAll(".layer-dev").forEach((x) => x.classList.toggle("sel", x === d));
+            detail.innerHTML = info[d.dataset.dev];
+          }),
+        );
+      })();
+
+      /* ===========================================================
+   SESSION 4 · SIM 6 — UNICAST / BROADCAST / MULTICAST
+   One source A → switch → four hosts. A mode button sends the
+   frame to one (unicast), all (broadcast) or a subscribed group
+   (multicast), lighting the wires and recipients accordingly.
+   =========================================================== */
+      (function () {
+        const slide = document.getElementById("castSim");
+        if (!slide) return;
+
+        const frames = {};
+        slide.querySelectorAll(".cast-frame").forEach((f) => (frames[f.dataset.f] = f));
+        const hosts = {};
+        slide.querySelectorAll(".cast-node[data-h]").forEach((h) => (hosts[h.dataset.h] = h));
+        const wires = {};
+        slide.querySelectorAll(".cast-wire[data-h]").forEach((w) => (wires[w.dataset.h] = w));
+        const wAS = slide.querySelector("#cwAS");
+        const cards = [...slide.querySelectorAll(".cast-card")];
+        const modeBtns = [...slide.querySelectorAll(".sim-btn[data-mode]")];
+        const resetBtn = slide.querySelector("#castReset");
+
+        const SW = { x: 430, y: 216 };
+        const A = { x: 120, y: 216 };
+        const HP = { B: { x: 820, y: 66 }, C: { x: 820, y: 172 }, D: { x: 820, y: 280 }, E: { x: 820, y: 388 } };
+        const recipients = { uni: ["B"], bcast: ["B", "C", "D", "E"], mcast: ["B", "D"] };
+
+        let timers = [];
+        const clr = () => { timers.forEach(clearTimeout); timers = []; };
+        const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+        const place = (f, p) => { f.style.left = p.x - 12 + "px"; f.style.top = p.y - 12 + "px"; };
+
+        function clearAll() {
+          clr();
+          Object.values(frames).forEach((f) => { f.style.opacity = "0"; f.classList.remove("bcast", "mcast"); });
+          Object.values(wires).forEach((w) => w.classList.remove("on", "uni", "bcast", "mcast"));
+          wAS.classList.remove("on", "uni", "bcast", "mcast");
+          Object.values(hosts).forEach((h) => h.classList.remove("lit", "uni", "bcast", "mcast"));
+        }
+        function reset() {
+          clearAll();
+          modeBtns.forEach((b) => b.classList.remove("active"));
+          cards.forEach((c) => c.classList.remove("active"));
+        }
+        function run(mode) {
+          clearAll();
+          modeBtns.forEach((b) => b.classList.toggle("active", b.dataset.mode === mode));
+          cards.forEach((c) => c.classList.toggle("active", c.dataset.m === mode));
+          const fa = frames.A;
+          fa.classList.toggle("bcast", mode === "bcast");
+          fa.classList.toggle("mcast", mode === "mcast");
+          place(fa, A);
+          fa.style.opacity = "1";
+          wAS.classList.add("on", mode);
+          later(() => place(fa, SW), 40);
+          later(() => {
+            fa.style.opacity = "0";
+            recipients[mode].forEach((h) => {
+              const f = frames[h];
+              f.classList.toggle("bcast", mode === "bcast");
+              f.classList.toggle("mcast", mode === "mcast");
+              place(f, SW);
+              f.style.opacity = "1";
+              wires[h].classList.add("on", mode);
+              later(() => { place(f, HP[h]); hosts[h].classList.add("lit", mode); }, 40);
+            });
+          }, 640);
+        }
+        modeBtns.forEach((b) => b.addEventListener("click", () => run(b.dataset.mode)));
+        resetBtn.addEventListener("click", reset);
+        reset();
+      })();
+
+      /* ===========================================================
          TEXT-SIZE CONTROL
          A floating A− / A+ control scales the text on every slide
-         EXCEPT the excluded pages. Each element's original size is
-         recorded once, then multiplied by the chosen factor.
+         EXCEPT slides marked data-noscale. Each element's original
+         size is recorded once, then multiplied by the chosen factor.
          =========================================================== */
       (function () {
-        // 1-indexed page numbers to leave at their original size:
-        // title (1) plus the three pixel-aligned visuals — the MAC sim (8),
-        // the STP role diagram (16) and the packet-walk sim (25) — whose
-        // absolute positioning would drift if their text were rescaled.
-        const EXCLUDE = new Set([1, 8, 16, 25]);
+        // Slides whose absolutely-positioned text would drift if rescaled are
+        // tagged with data-noscale (the title plus the pixel-aligned sims and
+        // diagrams). Using an attribute keeps this correct when slides are added.
         const slides = [...document.querySelectorAll(".slide")];
         const targets = [];
-        slides.forEach((sl, i) => {
-          if (EXCLUDE.has(i + 1)) return;
+        slides.forEach((sl) => {
+          if (sl.hasAttribute("data-noscale")) return;
           sl.querySelectorAll("*").forEach((el) => {
             // skip SVG (its text scales with the drawing) and the control itself
             if (el.tagName === "svg" || el.closest("svg")) return;

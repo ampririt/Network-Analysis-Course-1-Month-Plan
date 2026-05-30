@@ -4,6 +4,7 @@
   - [📖 Lecture](#-lecture)
   - [Break (10 min)](#break-10-min)
   - [🛠️ Hands-on Lab](#️-hands-on-lab)
+    - [📷 Step-by-Step Lab Walkthrough →](./LAB_TUTORIAL.md)
   - [🔍 Deep Dive: IP Addressing \& Subnetting](#-deep-dive-ip-addressing--subnetting)
     - [IPv4 Address Classes (Legacy — For Context)](#ipv4-address-classes-legacy--for-context)
     - [Private IP Address Ranges (RFC 1918)](#private-ip-address-ranges-rfc-1918)
@@ -53,14 +54,17 @@
 
 ### 🛠️ Hands-on Lab
 
-**Lab A — Wireshark: TCP 3-Way Handshake (20 min)**
+> [!TIP]
+> A full step-by-step walkthrough with screenshot placeholders is in **[LAB_TUTORIAL.md](./LAB_TUTORIAL.md)** — follow that page while doing the labs below.
+
+**Lab A — Wireshark: TCP 3-Way Handshake (20 min)** · [📷 walkthrough](./LAB_TUTORIAL.md#lab-a--wireshark-tcp-3-way-handshake)
 1. Capture traffic while visiting a website
 2. Apply filter: `tcp.flags.syn == 1`
 3. Identify the SYN → SYN-ACK → ACK sequence
 4. Right-click → **Follow TCP Stream** — observe the full conversation
 5. Compare a TCP connection (HTTP) vs. a UDP conversation (DNS: `udp.port == 53`)
 
-**Lab B — Cisco Packet Tracer: Simulation Mode Protocol Walk (20 min)**
+**Lab B — Cisco Packet Tracer: Simulation Mode Protocol Walk (20 min)** · [📷 walkthrough](./LAB_TUTORIAL.md#lab-b--packet-tracer-simulation-mode-protocol-walk)
 1. Build a network: 2 PCs → Switch → Router → Server
 2. Configure static IPs on different subnets with the router as gateway
 3. Switch to **Simulation Mode**
@@ -70,7 +74,7 @@
    - ICMP encapsulation inside IP inside Ethernet
 6. Click on each PDU to inspect headers at every layer
 
-**Lab C — Cisco Packet Tracer: IP Network Design & Multi-Subnet Build (40 min)**
+**Lab C — Cisco Packet Tracer: IP Network Design & Multi-Subnet Build (40 min)** · [📷 walkthrough](./LAB_TUTORIAL.md#lab-c--packet-tracer-multi-subnet-ip-design-build)
 
 > [!IMPORTANT]
 > This lab builds the foundation for all future Packet Tracer exercises. Students design an IP scheme from scratch.
