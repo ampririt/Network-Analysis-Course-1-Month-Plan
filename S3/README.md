@@ -22,7 +22,6 @@
 - **HTTP/HTTPS & TLS**: Application-layer web traffic and encryption — *huge topic, deserves its own session on the application layer*
 - **SSH / Telnet**: Remote management — *pairs well with a security session*
 - **SMTP / IMAP / POP3**: Email protocols — *only if your audience cares about mail flow*
-- Live demo: Capture a DHCP lease renewal in Wireshark
 
 **Network Security**
 - **Why services are targets**: Most core services (ARP, DHCP, DNS) have *no built-in authentication*, so they are easy to spoof or abuse.

@@ -10,12 +10,17 @@
 **Learning Objectives**: Understand how switches forward traffic using MAC address tables. Configure VLANs to segment networks. Learn how routers forward traffic between subnets. Analyze routing & switching in captures.
 
 ### 📖 Lecture 
-- **Switching**: MAC address table, broadcast vs. unicast, switch forwarding decisions
-- **VLANs**: Why segment networks? VLAN tagging (802.1Q), trunk vs. access ports
-- **Routing**: Routing table, static vs. dynamic routing, default gateway
-- **Inter-VLAN Routing**: Router-on-a-Stick concept, sub-interfaces
-- **Subnetting Refresher**: Network/host portions, subnet mask, CIDR notation
-- Live demo: `show ip route`, `show vlan brief`, `show mac address-table` in Packet Tracer
+- **Layer 2 vs. Layer 3**: Where switching ends and routing begins; collision domains vs. broadcast domains
+- **Switching**: MAC address table, MAC learning & aging, broadcast vs. unicast vs. multicast, switch forwarding decisions, flooding of unknown unicast frames
+- **VLANs**: Why segment networks? (security, broadcast control, logical grouping), VLAN tagging (802.1Q), trunk vs. access ports, the native VLAN
+- **Spanning Tree Protocol (STP)**: Loop prevention, root bridge election, port states (blocking/forwarding) — why a redundant switch link won't melt the network
+- **Routing**: Routing table, static vs. dynamic routing, default gateway, longest-prefix match, administrative distance & metrics
+- **Dynamic Routing Protocols**: Distance-vector (RIP) vs. link-state (OSPF) at a high level — how routers learn paths automatically
+- **Inter-VLAN Routing**: Router-on-a-Stick concept, sub-interfaces, vs. Layer 3 switch (SVI) approach
+- **Subnetting Refresher**: Network/host portions, subnet mask, CIDR notation, calculating usable hosts & subnet ranges
+- **First-Hop & Address Services**: Default gateway role, ARP at Layer 2, DHCP relay across subnets
+- **Packet Walk-through**: Trace a single packet PC → switch → router → switch → PC, watching MAC rewrites vs. IP preservation at each hop
+- Live demo: `show ip route`, `show vlan brief`, `show mac address-table`, `show interfaces trunk`, `show ip arp` in Packet Tracer
 
 ### Break (10 min)
 - Step away, stretch, and grab a drink before diving into the hands-on labs.
