@@ -1,7 +1,7 @@
 ## Wireshark — Lab A: The TCP 3-Way Handshake
 
 > Companion guide to [Session 2 — The Protocol Stack Deep Dive](./README.md).
-> Read this **before** doing **Lab A** in the [README](./README.md#️-hands-on-lab).
+> Read this **before** doing **Lab A** in the [README](./README.md#hands-on-lab).
 > New to Wireshark? Start with the [Session 1 Wireshark guide](../S1/WIRESHARK_GUIDE.md) for installation and the basics.
 >
 > ⏱️ **~20 min** · **Objective:** see a real `SYN → SYN-ACK → ACK` handshake and contrast connection-oriented **TCP** with connectionless **UDP**.
@@ -9,21 +9,21 @@
 ---
 
 - [Wireshark — Lab A: The TCP 3-Way Handshake](#wireshark--lab-a-the-tcp-3-way-handshake)
-  - [🤝 What is the TCP 3-Way Handshake?](#-what-is-the-tcp-3-way-handshake)
-  - [✅ Before You Start](#-before-you-start)
-  - [🧪 Lab A — Capture & Read a Handshake](#-lab-a--capture--read-a-handshake)
+  - [What is the TCP 3-Way Handshake?](#what-is-the-tcp-3-way-handshake)
+  - [Before You Start](#before-you-start)
+  - [Lab A — Capture & Read a Handshake](#lab-a--capture--read-a-handshake)
     - [Step A1 — Start a capture](#step-a1--start-a-capture)
     - [Step A2 — Generate traffic](#step-a2--generate-traffic)
     - [Step A3 — Filter for the handshake](#step-a3--filter-for-the-handshake)
     - [Step A4 — Identify SYN → SYN-ACK → ACK](#step-a4--identify-syn--syn-ack--ack)
     - [Step A5 — Follow the TCP stream](#step-a5--follow-the-tcp-stream)
     - [Step A6 — Compare with UDP (DNS)](#step-a6--compare-with-udp-dns)
-  - [📝 Lab A Questions](#-lab-a-questions)
-  - [➡️ Next Steps](#️-next-steps)
+  - [Lab A Questions](#lab-a-questions)
+  - [Next Steps](#next-steps)
 
 ---
 
-### 🤝 What is the TCP 3-Way Handshake?
+### What is the TCP 3-Way Handshake?
 
 **TCP (Transmission Control Protocol)** is **connection-oriented**: before any data is exchanged, the two hosts agree to talk by trading three small control segments. This is the **3-way handshake**, and it uses two of the TCP header **flags** — **`SYN`** (synchronize) and **`ACK`** (acknowledge):
 
@@ -39,16 +39,16 @@ By contrast, **UDP (User Datagram Protocol)** is **connectionless** — there's 
 
 ---
 
-### ✅ Before You Start
+### Before You Start
 
-- [ ] **Wireshark installed** — see the [Session 1 install steps](../S1/WIRESHARK_GUIDE.md#️-installing-wireshark) if you haven't yet.
-- [ ] Review the **TCP/UDP header** fields in the [README Lecture](./README.md#-lecture) (ports, sequence/ack numbers, flags).
+- [ ] **Wireshark installed** — see the [Session 1 install steps](../S1/WIRESHARK_GUIDE.md#installing-wireshark) if you haven't yet.
+- [ ] Review the **TCP/UDP header** fields in the [README Lecture](./README.md#lecture) (ports, sequence/ack numbers, flags).
 - [ ] Use a **plain `http://`** site (e.g. `http://example.com`) so the handshake is easy to spot and not buried in TLS.
-- [ ] **VPN off**, browser cache cleared (same [pre-flight checklist](../S1/WIRESHARK_GUIDE.md#-before-you-capture-pre-flight-checklist) as Session 1).
+- [ ] **VPN off**, browser cache cleared (same [pre-flight checklist](../S1/WIRESHARK_GUIDE.md#before-you-capture-pre-flight-checklist) as Session 1).
 
 ---
 
-### 🧪 Lab A — Capture & Read a Handshake
+### Lab A — Capture & Read a Handshake
 
 #### Step A1 — Start a capture
 
@@ -125,7 +125,7 @@ Look for three consecutive packets between your PC and the server. Click each on
 
 ---
 
-### 📝 Lab A Questions
+### Lab A Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -171,7 +171,7 @@ The server's **Acknowledgment number = your SYN's Sequence number + 1**. The `SY
 
 ---
 
-### ➡️ Next Steps
+### Next Steps
 
 - **Capture a teardown too:** apply `tcp.flags.fin == 1` and find the `FIN/ACK` packets that *close* a connection — the mirror image of the handshake.
 - **Peek at HTTPS:** load an `https://` site and note that the TCP handshake is still visible, but the payload is encrypted (TLS) — you'll cover this in a later session.

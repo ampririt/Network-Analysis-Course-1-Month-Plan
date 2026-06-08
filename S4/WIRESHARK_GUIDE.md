@@ -1,26 +1,26 @@
 ## Wireshark — Lab B: VLAN & Routing Traffic Analysis
 
 > Companion guide to [Session 4 — Routing, Switching & VLANs](./README.md).
-> Read this **before** doing **Lab B** in the [README](./README.md#️-hands-on-lab).
+> Read this **before** doing **Lab B** in the [README](./README.md#hands-on-lab).
 > New to Wireshark? See the [Session 1 guide](../S1/WIRESHARK_GUIDE.md) for installation and the basics, and the [Session 2 guide](../S2/WIRESHARK_GUIDE.md) for filters & Follow-Stream.
 
 ---
 
 - [Wireshark — Lab B: VLAN \& Routing Traffic Analysis](#wireshark--lab-b-vlan--routing-traffic-analysis)
-  - [🏷️ Background: the 802.1Q VLAN tag](#️-background-the-8021q-vlan-tag)
-  - [🧪 Lab B — Analyse VLAN & Routed Traffic](#-lab-b--analyse-vlan--routed-traffic)
+  - [Background: the 802.1Q VLAN tag](#background-the-8021q-vlan-tag)
+  - [Lab B — Analyse VLAN & Routed Traffic](#lab-b--analyse-vlan--routed-traffic)
     - [Step B1 — Open the tagged capture](#step-b1--open-the-tagged-capture)
     - [Step B2 — Find the VLAN IDs](#step-b2--find-the-vlan-ids)
     - [Step B3 — Inspect the 802.1Q tag in the Ethernet header](#step-b3--inspect-the-8021q-tag-in-the-ethernet-header)
     - [Step B4 — Trace a ping across subnets (TTL)](#step-b4--trace-a-ping-across-subnets-ttl)
     - [Step B5 — Map subnets with Endpoints](#step-b5--map-subnets-with-endpoints)
     - [Step B6 — Map flows with Conversations](#step-b6--map-flows-with-conversations)
-  - [📝 Lab B Questions](#-lab-b-questions)
-  - [➡️ Next Steps](#️-next-steps)
+  - [Lab B Questions](#lab-b-questions)
+  - [Next Steps](#next-steps)
 
 ---
 
-### 🏷️ Background: the 802.1Q VLAN tag
+### Background: the 802.1Q VLAN tag
 
 When a frame crosses a **trunk** (the switch-to-switch and switch-to-router links you built in [Packet Tracer Lab A](./PACKET_TRACER_GUIDE.md)), the switch inserts a **4-byte 802.1Q tag** into the Ethernet header so the far end knows which **VLAN** the frame belongs to. The tag sits right after the source MAC and contains:
 
@@ -35,7 +35,7 @@ Access ports strip this tag; trunk ports carry it. This lab reads those tags str
 
 ---
 
-## 🧪 Lab B — Analyse VLAN & Routed Traffic
+## Lab B — Analyse VLAN & Routed Traffic
 
 **⏱️ ~25 min · Objective:** find VLAN tags in real frames, watch TTL drop at each router hop, and map subnets/flows with Wireshark statistics.
 
@@ -96,7 +96,7 @@ Open **Statistics → Conversations → IPv4**. Each row is a **flow between two
 
 ---
 
-## 📝 Lab B Questions
+## Lab B Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -134,8 +134,8 @@ The switch-to-switch link is a **trunk**, which **tags** every frame so the othe
 
 ---
 
-## ➡️ Next Steps
+## Next Steps
 
 - Cross-check against your build: the VLAN IDs and subnets you see here should match the VLAN plan from [Packet Tracer Lab A](./PACKET_TRACER_GUIDE.md) and the **Workgroup Design Challenge**.
 - **Homework (from the README):** write a paragraph on **OSPF vs static routing**, and try **port security** on an access port (max 1 MAC).
-- Compare with earlier captures: the **TTL** mechanic here is the same one behind `ping`/`traceroute` from [Session 1](../S1/README.md#-deep-dive-the-ping-command--options).
+- Compare with earlier captures: the **TTL** mechanic here is the same one behind `ping`/`traceroute` from [Session 1](../S1/README.md#deep-dive-the-ping-command--options).

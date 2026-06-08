@@ -1,17 +1,17 @@
 ## Session 4 — Routing, Switching & VLANs
 
 - [Session 4 — Routing, Switching \& VLANs](#session-4--routing-switching--vlans)
-  - [📖 Lecture](#-lecture)
+  - [Lecture](#lecture)
   - [Break (10 min)](#break-10-min)
-  - [🛠️ Hands-on Lab](#️-hands-on-lab)
+  - [Hands-on Lab](#hands-on-lab)
     - [Packet Tracer — Lab A + Design Challenge guide →](./PACKET_TRACER_GUIDE.md)
     - [Wireshark — Lab B guide →](./WIRESHARK_GUIDE.md)
-  - [📚 Homework](#-homework)
+  - [Homework](#homework)
 
 
 **Learning Objectives**: Understand how switches forward traffic using MAC address tables. Configure VLANs to segment networks. Learn how routers forward traffic between subnets. Analyze routing & switching in captures.
 
-### 📖 Lecture 
+### Lecture 
 - **Layer 2 vs. Layer 3**: Where switching ends and routing begins; collision domains vs. broadcast domains
 - **Switching**: MAC address table, MAC learning & aging, broadcast vs. unicast vs. multicast, switch forwarding decisions, flooding of unknown unicast frames
 - **VLANs**: Why segment networks? (security, broadcast control, logical grouping), VLAN tagging (802.1Q), trunk vs. access ports, the native VLAN
@@ -27,7 +27,7 @@
 ### Break (10 min)
 - Step away, stretch, and grab a drink before diving into the hands-on labs.
 
-### 🛠️ Hands-on Lab
+### Hands-on Lab
 
 > [!TIP]
 > Each lab below is a short introduction. **Full step-by-step instructions, diagrams, and lab questions live in the companion guides** — follow those pages while you work.
@@ -42,7 +42,7 @@
 Build a 6-PC, 2-switch, 1-router office with **three VLANs** (Admin / Sales / IT). You'll create the VLANs on both switches, assign **access ports**, **trunk** the switch-to-switch and switch-to-router links, configure **Router-on-a-Stick** sub-interfaces (`G0/0.10/.20/.30` with `encapsulation dot1Q`) as per-VLAN gateways, add **per-VLAN DHCP**, then prove inter-VLAN routing and verify with `show vlan brief` / `show interfaces trunk` / `show ip route`.
 
 > 📖 **Full instructions, figures, and questions:**
-> 👉 **[Packet Tracer — Lab A: Small Office Mega-Lab](./PACKET_TRACER_GUIDE.md#-lab-a--small-office-network-mega-lab)**
+> 👉 **[Packet Tracer — Lab A: Small Office Mega-Lab](./PACKET_TRACER_GUIDE.md#lab-a--small-office-network-mega-lab)**
 
 ---
 
@@ -54,7 +54,7 @@ Build a 6-PC, 2-switch, 1-router office with **three VLANs** (Admin / Sales / IT
 Given only a **business brief** (the "BrightByte" startup, base network `172.16.0.0/24`, three growth-sized departments + a server), each workgroup **designs an IP/VLAN scheme from scratch (VLSM), implements it in Packet Tracer, and demonstrates it passing a fixed 6-point acceptance test**. No step-by-step snippets — the students supply the design and apply Lab A's skills; success = the test passes.
 
 > 📖 **The brief, deliverables, and acceptance test:**
-> 👉 **[Workgroup Design Challenge](./PACKET_TRACER_GUIDE.md#-workgroup-design-challenge--design-it-build-it-prove-it)**
+> 👉 **[Workgroup Design Challenge](./PACKET_TRACER_GUIDE.md#workgroup-design-challenge--design-it-build-it-prove-it)**
 
 ---
 
@@ -65,7 +65,7 @@ Read VLANs and routing straight out of a capture. You'll filter `vlan` to find V
 > 📖 **Full instructions, figures, and questions:**
 > 👉 **[Wireshark — Lab B: VLAN & Routing Traffic Analysis](./WIRESHARK_GUIDE.md)**
 
-### 📚 Homework
+### Homework
 - Save the Small Office `.pkt` file for future practice
 - Research: What is OSPF and how does it differ from static routing? Write a 1-paragraph summary
 - Optional: Try configuring port security on a switch port — set max MAC addresses to 1

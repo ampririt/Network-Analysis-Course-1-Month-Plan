@@ -1,14 +1,14 @@
 ## Cisco Packet Tracer — Lab A + Workgroup Design Challenge: VLANs & Routing
 
 > Companion guide to [Session 4 — Routing, Switching & VLANs](./README.md).
-> Read this **before** doing **Lab A** and the **Workgroup Lab** in the [README](./README.md#️-hands-on-lab).
+> Read this **before** doing **Lab A** and the **Workgroup Lab** in the [README](./README.md#hands-on-lab).
 > New to Packet Tracer? Start with the [Session 1 Packet Tracer guide](../S1/PACKET_TRACER_GUIDE.md) for installation, the window tour, and CLI basics. This session uses the VLAN/Router-on-a-Stick concepts that Sessions 2–3 deliberately deferred.
 
 ---
 
 - [Cisco Packet Tracer — Lab A + Workgroup Design Challenge](#cisco-packet-tracer--lab-a--workgroup-design-challenge-vlans--routing)
-  - [🧪 Lab A — "Small Office Network" Mega-Lab](#-lab-a--small-office-network-mega-lab)
-    - [🗺️ Addressing & VLAN plan](#️-addressing--vlan-plan)
+  - [Lab A — "Small Office Network" Mega-Lab](#lab-a--small-office-network-mega-lab)
+    - [Addressing & VLAN plan](#addressing--vlan-plan)
     - [Step A1 — Build the topology](#step-a1--build-the-topology)
     - [Step A2 — Create the VLANs (both switches)](#step-a2--create-the-vlans-both-switches)
     - [Step A3 — Assign access ports](#step-a3--assign-access-ports)
@@ -16,26 +16,26 @@
     - [Step A5 — Router-on-a-Stick (inter-VLAN routing)](#step-a5--router-on-a-stick-inter-vlan-routing)
     - [Step A6 — DHCP per VLAN](#step-a6--dhcp-per-vlan)
     - [Step A7 — Test & verify](#step-a7--test--verify)
-    - [📝 Lab A Questions](#-lab-a-questions)
-  - [👥 Workgroup Design Challenge — Design It, Build It, Prove It](#-workgroup-design-challenge--design-it-build-it-prove-it)
-    - [📋 The brief](#-the-brief)
-    - [🎨 Deliverable 1 — The design (on paper first)](#-deliverable-1--the-design-on-paper-first)
-    - [🔧 Deliverable 2 — The implementation](#-deliverable-2--the-implementation)
-    - [✅ Deliverable 3 — The proof (acceptance test)](#-deliverable-3--the-proof-acceptance-test)
-    - [📝 Design-Challenge Questions](#-design-challenge-questions)
-  - [✅ Self-Check](#-self-check)
-  - [➡️ Next Steps](#️-next-steps)
+    - [Lab A Questions](#lab-a-questions)
+  - [Workgroup Design Challenge — Design It, Build It, Prove It](#workgroup-design-challenge--design-it-build-it-prove-it)
+    - [The brief](#the-brief)
+    - [Deliverable 1 — The design (on paper first)](#deliverable-1--the-design-on-paper-first)
+    - [Deliverable 2 — The implementation](#deliverable-2--the-implementation)
+    - [Deliverable 3 — The proof (acceptance test)](#deliverable-3--the-proof-acceptance-test)
+    - [Design-Challenge Questions](#design-challenge-questions)
+  - [Self-Check](#self-check)
+  - [Next Steps](#next-steps)
 
 ---
 
-## 🧪 Lab A — "Small Office Network" Mega-Lab
+## Lab A — "Small Office Network" Mega-Lab
 
 **⏱️ ~55 min · Objective:** build a realistic office network from scratch — three VLANs, a trunk, **Router-on-a-Stick** inter-VLAN routing, and per-VLAN DHCP.
 
 > [!IMPORTANT]
 > This is the **core infrastructure lab** of the course. Everything here — VLANs, trunking, sub-interfaces — is what real switches and routers do every day.
 
-### 🗺️ Addressing & VLAN plan
+### Addressing & VLAN plan
 
 | VLAN | Name | Subnet | Gateway (router sub-int) | PCs |
 |:---:|:---|:---|:---|:---|
@@ -191,7 +191,7 @@ Then set each PC to **DHCP** (Desktop → IP Configuration → DHCP).
   <em>Fig. 7 — 📸 <code>img/labA-step7-verify.png</code>: a successful cross-VLAN ping + verification output.</em>
 </p>
 
-### 📝 Lab A Questions
+### Lab A Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -229,14 +229,14 @@ Confirm the PC's **switch port is in the correct VLAN** (and in `access` mode). 
 
 ---
 
-## 👥 Workgroup Design Challenge — Design It, Build It, Prove It
+## Workgroup Design Challenge — Design It, Build It, Prove It
 
 **⏱️ ~40 min (in workgroups) · Objective:** given only a **business brief**, your group **designs an IP/VLAN scheme from scratch and implements it in Packet Tracer** — then demonstrates it passing a fixed **acceptance test**. This is the one activity that *proves* you can take everything from Sessions 2–4 (subnetting, VLANs, trunking, Router-on-a-Stick, DHCP) and turn requirements into a working network.
 
 > [!IMPORTANT]
 > This is a **proof-of-competency** activity, not a guided walkthrough. There are **no step-by-step CLI snippets here** — you decide the design and apply the skills from Lab A. The grade is simple: **does it pass the acceptance test?**
 
-### 📋 The brief
+### The brief
 
 > **Client: "BrightByte" — a startup moving into a new office.** They've handed you their requirements and the base network **`172.16.0.0/24`**. Design and build their network.
 
@@ -250,7 +250,7 @@ Confirm the PC's **switch port is in the correct VLAN** (and in `access` mode). 
 4. **Inter-department traffic must route** (any department can reach the server).
 5. Use **one router (Router-on-a-Stick)** and as many switches as you need.
 
-### 🎨 Deliverable 1 — The design (on paper first)
+### Deliverable 1 — The design (on paper first)
 
 Before touching Packet Tracer, your group produces a **design document** — this *is* the engineering, and it's half the proof:
 
@@ -265,7 +265,7 @@ Before touching Packet Tracer, your group produces a **design document** — thi
   <em>Fig. 8 — 📸 <code>img/workgroup-design-plan.png</code>: the group's VLSM subnet table + VLAN plan + topology sketch.</em>
 </p>
 
-### 🔧 Deliverable 2 — The implementation
+### Deliverable 2 — The implementation
 
 Build your design in Packet Tracer using the skills from **Lab A** — create the VLANs, assign access ports, trunk the links, configure the router sub-interfaces (one gateway per VLAN), set up a DHCP pool per user VLAN, and give the server its static address.
 
@@ -274,7 +274,7 @@ Build your design in Packet Tracer using the skills from **Lab A** — create th
   <em>Fig. 9 — 📸 <code>img/workgroup-build.png</code>: the BrightByte network built and addressed in Packet Tracer.</em>
 </p>
 
-### ✅ Deliverable 3 — The proof (acceptance test)
+### Deliverable 3 — The proof (acceptance test)
 
 Your network is "done" only when it **passes every check below** — demonstrate each live (and screenshot it). This is the objective evidence that you can *implement*, not just describe:
 
@@ -295,7 +295,7 @@ Your network is "done" only when it **passes every check below** — demonstrate
 > [!TIP]
 > **Stretch goals** (if you finish early): add a rule so **only Management** can reach the Server VLAN (a basic ACL); add a second switch and prove a PC keeps its VLAN when moved to it; add a guest VLAN with no route to the others.
 
-### 📝 Design-Challenge Questions
+### Design-Challenge Questions
 
 **Discuss in your group, then click "Show answer".**
 
@@ -325,7 +325,7 @@ A guided lab gives you the commands; here **you supply the design** (subnetting 
 
 ---
 
-## ✅ Self-Check
+## Self-Check
 
 - [ ] **Lab A:** 3 VLANs created on both switches; PC ports in the right VLANs (`show vlan brief`)
 - [ ] **Lab A:** switch–switch and switch–router links are **trunks** (`show interfaces trunk`)
@@ -338,7 +338,7 @@ A guided lab gives you the commands; here **you supply the design** (subnetting 
 
 ---
 
-## ➡️ Next Steps
+## Next Steps
 
 - Analyse your own VLAN traffic in [Wireshark Lab B](./WIRESHARK_GUIDE.md): capture/open 802.1Q-tagged frames and find the VLAN tag and per-hop TTL decrements you just engineered.
 - **Homework (from the README):** save the Small Office `.pkt`, write a paragraph on **OSPF vs static routing**, and try **port security** (max 1 MAC per access port).

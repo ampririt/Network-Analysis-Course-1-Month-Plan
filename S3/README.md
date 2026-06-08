@@ -1,16 +1,16 @@
 ## Session 3 — Network Services& Security
 
 - [Session 3 — Network Services\& Security](#session-3--network-services-security)
-  - [📖 Lecture](#-lecture)
-  - [🛠️ Hands-on Lab](#️-hands-on-lab)
+  - [Lecture](#lecture)
+  - [Hands-on Lab](#hands-on-lab)
     - [Wireshark — Labs A & C guide →](./WIRESHARK_GUIDE.md)
     - [Packet Tracer — Lab B guide →](./PACKET_TRACER_GUIDE.md)
-  - [📚 Homework](#-homework)
+  - [Homework](#homework)
 
 
 **Learning Objectives**: Understand how devices obtain IPs, resolve names, and discover MAC addresses. Analyze these protocols in captures.
 
-### 📖 Lecture
+### Lecture
 
 **Network Services**
 - A *network service* is a function one device (**server**) provides to others (**clients**) over the network — addressed by **IP + transport protocol + port** (e.g., DNS = `udp/53`, DHCP = `udp/67/68`).
@@ -38,7 +38,7 @@
 - **Defenses**: Switch hardening (**DHCP snooping**, **Dynamic ARP Inspection**, **port security**), encryption (**HTTPS/TLS**, **SSH** over Telnet), firewalls & segmentation (**VLANs**, **DMZ**), and **DNSSEC**.
 - **The analyst's mindset**: Establish a *baseline* of normal traffic so anomalies (unexpected ARP replies, spikes, odd ports) stand out.
 
-### 🛠️ Hands-on Lab
+### Hands-on Lab
 
 > [!TIP]
 > Each lab below is a short introduction. **Full step-by-step instructions, diagrams, and lab questions live in the companion guides** — follow those pages while you work.
@@ -50,7 +50,7 @@
 Watch a device get an address and resolve a name. You'll release/renew your IP, capture the four **DHCP DORA** packets (`Discover → Offer → Request → ACK`) and read the lease/gateway/DNS options, then filter `dns` to inspect a **query and its response** — identifying the IP returned and the record type (A / AAAA / CNAME).
 
 > 📖 **Full instructions, figures, and questions:**
-> 👉 **[Wireshark — Lab A: DHCP & DNS Analysis](./WIRESHARK_GUIDE.md#-lab-a--dhcp--dns-analysis)**
+> 👉 **[Wireshark — Lab A: DHCP & DNS Analysis](./WIRESHARK_GUIDE.md#lab-a--dhcp--dns-analysis)**
 
 ---
 
@@ -70,8 +70,8 @@ Build the **server side** of those services. You'll configure a router **DHCP po
 Learn to recognise attack *signatures* in a capture: spot **ARP spoofing** (two MACs claiming one IP), identify a **port scan** (a burst of SYNs to sequential ports, open vs. closed via SYN-ACK/RST), and compare **plaintext HTTP vs. encrypted TLS** to see why HTTPS matters — then map each attack to the defense that stops it.
 
 > 📖 **Full instructions, figures, and questions:**
-> 👉 **[Wireshark — Lab C: Network Security Analysis](./WIRESHARK_GUIDE.md#-lab-c--network-security-analysis)**
+> 👉 **[Wireshark — Lab C: Network Security Analysis](./WIRESHARK_GUIDE.md#lab-c--network-security-analysis)**
 
-### 📚 Homework
+### Homework
 - Kurose & Ross Wireshark Lab: **DNS**
 - Research: What is DNS poisoning/spoofing? Write a 1-paragraph summary

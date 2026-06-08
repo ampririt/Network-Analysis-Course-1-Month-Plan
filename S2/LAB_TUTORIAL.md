@@ -1,11 +1,11 @@
-# 🛠️ Session 2 — Hands-on Lab Walkthrough
+# Session 2 — Hands-on Lab Walkthrough
 
 > **This walkthrough has moved.** To match the Session 1 layout, the labs are now split into two focused companion guides:
 >
 > - 🦈 **[Wireshark — Lab A: The TCP 3-Way Handshake](./WIRESHARK_GUIDE.md)**
 > - 📦 **[Packet Tracer — Labs B & C: Protocol Walk + Multi-Subnet Design](./PACKET_TRACER_GUIDE.md)**
 >
-> See the [Session 2 README](./README.md#️-hands-on-lab) for the lab introductions.
+> See the [Session 2 README](./README.md#hands-on-lab) for the lab introductions.
 
 ---
 
@@ -36,7 +36,7 @@ To show a picture: save your screenshot into [`S2/img/`](./img/) with the **exac
 - The two most common real-world failures (wrong mask, IP conflict) — Lab C
 
 🔹 **Recommended additions for stronger retention** (each ~10–15 min, optional):
-1. **Subnetting drills without a calculator.** The labs build *one* scheme; fluency comes from repetition. Treat the [homework `10.0.0.0/16` exercise](./README.md#-homework) as required, not optional.
+1. **Subnetting drills without a calculator.** The labs build *one* scheme; fluency comes from repetition. Treat the [homework `10.0.0.0/16` exercise](./README.md#homework) as required, not optional.
 2. **A second handshake variant.** In Lab A, also capture a **TCP teardown** (`tcp.flags.fin == 1`) and an **HTTPS** session to note the payload is encrypted but the handshake is still visible.
 
 🔸 **Deliberately deferred to later sessions:** VLAN theory & trunking → **Session 4**; DHCP/DNS/ARP services in depth → **Session 3**; routing protocols → **Session 4**.

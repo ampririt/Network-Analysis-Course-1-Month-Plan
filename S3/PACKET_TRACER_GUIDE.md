@@ -1,27 +1,27 @@
 ## Cisco Packet Tracer — Lab B: DHCP & DNS Server Setup
 
 > Companion guide to [Session 3 — Network Services & Security](./README.md).
-> Read this **before** doing **Lab B** in the [README](./README.md#️-hands-on-lab).
+> Read this **before** doing **Lab B** in the [README](./README.md#hands-on-lab).
 > New to Packet Tracer? Start with the [Session 1 Packet Tracer guide](../S1/PACKET_TRACER_GUIDE.md) for installation, the window tour, and CLI basics.
 
 ---
 
 - [Cisco Packet Tracer — Lab B: DHCP \& DNS Server Setup](#cisco-packet-tracer--lab-b-dhcp--dns-server-setup)
-  - [🧩 What You'll Build](#-what-youll-build)
-  - [🧪 Lab B — DHCP & DNS Server Setup](#-lab-b--dhcp--dns-server-setup)
+  - [What You'll Build](#what-youll-build)
+  - [Lab B — DHCP & DNS Server Setup](#lab-b--dhcp--dns-server-setup)
     - [Step B1 — Build the topology](#step-b1--build-the-topology)
     - [Step B2 — Configure the router's DHCP pool](#step-b2--configure-the-routers-dhcp-pool)
     - [Step B3 — Set the PCs to DHCP](#step-b3--set-the-pcs-to-dhcp)
     - [Step B4 — Configure the DNS server](#step-b4--configure-the-dns-server)
     - [Step B5 — Watch DORA in Simulation Mode](#step-b5--watch-dora-in-simulation-mode)
     - [Step B6 — Resolve a name from a PC](#step-b6--resolve-a-name-from-a-pc)
-  - [📝 Lab B Questions](#-lab-b-questions)
-  - [✅ Self-Check](#-self-check)
-  - [➡️ Next Steps](#️-next-steps)
+  - [Lab B Questions](#lab-b-questions)
+  - [Self-Check](#self-check)
+  - [Next Steps](#next-steps)
 
 ---
 
-### 🧩 What You'll Build
+### What You'll Build
 
 In [Wireshark Lab A](./WIRESHARK_GUIDE.md) you *watched* DHCP and DNS work. Here you build the **server side**: a router that hands out addresses (**DHCP**) and a server that resolves names (**DNS**). When you're done, a PC set to "obtain IP automatically" will get a full configuration on its own and reach a website by name — no manual addressing at all.
 
@@ -33,7 +33,7 @@ In [Wireshark Lab A](./WIRESHARK_GUIDE.md) you *watched* DHCP and DNS work. Here
 
 ---
 
-## 🧪 Lab B — DHCP & DNS Server Setup
+## Lab B — DHCP & DNS Server Setup
 
 **⏱️ ~25 min · Objective:** configure DHCP + DNS so clients auto-configure and browse by name.
 
@@ -142,7 +142,7 @@ Click the **Server → Services tab → DNS**:
 
 ---
 
-## 📝 Lab B Questions
+## Lab B Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -180,7 +180,7 @@ Pinging the **IP** needs no name resolution, so it works. Pinging the **name** r
 
 ---
 
-## ✅ Self-Check
+## Self-Check
 
 - [ ] Router LAN interface up at `192.168.1.1`; DHCP pool defined with `network`, `default-router`, `dns-server`
 - [ ] All 3 PCs obtained an address **via DHCP** (not typed in by hand)
@@ -191,7 +191,7 @@ Pinging the **IP** needs no name resolution, so it works. Pinging the **name** r
 
 ---
 
-## ➡️ Next Steps
+## Next Steps
 
 - Pair this with [Wireshark Labs A & C](./WIRESHARK_GUIDE.md): capture the very DORA and DNS packets your server here produces, then look at the **security** angle (rogue DHCP, DNS spoofing).
 - **Homework (from the README):** the Kurose & Ross **DNS** Wireshark lab + a paragraph on **DNS poisoning/spoofing**.

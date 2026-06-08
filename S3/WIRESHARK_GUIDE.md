@@ -1,35 +1,35 @@
 ## Wireshark — Labs A & C: Network Services & Security Analysis
 
 > Companion guide to [Session 3 — Network Services & Security](./README.md).
-> Read this **before** doing **Lab A** and **Lab C** in the [README](./README.md#️-hands-on-lab).
+> Read this **before** doing **Lab A** and **Lab C** in the [README](./README.md#hands-on-lab).
 > New to Wireshark? Start with the [Session 1 Wireshark guide](../S1/WIRESHARK_GUIDE.md) for installation and the basics, and the [Session 2 guide](../S2/WIRESHARK_GUIDE.md) for filters & Follow-Stream.
 
 ---
 
 - [Wireshark — Labs A \& C: Network Services \& Security Analysis](#wireshark--labs-a--c-network-services--security-analysis)
-  - [🧪 Lab A — DHCP & DNS Analysis](#-lab-a--dhcp--dns-analysis)
-    - [🔑 Background: DORA & name resolution](#-background-dora--name-resolution)
+  - [Lab A — DHCP & DNS Analysis](#lab-a--dhcp--dns-analysis)
+    - [Background: DORA & name resolution](#background-dora--name-resolution)
     - [Step A1 — Start capturing](#step-a1--start-capturing)
     - [Step A2 — Release & renew your IP](#step-a2--release--renew-your-ip)
     - [Step A3 — Find the 4 DORA packets](#step-a3--find-the-4-dora-packets)
     - [Step A4 — Inspect a DNS query](#step-a4--inspect-a-dns-query)
     - [Step A5 — Inspect the DNS response](#step-a5--inspect-the-dns-response)
-    - [📝 Lab A Questions](#-lab-a-questions)
-  - [🧪 Lab C — Network Security Analysis](#-lab-c--network-security-analysis)
+    - [Lab A Questions](#lab-a-questions)
+  - [Lab C — Network Security Analysis](#lab-c--network-security-analysis)
     - [Step C1 — Spot an ARP anomaly](#step-c1--spot-an-arp-anomaly)
     - [Step C2 — Identify a port scan](#step-c2--identify-a-port-scan)
     - [Step C3 — Plaintext vs. encrypted](#step-c3--plaintext-vs-encrypted)
     - [Step C4 — Reflect: which defense stops which attack?](#step-c4--reflect-which-defense-stops-which-attack)
-    - [📝 Lab C Questions](#-lab-c-questions)
-  - [➡️ Next Steps](#️-next-steps)
+    - [Lab C Questions](#lab-c-questions)
+  - [Next Steps](#next-steps)
 
 ---
 
-## 🧪 Lab A — DHCP & DNS Analysis
+## Lab A — DHCP & DNS Analysis
 
 **⏱️ ~20 min · Objective:** watch a device **get an address (DHCP)** and **resolve a name (DNS)** — two services that make "the network just work."
 
-### 🔑 Background: DORA & name resolution
+### Background: DORA & name resolution
 
 When a device joins a network it has no IP yet, so it asks for one. **DHCP** (Dynamic Host Configuration Protocol) answers in a four-step exchange remembered as **DORA**:
 
@@ -101,7 +101,7 @@ Click the matching **Standard query response** and expand **Answers**. Note the 
   <em>Fig. 5 — 📸 <code>img/labA-step5-dnsresponse.png</code>: the DNS response Answers section with the A record.</em>
 </p>
 
-### 📝 Lab A Questions
+### Lab A Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -139,7 +139,7 @@ An **`A`** record maps a name → **IPv4** address. An **`AAAA`** ("quad-A") rec
 
 ---
 
-## 🧪 Lab C — Network Security Analysis
+## Lab C — Network Security Analysis
 
 **⏱️ ~25 min · Objective:** recognise the *signatures* of common attacks (ARP spoofing, port scans) in a capture, and see why **HTTPS** matters.
 
@@ -195,7 +195,7 @@ Match each defense to the attack it neutralises:
 | Plaintext credential capture | **HTTPS / TLS** (and SSH over Telnet) |
 | DNS spoofing / cache poisoning | **DNSSEC** |
 
-### 📝 Lab C Questions
+### Lab C Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -233,7 +233,7 @@ You can still see **metadata**: the IP addresses, ports, the TLS handshake, and 
 
 ---
 
-## ➡️ Next Steps
+## Next Steps
 
 - Build the matching **server side** in [Packet Tracer Lab B](./PACKET_TRACER_GUIDE.md) — configure a DHCP pool + DNS records and watch DORA happen in Simulation Mode.
 - **Homework (from the README):** complete the Kurose & Ross **DNS** Wireshark lab and write a one-paragraph summary of **DNS poisoning/spoofing**.

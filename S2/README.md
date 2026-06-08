@@ -1,22 +1,22 @@
 ## Session 2 — The Protocol Stack Deep Dive: Ethernet, IP, TCP & UDP
 
 - [Session 2 — The Protocol Stack Deep Dive: Ethernet, IP, TCP \& UDP](#session-2--the-protocol-stack-deep-dive-ethernet-ip-tcp--udp)
-  - [📖 Lecture](#-lecture)
+  - [Lecture](#lecture)
   - [Break (10 min)](#break-10-min)
-  - [🛠️ Hands-on Lab](#️-hands-on-lab)
+  - [Hands-on Lab](#hands-on-lab)
     - [Wireshark — Lab A guide →](./WIRESHARK_GUIDE.md)
     - [Packet Tracer — Labs B & C guide →](./PACKET_TRACER_GUIDE.md)
-  - [🔍 Deep Dive: IP Addressing \& Subnetting](#-deep-dive-ip-addressing--subnetting)
+  - [Deep Dive: IP Addressing \& Subnetting](#deep-dive-ip-addressing--subnetting)
     - [IPv4 Address Classes (Legacy — For Context)](#ipv4-address-classes-legacy--for-context)
     - [Private IP Address Ranges (RFC 1918)](#private-ip-address-ranges-rfc-1918)
     - [Subnetting Quick-Reference Table](#subnetting-quick-reference-table)
     - [How to Subnet: Step-by-Step](#how-to-subnet-step-by-step)
-  - [📚 Homework](#-homework)
+  - [Homework](#homework)
 
 
 **Learning Objectives**: Understand frame/packet/segment structure. Read protocol headers. Differentiate TCP vs. UDP. Design IP addressing schemes and perform subnetting.
 
-### 📖 Lecture
+### Lecture
 
 **Part 1 — Protocol Headers**
 - **Ethernet Frame**: Source/Destination MAC, EtherType, payload
@@ -53,7 +53,7 @@
 ### Break (10 min)
 - Step away, stretch, and grab a drink before diving into the hands-on labs.
 
-### 🛠️ Hands-on Lab
+### Hands-on Lab
 
 > [!TIP]
 > Each lab below is a short introduction. **Full step-by-step instructions, diagrams, and lab questions live in the companion guides** — follow those pages while you work.
@@ -74,7 +74,7 @@ Capture live traffic and watch a real **`SYN → SYN-ACK → ACK`** handshake se
 Build a small **PCs → Switch → Router → Server** network across two subnets, then drop into **Simulation Mode** and step a ping through it one hop at a time. You'll see **ARP** resolve MAC addresses and **ICMP encapsulated inside IP inside Ethernet**, and confirm the core routing idea: the **MAC changes at each hop while the IP stays the same**.
 
 > 📖 **Full instructions, figures, and questions:**
-> 👉 **[Packet Tracer — Lab B: Simulation-Mode Protocol Walk](./PACKET_TRACER_GUIDE.md#-lab-b--simulation-mode-protocol-walk)**
+> 👉 **[Packet Tracer — Lab B: Simulation-Mode Protocol Walk](./PACKET_TRACER_GUIDE.md#lab-b--simulation-mode-protocol-walk)**
 
 ---
 
@@ -86,11 +86,11 @@ Build a small **PCs → Switch → Router → Server** network across two subnet
 Design and build a real, routed network for a company with three departments — **Engineering** (50 hosts), **Marketing** (25 hosts), **Management** (10 hosts) — out of `192.168.0.0/24`. You'll subnet on paper first (`/26`, `/27`, `/28`), build the three-department topology, configure the router, verify same-subnet **and** cross-subnet connectivity, then deliberately break it (wrong mask, IP conflict) to learn why addressing discipline matters.
 
 > 📖 **Full subnet tables, router config, verification, and questions:**
-> 👉 **[Packet Tracer — Lab C: Multi-Subnet IP Design Build](./PACKET_TRACER_GUIDE.md#-lab-c--multi-subnet-ip-design-build)**
+> 👉 **[Packet Tracer — Lab C: Multi-Subnet IP Design Build](./PACKET_TRACER_GUIDE.md#lab-c--multi-subnet-ip-design-build)**
 
 ---
 
-### 🔍 Deep Dive: IP Addressing & Subnetting
+### Deep Dive: IP Addressing & Subnetting
 
 #### IPv4 Address Classes (Legacy — For Context)
 
@@ -149,7 +149,7 @@ Design and build a real, routed network for a company with three departments —
 
 ---
 
-### 📚 Homework
+### Homework
 - Kurose & Ross Wireshark Lab: **TCP** (download from textbook website)
 - **IP Design Exercise**: Given the network `10.0.0.0/16`, design an IP scheme for 5 departments with 100, 60, 30, 15, and 5 hosts. Document subnet addresses, masks, usable ranges, and gateways in a table
 - In Packet Tracer: Build the design above with at least 1 PC per subnet and verify cross-subnet connectivity via a router

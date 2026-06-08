@@ -7,13 +7,13 @@
 ---
 
 - [Cisco Packet Tracer — Getting Started \& Lab 2](#cisco-packet-tracer--getting-started--lab-2)
-  - [📦 What is Cisco Packet Tracer?](#-what-is-cisco-packet-tracer)
-  - [⬇️ Installing Packet Tracer](#️-installing-packet-tracer)
-  - [🧭 A Tour of the Packet Tracer Window](#-a-tour-of-the-packet-tracer-window)
-  - [🧱 Device Icons You'll Use](#-device-icons-youll-use)
-  - [🗑️ Deleting a Device or Cable](#️-deleting-a-device-or-cable)
-  - [🎯 What We're Building](#-what-were-building)
-  - [🧪 Lab 2 — Build a Routed Two-Subnet Network](#-lab-2--build-a-routed-two-subnet-network)
+  - [What is Cisco Packet Tracer?](#what-is-cisco-packet-tracer)
+  - [Installing Packet Tracer](#installing-packet-tracer)
+  - [A Tour of the Packet Tracer Window](#a-tour-of-the-packet-tracer-window)
+  - [Device Icons You'll Use](#device-icons-youll-use)
+  - [Deleting a Device or Cable](#deleting-a-device-or-cable)
+  - [What We're Building](#what-were-building)
+  - [Lab 2 — Build a Routed Two-Subnet Network](#lab-2--build-a-routed-two-subnet-network)
     - [Step 1 — Drop the devices](#step-1--drop-the-devices)
     - [Step 2 — Cable the devices](#step-2--cable-the-devices)
     - [Step 3 — Configure PC0](#step-3--configure-pc0)
@@ -21,20 +21,22 @@
     - [Step 5 — Configure the Router](#step-5--configure-the-router)
     - [Step 6 — Verify the addressing](#step-6--verify-the-addressing)
     - [Step 7 — Test connectivity with `ping`](#step-7--test-connectivity-with-ping)
-  - [📝 Lab 2 Questions](#-lab-2-questions)
-  - [➡️ Next Steps](#️-next-steps)
+  - [Lab 2 Questions](#lab-2-questions)
+  - [Activity 2 — ARP in Action](#activity-2--arp-in-action)
+    - [Activity 2 Questions](#activity-2-questions)
+  - [Next Steps](#next-steps)
 
 ---
 
-### 📦 What is Cisco Packet Tracer?
+### What is Cisco Packet Tracer?
 
 **Cisco Packet Tracer** is a free network **simulator** from Cisco's Networking Academy. It lets you drag-and-drop routers, switches, PCs and servers onto a canvas, cable them together, configure them, and then send real-looking traffic between them — all in software, with no physical hardware required.
 
-Where **Wireshark** lets you *observe* the traffic on a real network, **Packet Tracer** lets you *build* a network and watch packets flow through it. Its **Simulation Mode** even animates a single packet hop-by-hop and shows how each device encapsulates/de-encapsulates it at every OSI layer — making it the perfect companion to the [Session 1 OSI lecture](./README.md#-lecture).
+Where **Wireshark** lets you *observe* the traffic on a real network, **Packet Tracer** lets you *build* a network and watch packets flow through it. Its **Simulation Mode** even animates a single packet hop-by-hop and shows how each device encapsulates/de-encapsulates it at every OSI layer — making it the perfect companion to the [Session 1 OSI lecture](./README.md#lecture).
 
 ---
 
-### ⬇️ Installing Packet Tracer
+### Installing Packet Tracer
 
 Packet Tracer is distributed free through the **Cisco Networking Academy "Resource Hub"**. You need a (free) Cisco account to download it.
 
@@ -61,7 +63,7 @@ Packet Tracer is distributed free through the **Cisco Networking Academy "Resour
 
 ---
 
-### 🧭 A Tour of the Packet Tracer Window
+### A Tour of the Packet Tracer Window
 
 Once you're in, you'll see the main workspace:
 
@@ -81,7 +83,7 @@ Once you're in, you'll see the main workspace:
 
 ---
 
-### 🧱 Device Icons You'll Use
+### Device Icons You'll Use
 
 Packet Tracer uses Cisco's standard network iconography. The ones relevant to this lab are **PC**, **Router**, and the **Cable (Various)** connector.
 
@@ -92,7 +94,7 @@ Packet Tracer uses Cisco's standard network iconography. The ones relevant to th
 
 ---
 
-### 🗑️ Deleting a Device or Cable
+### Deleting a Device or Cable
 
 Made a mistake? Click the **Delete** tool in the top toolbar (the box with an ✕, shortcut **Del**), then click the device or cable you want to remove.
 
@@ -103,7 +105,7 @@ Made a mistake? Click the **Delete** tool in the top toolbar (the box with an �
 
 ---
 
-### 🎯 What We're Building
+### What We're Building
 
 We'll connect **two PCs on two *different* subnets** through a **router**. A router is required here because the two PCs live on different networks — a switch alone could not move traffic between them.
 
@@ -123,7 +125,7 @@ We'll connect **two PCs on two *different* subnets** through a **router**. A rou
 
 ---
 
-### 🧪 Lab 2 — Build a Routed Two-Subnet Network
+### Lab 2 — Build a Routed Two-Subnet Network
 
 #### Step 1 — Drop the devices
 
@@ -253,7 +255,7 @@ Both should return **4 successful replies** with `TTL=127`. Reaching `10.1.1.100
 
 ---
 
-### 📝 Lab 2 Questions
+### Lab 2 Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -273,7 +275,7 @@ Because the **router (Router0)** sits between the two subnets and **forwards (ro
 The ping would **fail** ("Destination host unreachable" / request timed out). Without a default gateway, PC0 has nowhere to send packets destined for a *different* subnet — it only knows how to reach hosts on its own `192.168.1.0/24` network. The gateway is the "exit door" to everything off-subnet.
 </details>
 
-**Q3.** In the `ping` output, the reply shows **`TTL=127`**. The sender started it at 128 — what does the decrement tell you about how many **hops** the packet took? *(See the [README ping deep-dive](./README.md#-deep-dive-the-ping-command--options).)*
+**Q3.** In the `ping` output, the reply shows **`TTL=127`**. The sender started it at 128 — what does the decrement tell you about how many **hops** the packet took? *(See the [README ping deep-dive](./README.md#deep-dive-the-ping-command--options).)*
 
 <details>
 <summary>💡 Show answer</summary>
@@ -299,8 +301,89 @@ At the router the packet comes **in** and is processed **up** to **Layer 3 (IP)*
 
 ---
 
-### ➡️ Next Steps
+### Activity 2 — ARP in Action
 
-- Re-run the ping in **Simulation Mode** and map each animation step to the **encapsulation/de-encapsulation** walkthrough from the [Session 1 lecture](./README.md#-lecture).
+In [Wireshark Activity 2](./WIRESHARK_GUIDE.md#activity-2--arp-who-has-this-ip) you saw ARP on a real network. Packet Tracer's **Simulation Mode** lets you watch the *same* exchange frame-by-frame on the two-subnet network you just built — and reveals a subtle but important detail about pinging *across* subnets.
+
+#### Step 1 — Check the starting ARP cache
+
+Open **`PC0` → Desktop → Command Prompt** and run `arp -a`. Note what's already known (often nothing, or just the gateway). This is the table ARP will fill in.
+
+#### Step 2 — Enter Simulation Mode
+
+Click **Simulation** (bottom-right). In **Edit Filters**, keep only **ARP** and **ICMP** checked so the view isn't cluttered.
+
+#### Step 3 — Ping and watch ARP go first
+
+From `PC0`'s Command Prompt, `ping 192.168.1.1` (the gateway). Click **Play/Forward** and watch: **an ARP request/reply happens *before* the first ICMP echo** — PC0 must learn the gateway's MAC before it can build the frame.
+
+<p align="center">
+  <img src="./img/labB-arp-sim.png" alt="An ARP broadcast leaving PC0 in Simulation Mode" width="640"><br>
+  <em>Fig. 13 — the ARP request (broadcast) leaving PC0 before the ICMP echo can be sent.</em>
+</p>
+
+#### Step 4 — Inspect the ARP PDU
+
+Click the ARP envelope → **PDU Information**. On the **Outbound** layer note the **Layer-2 destination = `FFFF.FFFF.FFFF`** (broadcast) and the **opcode** (request). The reply that comes back is a **unicast** straight to PC0.
+
+#### Step 5 — The cross-subnet twist
+
+Now `ping 10.1.1.100` (PC1, on the *other* subnet) and step through it. Watch **whose MAC PC0 asks for**: it ARPs for its **gateway `192.168.1.1`**, **not** for `10.1.1.100`. Because the destination is on a different network, PC0 hands the frame to the router's MAC; the router then ARPs on the `10.1.1.0` side for PC1.
+
+#### Step 6 — Confirm the learned tables
+
+Back in Realtime, run `arp -a` on PC0 (now shows the gateway's IP↔MAC), and on the router CLI run:
+
+```ios
+Router> enable
+Router# show ip arp
+```
+
+<p align="center">
+  <img src="./img/labB-arp-tables.png" alt="arp -a on PC0 and show ip arp on the router" width="700"><br>
+  <em>Fig. 14 — the learned mappings: <code>arp -a</code> on PC0 and <code>show ip arp</code> on Router0.</em>
+</p>
+
+#### Activity 2 Questions
+
+**Try each one first, then click "Show answer".**
+
+**Q1.** When PC0 pings `10.1.1.100` (a different subnet), **whose MAC** does it request with ARP?
+
+<details>
+<summary>💡 Show answer</summary>
+
+Its **default gateway's** MAC (`192.168.1.1`, the router's g0/0) — **not** `10.1.1.100`. The destination is off-subnet, so PC0 can't reach it directly; it delivers the frame to the router, which forwards it. ARP only ever resolves addresses on the **local** link.
+</details>
+
+**Q2.** Why is the ARP **request a broadcast** but the **reply a unicast**?
+
+<details>
+<summary>💡 Show answer</summary>
+
+The request must reach **everyone** because the sender doesn't know which device owns the IP — so it's broadcast (`FFFF.FFFF.FFFF`). The reply, however, is addressed straight **back to the asker**, whose MAC is now known, so it's a unicast — no need to bother the whole segment.
+</details>
+
+**Q3.** Why doesn't PC0's ARP broadcast ever reach a device on the `10.1.1.0` subnet?
+
+<details>
+<summary>💡 Show answer</summary>
+
+Because **routers don't forward broadcasts**. An ARP request is confined to its own **broadcast domain** (the local subnet). That's exactly why cross-subnet traffic must go *through* the router rather than ARP-ing for the remote host directly.
+</details>
+
+**Q4.** What does `show ip arp` on the router list?
+
+<details>
+<summary>💡 Show answer</summary>
+
+The router's own ARP table — the **IP↔MAC mappings** it has learned for directly-connected hosts on **each** of its interfaces (e.g. PC0 on the `192.168.1.0` side, PC1 on the `10.1.1.0` side), along with the interface and age of each entry.
+</details>
+
+---
+
+### Next Steps
+
+- Re-run the ping in **Simulation Mode** and map each animation step to the **encapsulation/de-encapsulation** walkthrough from the [Session 1 lecture](./README.md#lecture).
 - Back in the [Wireshark guide](./WIRESHARK_GUIDE.md), compare what a *simulated* packet looks like here versus a *real* captured packet in Wireshark.
-- Complete the [Session 1 Homework](./README.md#-homework).
+- Complete the [Session 1 Homework](./README.md#homework).

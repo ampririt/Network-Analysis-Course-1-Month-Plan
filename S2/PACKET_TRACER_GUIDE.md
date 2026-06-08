@@ -1,33 +1,33 @@
 ## Cisco Packet Tracer — Labs B & C: Protocol Walk + Multi-Subnet Design
 
 > Companion guide to [Session 2 — The Protocol Stack Deep Dive](./README.md).
-> Read this **before** doing **Lab B** and **Lab C** in the [README](./README.md#️-hands-on-lab).
+> Read this **before** doing **Lab B** and **Lab C** in the [README](./README.md#hands-on-lab).
 > New to Packet Tracer? Start with the [Session 1 Packet Tracer guide](../S1/PACKET_TRACER_GUIDE.md) for installation, the window tour, and CLI basics.
 
 ---
 
 - [Cisco Packet Tracer — Labs B \& C](#cisco-packet-tracer--labs-b--c-protocol-walk--multi-subnet-design)
-  - [🧪 Lab B — Simulation-Mode Protocol Walk](#-lab-b--simulation-mode-protocol-walk)
+  - [Lab B — Simulation-Mode Protocol Walk](#lab-b--simulation-mode-protocol-walk)
     - [Step B1 — Build the topology](#step-b1--build-the-topology)
     - [Step B2 — Address the devices](#step-b2--address-the-devices)
     - [Step B3 — Enter Simulation Mode](#step-b3--enter-simulation-mode)
     - [Step B4 — Send a ping and step through](#step-b4--send-a-ping-and-step-through)
     - [Step B5 — Inspect the PDU layers](#step-b5--inspect-the-pdu-layers)
-    - [📝 Lab B Questions](#-lab-b-questions)
-  - [🧪 Lab C — Multi-Subnet IP Design Build](#-lab-c--multi-subnet-ip-design-build)
+    - [Lab B Questions](#lab-b-questions)
+  - [Lab C — Multi-Subnet IP Design Build](#lab-c--multi-subnet-ip-design-build)
     - [Step C1 — Subnet on paper (do this first!)](#step-c1--subnet-on-paper-do-this-first)
     - [Step C2 — Build the topology](#step-c2--build-the-topology)
     - [Step C3 — Configure the router](#step-c3--configure-the-router)
     - [Step C4 — Assign PC IPs](#step-c4--assign-pc-ips)
     - [Step C5 — Verify connectivity](#step-c5--verify-connectivity)
     - [Step C6 — Break it on purpose](#step-c6--break-it-on-purpose)
-    - [📝 Lab C Questions](#-lab-c-questions)
-  - [✅ Self-Check & Submission](#-self-check--submission)
-  - [➡️ Next Steps](#️-next-steps)
+    - [Lab C Questions](#lab-c-questions)
+  - [Self-Check & Submission](#self-check--submission)
+  - [Next Steps](#next-steps)
 
 ---
 
-## 🧪 Lab B — Simulation-Mode Protocol Walk
+## Lab B — Simulation-Mode Protocol Walk
 
 **⏱️ ~20 min · Objective:** watch encapsulation (**ICMP → IP → Ethernet**) and **ARP** resolution happen *hop-by-hop*.
 
@@ -115,7 +115,7 @@ Router(config-if)# no shutdown
   <em>Fig. 5 — 📸 <code>img/labB-step5-pdu.png</code>: PDU Details showing the Ethernet + IP + ICMP headers.</em>
 </p>
 
-### 📝 Lab B Questions
+### Lab B Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -145,7 +145,7 @@ The **switch** is a Layer-2 device — it only looks at **Layer 2 (Ethernet/MAC)
 
 ---
 
-## 🧪 Lab C — Multi-Subnet IP Design Build
+## Lab C — Multi-Subnet IP Design Build
 
 **⏱️ ~40 min · Objective:** design an IP scheme **from scratch** and build a routed, multi-subnet network. *This is the foundation lab for every later session.*
 
@@ -268,7 +268,7 @@ Failures teach faster than successes — reproduce these two, then fix them:
 > [!IMPORTANT]
 > **Save your `.pkt` file** — you'll extend this topology in later sessions.
 
-### 📝 Lab C Questions
+### Lab C Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -306,7 +306,7 @@ Because the addressing plan drives **everything** — gateway IPs, masks, and wh
 
 ---
 
-## ✅ Self-Check & Submission
+## Self-Check & Submission
 
 Tick every box before you call Session 2 done:
 
@@ -320,8 +320,8 @@ Tick every box before you call Session 2 done:
 
 ---
 
-## ➡️ Next Steps
+## Next Steps
 
-- **Homework (from the README):** complete the [`10.0.0.0/16` 5-department design](./README.md#-homework) and build it in Packet Tracer — this is the subnetting *repetition* that turns the one-off Lab C into fluency.
+- **Homework (from the README):** complete the [`10.0.0.0/16` 5-department design](./README.md#homework) and build it in Packet Tracer — this is the subnetting *repetition* that turns the one-off Lab C into fluency.
 - Keep your `.pkt` file; later sessions extend this multi-subnet topology with DHCP/DNS (Session 3) and routing/VLANs (Session 4).
 - Revisit the [Wireshark guide](./WIRESHARK_GUIDE.md) and capture a **TCP teardown** (`tcp.flags.fin == 1`) for a complete picture of a connection's life cycle.

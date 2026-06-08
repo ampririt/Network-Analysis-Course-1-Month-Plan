@@ -8,20 +8,22 @@
 ---
 
 - [Wireshark — Getting Started \& Lab 1](#wireshark--getting-started--lab-1)
-  - [🦈 What is Wireshark?](#-what-is-wireshark)
-  - [🧩 How a Packet Sniffer Works](#-how-a-packet-sniffer-works)
-  - [⬇️ Installing Wireshark](#️-installing-wireshark)
-  - [✅ Before You Capture: Pre-flight Checklist](#-before-you-capture-pre-flight-checklist)
-  - [🖥️ The Wireshark Start Screen](#️-the-wireshark-start-screen)
-  - [🪟 The Five Parts of the Wireshark Window](#-the-five-parts-of-the-wireshark-window)
-  - [🌐 A Quick Word on HTTP (the traffic we'll capture)](#-a-quick-word-on-http-the-traffic-well-capture)
-  - [🧪 Lab 1 — Taking Wireshark for a Test Run](#-lab-1--taking-wireshark-for-a-test-run)
-  - [📝 Lab 1 Questions](#-lab-1-questions)
-  - [➡️ Next Steps](#️-next-steps)
+  - [What is Wireshark?](#what-is-wireshark)
+  - [How a Packet Sniffer Works](#how-a-packet-sniffer-works)
+  - [Installing Wireshark](#installing-wireshark)
+  - [Before You Capture: Pre-flight Checklist](#before-you-capture-pre-flight-checklist)
+  - [The Wireshark Start Screen](#the-wireshark-start-screen)
+  - [The Five Parts of the Wireshark Window](#the-five-parts-of-the-wireshark-window)
+  - [A Quick Word on HTTP (the traffic we'll capture)](#a-quick-word-on-http-the-traffic-well-capture)
+  - [Lab 1 — Taking Wireshark for a Test Run](#lab-1--taking-wireshark-for-a-test-run)
+  - [Lab 1 Questions](#lab-1-questions)
+  - [Activity 2 — ARP: Who Has This IP?](#activity-2--arp-who-has-this-ip)
+    - [Activity 2 Questions](#activity-2-questions)
+  - [Next Steps](#next-steps)
 
 ---
 
-### 🦈 What is Wireshark?
+### What is Wireshark?
 
 **Wireshark** is the world's most popular **packet sniffer** (also called a *packet analyzer* or *protocol analyzer*). It is a free, open-source tool that lets you *see* the network protocols running on your computer "in action" — observing the actual sequence of messages exchanged between protocol entities, drilling down into the details of each protocol field, and watching how your actions (like loading a web page) cause protocols to send and receive messages.
 
@@ -31,7 +33,7 @@ A packet sniffer is **passive**. It only *observes* messages sent and received b
 
 ---
 
-### 🧩 How a Packet Sniffer Works
+### How a Packet Sniffer Works
 
 <p align="center">
   <img src="./img/packet%20sniffer%20structure.png" alt="Packet sniffer structure" width="600"><br>
@@ -43,11 +45,11 @@ A packet sniffer (the dashed rectangle above) is an addition to the normal netwo
 1. **Packet capture library (`pcap`)** — receives a *copy* of every **link-layer frame** sent or received over a given interface (Ethernet or Wi-Fi). Because *all* higher-layer messages — HTTP, DNS, TCP, UDP, IP — are eventually encapsulated into link-layer frames, capturing every frame gives you **every message** sent/received by **every** protocol and application on your machine.
 2. **Packet analyzer** — understands the structure of the captured frames and the protocols nested inside them. It decodes and displays the contents of each protocol field (Ethernet → IP → TCP/UDP → HTTP, etc.) in a readable form.
 
-This maps directly onto the **OSI / TCP-IP encapsulation** you learned in the [Session 1 lecture](./README.md#-lecture): the capture library grabs the raw **Layer 2 frame**, and the analyzer peels back **Layer 3 (IP)**, **Layer 4 (TCP/UDP)**, and **Layer 7 (application)** for you.
+This maps directly onto the **OSI / TCP-IP encapsulation** you learned in the [Session 1 lecture](./README.md#lecture): the capture library grabs the raw **Layer 2 frame**, and the analyzer peels back **Layer 3 (IP)**, **Layer 4 (TCP/UDP)**, and **Layer 7 (application)** for you.
 
 ---
 
-### ⬇️ Installing Wireshark
+### Installing Wireshark
 
 Download Wireshark for your operating system from the official site:
 
@@ -61,7 +63,7 @@ There is also a short official intro video: <https://youtu.be/kCwd2YoJcvg>
 
 ---
 
-### ✅ Before You Capture: Pre-flight Checklist
+### Before You Capture: Pre-flight Checklist
 
 These settings make sure your traffic is **readable plaintext** instead of encrypted noise:
 
@@ -73,7 +75,7 @@ These settings make sure your traffic is **readable plaintext** instead of encry
 
 ---
 
-### 🖥️ The Wireshark Start Screen
+### The Wireshark Start Screen
 
 When you launch Wireshark, you'll see a startup screen like the one below. **Don't panic if yours looks a little different** — Wireshark runs on many platforms and toolkits, but the functionality is the same.
 
@@ -90,7 +92,7 @@ You can also start a capture via the **Capture → Options** menu (Mac) or **Cap
 
 ---
 
-### 🪟 The Five Parts of the Wireshark Window
+### The Five Parts of the Wireshark Window
 
 Once capturing, the window looks like Fig. 3. It has **five major components**:
 
@@ -100,7 +102,7 @@ Once capturing, the window looks like Fig. 3. It has **five major components**:
 </p>
 
 1. **Command menus** (top) — standard pulldown menus. The two you'll use most now are **File** (save/open capture files, exit) and **Capture** (start/stop capturing).
-2. **Display filter field** — type a protocol name or expression here to show only the packets you care about (e.g. `http`). Filtering is covered in depth in the [README's Display Filters deep-dive](./README.md#-deep-dive-wireshark-display-filters).
+2. **Display filter field** — type a protocol name or expression here to show only the packets you care about (e.g. `http`). Filtering is covered in depth in the [README's Display Filters deep-dive](./README.md#deep-dive-wireshark-display-filters).
 3. **Packet-listing window** — one line per packet: the Wireshark packet **number**, **time**, **source** and **destination IP**, highest-level **protocol**, and a short **info** summary. Click any column header to sort.
 4. **Packet-header details window** — a tree of the selected packet's protocol layers. Expand/collapse each layer (Frame → Ethernet → IP → TCP/UDP → application) with the ▸/▾ triangles. This is where you *see encapsulation* layer by layer.
 5. **Packet-contents window** — the entire raw frame in **hexadecimal and ASCII**.
@@ -109,7 +111,7 @@ Once capturing, the window looks like Fig. 3. It has **five major components**:
 
 ---
 
-### 🌐 A Quick Word on HTTP (the traffic we'll capture)
+### A Quick Word on HTTP (the traffic we'll capture)
 
 In the lab below you'll load a web page, so the traffic you capture will be **HTTP** — the protocol web browsers and servers use. At its core, HTTP is a simple **request → reply** conversation between a browser (the *client*) and a web server:
 
@@ -129,7 +131,7 @@ These are exactly the messages you'll hunt for in Wireshark: the **`GET`** your 
 
 ---
 
-### 🧪 Lab 1 — Taking Wireshark for a Test Run
+### Lab 1 — Taking Wireshark for a Test Run
 
 The best way to learn the tool is to use it. This lab captures a real HTTP page download and finds the `GET` request inside it.
 
@@ -167,7 +169,7 @@ The best way to learn the tool is to use it. This lab captures a real HTTP page 
 
 ---
 
-### 📝 Lab 1 Questions
+### Lab 1 Questions
 
 Answer these from your own capture (or from a downloaded trace file, if you couldn't capture live). **Try each one first, then click "Show answer".**
 
@@ -221,7 +223,74 @@ This is a hands-on step, not a fact to look up. Select the `GET` packet, **File 
 
 ---
 
-### ➡️ Next Steps
+### Activity 2 — ARP: Who Has This IP?
+
+Every time your computer sends a packet on the local network, it needs the **MAC address** of the next device (a LAN host, or your gateway). It already knows the *IP*, so it asks: *"Who has this IP? Tell me your MAC."* That question-and-answer is **ARP (Address Resolution Protocol)** — the glue between **Layer 3 (IP)** and **Layer 2 (MAC)**. This short activity makes ARP visible.
+
+1. **Look at your ARP cache.** In a terminal, run `arp -a` to see the IP→MAC mappings your computer already knows. To force fresh ARP traffic, flush it first:
+   ```sh
+   # macOS / Linux
+   sudo arp -d -a
+   # Windows (Admin)
+   arp -d *
+   ```
+2. **Capture and filter.** Start a capture, then type **`arp`** in the filter bar and press **Enter**.
+3. **Generate an ARP exchange.** `ping` your gateway or another device on your LAN (e.g. `ping 192.168.1.1`). Your computer must resolve that IP's MAC before the ping can go out.
+4. **Spot the request and the reply.** You'll see a pair:
+   * **Request** — a **broadcast** (destination MAC `ff:ff:ff:ff:ff:ff`): *"Who has 192.168.1.1? Tell 192.168.1.x"*.
+   * **Reply** — a **unicast** back to you: *"192.168.1.1 is at `aa:bb:cc:dd:ee:ff`"*.
+
+   <p align="center">
+     <img src="./img/labA-arp-pair.png" alt="ARP request and reply in the packet list" width="700"><br>
+     <em>Fig. 9 — the ARP request (broadcast "who has…") and the unicast reply ("…is at").</em>
+   </p>
+5. **Read the ARP fields.** Click a packet and expand **Address Resolution Protocol**. Note the **Opcode** (request = `1`, reply = `2`) and the **Sender**/**Target** MAC + IP fields — together they carry the IP↔MAC mapping.
+
+   <p align="center">
+     <img src="./img/labA-arp-detail.png" alt="The Address Resolution Protocol layer expanded, plus the arp -a cache" width="700"><br>
+     <em>Fig. 10 — the ARP layer expanded (opcode, sender/target) and the now-cached entry in <code>arp -a</code>.</em>
+   </p>
+6. **Confirm the cache.** Run `arp -a` again — the IP you pinged now has a MAC stored, so your computer won't need to ask again until the entry ages out.
+
+#### Activity 2 Questions
+
+**Try each one first, then click "Show answer".**
+
+**Q1.** What **destination MAC** does an ARP *request* use, and why?
+
+<details>
+<summary>💡 Show answer</summary>
+
+The **broadcast** address `ff:ff:ff:ff:ff:ff`. The sender doesn't yet know the target's MAC (that's the whole point of asking), so it must send the question to **every** device on the local segment — only the owner of that IP answers.
+</details>
+
+**Q2.** What are the **Opcode** values for an ARP request versus a reply?
+
+<details>
+<summary>💡 Show answer</summary>
+
+**Request = `1`**, **Reply = `2`**. Same packet format — the opcode is what distinguishes the question from the answer.
+</details>
+
+**Q3.** Which **two layers** does ARP bridge, and why is that needed?
+
+<details>
+<summary>💡 Show answer</summary>
+
+ARP maps a **Layer-3 IP address** to a **Layer-2 MAC address**. You address packets by IP, but the actual local delivery (the Ethernet/Wi-Fi frame) needs a MAC — ARP fills that gap on each local link.
+</details>
+
+**Q4.** If you `ping` a host on a **different subnet**, whose MAC does ARP resolve — the remote host's, or something else?
+
+<details>
+<summary>💡 Show answer</summary>
+
+Your **default gateway's** MAC, *not* the remote host's. ARP only works on the **local link**; a remote host's MAC is meaningless to you. So your computer ARPs for the gateway and hands the packet to it — the router then forwards it onward (and ARPs on the next link). This is the same "IP stays, MAC changes per hop" idea behind routing.
+</details>
+
+---
+
+### Next Steps
 
 - Apply the [Display Filter recipes](./README.md#2-essential-filter-recipes-for-network-analysis) from the README (`dns`, `icmp`, `ip.addr == …`, `tcp.port == 80`) to the *same* capture and see how the listing changes.
-- Complete the [Session 1 Homework](./README.md#-homework): read the Wireshark User Guide (Ch. 1 & 3) and download a sample capture from `wiki.wireshark.org/SampleCaptures` to identify three protocols.
+- Complete the [Session 1 Homework](./README.md#homework): read the Wireshark User Guide (Ch. 1 & 3) and download a sample capture from `wiki.wireshark.org/SampleCaptures` to identify three protocols.

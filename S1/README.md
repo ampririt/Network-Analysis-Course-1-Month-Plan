@@ -1,22 +1,22 @@
 ## Session 1 — Introduction to Network Analysis & The OSI Model
 
 - [Session 1 — Introduction to Network Analysis \& The OSI Model](#session-1--introduction-to-network-analysis--the-osi-model)
-  - [📖 Lecture](#-lecture)
+  - [Lecture](#lecture)
   - [Break (10 min)](#break-10-min)
   - [Hands-on Lab](#hands-on-lab)
-  - [🔍 Deep Dive: The `ping` Command \& Options](#-deep-dive-the-ping-command--options)
+  - [Deep Dive: The `ping` Command \& Options](#deep-dive-the-ping-command--options)
     - [Analyzing the `ping` Output Fields:](#analyzing-the-ping-output-fields)
     - [Crucial `ping` Command Options:](#crucial-ping-command-options)
-  - [🔍 Deep Dive: Wireshark Display Filters](#-deep-dive-wireshark-display-filters)
+  - [Deep Dive: Wireshark Display Filters](#deep-dive-wireshark-display-filters)
     - [1. Common Comparison \& Logical Operators](#1-common-comparison--logical-operators)
     - [2. Essential Filter Recipes for Network Analysis](#2-essential-filter-recipes-for-network-analysis)
-  - [📚 Homework](#-homework)
+  - [Homework](#homework)
 
 
 
 **Learning Objectives**: Understand what network analysis is and why it matters. Learn the OSI model and TCP/IP stack. Set up tools.
 
-### 📖 Lecture
+### Lecture
 - **Introduction**: What is network analysis? Real-world use cases (troubleshooting, security, performance) (15 min)
 - **The OSI 7-Layer Model**: Detailed breakdown of the purpose and function of each layer (15 min)
 - **TCP/IP 4-Layer Model**: Understanding the modern mapping to OSI layers (10 min)
@@ -31,7 +31,7 @@
 
 **Lab A — Wireshark: First Capture**
 
-Get hands-on with **Wireshark**, the industry-standard packet sniffer. You'll install the tool, start a live capture on your network interface, load a plain-`http://` web page to generate traffic, then use a display filter to isolate the **HTTP `GET`** request and walk down its OSI layers (Ethernet → IP → TCP → HTTP) to see encapsulation for real. You'll finish by saving the capture as a `.pcap` file.
+Get hands-on with **Wireshark**, the industry-standard packet sniffer. You'll install the tool, start a live capture on your network interface, load a plain-`http://` web page to generate traffic, then use a display filter to isolate the **HTTP `GET`** request and walk down its OSI layers (Ethernet → IP → TCP → HTTP) to see encapsulation for real. You'll finish by saving the capture as a `.pcap` file. A bonus **ARP activity** then shows how your computer resolves an IP to a MAC address.
 
 > 📖 **Full step-by-step instructions, screenshots, and lab questions are in the companion guide:**
 > 👉 **[Wireshark — Getting Started & Lab 1](./WIRESHARK_GUIDE.md)**
@@ -40,14 +40,14 @@ Get hands-on with **Wireshark**, the industry-standard packet sniffer. You'll in
 
 **Lab B — Cisco Packet Tracer: Build Your First Network**
 
-Build a network from scratch in **Cisco Packet Tracer**, a free network simulator. You'll place two PCs and a **2901 router**, cable them up, and configure two *different* subnets — proving why a router (not just a switch) is needed to move traffic between networks. After assigning IPs and bringing up the router interfaces via the CLI, you'll verify everything with `ipconfig` and a cross-subnet `ping`, then replay it in **Simulation Mode** to watch encapsulation happen hop-by-hop.
+Build a network from scratch in **Cisco Packet Tracer**, a free network simulator. You'll place two PCs and a **2901 router**, cable them up, and configure two *different* subnets — proving why a router (not just a switch) is needed to move traffic between networks. After assigning IPs and bringing up the router interfaces via the CLI, you'll verify everything with `ipconfig` and a cross-subnet `ping`, then replay it in **Simulation Mode** to watch encapsulation happen hop-by-hop. A bonus **ARP activity** reveals how a host resolves its gateway's MAC before sending across subnets.
 
 > 📖 **Full step-by-step instructions, screenshots, and lab questions are in the companion guide:**
 > 👉 **[Cisco Packet Tracer — Getting Started & Lab 2](./PACKET_TRACER_GUIDE.md)**
 
 ---
 
-### 🔍 Deep Dive: The `ping` Command & Options
+### Deep Dive: The `ping` Command & Options
 
 `ping` is the most widely used network utility for checking host reachability. It utilizes the **Internet Control Message Protocol (ICMP)**, operating at **Layer 3 (Network)** of the OSI model. 
 
@@ -74,7 +74,7 @@ When you run `ping`, your system sends an **ICMP Echo Request (Type 8)** packet 
 
 ---
 
-### 🔍 Deep Dive: Wireshark Display Filters
+### Deep Dive: Wireshark Display Filters
 
 Unlike **Capture Filters** (which decide which packets are recorded to the disk *during* capture), **Display Filters** are applied to already-captured packets. They let you search, hide, and drill down into thousands of packets instantly.
 
@@ -115,7 +115,7 @@ Wireshark uses a very intuitive, color-coded syntax in its filter bar:
 
 ---
 
-### 📚 Homework
+### Homework
 - Read: Wireshark User Guide — Chapter 1 & 3
 - Explore: `wiki.wireshark.org/SampleCaptures` — download 1 PCAP and identify 3 protocols
 
