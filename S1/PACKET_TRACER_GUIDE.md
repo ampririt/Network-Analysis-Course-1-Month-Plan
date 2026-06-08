@@ -192,6 +192,26 @@ So the flow is: **`enable`** (get admin rights) → **`configure terminal`** (st
 
 > 💡 Stuck or unsure what you can type? Enter **`?`** at any prompt and IOS lists every command available in that mode.
 
+**Understanding `ip address 192.168.1.1 255.255.255.0`.** This single command gives the interface its identity on the network. It has **two parts**:
+
+```
+ip address   192.168.1.1        255.255.255.0
+             └─ the IP address  └─ the subnet mask
+```
+
+* **`192.168.1.1` — the interface's IP address.** This becomes the address of the router's **g0/0** port, and it's exactly the **default gateway** you typed into PC0 (Step 3). When PC0 needs to reach another network, it hands its packets to this address.
+* **`255.255.255.0` — the subnet mask.** The mask splits an IP address into a **network part** and a **host part**. A `255` byte means "this byte is the network"; a `0` byte means "this byte identifies the individual host." So `255.255.255.0` says *the first three numbers are the network, the last number is the host*:
+
+  | | 1st | 2nd | 3rd | 4th |
+  | :--- | :---: | :---: | :---: | :---: |
+  | **IP** `192.168.1.1` | 192 | 168 | 1 | **1** |
+  | **Mask** `255.255.255.0` | 255 | 255 | 255 | **0** |
+  | **Meaning** | network | network | network | host |
+
+  This defines the network **`192.168.1.0/24`** — every host whose address starts with `192.168.1.` (from `.1` to `.254`) is on the *same* local network. The `/24` is just shorthand for "24 mask bits set to 1" (8 + 8 + 8), the same thing as `255.255.255.0`.
+
+> 🔑 This is **why the lab needs a router**: PC0 (`192.168.1.x`) and PC1 (`10.1.1.x`) have **different network parts** under this mask, so they're on **different networks** and can only reach each other *through* the router. Notice the router's two interfaces sit on the two different networks — `192.168.1.1` on g0/0 and `10.1.1.1` on g0/1.
+
 <p align="center">
   <img src="./img/cisco_package_tracer/router_setting.png" alt="Router CLI configuration" width="600"><br>
   <em>Fig. 10 — Assigning each interface its IP and bringing it up with <code>no shutdown</code>.</em>

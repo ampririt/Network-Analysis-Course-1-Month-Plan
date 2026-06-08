@@ -3122,7 +3122,12 @@
         font-size: 18px;
         margin-bottom: 2px;
       }
-      .mail-letter.envelope {
+      /* Letter's "wrapped in an envelope" state. NOTE: must NOT be the bare
+         class name `.envelope` — that selector is defined above for the postal
+         analogy card (position: relative, full-width padding) and would leak
+         onto this absolutely-positioned letter, ballooning its width and
+         knocking it out of place (the "Envelope · stamped" bug). */
+      .mail-letter.ml-envelope {
         background: var(--amber-soft);
       }
       .mail-letter.delivered {
@@ -8768,13 +8773,12 @@
         <!-- =========================================================
              SLIDE 19.5 — INTRODUCTION TO WIRESHARK
              Logo, what it is, what it's used for, three-pane mock UI.
-             Sits right before the Lab A slide.
              ========================================================= -->
         <section class="slide">
           <div class="masthead">
             <div class="left">
               <span class="tag">Tool Introduction</span
-              ><span>Before Lab A · Wireshark</span>
+              ><span>Packet capture · Wireshark</span>
             </div>
             <div class="right"></div>
           </div>
@@ -8901,126 +8905,14 @@
         </section>
 
         <!-- =========================================================
-             SLIDE 20 — LAB A: WIRESHARK
-             ========================================================= -->
-        <section class="slide">
-          <div class="masthead">
-            <div class="left">
-              <span class="tag">Lab A</span
-              ><span>Wireshark · First Capture · 20 min</span>
-            </div>
-            <div class="right">20 / 23</div>
-          </div>
-          <span class="eyebrow reveal" style="--i: 0"
-            >Hands-on · 20 minutes</span
-          >
-          <h2 class="reveal" style="--i: 1; font-size: 60px">
-            Lab A — <em class="display">your first capture.</em>
-          </h2>
-          <div class="grid-2" style="gap: 60px; margin-top: 40px">
-            <div class="steps reveal" style="--i: 2">
-              <div class="step">
-                <div class="body">
-                  <strong>Install</strong> Wireshark from
-                  <span class="mono">wireshark.org</span> and open it.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Select</strong> your active network interface (Wi-Fi
-                  or Ethernet) from the welcome list.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Start</strong> capturing — the packet list begins
-                  streaming in real time.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Generate</strong> traffic: open a browser, visit
-                  <span class="mono">http://example.com</span> (use HTTP, not
-                  HTTPS, so we can see the message).
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Stop</strong> the capture after the page loads. Scroll
-                  the packet list.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Inspect</strong> one HTTP packet. Notice the three
-                  panes — list, details, bytes.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Identify</strong> the layers in the details pane:
-                  Ethernet → IPv4 → TCP → HTTP. This is the OSI/TCP-IP stack
-                  made visible.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Filter.</strong> Type
-                  <span class="mono">http</span> in the filter bar. Then try
-                  <span class="mono">dns</span>, <span class="mono">icmp</span>,
-                  <span class="mono">ip.addr == &lt;your-ip&gt;</span>.
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="card reveal" style="--i: 3">
-                <div class="label">What to look for</div>
-                <h3>The three panes</h3>
-                <p style="margin-top: 10px">
-                  <strong>Packet List</strong> — one row per frame: number,
-                  time, source, destination, protocol, info.<br /><strong
-                    >Packet Details</strong
-                  >
-                  — protocol tree, top-down.
-                  <em>Click a layer to highlight its bytes.</em><br /><strong
-                    >Packet Bytes</strong
-                  >
-                  — the raw hex + ASCII.
-                </p>
-              </div>
-              <div class="card amber reveal" style="--i: 4; margin-top: 20px">
-                <div class="label">Three filters worth memorizing</div>
-                <p style="font-size: 19px; margin-top: 8px">
-                  <span class="mono">http</span> — HTTP only<br />
-                  <span class="mono">tcp.port == 443</span> — HTTPS
-                  conversations<br />
-                  <span class="mono">ip.src == 10.0.0.5 &amp;&amp; dns</span> —
-                  DNS from one host
-                </p>
-              </div>
-              <div class="card moss reveal" style="--i: 5; margin-top: 20px">
-                <div class="label">Tip</div>
-                <p style="margin-top: 8px">
-                  Right-click any HTTP packet → <em>Follow → HTTP Stream</em>.
-                  Wireshark reconstructs the full request and response as
-                  readable text. This is the moment most students fall in love.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="page-num">P. 20</div>
-        </section>
-
-        <!-- =========================================================
              SLIDE 20.5 — INTRODUCTION TO CISCO PACKET TRACER
              Logo, what it is, what it's used for, mock topology canvas.
-             Sits right before the Lab B slide.
              ========================================================= -->
         <section class="slide">
           <div class="masthead">
             <div class="left">
               <span class="tag">Tool Introduction</span
-              ><span>Before Lab B · Cisco Packet Tracer</span>
+              ><span>Build &amp; simulate · Cisco Packet Tracer</span>
             </div>
             <div class="right"></div>
           </div>
@@ -9177,112 +9069,6 @@
             </div>
           </div>
           <div class="page-num"></div>
-        </section>
-
-        <!-- =========================================================
-             SLIDE 21 — LAB B: PACKET TRACER
-             ========================================================= -->
-        <section class="slide">
-          <div class="masthead">
-            <div class="left">
-              <span class="tag">Lab B</span
-              ><span>Packet Tracer · Build Your First Network · 25 min</span>
-            </div>
-            <div class="right">21 / 23</div>
-          </div>
-          <span class="eyebrow amber reveal" style="--i: 0"
-            >Hands-on · 25 minutes</span
-          >
-          <h2 class="reveal" style="--i: 1; font-size: 60px">
-            Lab B — <em class="display">build, then watch it talk.</em>
-          </h2>
-          <div class="grid-2" style="gap: 60px; margin-top: 40px">
-            <div class="steps reveal" style="--i: 2">
-              <div class="step">
-                <div class="body">
-                  <strong>Install</strong> Cisco Packet Tracer and sign in with
-                  a free NetAcad account.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Place</strong> 2 PCs and 1 switch onto the workspace
-                  from the device drawer.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Cable</strong> them with copper straight-through
-                  cables (PC NIC ↔ switch FastEthernet ports).
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Configure</strong> static IPs — e.g.
-                  <span class="mono">192.168.1.10/24</span> and
-                  <span class="mono">192.168.1.20/24</span>. (Click PC → Desktop
-                  → IP Configuration.)
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Switch to Simulation Mode</strong> — the clock icon,
-                  bottom-right corner.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Ping.</strong> From PC1's command prompt:
-                  <span class="mono">ping 192.168.1.20</span>. Click
-                  <em>Capture/Forward</em> to step the simulation.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Watch</strong> the event list: an
-                  <span class="mono">ARP request</span> appears first (PC1
-                  doesn't know PC2's MAC) — then
-                  <span class="mono">ARP reply</span>, then
-                  <span class="mono">ICMP echo / reply</span>.
-                </div>
-              </div>
-              <div class="step">
-                <div class="body">
-                  <strong>Click any event</strong> to see the OSI layers
-                  visualized — outbound / inbound, layer-by-layer.
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="card amber reveal" style="--i: 3">
-                <div class="label">The lesson</div>
-                <h3>OSI made tangible</h3>
-                <p style="margin-top: 10px">
-                  Simulation Mode is unique: you literally see the frame travel
-                  through Layers 1 → 2 → 3 → … as it crosses the wire. This is
-                  the model on slide 12, but in motion.
-                </p>
-              </div>
-              <div class="card reveal" style="--i: 4; margin-top: 20px">
-                <div class="label">Why ARP first?</div>
-                <p style="margin-top: 8px">
-                  PC1 has an IP for PC2 but no MAC. Ethernet (L2) needs a MAC.
-                  ARP fills the gap: "<em
-                    >Who has 192.168.1.20? Tell 192.168.1.10.</em
-                  >" Only after the reply can the ICMP frame actually be sent.
-                </p>
-              </div>
-              <div class="card moss reveal" style="--i: 5; margin-top: 20px">
-                <div class="label">Stretch goal</div>
-                <p style="margin-top: 8px">
-                  Add a third PC and a second switch. Connect the switches. Try
-                  a ping across switches — observe MAC table learning on each
-                  switch.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="page-num">P. 21</div>
         </section>
 
         <!-- =========================================================
@@ -12003,15 +11789,33 @@
         let paused = false;
 
         function place(stop) {
-          // Find the [data-stop] element on this stop and centre the letter on it.
+          // Centre the travelling letter on this stop's [data-stop] element.
+          //
+          // Two things make naive positioning fail: (1) the whole deck is
+          // uniformly scaled to fit the viewport (transform: scale on #deckStage),
+          // so getBoundingClientRect() reports SCALED screen pixels; and (2) the
+          // letter's absolute top/left resolve against a containing-block origin
+          // (the .reveal transform on .mail-sim) that does not line up 1:1 with
+          // the sim's box. Computing an absolute target gets both of these wrong —
+          // the letter drifted further off the lower it travelled, most visibly at
+          // the "Envelope · stamped" stop.
+          //
+          // Instead, measure where the letter and the target ACTUALLY sit on
+          // screen, then nudge the letter's style by the remaining gap converted
+          // out of the viewport scale. This is self-correcting and immune to both
+          // the scale factor and the origin quirk.
           const target = sim.querySelector(`[data-stop="${stop}"]`);
           if (!target) return;
-          const simBox = sim.getBoundingClientRect();
+          const factor =
+            Math.min(window.innerWidth / 1920, window.innerHeight / 1080) || 1;
           const tBox = target.getBoundingClientRect();
-          const left = tBox.left - simBox.left + tBox.width / 2;
-          const top = tBox.top - simBox.top + tBox.height / 2;
-          letter.style.left = left + "px";
-          letter.style.top = top + "px";
+          const lBox = letter.getBoundingClientRect();
+          const curLeft = parseFloat(letter.style.left) || 0;
+          const curTop = parseFloat(letter.style.top) || 0;
+          const dx = tBox.left + tBox.width / 2 - (lBox.left + lBox.width / 2);
+          const dy = tBox.top + tBox.height / 2 - (lBox.top + lBox.height / 2);
+          letter.style.left = curLeft + dx / factor + "px";
+          letter.style.top = curTop + dy / factor + "px";
         }
 
         function showStep() {
@@ -12025,19 +11829,19 @@
             if (target) target.classList.add("active");
             place(stop);
             // Visual state of the letter changes as it gets wrapped/unwrapped
-            letter.classList.remove("envelope", "delivered");
+            letter.classList.remove("ml-envelope", "delivered");
             if (stop === 0)
               letter.innerHTML = '<span class="li">📄</span>Document';
             else if (stop === 1)
               letter.innerHTML = '<span class="li">📄</span>Reviewed';
             else if (stop === 2) {
-              letter.classList.add("envelope");
+              letter.classList.add("ml-envelope");
               letter.innerHTML = '<span class="li">✉️</span>Envelope · stamped';
             } else if (stop === 3) {
-              letter.classList.add("envelope");
+              letter.classList.add("ml-envelope");
               letter.innerHTML = '<span class="li">📬</span>In transit';
             } else if (stop === 4) {
-              letter.classList.add("envelope");
+              letter.classList.add("ml-envelope");
               letter.innerHTML = '<span class="li">✉️</span>Envelope received';
             } else if (stop === 5)
               letter.innerHTML = '<span class="li">📄</span>Opened';
@@ -12091,7 +11895,7 @@
           sim
             .querySelectorAll(".mail-role")
             .forEach((r) => r.classList.remove("active"));
-          letter.classList.remove("envelope", "delivered");
+          letter.classList.remove("ml-envelope", "delivered");
           letter.innerHTML = '<span class="li">📄</span>Document';
           place(0);
           stage.innerHTML = "STATUS: <strong>IDLE</strong>";

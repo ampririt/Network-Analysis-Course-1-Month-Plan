@@ -4,6 +4,8 @@
   - [📖 Lecture](#-lecture)
   - [Break (10 min)](#break-10-min)
   - [🛠️ Hands-on Lab](#️-hands-on-lab)
+    - [Packet Tracer — Lab A + Design Challenge guide →](./PACKET_TRACER_GUIDE.md)
+    - [Wireshark — Lab B guide →](./WIRESHARK_GUIDE.md)
   - [📚 Homework](#-homework)
 
 
@@ -27,34 +29,41 @@
 
 ### 🛠️ Hands-on Lab
 
-**Lab A — Cisco Packet Tracer: "Small Office Network" Mega-Lab (55 min)**
+> [!TIP]
+> Each lab below is a short introduction. **Full step-by-step instructions, diagrams, and lab questions live in the companion guides** — follow those pages while you work.
+
+---
+
+**Lab A — Cisco Packet Tracer: "Small Office Network" Mega-Lab (~55 min)**
 
 > [!IMPORTANT]
 > This is the core infrastructure lab of the course. Students build a realistic office network from scratch.
 
-**Topology**: 6 PCs → 2 Switches → 1 Router → 1 Server
+Build a 6-PC, 2-switch, 1-router office with **three VLANs** (Admin / Sales / IT). You'll create the VLANs on both switches, assign **access ports**, **trunk** the switch-to-switch and switch-to-router links, configure **Router-on-a-Stick** sub-interfaces (`G0/0.10/.20/.30` with `encapsulation dot1Q`) as per-VLAN gateways, add **per-VLAN DHCP**, then prove inter-VLAN routing and verify with `show vlan brief` / `show interfaces trunk` / `show ip route`.
 
-1. **Create 3 VLANs** on both switches:
-   - VLAN 10: Admin (2 PCs)
-   - VLAN 20: Sales (2 PCs)
-   - VLAN 30: IT (2 PCs)
-2. **Assign switch ports** to VLANs (access mode)
-3. **Configure trunk port** between switches
-4. **Configure Router-on-a-Stick**:
-   - Sub-interfaces: `G0/0.10`, `G0/0.20`, `G0/0.30`
-   - Assign gateway IPs for each VLAN
-   - Enable `encapsulation dot1Q [vlan-id]`
-5. **Configure DHCP** on router for each VLAN
-6. **Test inter-VLAN connectivity**: Ping from Admin PC to Sales PC
-7. **Verify** with: `show vlan brief`, `show ip interface brief`, `show ip route`
+> 📖 **Full instructions, figures, and questions:**
+> 👉 **[Packet Tracer — Lab A: Small Office Mega-Lab](./PACKET_TRACER_GUIDE.md#-lab-a--small-office-network-mega-lab)**
 
-**Lab B — Wireshark: VLAN & Routing Traffic Analysis (25 min)**
-1. Open a provided PCAP containing 802.1Q tagged traffic
-2. Filter: `vlan` → identify VLAN IDs in captured frames
-3. Inspect the Ethernet II header → locate the 802.1Q tag field (TPID `0x8100`)
-4. Filter: `icmp` → trace a ping across subnets — observe TTL decrement at each router hop
-5. Use **Statistics → Endpoints** to identify all active subnets in the capture
-6. Use **Statistics → Conversations** to map traffic flow between VLANs
+---
+
+**👥 Workgroup Design Challenge — Design It, Build It, Prove It (~40 min)**
+
+> [!IMPORTANT]
+> The **proof-of-competency** activity: one design challenge that shows students can turn requirements into a working network using everything from Sessions 2–4.
+
+Given only a **business brief** (the "BrightByte" startup, base network `172.16.0.0/24`, three growth-sized departments + a server), each workgroup **designs an IP/VLAN scheme from scratch (VLSM), implements it in Packet Tracer, and demonstrates it passing a fixed 6-point acceptance test**. No step-by-step snippets — the students supply the design and apply Lab A's skills; success = the test passes.
+
+> 📖 **The brief, deliverables, and acceptance test:**
+> 👉 **[Workgroup Design Challenge](./PACKET_TRACER_GUIDE.md#-workgroup-design-challenge--design-it-build-it-prove-it)**
+
+---
+
+**Lab B — Wireshark: VLAN & Routing Traffic Analysis (~25 min)**
+
+Read VLANs and routing straight out of a capture. You'll filter `vlan` to find VLAN IDs, expand the Ethernet header to inspect the **802.1Q tag** (TPID `0x8100`), filter `icmp` to watch **TTL decrement at each router hop**, and use **Statistics → Endpoints / Conversations** to map the active subnets and inter-VLAN flows.
+
+> 📖 **Full instructions, figures, and questions:**
+> 👉 **[Wireshark — Lab B: VLAN & Routing Traffic Analysis](./WIRESHARK_GUIDE.md)**
 
 ### 📚 Homework
 - Save the Small Office `.pkt` file for future practice

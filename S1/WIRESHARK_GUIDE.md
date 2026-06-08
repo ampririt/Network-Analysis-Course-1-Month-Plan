@@ -149,8 +149,19 @@ The best way to learn the tool is to use it. This lab captures a real HTTP page 
      <em>Fig. 6 — The <code>http</code> display filter in the green (valid) filter bar.</em>
    </p>
 7. **Find the HTTP `GET`.** In the packet listing, look for the line whose Info shows **`GET`** followed by the `gaia.cs.umass.edu` URL. Click it.
-8. **Explore the layers (OSI in action).** In the **packet-header details** pane, collapse the **Frame**, **Ethernet II**, **Internet Protocol**, and **Transmission Control Protocol** sections (▸), and **expand the Hypertext Transfer Protocol** section (▾). You can now read the raw HTTP `GET` request — its `Host`, `User-Agent`, and `Accept` headers. Your screen should resemble Fig. 3 with HTTP maximized.
-9. **Exit Wireshark.** 🎉 **Congratulations — you've completed your first Wireshark lab!**
+8. **Explore the layers (OSI in action).** In the **packet-header details** pane, collapse the **Frame**, **Ethernet II**, **Internet Protocol**, and **Transmission Control Protocol** sections (▸), and **expand the Hypertext Transfer Protocol** section (▾). You can now read the raw HTTP `GET` request — its `Host`, `User-Agent`, and `Accept` headers.
+
+   <p align="center">
+     <img src="./img/Screenshot%202026-06-08%20at%2011.07.29.png" alt="The HTTP GET request selected, with its layers expanded" width="700"><br>
+     <em>Fig. 7 — The selected <code>GET</code> packet. Note the destination IP <code>128.119.245.12</code> (gaia), <strong>Dest Port: 80</strong>, and the <code>Host</code> / <code>User-Agent</code> headers inside the expanded HTTP layer.</em>
+   </p>
+9. **See the server's reply.** Click the **`HTTP/1.1 200 OK`** packet that comes back from the server. Expand the **Hypertext Transfer Protocol** layer and look at the **Packet Bytes** pane — you can read the actual page text the server sent.
+
+   <p align="center">
+     <img src="./img/Screenshot%202026-06-08%20at%2010.05.14.png" alt="The HTTP 200 OK reply with the page text visible" width="700"><br>
+     <em>Fig. 8 — The <code>200 OK</code> reply. The bytes pane shows the page content: "Congratulations! You've downloaded the first Wireshark lab file!"</em>
+   </p>
+10. **Exit Wireshark.** 🎉 **Congratulations — you've completed your first Wireshark lab!**
 
 > 💾 To keep your capture for later, use **File → Export Specified Packets…** (or **File → Save As…**) and save it as a `.pcap` / `.pcapng` file — e.g. `my_first_capture.pcap`.
 
@@ -181,7 +192,7 @@ Subtract the **Time** value of the `GET` packet from the **Time** value of the `
 <details>
 <summary>💡 Show answer</summary>
 
-`gaia.cs.umass.edu` resolves to **`128.119.245.12`** — you can read it as the **Destination IP** of your `GET` packet (or the **Source IP** of the `200 OK`). **Your computer's IP** is the **Source IP** of the `GET` — usually a private address like `192.168.x.x` or `10.x.x.x` on a home/office network.
+`gaia.cs.umass.edu` resolves to **`128.119.245.12`** — you can read it as the **Destination IP** of your `GET` packet (or the **Source IP** of the `200 OK`). See it in the IPv4 layer in **Fig. 7**. **Your computer's IP** is the **Source IP** of the `GET` — a private address (e.g. `172.20.2.203` in Fig. 7, but yours may be `192.168.x.x` or `10.x.x.x`).
 </details>
 
 **Q4.** Select the TCP packet that carries the HTTP `GET`. **What type of web browser** issued the request? *(Read the value after the `User-Agent:` field in the expanded HTTP section.)*
@@ -189,7 +200,7 @@ Subtract the **Time** value of the `GET` packet from the **Time** value of the `
 <details>
 <summary>💡 Show answer</summary>
 
-Whatever browser you used — the **`User-Agent:`** header names it. e.g. a string containing `Firefox/…`, `Safari/…`, `Chrome/…`, or `Edg/…`. This is exactly how a web server learns which browser is contacting it.
+Whatever browser you used — the **`User-Agent:`** header names it. In **Fig. 7** the header reads `…AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140…`, i.e. **Chrome**. (Yours might say `Firefox/…`, `Safari/…`, or `Edg/…`.) This is exactly how a web server learns which browser is contacting it.
 </details>
 
 **Q5.** Expand the **Transmission Control Protocol** section of that same packet. **What is the destination port number** (after `Dest Port:`) the HTTP request was sent to?
@@ -197,7 +208,7 @@ Whatever browser you used — the **`User-Agent:`** header names it. e.g. a stri
 <details>
 <summary>💡 Show answer</summary>
 
-**`80`** — the well-known port for HTTP. (Your browser's own **source** port is a random high number, e.g. `54321`.)
+**`80`** — the well-known port for HTTP, shown as **Dest Port: 80** in the TCP layer (see **Fig. 7**). (Your browser's own **source** port is a random high number, e.g. `54321`.)
 </details>
 
 **Q6.** **Print the two HTTP messages** (`GET` and `200 OK`): **File → Print**, choose **"Selected Packet Only"** and **"Print as displayed"**, then **OK**.

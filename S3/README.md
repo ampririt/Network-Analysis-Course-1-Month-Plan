@@ -3,6 +3,8 @@
 - [Session 3 — Network Services\& Security](#session-3--network-services-security)
   - [📖 Lecture](#-lecture)
   - [🛠️ Hands-on Lab](#️-hands-on-lab)
+    - [Wireshark — Labs A & C guide →](./WIRESHARK_GUIDE.md)
+    - [Packet Tracer — Lab B guide →](./PACKET_TRACER_GUIDE.md)
   - [📚 Homework](#-homework)
 
 
@@ -38,39 +40,37 @@
 
 ### 🛠️ Hands-on Lab
 
-**Lab A — Wireshark: DHCP & DNS Analysis (20 min)**
-1. Release and renew IP: `ipconfig /release` → `ipconfig /renew` (Windows) or `sudo dhclient -r && sudo dhclient` (Linux/Mac)
-2. Capture during renewal — filter: `dhcp` or `bootp`
-3. Identify all 4 DORA packets — inspect option fields (lease time, gateway, DNS server)
-4. Filter: `dns` → find a query for `google.com`
-5. Inspect the DNS response — what IP was returned? What record type?
+> [!TIP]
+> Each lab below is a short introduction. **Full step-by-step instructions, diagrams, and lab questions live in the companion guides** — follow those pages while you work.
 
-**Lab B — Cisco Packet Tracer: DHCP & DNS Server Setup (25 min)**
-1. Build topology: 3 PCs → Switch → Router → DHCP Server + DNS Server
-2. Configure the router with a DHCP pool (network, default-router, dns-server)
-3. Set PCs to obtain IP via DHCP
-4. Configure DNS Server with entries (e.g., `www.lab.com` → `192.168.1.100`)
-5. Switch to **Simulation Mode** — observe DORA packets in real time
-6. From a PC, use the web browser to visit `www.lab.com` — observe DNS query then HTTP
+---
 
-**Lab C — Wireshark: Network Security Analysis (25 min)**
+**Lab A — Wireshark: DHCP & DNS Analysis (~20 min)**
+
+Watch a device get an address and resolve a name. You'll release/renew your IP, capture the four **DHCP DORA** packets (`Discover → Offer → Request → ACK`) and read the lease/gateway/DNS options, then filter `dns` to inspect a **query and its response** — identifying the IP returned and the record type (A / AAAA / CNAME).
+
+> 📖 **Full instructions, figures, and questions:**
+> 👉 **[Wireshark — Lab A: DHCP & DNS Analysis](./WIRESHARK_GUIDE.md#-lab-a--dhcp--dns-analysis)**
+
+---
+
+**Lab B — Cisco Packet Tracer: DHCP & DNS Server Setup (~25 min)**
+
+Build the **server side** of those services. You'll configure a router **DHCP pool** (network, default-router, dns-server), set PCs to obtain addresses automatically, add a **DNS A record** (`www.lab.com` → `192.168.1.100`), watch **DORA** unfold in Simulation Mode, and finally browse to the site **by name** from a PC.
+
+> 📖 **Full instructions, figures, and questions:**
+> 👉 **[Packet Tracer — Lab B: DHCP & DNS Server Setup](./PACKET_TRACER_GUIDE.md)**
+
+---
+
+**Lab C — Wireshark: Network Security Analysis (~25 min)**
 
 > ⚠️ Run only on your own lab network / a host you control. Scanning or spoofing networks you don't own may be illegal.
 
-1. **Spot an ARP anomaly**:
-   - Filter: `arp` — note your normal request/reply pairs and the gateway's MAC.
-   - Look for **two different MACs claiming the same IP**, or a flood of gratuitous ARPs → the signature of **ARP spoofing**.
-   - Tip: Wireshark's *Analyze → Expert Information* flags "duplicate IP address detected."
-2. **Identify a port scan**:
-   - On a lab host, run `nmap -sS <target-ip>` from another machine you control.
-   - In Wireshark, filter: `tcp.flags.syn == 1 && tcp.flags.ack == 0`.
-   - Observe **many SYNs to sequential ports** from one source — classic scan behavior.
-   - Compare RST (closed) vs. SYN-ACK (open) responses to see which ports are open.
-3. **Inspect plaintext vs. encrypted**:
-   - Visit an `http://` site and a `https://` site while capturing.
-   - Filter `http` → confirm you can read credentials/content in **Follow TCP Stream**.
-   - Filter `tls` → confirm the payload is encrypted (only the handshake/SNI is visible) — *why HTTPS matters*.
-4. **Reflect**: Which of these attacks would **DHCP snooping**, **Dynamic ARP Inspection**, or **HTTPS** have prevented?
+Learn to recognise attack *signatures* in a capture: spot **ARP spoofing** (two MACs claiming one IP), identify a **port scan** (a burst of SYNs to sequential ports, open vs. closed via SYN-ACK/RST), and compare **plaintext HTTP vs. encrypted TLS** to see why HTTPS matters — then map each attack to the defense that stops it.
+
+> 📖 **Full instructions, figures, and questions:**
+> 👉 **[Wireshark — Lab C: Network Security Analysis](./WIRESHARK_GUIDE.md#-lab-c--network-security-analysis)**
 
 ### 📚 Homework
 - Kurose & Ross Wireshark Lab: **DNS**

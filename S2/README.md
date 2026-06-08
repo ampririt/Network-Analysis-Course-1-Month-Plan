@@ -4,7 +4,8 @@
   - [📖 Lecture](#-lecture)
   - [Break (10 min)](#break-10-min)
   - [🛠️ Hands-on Lab](#️-hands-on-lab)
-    - [📷 Step-by-Step Lab Walkthrough →](./LAB_TUTORIAL.md)
+    - [Wireshark — Lab A guide →](./WIRESHARK_GUIDE.md)
+    - [Packet Tracer — Labs B & C guide →](./PACKET_TRACER_GUIDE.md)
   - [🔍 Deep Dive: IP Addressing \& Subnetting](#-deep-dive-ip-addressing--subnetting)
     - [IPv4 Address Classes (Legacy — For Context)](#ipv4-address-classes-legacy--for-context)
     - [Private IP Address Ranges (RFC 1918)](#private-ip-address-ranges-rfc-1918)
@@ -55,52 +56,37 @@
 ### 🛠️ Hands-on Lab
 
 > [!TIP]
-> A full step-by-step walkthrough with screenshot placeholders is in **[LAB_TUTORIAL.md](./LAB_TUTORIAL.md)** — follow that page while doing the labs below.
+> Each lab below is a short introduction. **Full step-by-step instructions, diagrams, and lab questions live in the companion guides** — follow those pages while you work.
 
-**Lab A — Wireshark: TCP 3-Way Handshake (20 min)** · [📷 walkthrough](./LAB_TUTORIAL.md#lab-a--wireshark-tcp-3-way-handshake)
-1. Capture traffic while visiting a website
-2. Apply filter: `tcp.flags.syn == 1`
-3. Identify the SYN → SYN-ACK → ACK sequence
-4. Right-click → **Follow TCP Stream** — observe the full conversation
-5. Compare a TCP connection (HTTP) vs. a UDP conversation (DNS: `udp.port == 53`)
+---
 
-**Lab B — Cisco Packet Tracer: Simulation Mode Protocol Walk (20 min)** · [📷 walkthrough](./LAB_TUTORIAL.md#lab-b--packet-tracer-simulation-mode-protocol-walk)
-1. Build a network: 2 PCs → Switch → Router → Server
-2. Configure static IPs on different subnets with the router as gateway
-3. Switch to **Simulation Mode**
-4. Send a ping from PC1 to the Server
-5. Step through each packet — observe:
-   - ARP resolution at each hop
-   - ICMP encapsulation inside IP inside Ethernet
-6. Click on each PDU to inspect headers at every layer
+**Lab A — Wireshark: TCP 3-Way Handshake (~20 min)**
 
-**Lab C — Cisco Packet Tracer: IP Network Design & Multi-Subnet Build (40 min)** · [📷 walkthrough](./LAB_TUTORIAL.md#lab-c--packet-tracer-multi-subnet-ip-design-build)
+Capture live traffic and watch a real **`SYN → SYN-ACK → ACK`** handshake set up a TCP connection. You'll filter with `tcp.flags.syn == 1`, expand the TCP **Flags** to confirm each step, use **Follow TCP Stream** to read the whole conversation, then contrast it with a connectionless **UDP** (DNS) exchange that has no handshake at all.
+
+> 📖 **Full instructions, figures, and questions:**
+> 👉 **[Wireshark — Lab A: The TCP 3-Way Handshake](./WIRESHARK_GUIDE.md)**
+
+---
+
+**Lab B — Cisco Packet Tracer: Simulation-Mode Protocol Walk (~20 min)**
+
+Build a small **PCs → Switch → Router → Server** network across two subnets, then drop into **Simulation Mode** and step a ping through it one hop at a time. You'll see **ARP** resolve MAC addresses and **ICMP encapsulated inside IP inside Ethernet**, and confirm the core routing idea: the **MAC changes at each hop while the IP stays the same**.
+
+> 📖 **Full instructions, figures, and questions:**
+> 👉 **[Packet Tracer — Lab B: Simulation-Mode Protocol Walk](./PACKET_TRACER_GUIDE.md#-lab-b--simulation-mode-protocol-walk)**
+
+---
+
+**Lab C — Cisco Packet Tracer: IP Network Design & Multi-Subnet Build (~40 min)**
 
 > [!IMPORTANT]
-> This lab builds the foundation for all future Packet Tracer exercises. Students design an IP scheme from scratch.
+> This lab builds the foundation for all future Packet Tracer exercises. Students design an IP scheme **from scratch**.
 
-**Scenario**: A small company has 3 departments — **Engineering** (50 hosts), **Marketing** (25 hosts), and **Management** (10 hosts). Design and build the network using `192.168.0.0/24`.
+Design and build a real, routed network for a company with three departments — **Engineering** (50 hosts), **Marketing** (25 hosts), **Management** (10 hosts) — out of `192.168.0.0/24`. You'll subnet on paper first (`/26`, `/27`, `/28`), build the three-department topology, configure the router, verify same-subnet **and** cross-subnet connectivity, then deliberately break it (wrong mask, IP conflict) to learn why addressing discipline matters.
 
-1. **Subnetting on Paper (10 min)**:
-   * Calculate the required subnet size for each department
-   * Determine the subnet mask, network address, broadcast address, and usable range for each:
-     - Engineering: `192.168.0.0/26` → 62 usable hosts
-     - Marketing: `192.168.0.64/27` → 30 usable hosts
-     - Management: `192.168.0.96/28` → 14 usable hosts
-   * Document the IP allocation plan in a table
-2. **Build in Packet Tracer (15 min)**:
-   * Drag onto workspace: 6 PCs (2 per department), 3 Switches, 1 Router
-   * Connect PCs to their department switch → connect all switches to the router
-   * Configure router sub-interfaces with the gateway IP for each subnet
-   * Assign static IPs to each PC within the correct subnet range
-3. **Verify Connectivity (10 min)**:
-   * Ping within the same subnet → should succeed immediately
-   * Ping across subnets → should succeed via the router
-   * Deliberately assign a PC the wrong subnet mask → observe and explain the failure
-   * Run `show ip interface brief` on the router to verify all sub-interfaces are `up/up`
-4. **IP Conflict Demonstration (5 min)**:
-   * Assign two PCs the same IP address → observe the conflict warning
-   * Discuss: *Why is IP address management (IPAM) critical in real networks?*
+> 📖 **Full subnet tables, router config, verification, and questions:**
+> 👉 **[Packet Tracer — Lab C: Multi-Subnet IP Design Build](./PACKET_TRACER_GUIDE.md#-lab-c--multi-subnet-ip-design-build)**
 
 ---
 
