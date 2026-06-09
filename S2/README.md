@@ -4,8 +4,6 @@
   - [Lecture](#lecture)
   - [Break (10 min)](#break-10-min)
   - [Hands-on Lab](#hands-on-lab)
-    - [Wireshark — Lab A guide →](./WIRESHARK_GUIDE.md)
-    - [Packet Tracer — Labs B & C guide →](./PACKET_TRACER_GUIDE.md)
   - [Deep Dive: IP Addressing \& Subnetting](#deep-dive-ip-addressing--subnetting)
     - [IPv4 Address Classes (Legacy — For Context)](#ipv4-address-classes-legacy--for-context)
     - [Private IP Address Ranges (RFC 1918)](#private-ip-address-ranges-rfc-1918)
@@ -18,36 +16,31 @@
 
 ### Lecture
 
-**Part 1 — Protocol Headers**
-- **Ethernet Frame**: Source/Destination MAC, EtherType, payload
-- **IPv4 Header**: Source/Destination IP, TTL, Protocol field, fragmentation
-- **TCP Header**: Ports, sequence/ack numbers, flags (SYN, ACK, FIN, RST), 3-way handshake
-- **UDP Header**: Ports, length, checksum — connectionless simplicity
-- Ports & well-known services: 80 (HTTP), 443 (HTTPS), 53 (DNS), 22 (SSH)
+> The lecture runs in **two halves** — first *reading* the protocols that carry every conversation (headers, field by field), then *designing* the IP space those packets live in. Live, interactive simulations (layer-by-layer delivery, the 3-way handshake, the sliding window, UDP loss, and IP/subnet calculation) run throughout.
 
-**Part 2 — IP Network Design & Subnetting**
-- **IPv4 Address Structure**: Network portion vs. host portion, dotted-decimal & binary representation
-- **Subnet Masks**: How masks define network boundaries — `255.255.255.0` (`/24`), `255.255.0.0` (`/16`)
-- **CIDR Notation**: Classless Inter-Domain Routing — why classful addressing is obsolete
-- **Subnetting**: Borrowing host bits to create subnets — calculating network address, broadcast address, usable host range
-- **Private vs. Public IP Ranges**: RFC 1918 (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) and why NAT is needed
-- **IP Design Best Practices**: Address planning for departments, growth considerations, documentation standards
+**Part 1 — Reading the Protocols**
+- **Data units & encapsulation**: how one HTTP request travels *down* the stack (L7 → L1) and back *up* — each layer wraps the one above. The data unit per layer: **segment / datagram** (L4) → **packet** (L3) → **frame** (L2).
+- **Ethernet frame (L2)**: Destination MAC + Source MAC (48 bits each), **EtherType** (`0x0800` IPv4, `0x0806` ARP, `0x86DD` IPv6), payload (46–1500 bytes), and the **FCS** CRC trailer.
+- **IPv4 header (L3, 20 bytes)**: Version, IHL, DSCP/ECN, Total Length, Identification + Flags (DF/MF) + Fragment Offset (**fragmentation**), **TTL**, **Protocol**, Header Checksum, and Source/Destination IP.
+- **TCP header (L4 segment)**: Source/Destination **Port**, **Sequence Number** (makes TCP *ordered*), **Acknowledgement Number** (makes TCP *reliable*), Data Offset, **Flags** (SYN, ACK, FIN, RST), and Window.
+- **UDP header (L4 datagram, 8 bytes)**: Source Port, Destination Port, Length, Checksum — and nothing more.
+- **TCP vs. UDP**: connection-oriented & reliable (handshake, ACKs, retransmission, flow control) versus connectionless & fast (fire-and-forget). Choose by what failure costs.
+- **The 3-way handshake**: `SYN → SYN/ACK → ACK` opens a connection and synchronises each side's sequence numbers.
+- **TCP flow control — the sliding window**: the byte stream is sliced into MSS-sized segments; each ACK names the next expected byte and slides the window forward; the receiver's advertised window is its free buffer.
+- **Ports & demultiplexing**: one host, one IP, but **65,536 ports** (0–65535) — the destination port picks which program receives the packet. Ranges: **well-known** 0–1023, **registered** 1024–49151, **ephemeral** 49152–65535. Common services: 20/21 FTP, 22 SSH, 25 SMTP, 53 DNS, 67/68 DHCP, 80 HTTP, 443 HTTPS/QUIC, 3389 RDP.
 
-**Part 3 — Enterprise Network Design Principles**
-- **Hierarchical Design Model**:
-    - **Access Layer**: Local connection for end devices (PCs, APs).
-    - **Distribution Layer**: Aggregates access switches; handles routing, filtering, and security policies.
-    - **Core Layer**: The high-speed backbone of the network, optimized for fast transport.
-- **Redundancy & High Availability (HA)**:
-    - **L2 Redundancy**: EtherChannel (link bundling) and Spanning Tree Protocol (STP).
-    - **L3 Redundancy**: First Hop Redundancy Protocols (**HSRP/VRRP**) for gateway failover.
-- **Segmentation & Security**:
-    - **VLANs**: Why we separate traffic at Layer 2 (Security, Broadcast control).
-    - **Inter-VLAN Routing**: Using Router-on-a-Stick (ROAS) vs. Layer 3 Switches.
-    - **DMZ (Demilitarized Zone)**: Isolating public-facing servers from the internal enterprise network.
-- **Scalability & IPAM**:
-    - **Route Summarization**: Reducing routing table size by grouping subnets.
-    - **IP Address Management (IPAM)**: Tools and workflows for tracking thousands of IP allocations.
+**Part 2 — Designing the IP Space**
+- **Address structure**: every IPv4 address is 32 bits / 4 octets, split into a **network** portion and a **host** portion — the subnet mask draws the line (e.g. `192.168.1.10/24`).
+- **From classful to classless**: the old Class A/B/C system (`/8`, `/16`, `/24`) wasted huge blocks and bloated routing tables; **CIDR** (1993) lets the network/host boundary fall on *any* bit.
+- **Subnet masks & CIDR**: a mask is a run of `1`s (network) followed by `0`s (host); `/n` simply counts the network bits.
+- **Private address space (RFC 1918)**: `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` — reused everywhere behind **NAT**, never routed on the public internet.
+- **Why subnet?** One network is **one broadcast domain** — a single Sales broadcast (ARP, DHCP Discover…) floods IT and Accounting too. Splitting one block into right-sized subnets gives each zone its own broadcast domain *and* conserves addresses.
+- **How to subnet (four moves)**: ① count the need (how many subnets, and hosts in the largest) → ② pick the smallest prefix where `usable = 2^(host bits) − 2` covers it → ③ walk the blocks (subnets start at multiples of `256 / 2ⁿ`) → ④ name the edges (network = host bits all `0`, broadcast = all `1`, gateway = first usable).
+- **IP design best practices**: plan by function (one subnet per role), size for growth (round up, leave gaps), and **document it** — an IPAM sheet of every subnet, mask, gateway, and purpose.
+
+**Part 3 — Network Design Foundations**
+- **Physical topologies**: **star** (every device to a central switch — today's standard), **bus** (one shared backbone — cheap, legacy), **ring** (token-passing loop), **mesh** (many cross-links — resilient, costly, used for backbones).
+- **Frame delivery modes**: **unicast** (one recipient), **broadcast** (every host on the segment), and **multicast** (a subscribed group) — and how a switch (or a VLAN on it) joins its ports into the single broadcast domain a subnet maps to.
 
 
 ### Break (10 min)
@@ -60,7 +53,7 @@
 
 ---
 
-**Lab A — Wireshark: TCP 3-Way Handshake (~20 min)**
+**Lab A — Wireshark: TCP 3-Way Handshake**
 
 Capture live traffic and watch a real **`SYN → SYN-ACK → ACK`** handshake set up a TCP connection. You'll filter with `tcp.flags.syn == 1`, expand the TCP **Flags** to confirm each step, use **Follow TCP Stream** to read the whole conversation, then contrast it with a connectionless **UDP** (DNS) exchange that has no handshake at all.
 
@@ -69,7 +62,7 @@ Capture live traffic and watch a real **`SYN → SYN-ACK → ACK`** handshake se
 
 ---
 
-**Lab B — Cisco Packet Tracer: Simulation-Mode Protocol Walk (~20 min)**
+**Lab B — Cisco Packet Tracer: Simulation-Mode Protocol Walk**
 
 Build a small **PCs → Switch → Router → Server** network across two subnets, then drop into **Simulation Mode** and step a ping through it one hop at a time. You'll see **ARP** resolve MAC addresses and **ICMP encapsulated inside IP inside Ethernet**, and confirm the core routing idea: the **MAC changes at each hop while the IP stays the same**.
 
@@ -78,7 +71,7 @@ Build a small **PCs → Switch → Router → Server** network across two subnet
 
 ---
 
-**Lab C — Cisco Packet Tracer: IP Network Design & Multi-Subnet Build (~40 min)**
+**Lab C — Cisco Packet Tracer: IP Network Design & Multi-Subnet Build**
 
 > [!IMPORTANT]
 > This lab builds the foundation for all future Packet Tracer exercises. Students design an IP scheme **from scratch**.

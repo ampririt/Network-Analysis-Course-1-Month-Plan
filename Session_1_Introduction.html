@@ -9955,11 +9955,12 @@
               color: var(--ink-soft);
             "
           >
-            They are not redundant — they answer two genuinely different
-            questions. IP answers "where in the world is this device?" so
-            routers across continents can route. MAC answers "which NIC on this
-            exact wire should grab the frame?" so the local switch can deliver
-            it. Lose either, and the internet stops working.
+            They are not redundant — they accomplish two genuinely different
+            functions. <strong>Layer 2 (MAC) handles hop-to-hop delivery</strong>
+            — getting the frame across one link to the very next device.
+            <strong>Layer 3 (IP) handles end-to-end delivery</strong> — naming
+            the two "ends" of the conversation so routers can carry the packet
+            across the whole internet. Lose either, and delivery breaks.
           </p>
 
           <div class="why-both">
@@ -9969,7 +9970,7 @@
                 <span class="m-icon">public</span>
                 <div>
                   <div class="rt">IP Address</div>
-                  <div class="rsub">Layer 3 · Network · logical · routable</div>
+                  <div class="rsub">Layer 3 · Network · end-to-end · routable</div>
                 </div>
               </div>
               <div class="role-q">"Where in the world is this device?"</div>
@@ -9998,7 +9999,7 @@
                 <span class="m-icon">memory</span>
                 <div>
                   <div class="rt">MAC Address</div>
-                  <div class="rsub">Layer 2 · Data Link · physical · local</div>
+                  <div class="rsub">Layer 2 · Data Link · hop-to-hop · local</div>
                 </div>
               </div>
               <div class="role-q">
@@ -10040,33 +10041,42 @@
               <div class="q">"Why not just use IP for everything?"</div>
               <div class="a">
                 The wire only carries electrical / optical / radio signals — it
-                has no concept of IP. The physical NIC needs a local hardware
-                address to decide "is this frame for me?" without having to
-                parse the IP header.
+                has no concept of IP. The
+                <strong>Network Interface Card (NIC)</strong> your Ethernet wire
+                plugs into does the Layer 2 job: it
+                <strong>turns bits into signals onto the wire and reads signals
+                back off it</strong>, using its MAC address to decide "is this
+                frame for me?" — no IP parsing needed.
                 <strong>No MAC = no local delivery.</strong>
               </div>
             </div>
           </div>
 
-          <p
+          <div
             class="reveal"
-            style="
-              --i: 6;
-              margin-top: 14px;
-              font-size: 16px;
-              color: var(--ink-soft);
-              font-style: italic;
-              padding: 0 6px;
-            "
+            style="--i: 6; margin-top: 14px; display: flex; gap: 22px; align-items: center; flex-wrap: wrap"
           >
-            <strong style="color: var(--ink); font-style: normal"
-              >The arrangement:</strong
-            >
-            IP gives the packet a stable end-to-end identity that survives every
-            hop. MAC gives every hop a fast, hardware-level way to hand the
-            packet to the next neighbour. The next slide shows this happening
-            live — IP stays constant, MAC changes at every router.
-          </p>
+            <!-- encapsulation: data wrapped in an IP header (the two ends),
+                 then in a MAC header (the current hop) -->
+            <div style="font-family: var(--font-mono); font-weight: 700; font-size: 13px; flex: 0 0 auto">
+              <span style="display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--amber); color: var(--amber); border-radius: 9px; padding: 8px 10px">
+                MAC hdr · this hop
+                <span style="display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--cobalt); color: var(--cobalt-deep); border-radius: 7px; padding: 7px 9px">
+                  IP hdr · the two ends
+                  <span style="border: 1.5px solid var(--ink); color: var(--ink); border-radius: 5px; padding: 6px 9px; background: var(--paper)">data</span>
+                </span>
+              </span>
+            </div>
+            <div style="flex: 1; min-width: 380px; font-size: 16px; line-height: 1.5; color: var(--ink-soft)">
+              <strong style="color: var(--ink)">A "hop" is one link between two directly-connected devices</strong>
+              — PC→router, router→router, router→server. The data is wrapped in an
+              <strong>IP header</strong> (source &amp; destination of the two ends), then in a
+              <strong>MAC header</strong> (source &amp; destination of this hop). Each router
+              <strong>strips and rebuilds the outer MAC header</strong> to reach the next hop,
+              while the <strong>IP header rides untouched</strong> to the final host — so MAC
+              delivers <em>hop-to-hop</em> and IP delivers <em>end-to-end</em>. The next slide shows it live.
+            </div>
+          </div>
           <div class="page-num"></div>
         </section>
 
@@ -10129,17 +10139,17 @@
 
             <div class="hop-readout">
               <div class="rd ip">
-                <div class="h">Layer 3 · IP — "Final destination"</div>
+                <div class="h">Layer 3 · IP — end-to-end (final destination)</div>
                 <div class="v" id="rdIp">src 10.0.0.5 → dst 200.12.34.56</div>
                 <div class="verdict">
-                  ✓ Unchanged at every hop — that's the IP's job.
+                  ✓ Unchanged at every hop — IP delivers end to end.
                 </div>
               </div>
               <div class="rd mac">
-                <div class="h">Layer 2 · MAC — "Next hop"</div>
+                <div class="h">Layer 2 · MAC — hop-to-hop (next hop)</div>
                 <div class="v" id="rdMac">src AA:11 → dst BB:22</div>
                 <div class="verdict">
-                  ↻ Rewritten by every router as the frame is re-built.
+                  ↻ Stripped &amp; rebuilt by every router — MAC delivers hop to hop.
                 </div>
               </div>
             </div>

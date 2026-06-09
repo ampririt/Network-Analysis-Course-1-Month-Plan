@@ -6091,6 +6091,15 @@
         25% { transform: translateX(-5px) scale(1.12); }
         75% { transform: translateX(5px) scale(1.12); }
       }
+      /* Page 66 (DDoS reflection): the four reflector nodes are stacked only
+         ~103px apart, so the default 132px-tall node boxes overlapped and
+         covered each other's labels. Scope a more compact node to this stage
+         only — the other psim sims keep the full-size nodes. */
+      #dz-stage .psim-node { gap: 5px; }
+      #dz-stage .psim-node .ic-badge { width: 46px; height: 46px; }
+      #dz-stage .psim-node .ic-badge .msym { width: 27px; height: 27px; }
+      #dz-stage .psim-node .pn-label { font-size: 17px; }
+      #dz-stage .psim-node .pn-sub { font-size: 12px; }
       /* static topology hint lines */
       .psim-path {
         position: absolute;
@@ -6589,6 +6598,369 @@
         border-left: 4px solid;
         border-radius: 4px;
       }
+
+      /* ===========================================================
+         DMZ ARCHITECTURE — animated screened-subnet diagram (slide 67)
+         A request walks Internet → external FW → DMZ → internal FW →
+         internal LAN. Animation is pure class-toggle + CSS keyframes
+         (no pixel positioning), so it is immune to the scaled stage.
+         =========================================================== */
+      .dmz-stage { margin-top: 14px; }
+      .dmz-flow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-family: var(--font-mono);
+        font-weight: 700;
+      }
+      .dmz-zone {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 7px;
+        padding: 16px 18px;
+        min-width: 150px;
+        border: 1.5px solid var(--rule);
+        border-radius: 14px;
+        background: var(--paper);
+        opacity: 0.42;
+        transition: opacity 0.35s ease, transform 0.35s ease,
+          box-shadow 0.35s ease, border-color 0.35s ease;
+      }
+      .dmz-zone.on {
+        opacity: 1;
+        border-color: currentColor;
+        transform: translateY(-5px);
+        box-shadow: 6px 6px 0 currentColor;
+      }
+      .dmz-zone .dz-name { font-size: 16px; letter-spacing: 0.04em; }
+      .dmz-zone .dz-sub { font-size: 12px; font-weight: 400; color: var(--muted); }
+      .dmz-box { min-width: 226px; background: var(--paper-warm); }
+      .dmz-servers { display: flex; gap: 16px; margin-top: 4px; }
+      .dmz-srv {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        color: var(--plum);
+        opacity: 0.5;
+        transition: opacity 0.3s ease;
+      }
+      .dmz-box.on .dmz-srv { opacity: 1; }
+      .dmz-srv .ic-badge { width: 44px; height: 44px; }
+      /* gate = firewall sitting on the connector between two zones */
+      .dmz-gate {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 7px;
+        padding: 0 4px;
+        opacity: 0.5;
+        transition: opacity 0.35s ease;
+      }
+      .dmz-gate.on { opacity: 1; }
+      .dmz-gate .dg-fw {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        font-size: 12px;
+        color: var(--ink);
+      }
+      .dmz-gate .dg-track {
+        width: 72px;
+        height: 5px;
+        border-radius: 3px;
+        background: var(--rule);
+        position: relative;
+        overflow: hidden;
+      }
+      .dmz-gate.flow .dg-track {
+        background-image: linear-gradient(
+          90deg,
+          transparent 0 40%,
+          var(--cobalt) 40% 60%,
+          transparent 60% 100%
+        );
+        background-size: 220% 100%;
+        animation: dmzFlow 0.9s linear infinite;
+      }
+      .dmz-gate.deny .dg-track { background: #f3d2cc; }
+      .dmz-gate .dg-rule {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 6px;
+        white-space: nowrap;
+      }
+      .dmz-gate .dg-rule.ok { color: var(--moss); background: var(--moss-soft); }
+      .dmz-gate .dg-rule.deny { color: #b5301f; background: #f3d2cc; }
+      .dmz-gate.deny .dg-rule.deny { box-shadow: 0 0 0 2px #b5301f; }
+      @keyframes dmzFlow {
+        from { background-position: -60% 0; }
+        to { background-position: 160% 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .dmz-gate.flow .dg-track { animation: none; }
+      }
+
+      /* ===========================================================
+         IDS vs IPS — animated out-of-band vs inline comparison (slide 77)
+         Two lanes: IDS gets a mirrored copy and only alerts (the packet
+         already passed); IPS sits inline and drops the packet in real
+         time. Pure class-toggle animation — immune to the scaled stage.
+         =========================================================== */
+      .iip-stage { margin-top: 12px; }
+      .iip-lane {
+        margin-top: 12px;
+        padding: 12px 18px;
+        border: 1.5px solid var(--rule);
+        border-radius: 14px;
+        background: var(--paper);
+      }
+      .iip-lane .iip-tag {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .iip-lane .iip-tag .msym { width: 18px; height: 18px; }
+      .iip-track {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 10px;
+        font-family: var(--font-mono);
+        font-weight: 700;
+      }
+      .iip-branch {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .iip-node {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        padding: 10px 14px;
+        min-width: 108px;
+        border: 1.5px solid var(--rule);
+        border-radius: 12px;
+        background: var(--paper);
+        opacity: 0.45;
+        transition: opacity 0.35s ease, transform 0.35s ease,
+          box-shadow 0.35s ease, border-color 0.35s ease, color 0.35s ease;
+      }
+      .iip-node.on {
+        opacity: 1;
+        border-color: currentColor;
+        transform: translateY(-4px);
+        box-shadow: 5px 5px 0 currentColor;
+      }
+      .iip-node.hit {
+        opacity: 1;
+        color: #b5301f;
+        border-color: #b5301f;
+        transform: translateY(-4px);
+        box-shadow: 5px 5px 0 #b5301f;
+      }
+      .iip-node .nm { font-size: 14px; letter-spacing: 0.03em; }
+      .iip-node .sub { font-size: 11px; font-weight: 400; color: var(--muted); }
+      .iip-node .ic-badge { width: 40px; height: 40px; }
+      .iip-arrow {
+        flex: 0 0 auto;
+        width: 48px;
+        height: 5px;
+        border-radius: 3px;
+        background: var(--rule);
+        position: relative;
+        overflow: hidden;
+      }
+      .iip-arrow.flow {
+        background-image: linear-gradient(
+          90deg,
+          transparent 0 40%,
+          var(--cobalt) 40% 60%,
+          transparent 60% 100%
+        );
+        background-size: 220% 100%;
+        animation: dmzFlow 0.9s linear infinite;
+      }
+      .iip-arrow.block { background: #f3d2cc; }
+      .iip-badge {
+        font-family: var(--font-mono);
+        font-weight: 800;
+        font-size: 13px;
+        padding: 5px 12px;
+        border-radius: 8px;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+      .iip-badge .msym { width: 15px; height: 15px; }
+      .iip-badge.show { opacity: 1; transform: scale(1); }
+      .iip-badge.alert { color: #b5301f; background: #fbeede; border: 1.5px solid var(--amber); }
+      .iip-badge.drop { color: #fff; background: #b5301f; }
+
+      /* ===========================================================
+         TROJAN — "how a Trojan horse works" 6-step grid (slide 69)
+         A 2×3 flow of cards the viewer clicks through one step at a
+         time. Pure class-toggle highlighting — immune to the scaled
+         stage. Mirrors the reference infographic's six stages.
+         =========================================================== */
+      .tjg-flow { margin-top: 16px; display: flex; flex-direction: column; gap: 20px; }
+      .tjg-row { display: flex; align-items: stretch; justify-content: center; gap: 10px; }
+      .tjg-card {
+        flex: 1 1 0;
+        max-width: 360px;
+        border: 1.5px solid var(--rule);
+        border-radius: 16px;
+        background: var(--paper);
+        padding: 18px 20px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: opacity 0.35s ease, transform 0.35s ease,
+          box-shadow 0.35s ease, border-color 0.35s ease;
+      }
+      .tjg-card.on {
+        opacity: 1;
+        border-color: currentColor;
+        transform: translateY(-5px);
+        box-shadow: 6px 6px 0 currentColor;
+      }
+      .tjg-card.done { opacity: 1; }
+      .tjg-card .ic-badge { width: 58px; height: 58px; }
+      .tjg-card .ic-badge .msym { width: 32px; height: 32px; }
+      .tjg-num {
+        font-family: var(--font-mono);
+        font-weight: 800;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        color: currentColor;
+      }
+      .tjg-label {
+        font-family: var(--font-body);
+        font-size: 18px;
+        line-height: 1.3;
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .tjg-arrow {
+        flex: 0 0 auto;
+        align-self: center;
+        font-family: var(--font-mono);
+        font-weight: 800;
+        font-size: 22px;
+        color: var(--rule);
+        transition: color 0.35s ease, transform 0.35s ease;
+      }
+      .tjg-arrow.flow { color: var(--plum); transform: scale(1.3); }
+
+      /* ===========================================================
+         DoS / DDoS — animated flood with a server load/memory meter
+         (slide 64). Reuses .iip-node / .iip-arrow; the meter fill is a
+         %-width bar (scale-safe) driven step by step from the script.
+         =========================================================== */
+      .dos-meter { margin: 16px auto 0; max-width: 860px; }
+      .dos-meter .dm-top {
+        display: flex;
+        justify-content: space-between;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      .dos-meter .dm-bar {
+        height: 28px;
+        border: 1.5px solid var(--ink);
+        border-radius: 8px;
+        background: var(--paper);
+        overflow: hidden;
+      }
+      .dos-meter .dm-fill {
+        height: 100%;
+        width: 0;
+        background: var(--moss);
+        transition: width 0.9s ease, background 0.5s ease;
+      }
+      .dos-botnet { display: flex; gap: 7px; justify-content: center; margin-top: 1px; }
+      .dos-botnet .msym { width: 18px; height: 18px; }
+
+      /* ===========================================================
+         ANALYST DETECTION LOOP — animated circular loop (slide 84)
+         Five stages sit on a flowing dashed ring; the active stage is
+         highlighted and its detail shows in the centre. Auto-cycles,
+         with manual controls. %-positioned, so it scales with the stage.
+         =========================================================== */
+      .loop-stage { position: relative; height: 432px; margin-top: 10px; }
+      .loop-ring { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+      .loop-ring ellipse {
+        fill: none;
+        stroke: var(--rule);
+        stroke-width: 0.5;
+        stroke-dasharray: 2 2.2;
+        animation: loopFlow 4.5s linear infinite;
+      }
+      @keyframes loopFlow { to { stroke-dashoffset: -42; } }
+      .loop-node {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        width: 162px;
+        text-align: center;
+        z-index: 2;
+        opacity: 0.45;
+        cursor: pointer;
+        transition: opacity 0.35s ease, transform 0.35s ease;
+      }
+      .loop-node.on { opacity: 1; transform: translate(-50%, -50%) scale(1.07); }
+      .loop-node .ic-badge { width: 56px; height: 56px; transition: box-shadow 0.35s ease; }
+      .loop-node.on .ic-badge { box-shadow: 0 0 0 5px currentColor; }
+      .loop-node .ln-name { font-family: var(--font-mono); font-weight: 700; font-size: 15px; letter-spacing: 0.03em; }
+      .loop-node .ln-tag { font-size: 12px; color: var(--muted); font-weight: 400; }
+      .loop-center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 38%;
+        max-width: 430px;
+        text-align: center;
+        z-index: 3;
+      }
+      .loop-center .lc-num { font-family: var(--font-mono); font-weight: 800; font-size: 13px; letter-spacing: 0.16em; color: var(--muted); }
+      .loop-center .lc-name { font-family: var(--font-display); font-weight: 600; font-size: 30px; line-height: 1.1; margin: 4px 0 8px; }
+      .loop-center .lc-detail { font-size: 16px; line-height: 1.45; color: var(--ink-soft); min-height: 92px; }
+      .loop-center .lc-note { font-family: var(--font-mono); font-size: 12px; color: var(--cobalt); margin-top: 8px; }
     </style>
   </head>
   <body>
@@ -6815,6 +7187,17 @@
           <div class="page-num"></div>
         </section>
 
+        <!-- ========================================================= CHAPTER — ARP ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Network service · 1 of 5 —</div>
+          <h2 class="reveal" style="--i: 1">ARP</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">
+            Address Resolution Protocol — turns a known IP address into the MAC address needed to actually deliver a frame on the local link.
+          </p>
+          <div class="page-num"></div>
+        </section>
+
         <!-- ========================================================= ARP — explained (teaching) ========================================================= -->
         <section class="slide">
           <div class="masthead">
@@ -6968,6 +7351,17 @@
               <button class="sim-btn" id="arpsStop" disabled>■ Stop</button>
             </div>
           </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= CHAPTER — DHCP ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Network service · 2 of 5 —</div>
+          <h2 class="reveal" style="--i: 1">DHCP</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">
+            Dynamic Host Configuration Protocol — automatically hands a joining device its IP, subnet mask, gateway and DNS server in one short exchange.
+          </p>
           <div class="page-num"></div>
         </section>
 
@@ -7151,6 +7545,17 @@
               <button class="sim-btn" id="dhcpsStop" disabled>■ Stop</button>
             </div>
           </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= CHAPTER — DNS ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Network service · 3 of 5 —</div>
+          <h2 class="reveal" style="--i: 1">DNS</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">
+            Domain Name System — the internet's phone book, translating human names like example.com into the IP addresses machines actually route to.
+          </p>
           <div class="page-num"></div>
         </section>
 
@@ -7381,6 +7786,17 @@
           <div class="page-num"></div>
         </section>
 
+        <!-- ========================================================= CHAPTER — ICMP ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Network service · 4 of 5 —</div>
+          <h2 class="reveal" style="--i: 1">ICMP</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">
+            Internet Control Message Protocol — the network's diagnostic channel behind ping and traceroute: reachability, errors and round-trip time.
+          </p>
+          <div class="page-num"></div>
+        </section>
+
         <!-- ========================================================= ICMP — explained (teaching) ========================================================= -->
         <section class="slide">
           <div class="masthead">
@@ -7545,6 +7961,17 @@
               <button class="sim-btn" id="icmpsStop" disabled>■ Stop</button>
             </div>
           </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= CHAPTER — NAT ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Network service · 5 of 5 —</div>
+          <h2 class="reveal" style="--i: 1">NAT</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">
+            Network Address Translation — lets many private hosts share one public IP by rewriting addresses and ports at the network's edge.
+          </p>
           <div class="page-num"></div>
         </section>
 
@@ -7785,6 +8212,17 @@
           <div class="page-num"></div>
         </section>
 
+        <!-- ========================================================= CHAPTER — HTTP ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Application protocol · 1 of 4 —</div>
+          <h2 class="reveal" style="--i: 1">HTTP / HTTPS</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">
+            HyperText Transfer Protocol — how browsers fetch the web; HTTPS wraps it in TLS so the bytes on the wire are encrypted.
+          </p>
+          <div class="page-num"></div>
+        </section>
+
         <!-- ========================================================= HTTP / HTTPS & TLS — dedicated ========================================================= -->
         <section class="slide">
           <div class="masthead">
@@ -7862,6 +8300,17 @@
               <button class="sim-btn" id="hsStop" disabled>■ Stop</button>
             </div>
           </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= CHAPTER — SSH ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Application protocol · 2 of 4 —</div>
+          <h2 class="reveal" style="--i: 1">SSH &amp; Telnet</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">
+            Remote command-line access — Telnet sends everything in cleartext, while SSH encrypts the entire session.
+          </p>
           <div class="page-num"></div>
         </section>
 
@@ -7973,6 +8422,17 @@
               </div>
             </div>
           </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= CHAPTER — FTP ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Application protocol · 3 of 4 —</div>
+          <h2 class="reveal" style="--i: 1">FTP</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">
+            File Transfer Protocol — moves files over separate control and data connections; plain FTP is unencrypted, so credentials travel in the clear.
+          </p>
           <div class="page-num"></div>
         </section>
 
@@ -8127,6 +8587,17 @@
               <button class="sim-btn" id="ftpfStop" disabled>■ Stop</button>
             </div>
           </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= CHAPTER — MAIL ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Application protocol · 4 of 4 —</div>
+          <h2 class="reveal" style="--i: 1">Email</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">
+            SMTP carries mail between servers, while IMAP and POP3 let a client read it from the mailbox.
+          </p>
           <div class="page-num"></div>
         </section>
 
@@ -8504,43 +8975,56 @@
           <div class="page-num"></div>
         </section>
 
+        <!-- ========================================================= CHAPTER — ATTACK FAMILY 1 ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Attack family · 1 of 4 —</div>
+          <h2 class="reveal" style="--i: 1">Interception &amp; spoofing</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">Lie about identity to slip into the middle of a conversation — breaking <strong>Confidentiality + Integrity</strong>. Ahead: ARP spoofing → MITM, rogue DHCP, and DNS spoofing.</p>
+          <div class="page-num"></div>
+        </section>
+
         <!-- ========================================================= ARP SPOOFING ========================================================= -->
         <section class="slide">
           <div class="masthead">
             <div class="left"><span class="tag">Attack</span><span>ARP spoofing → man-in-the-middle</span></div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow amber reveal" style="--i: 0">Lie about a MAC, and traffic comes to you</span>
-          <h2 class="reveal" style="--i: 1; font-size: 48px">
-            "I'm the gateway." <em class="display">— the attacker</em>
+          <span class="eyebrow amber reveal" style="--i: 0">ARP has no authentication — a host believes any reply</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            "I'm the gateway." <em class="display">— the attacker.</em>
           </h2>
-          <div class="reveal" style="--i: 2; margin-top: 24px; display: flex; align-items: center; justify-content: center; gap: 24px; font-family: var(--font-mono); font-weight: 700">
-            <div class="ic-node">
-              <div class="ic-badge ic-cobalt"><i class="msym" data-ic="person"></i></div>
-              <div style="text-align: center; border: 2px solid var(--cobalt); background: var(--cobalt-soft); color: var(--cobalt-deep); border-radius: 12px; padding: 14px 24px; font-size: 23px">Victim<div style="font-size: 14px; color: var(--muted); font-weight: 400">192.168.1.50</div></div>
+
+          <!-- MITM diagram: BOTH the victim's and the gateway's ARP caches are
+               poisoned so all traffic relays through the attacker. -->
+          <div class="reveal" style="--i: 2; margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 16px; font-family: var(--font-mono); font-weight: 700">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+              <div class="ic-node"><div class="ic-badge ic-cobalt"><i class="msym" data-ic="person"></i></div>
+                <div style="text-align: center; border: 2px solid var(--cobalt); background: var(--cobalt-soft); color: var(--cobalt-deep); border-radius: 12px; padding: 10px 22px; font-size: 21px">Victim<div style="font-size: 13px; color: var(--muted); font-weight: 400">192.168.1.50</div></div>
+              </div>
+              <div style="font-size: 12px; color: #b5301f; background: #f3d2cc; border-radius: 6px; padding: 4px 10px">cache poisoned: 1.1 → <b>ATK</b></div>
             </div>
-            <div style="text-align: center; color: var(--amber); display: flex; flex-direction: column; align-items: center; gap: 4px"><i class="msym" data-ic="swap" style="width: 34px; height: 34px"></i><div style="font-size: 15px; max-width: 170px; color: var(--ink-soft)">traffic for the gateway is <strong>diverted</strong></div></div>
-            <div class="ic-node">
-              <div class="ic-badge ic-danger"><i class="msym" data-ic="bug"></i></div>
-              <div style="text-align: center; border: 2.5px solid #c0392b; background: var(--plum-soft); color: var(--plum); border-radius: 12px; padding: 14px 24px; font-size: 23px">Attacker<div style="font-size: 14px; color: var(--muted); font-weight: 400">forged ARP replies</div></div>
+            <div style="display: flex; flex-direction: column; align-items: center; color: var(--amber); gap: 2px"><span style="font-size: 26px; line-height: 1">⇄</span><span style="font-size: 12px; color: var(--ink-soft); max-width: 130px; text-align: center">forged reply<br />"1.1 is me"</span></div>
+            <div class="ic-node"><div class="ic-badge ic-danger"><i class="msym" data-ic="hacker"></i></div>
+              <div style="text-align: center; border: 2.5px solid #c0392b; background: var(--plum-soft); color: var(--plum); border-radius: 12px; padding: 10px 22px; font-size: 21px">Attacker<div style="font-size: 13px; color: var(--muted); font-weight: 400">MITM · relays on</div></div>
             </div>
-            <div style="text-align: center; color: var(--moss)"><i class="msym" data-ic="swap" style="width: 30px; height: 30px"></i></div>
-            <div class="ic-node">
-              <div class="ic-badge ic-moss"><i class="msym" data-ic="dns"></i></div>
-              <div style="text-align: center; border: 2px solid var(--moss); background: var(--moss-soft); color: var(--moss); border-radius: 12px; padding: 14px 24px; font-size: 23px">Gateway<div style="font-size: 14px; color: var(--muted); font-weight: 400">192.168.1.1</div></div>
+            <div style="display: flex; flex-direction: column; align-items: center; color: var(--amber); gap: 2px"><span style="font-size: 26px; line-height: 1">⇄</span><span style="font-size: 12px; color: var(--ink-soft); max-width: 130px; text-align: center">forged reply<br />"1.50 is me"</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+              <div class="ic-node"><div class="ic-badge ic-moss"><i class="msym" data-ic="router"></i></div>
+                <div style="text-align: center; border: 2px solid var(--moss); background: var(--moss-soft); color: var(--moss); border-radius: 12px; padding: 10px 22px; font-size: 21px">Gateway<div style="font-size: 13px; color: var(--muted); font-weight: 400">192.168.1.1</div></div>
+              </div>
+              <div style="font-size: 12px; color: #b5301f; background: #f3d2cc; border-radius: 6px; padding: 4px 10px">cache poisoned: 1.50 → <b>ATK</b></div>
             </div>
           </div>
-          <div class="grid-2" style="margin-top: 28px; gap: 44px">
-            <div class="card plum reveal" style="--i: 3"><div class="label label-ic"><i class="msym" data-ic="dangerous"></i>How the poisoning works</div><p style="margin-top: 8px; font-size: 19px">The attacker floods forged ARP replies claiming <strong>the gateway's IP is at the attacker's MAC.</strong> Victims now send their traffic to the attacker, who relays it on — reading or altering it first.</p></div>
-            <div class="card reveal" style="--i: 4"><div class="label label-ic" style="color: var(--cobalt-deep)"><i class="msym" data-ic="search"></i>The signature in Wireshark</div><p style="margin-top: 8px; font-size: 19px"><strong>Two different MACs</strong> claiming the same IP, or a flood of gratuitous ARPs. Expert Info flags <em>"duplicate IP address detected."</em></p></div>
+
+          <div class="grid-3" style="margin-top: 22px; gap: 24px">
+            <div class="card reveal" style="--i: 3"><div class="label label-ic" style="color: var(--cobalt-deep)"><i class="msym" data-ic="dangerous"></i>Why ARP can be fooled</div><p style="margin-top: 6px; font-size: 17px; line-height: 1.5">ARP is <strong>stateless with no authentication</strong>. A host caches <em>any</em> reply — even unsolicited (gratuitous) ones — and the <strong>last reply wins</strong>. Nothing checks the sender really owns that IP.</p></div>
+            <div class="card plum reveal" style="--i: 4"><div class="label label-ic"><i class="msym" data-ic="swap"></i>The attack, step by step</div><p style="margin-top: 6px; font-size: 17px; line-height: 1.5">① Attacker joins the LAN &amp; turns on IP forwarding. ② Sends forged replies to the <strong>victim</strong> ("I'm the gateway") <em>and</em> the <strong>gateway</strong> ("I'm the victim"). ③ Both caches poisoned → traffic relays <strong>through the attacker</strong>.</p></div>
+            <div class="card amber reveal" style="--i: 5"><div class="label label-ic" style="color: var(--amber)"><i class="msym" data-ic="bug"></i>What it enables</div><p style="margin-top: 6px; font-size: 17px; line-height: 1.5">From the middle the attacker can <strong>sniff</strong> credentials &amp; cookies, <strong>modify or inject</strong> traffic, <strong>SSL-strip / hijack sessions</strong>, or just <strong>drop it</strong> (DoS).</p></div>
           </div>
-          <div class="reveal" style="--i: 5; margin-top: 22px; padding: 16px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 18px; line-height: 1.55">
-            <strong>The sequence:</strong> ① the victim broadcasts an ARP request
-            → ② the attacker overhears it and waits → ③ it sends the
-            <em>last</em> spoofed reply, poisoning the victim's ARP cache.
-            <strong>Defense:</strong> <strong>Dynamic ARP Inspection</strong>
-            (with DHCP snooping) drops replies that don't match a trusted
-            IP–MAC binding; static ARP entries protect critical hosts.
+
+          <div class="reveal" style="--i: 6; margin-top: 18px; padding: 14px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 17px; line-height: 1.55">
+            <strong>Defense:</strong> <strong>Dynamic ARP Inspection</strong> (with DHCP snooping) drops replies that don't match a trusted IP–MAC binding &nbsp;·&nbsp; <strong>static ARP entries</strong> pin critical hosts &nbsp;·&nbsp; <strong>encrypt everything</strong> (HTTPS/TLS, VPN) so intercepted data is useless &nbsp;·&nbsp; <strong>detect</strong> with arpwatch or Wireshark's <em>"duplicate IP address detected."</em>
           </div>
           <div class="page-num"></div>
         </section>
@@ -8564,7 +9048,7 @@
             <div style="position: absolute; left: 50%; top: 24%; transform: translate(-50%, -50%); font-family: var(--font-mono); font-size: 13px; color: var(--muted); z-index: 2">normal path</div>
             <div class="psim-node" id="as-cli" style="left: 13%; top: 24%; color: var(--cobalt-deep)"><div class="ic-badge ic-cobalt"><i class="msym" data-ic="person"></i></div><div class="pn-label">Victim</div><div class="pn-sub">192.168.1.50 · client</div></div>
             <div class="psim-node" id="as-srv" style="left: 87%; top: 24%; color: var(--moss)"><div class="ic-badge ic-moss"><i class="msym" data-ic="dns"></i></div><div class="pn-label">Gateway</div><div class="pn-sub">192.168.1.1 · server</div></div>
-            <div class="psim-node" id="as-atk" style="left: 50%; top: 84%; color: var(--plum)"><div class="ic-badge ic-danger"><i class="msym" data-ic="bug"></i></div><div class="pn-label">Attacker</div><div class="pn-sub">wedged in the middle</div></div>
+            <div class="psim-node" id="as-atk" style="left: 50%; top: 84%; color: var(--plum)"><div class="ic-badge ic-danger"><i class="msym" data-ic="hacker"></i></div><div class="pn-label">Attacker</div><div class="pn-sub">wedged in the middle</div></div>
           </div>
           <div class="sim-controls">
             <div class="sim-status">
@@ -8636,7 +9120,7 @@
             </svg>
             <div class="psim-node" id="rd-cli" style="left: 13%; top: 24%; color: var(--cobalt-deep)"><div class="ic-badge ic-cobalt"><i class="msym" data-ic="devices"></i></div><div class="pn-label">New client</div><div class="pn-sub">no IP yet · trusts first offer</div></div>
             <div class="psim-node" id="rd-real" style="left: 87%; top: 24%; color: var(--moss)"><div class="ic-badge ic-moss"><i class="msym" data-ic="dns"></i></div><div class="pn-label">Real DHCP</div><div class="pn-sub">legitimate server</div></div>
-            <div class="psim-node" id="rd-rog" style="left: 50%; top: 84%; color: var(--plum)"><div class="ic-badge ic-danger"><i class="msym" data-ic="bug"></i></div><div class="pn-label">Rogue DHCP</div><div class="pn-sub">attacker · answers faster</div></div>
+            <div class="psim-node" id="rd-rog" style="left: 50%; top: 84%; color: var(--plum)"><div class="ic-badge ic-danger"><i class="msym" data-ic="hacker"></i></div><div class="pn-label">Rogue DHCP</div><div class="pn-sub">attacker · answers faster</div></div>
           </div>
           <div class="sim-controls">
             <div class="sim-status">
@@ -8669,7 +9153,7 @@
             </svg>
             <div class="psim-node" id="ds-vic" style="left: 13%; top: 24%; color: var(--cobalt-deep)"><div class="ic-badge ic-cobalt"><i class="msym" data-ic="person"></i></div><div class="pn-label">Victim</div><div class="pn-sub">browsing bank.com</div></div>
             <div class="psim-node" id="ds-res" style="left: 87%; top: 24%; color: var(--moss)"><div class="ic-badge ic-moss"><i class="msym" data-ic="dns"></i></div><div class="pn-label">Real resolver</div><div class="pn-sub">the honest answer</div></div>
-            <div class="psim-node" id="ds-atk" style="left: 50%; top: 84%; color: var(--plum)"><div class="ic-badge ic-danger"><i class="msym" data-ic="bug"></i></div><div class="pn-label">Attacker</div><div class="pn-sub">forges the reply, first</div></div>
+            <div class="psim-node" id="ds-atk" style="left: 50%; top: 84%; color: var(--plum)"><div class="ic-badge ic-danger"><i class="msym" data-ic="hacker"></i></div><div class="pn-label">Attacker</div><div class="pn-sub">forges the reply, first</div></div>
           </div>
           <div class="sim-controls">
             <div class="sim-status">
@@ -8685,51 +9169,153 @@
           <div class="page-num"></div>
         </section>
 
+        <!-- ========================================================= CHAPTER — ATTACK FAMILY 2 ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Attack family · 2 of 4 —</div>
+          <h2 class="reveal" style="--i: 1">Denial of service</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">Overwhelm a service until it can no longer answer — breaking <strong>Availability</strong>. Ahead: DoS / DDoS, reflection &amp; amplification, and MAC flooding.</p>
+          <div class="page-num"></div>
+        </section>
+
         <!-- ========================================================= MAC FLOODING + DoS ========================================================= -->
-        <section class="slide">
+        <section class="slide" id="dosSlide">
           <div class="masthead">
-            <div class="left"><span class="tag">Attack</span><span>Flooding the infrastructure</span></div>
+            <div class="left"><span class="tag">Attack</span><span>DoS &amp; DDoS — flooding availability</span></div>
             <div class="right"></div>
           </div>
           <span class="eyebrow reveal" style="--i: 0; color: var(--plum)">Overwhelm the service until it can't answer</span>
-          <h2 class="reveal" style="--i: 1; font-size: 46px">
-            DoS &amp; DDoS — <em class="display">drowning availability.</em>
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            DoS &amp; DDoS — <em class="display">flood it until it falls.</em>
           </h2>
-          <!-- DDoS botnet diagram: attacker → botnet → target -->
-          <div class="reveal" style="--i: 2; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 20px; font-family: var(--font-mono); font-weight: 700">
-            <div class="ic-node">
-              <div class="ic-badge ic-danger"><i class="msym" data-ic="bug"></i></div>
-              <div style="text-align: center; font-size: 19px; color: var(--plum)">Attacker<div class="nsub" style="color: var(--muted); font-weight: 400">commands the botnet</div></div>
+          <div class="reveal" style="--i: 2; margin-top: 10px; font-family: var(--font-mono); font-size: 15px; display: flex; gap: 28px; flex-wrap: wrap; justify-content: center">
+            <span><b style="color: var(--plum)">DoS</b> — Denial of Service <span style="color: var(--muted)">(サービス拒否攻撃) · one source</span></span>
+            <span><b style="color: #b5301f">DDoS</b> — Distributed Denial of Service <span style="color: var(--muted)">(分散型サービス拒否攻撃) · many sources</span></span>
+          </div>
+
+          <!-- Animated DDoS chain: attacker → botnet → target, with a server
+               load/memory meter that fills as the flood builds, then crashes. -->
+          <div class="iip-stage reveal" style="--i: 3" id="dosStage">
+            <div class="iip-track" style="margin-top: 10px">
+              <div class="iip-node" id="dosAtk" style="color: var(--plum)"><div class="ic-badge ic-danger"><i class="msym" data-ic="hacker"></i></div><div class="nm">ATTACKER</div><div class="sub">commands the botnet</div></div>
+              <div class="iip-arrow" id="dosA1"></div>
+              <div class="iip-node" id="dosBot" style="color: var(--ink); min-width: 178px"><div class="ic-badge ic-ink"><i class="msym" data-ic="hub"></i></div><div class="nm">BOTNET</div><div class="dos-botnet"><i class="msym" data-ic="devices"></i><i class="msym" data-ic="router"></i><i class="msym" data-ic="dvr"></i></div><div class="sub">infected PCs · routers · IoT cams</div></div>
+              <div class="iip-arrow" id="dosA2"></div>
+              <div class="iip-node" id="dosSrv" style="color: var(--amber)"><div class="ic-badge ic-amber"><i class="msym" data-ic="storage"></i></div><div class="nm">TARGET SERVER</div><div class="sub">the website</div></div>
+              <span class="iip-badge drop" id="dosCrash">✕ HTTP 503</span>
+              <div class="iip-node" id="dosUsers" style="color: var(--cobalt-deep); opacity: 0.5"><div class="ic-badge ic-cobalt"><i class="msym" data-ic="person"></i></div><div class="nm">REAL USERS</div><div class="sub" id="dosUsersSub">served</div></div>
             </div>
-            <div style="color: var(--muted); font-size: 28px">→</div>
-            <div class="ic-node">
-              <div class="ic-badge ic-ink"><i class="msym" data-ic="hub"></i></div>
-              <div style="text-align: center; font-size: 19px">Botnet<div class="nsub" style="color: var(--muted); font-weight: 400">10³–10⁶ infected devices</div></div>
+            <div class="dos-meter">
+              <div class="dm-top"><span>SERVER MEMORY / LOAD</span><span id="dosPct">0%</span></div>
+              <div class="dm-bar"><div class="dm-fill" id="dosFill"></div></div>
             </div>
-            <div style="text-align: center; color: var(--amber); display: flex; flex-direction: column; align-items: center"><i class="msym" data-ic="bolt" style="width: 32px; height: 32px"></i><div style="font-size: 13px; color: var(--ink-soft)">flood of traffic</div></div>
-            <div class="ic-node">
-              <div class="ic-badge ic-amber"><i class="msym" data-ic="dns"></i></div>
-              <div style="text-align: center; font-size: 19px; color: var(--amber)">Target<div class="nsub" style="color: var(--muted); font-weight: 400">server overwhelmed</div></div>
-            </div>
-            <div style="color: var(--muted); font-size: 28px">✕</div>
-            <div class="ic-node" style="opacity: 0.55">
-              <div class="ic-badge ic-cobalt"><i class="msym" data-ic="person"></i></div>
-              <div style="text-align: center; font-size: 19px">Real users<div class="nsub" style="color: var(--muted); font-weight: 400">shut out</div></div>
+            <div class="sim-controls">
+              <div class="sim-status">
+                <span>STEP<span class="badge" id="dosBadge">0 / 6</span></span>
+                <span class="narration" id="dosNarr" style="min-height: 54px; font-size: 16px; line-height: 1.5">Click <b>Next ▶</b> (or the diagram) — watch the attacker flood the server until its memory fills and the site crashes.</span>
+              </div>
+              <div class="btns">
+                <button class="sim-btn" id="dosPrev" disabled>◀ Back</button>
+                <button class="sim-btn primary" id="dosNext">Next ▶</button>
+                <button class="sim-btn" id="dosReplay" disabled>↺ Restart</button>
+              </div>
             </div>
           </div>
-          <!-- three DDoS categories -->
-          <div class="grid-3 reveal" style="--i: 3; margin-top: 24px; gap: 26px">
-            <div class="card"><div class="label label-ic" style="color: var(--cobalt-deep)"><i class="msym" data-ic="public"></i>Volumetric</div><p style="margin-top: 6px; font-size: 18px; line-height: 1.5">Saturate the <strong>bandwidth</strong> with sheer volume — UDP / ICMP / DNS floods. Measured in <strong>Gbps–Tbps</strong>.</p></div>
-            <div class="card amber"><div class="label label-ic"><i class="msym" data-ic="swap"></i>Protocol</div><p style="margin-top: 6px; font-size: 18px; line-height: 1.5">Exhaust <strong>connection state</strong> — a <strong>SYN flood</strong> leaves thousands of half-open TCP sessions. Measured in <strong>packets/s</strong>.</p></div>
-            <div class="card plum"><div class="label label-ic"><i class="msym" data-ic="dvr"></i>Application (L7)</div><p style="margin-top: 6px; font-size: 18px; line-height: 1.5">Mimic <strong>real requests</strong> — HTTP flood, Slowloris. Low bandwidth, looks legit, <strong>hard to filter</strong>. Req/s.</p></div>
-          </div>
-          <!-- DoS vs DDoS + MAC flooding -->
-          <div class="grid-2 reveal" style="--i: 4; margin-top: 22px; gap: 40px">
-            <div style="padding: 14px 22px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 18px; line-height: 1.5"><strong>DoS vs DDoS:</strong> one source is a <strong>DoS</strong> — block its IP and you're done. A <strong>DDoS</strong> comes from thousands of IPs at once, so you can't just drop one — you need scrubbing / rate-limiting upstream.</div>
-            <div style="padding: 14px 22px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 18px; line-height: 1.5"><strong>MAC flooding</strong> is a LAN cousin: flood a switch's <strong>CAM table</strong> until it "fails open" and broadcasts every frame — letting the attacker sniff. Defense: <strong>port security</strong>.</div>
+
+          <div class="reveal" style="--i: 4; margin-top: 12px; padding: 11px 22px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 15px; line-height: 1.55">
+            <strong>Flood types:</strong> Volumetric (Gbps–Tbps) · Protocol / SYN flood (pps) · Application L7 / HTTP flood (rps). &nbsp;<strong>Defense:</strong> block one IP for a DoS; a DDoS needs upstream <strong>scrubbing</strong>, <strong>rate-limiting</strong> &amp; a <strong>CDN / WAF</strong>. &nbsp;<span style="color: var(--muted)">(MAC flooding is the LAN cousin — floods a switch's CAM table; defense: port security.)</span>
           </div>
           <div class="page-num"></div>
         </section>
+
+        <script>
+          /* DoS / DDoS — animated flood + server-load meter, click-through
+             (slide 64). Reuses .iip-* node/arrow classes; the meter is a
+             %-width bar so it is scale-safe. */
+          (function () {
+            const stage = document.getElementById("dosStage");
+            if (!stage) return;
+            const $ = (id) => document.getElementById(id);
+            const atk = $("dosAtk"), bot = $("dosBot"), srv = $("dosSrv"), users = $("dosUsers");
+            const A1 = $("dosA1"), A2 = $("dosA2"), crash = $("dosCrash");
+            const fill = $("dosFill"), pct = $("dosPct"), usersSub = $("dosUsersSub");
+            const narr = $("dosNarr"), badge = $("dosBadge");
+            const prevBtn = $("dosPrev"), nextBtn = $("dosNext"), replayBtn = $("dosReplay");
+            const nodes = [atk, bot, srv, users], arrows = [A1, A2];
+
+            const STEPS = [
+              { on: [atk, srv], load: 25, col: "var(--amber)",
+                html: "① <b>DoS — Denial of Service.</b> A single machine floods the server with more requests than it can handle. Block that one IP and it stops." },
+              { on: [atk, bot], load: 25, col: "var(--amber)",
+                html: "② <b>DDoS — building the botnet.</b> The attacker first infects thousands of PCs, home routers and IoT cameras with malware — an army of remote 'bots'." },
+              { on: [atk, bot], flow: [A1], load: 25, col: "var(--amber)",
+                html: "③ <b>One command.</b> The attacker tells the whole botnet to strike at once — traffic now comes from thousands of IPs worldwide." },
+              { on: [bot, srv], flow: [A2], load: 80, col: "var(--amber)",
+                html: "④ <b>The flood.</b> Every bot hammers the server together. It can no longer separate real users from attack traffic — memory and bandwidth start filling up." },
+              { on: [srv], hit: [srv], load: 100, crash: true,
+                html: "⑤ <b>Memory full → crash.</b> Resources are exhausted; the server stops responding (HTTP 503) and real users are locked out — denial of service achieved." },
+              { on: [atk, bot, srv], load: 100, crash: true,
+                html: "⑥ <b>Defense.</b> A DoS = block one IP. A DDoS needs upstream scrubbing, rate-limiting and a CDN / WAF — you can't drop hundreds of thousands of IPs by hand." },
+            ];
+
+            let i = -1;
+            function clearAll() {
+              nodes.forEach((e) => e && e.classList.remove("on", "hit"));
+              arrows.forEach((a) => a && a.classList.remove("flow"));
+            }
+            function setMeter(load, col, crashed) {
+              fill.style.width = load + "%";
+              fill.style.background = crashed ? "#b5301f" : col;
+              pct.textContent = load + "%" + (crashed ? " · MEMORY FULL" : "");
+              pct.style.color = crashed ? "#b5301f" : "var(--ink)";
+            }
+            function render() {
+              clearAll();
+              crash.classList.remove("show");
+              users.style.opacity = "0.5";
+              usersSub.textContent = "served";
+              if (i < 0) {
+                narr.innerHTML = "Click <b>Next ▶</b> (or the diagram) — watch the attacker flood the server until its memory fills and the site crashes.";
+                badge.textContent = "0 / 6";
+                setMeter(0, "var(--moss)", false);
+              } else {
+                const s = STEPS[i];
+                (s.on || []).forEach((e) => e && e.classList.add("on"));
+                (s.hit || []).forEach((e) => e && e.classList.add("hit"));
+                (s.flow || []).forEach((e) => e && e.classList.add("flow"));
+                setMeter(s.load, s.col || "var(--amber)", !!s.crash);
+                if (s.crash) {
+                  crash.classList.add("show");
+                  users.style.opacity = "1";
+                  users.classList.add("hit");
+                  usersSub.textContent = "locked out";
+                }
+                narr.innerHTML = s.html;
+                badge.textContent = i + 1 + " / 6";
+              }
+              prevBtn.disabled = i <= 0;
+              nextBtn.disabled = i >= STEPS.length - 1;
+              nextBtn.textContent = i >= STEPS.length - 1 ? "✓ Done" : "Next ▶";
+              replayBtn.disabled = i < 0;
+            }
+            function next() { if (i < STEPS.length - 1) { i++; render(); } }
+            function prev() { if (i > 0) { i--; render(); } }
+            function restart() { i = -1; render(); }
+            nextBtn.addEventListener("click", next);
+            prevBtn.addEventListener("click", prev);
+            replayBtn.addEventListener("click", restart);
+            stage.addEventListener("click", (e) => { if (e.target.closest(".sim-controls")) return; next(); });
+
+            let primed = false;
+            const slide = document.getElementById("dosSlide");
+            if (slide) {
+              new MutationObserver(() => {
+                if (slide.classList.contains("active") && !primed) { primed = true; i = 0; render(); }
+              }).observe(slide, { attributes: true, attributeFilter: ["class"] });
+            }
+            render();
+          })();
+        </script>
 
         <!-- ========================================================= REFLECTION & AMPLIFICATION ========================================================= -->
         <section class="slide">
@@ -8810,7 +9396,7 @@
             </svg>
             <div style="position: absolute; left: 28%; top: 6%; transform: translate(-50%, -50%); font-family: var(--font-mono); font-size: 12px; color: var(--muted); z-index: 2">tiny spoofed queries →</div>
             <div style="position: absolute; left: 69%; top: 6%; transform: translate(-50%, -50%); font-family: var(--font-mono); font-size: 12px; color: var(--amber); z-index: 2">⟹ amplified replies</div>
-            <div class="psim-node" id="dz-atk" style="left: 8%; top: 50%; color: var(--plum)"><div class="ic-badge ic-danger"><i class="msym" data-ic="bug"></i></div><div class="pn-label">Attacker</div><div class="pn-sub">spoofs victim's IP</div></div>
+            <div class="psim-node" id="dz-atk" style="left: 8%; top: 50%; color: var(--plum)"><div class="ic-badge ic-danger"><i class="msym" data-ic="hacker"></i></div><div class="pn-label">Attacker</div><div class="pn-sub">spoofs victim's IP</div></div>
             <div class="psim-node" id="dz-r1" style="left: 48%; top: 14%; color: var(--ink)"><div class="ic-badge ic-ink"><i class="msym" data-ic="dns"></i></div><div class="pn-label">DNS</div><div class="pn-sub">open resolver</div></div>
             <div class="psim-node" id="dz-r2" style="left: 48%; top: 38%; color: var(--ink)"><div class="ic-badge ic-ink"><i class="msym" data-ic="dns"></i></div><div class="pn-label">NTP</div><div class="pn-sub">monlist</div></div>
             <div class="psim-node" id="dz-r3" style="left: 48%; top: 62%; color: var(--ink)"><div class="ic-badge ic-ink"><i class="msym" data-ic="dns"></i></div><div class="pn-label">memcached</div><div class="pn-sub">≈ 51,000×</div></div>
@@ -8828,6 +9414,15 @@
               <button class="sim-btn" id="dzStop" disabled>■ Stop</button>
             </div>
           </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= CHAPTER — ATTACK FAMILY 3 ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Attack family · 3 of 4 —</div>
+          <h2 class="reveal" style="--i: 1">Malware &amp; code</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">Run hostile code to take over the host. Ahead: viruses, worms, Trojans, and buffer-overflow exploits.</p>
           <div class="page-num"></div>
         </section>
 
@@ -8905,28 +9500,138 @@
             <div class="left"><span class="tag">Interactive · Attack</span><span>Trojan · the disguised payload</span></div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow reveal" style="--i: 0; color: var(--plum)">Live simulation · Press START</span>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--plum)">Six steps · click through it</span>
           <h2 class="reveal" style="--i: 1; font-size: 46px">
-            Looks like a gift. <em class="display">Hides an attacker.</em>
+            How a Trojan horse <em class="display">actually works.</em>
           </h2>
-          <div class="psim-stage reveal" id="tj-stage" style="--i: 2; height: 360px">
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1">
-              <line x1="18" y1="50" x2="82" y2="50" stroke="var(--rule)" stroke-width="0.35" stroke-dasharray="1.3 1.3" />
-            </svg>
-            <div class="psim-node" id="tj-vic" style="left: 18%; top: 50%; color: var(--cobalt-deep)"><div class="ic-badge ic-cobalt"><i class="msym" data-ic="person"></i></div><div class="pn-label">Victim</div><div class="pn-sub">opens the file</div></div>
-            <div class="psim-node" id="tj-atk" style="left: 82%; top: 50%; color: var(--plum)"><div class="ic-badge ic-danger"><i class="msym" data-ic="bug"></i></div><div class="pn-label">Attacker</div><div class="pn-sub">command &amp; control</div></div>
+
+          <!-- 6-step lifecycle grid (2×3), stepped through on click -->
+          <div class="tjg-flow reveal" style="--i: 2" id="tjStage">
+            <div class="tjg-row">
+              <div class="tjg-card" id="tj1" style="color: var(--plum)">
+                <div class="ic-badge ic-plum"><i class="msym" data-ic="masks"></i></div>
+                <div class="tjg-num">STEP 1</div>
+                <div class="tjg-label">Malware hidden inside a normal-looking file</div>
+              </div>
+              <div class="tjg-arrow" id="tjAr1">→</div>
+              <div class="tjg-card" id="tj2" style="color: var(--cobalt-deep)">
+                <div class="ic-badge ic-cobalt"><i class="msym" data-ic="bolt"></i></div>
+                <div class="tjg-num">STEP 2</div>
+                <div class="tjg-label">Activated when the user opens the file</div>
+              </div>
+              <div class="tjg-arrow" id="tjAr2">→</div>
+              <div class="tjg-card" id="tj3" style="color: var(--amber)">
+                <div class="ic-badge ic-amber"><i class="msym" data-ic="storage"></i></div>
+                <div class="tjg-num">STEP 3</div>
+                <div class="tjg-label">Installs into system or temporary folders</div>
+              </div>
+            </div>
+            <div class="tjg-row">
+              <div class="tjg-card" id="tj4" style="color: var(--amber)">
+                <div class="ic-badge ic-amber"><i class="msym" data-ic="cached"></i></div>
+                <div class="tjg-num">STEP 4</div>
+                <div class="tjg-label">Runs quietly in the background</div>
+              </div>
+              <div class="tjg-arrow" id="tjAr4">→</div>
+              <div class="tjg-card" id="tj5" style="color: #b5301f">
+                <div class="ic-badge ic-danger"><i class="msym" data-ic="key"></i></div>
+                <div class="tjg-num">STEP 5</div>
+                <div class="tjg-label">Creates hidden access for the attacker</div>
+              </div>
+              <div class="tjg-arrow" id="tjAr5">→</div>
+              <div class="tjg-card" id="tj6" style="color: #b5301f">
+                <div class="ic-badge ic-danger"><i class="msym" data-ic="warning"></i></div>
+                <div class="tjg-num">STEP 6</div>
+                <div class="tjg-label">Steals data or installs more malware</div>
+              </div>
+            </div>
           </div>
+
           <div class="sim-controls">
             <div class="sim-status">
-              <span>STATUS<span class="badge" id="tjBadge">IDLE</span></span>
-              <span class="narration" id="tjNarration">Click START — a file that looks useful quietly hands the attacker a backdoor.</span>
+              <span>STEP<span class="badge" id="tjBadge">0 / 6</span></span>
+              <span class="narration" id="tjNarration" style="min-height: 52px; font-size: 16px; line-height: 1.5">Click <b>Next ▶</b> (or any card) to walk through how a Trojan goes from a harmless-looking file to a full compromise.</span>
             </div>
             <div class="btns">
-              <button class="sim-btn primary" id="tjStart">▶ Start</button>
-              <button class="sim-btn pause" id="tjPause" disabled>❚❚ Pause</button>
-              <button class="sim-btn" id="tjStop" disabled>■ Stop</button>
+              <button class="sim-btn" id="tjPrev" disabled>◀ Back</button>
+              <button class="sim-btn primary" id="tjNext">Next ▶</button>
+              <button class="sim-btn" id="tjReplay" disabled>↺ Restart</button>
             </div>
           </div>
+
+          <div class="reveal" style="--i: 3; margin-top: 12px; padding: 10px 22px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-family: var(--font-mono); font-size: 14px; line-height: 1.6">
+            <strong>Common types:</strong> Backdoor &nbsp;·&nbsp; RAT (remote access) &nbsp;·&nbsp; Downloader &nbsp;·&nbsp; Banking &nbsp;·&nbsp; Keylogger / Spyware &nbsp;·&nbsp; Ransomware &nbsp;·&nbsp; Rootkit &nbsp;—&nbsp; <span style="color: var(--muted)">a Trojan needs a user to run it and does <strong>not</strong> self-replicate (unlike a virus or worm).</span>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <script>
+          /* Trojan — six-step "how it works" lifecycle, manual click-through
+             (slide 69). Mirrors the reference infographic. Pure class toggles,
+             so it is immune to the scaled stage. */
+          (function () {
+            const stage = document.getElementById("tjStage");
+            if (!stage) return;
+            const $ = (id) => document.getElementById(id);
+            const cards = ["tj1", "tj2", "tj3", "tj4", "tj5", "tj6"].map($);
+            const arrows = ["tjAr1", "tjAr2", "tjAr4", "tjAr5"].map($);
+            const arrowInto = { 1: $("tjAr1"), 2: $("tjAr2"), 4: $("tjAr4"), 5: $("tjAr5") };
+            const narr = $("tjNarration"), badge = $("tjBadge");
+            const prevBtn = $("tjPrev"), nextBtn = $("tjNext"), replayBtn = $("tjReplay");
+            const TXT = [
+              "<b>① Disguise.</b> The malware is hidden inside a normal-looking file — a document, installer or fake 'update' — so the user trusts it and opens it.",
+              "<b>② Activation.</b> Nothing happens until the user opens the file. Unlike a virus, a Trojan needs that human action to run.",
+              "<b>③ Installation.</b> Once running, it copies its files into the system or temporary folders so it survives a reboot (persistence).",
+              "<b>④ Background.</b> It runs quietly — no pop-ups, no alerts — hiding its activity while it prepares the payload.",
+              "<b>⑤ Hidden access.</b> It opens a backdoor / C2 channel, handing the attacker remote control of the machine.",
+              "<b>⑥ Payload.</b> Finally it steals data, captures credentials, or installs more malware — RAT, banking, ransomware. Defense: never run untrusted files; endpoint AMP catches the payload.",
+            ];
+            let i = -1;
+            function render() {
+              cards.forEach((c, k) => {
+                c.classList.toggle("on", k === i);
+                c.classList.toggle("done", k < i);
+              });
+              arrows.forEach((a) => a && a.classList.remove("flow"));
+              if (i < 0) {
+                narr.innerHTML =
+                  "Click <b>Next ▶</b> (or any card) to walk through how a Trojan goes from a harmless-looking file to a full compromise.";
+                badge.textContent = "0 / 6";
+              } else {
+                if (arrowInto[i]) arrowInto[i].classList.add("flow");
+                narr.innerHTML = TXT[i];
+                badge.textContent = i + 1 + " / 6";
+              }
+              prevBtn.disabled = i <= 0;
+              nextBtn.disabled = i >= 5;
+              nextBtn.textContent = i >= 5 ? "✓ Done" : "Next ▶";
+              replayBtn.disabled = i < 0;
+            }
+            function next() { if (i < 5) { i++; render(); } }
+            function prev() { if (i > 0) { i--; render(); } }
+            function restart() { i = -1; render(); }
+            nextBtn.addEventListener("click", next);
+            prevBtn.addEventListener("click", prev);
+            replayBtn.addEventListener("click", restart);
+            cards.forEach((c, k) => c.addEventListener("click", () => { i = k; render(); }));
+
+            let primed = false;
+            const slide = document.getElementById("trojanSlide");
+            if (slide) {
+              new MutationObserver(() => {
+                if (slide.classList.contains("active") && !primed) { primed = true; i = 0; render(); }
+              }).observe(slide, { attributes: true, attributeFilter: ["class"] });
+            }
+            render();
+          })();
+        </script>
+
+        <!-- ========================================================= CHAPTER — ATTACK FAMILY 4 ========================================================= -->
+        <section class="slide divider-slide">
+          <div class="marker reveal" style="--i: 0">— Attack family · 4 of 4 —</div>
+          <h2 class="reveal" style="--i: 1">Recon &amp; the human</h2>
+          <div class="underline reveal" style="--i: 2"></div>
+          <p class="blurb reveal" style="--i: 3">Scout the target or trick the person to find the way in. Ahead: reconnaissance &amp; scanning, social engineering, and weak / stolen passwords.</p>
           <div class="page-num"></div>
         </section>
 
@@ -9074,86 +9779,309 @@
         </section>
 
         <!-- ========================================================= FIREWALLS & ZONES ========================================================= -->
-        <section class="slide">
+        <section class="slide" id="dmzSlide">
           <div class="masthead">
             <div class="left"><span class="tag">Defense</span><span>Firewalls · zones &amp; the DMZ</span></div>
             <div class="right"></div>
           </div>
           <span class="eyebrow moss reveal" style="--i: 0">The gatekeeper between trust levels</span>
-          <h2 class="reveal" style="--i: 1; font-size: 50px">
-            Default <em class="display">deny.</em> Allow only what's needed.
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Default <em class="display">deny.</em> Expose the DMZ — never the LAN.
           </h2>
-          <!-- zone diagram with icons + direction rules -->
-          <div class="reveal" style="--i: 2; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 22px; font-family: var(--font-mono); font-weight: 700">
-            <div class="ic-node">
-              <div class="ic-badge ic-amber"><i class="msym" data-ic="public"></i></div>
-              <div style="text-align: center; font-size: 18px; color: var(--amber)">OUTSIDE<div class="nsub" style="color: var(--muted); font-weight: 400">Internet · untrusted</div></div>
-            </div>
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--muted); font-size: 13px"><span style="font-size: 26px; line-height: 1">→</span>default deny</div>
-            <div class="ic-node">
-              <div class="ic-badge ic-ink"><i class="msym" data-ic="shield"></i></div>
-              <div style="text-align: center; font-size: 18px">FIREWALL<div class="nsub" style="color: var(--muted); font-weight: 400">stateful rules</div></div>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 16px">
-              <div style="display: flex; align-items: center; gap: 10px"><span style="color: var(--moss); font-size: 15px">✓&nbsp;:443/:25/:53→</span>
-                <div class="ic-node" style="flex-direction: row; gap: 12px"><div class="ic-badge ic-plum" style="width: 54px; height: 54px"><i class="msym" data-ic="dvr"></i></div><div style="font-size: 17px; color: var(--plum)">DMZ<div class="nsub" style="color: var(--muted); font-weight: 400">public web · mail · DNS</div></div></div>
+
+          <!-- Animated DMZ (screened subnet): a request walks
+               Internet → external FW → DMZ → internal FW → internal LAN.
+               JS steps highlight each zone/gate and drive the narration. -->
+          <div class="dmz-stage reveal" style="--i: 2" id="dmzStage">
+            <div class="dmz-flow">
+              <!-- Internet — untrusted -->
+              <div class="dmz-zone" id="dmzInternet" style="color: var(--amber)">
+                <div class="ic-badge ic-amber"><i class="msym" data-ic="public"></i></div>
+                <div class="dz-name">INTERNET</div>
+                <div class="dz-sub">untrusted</div>
               </div>
-              <div style="display: flex; align-items: center; gap: 10px"><span style="color: #b5301f; font-size: 15px">✕&nbsp;outside→</span>
-                <div class="ic-node" style="flex-direction: row; gap: 12px"><div class="ic-badge ic-moss" style="width: 54px; height: 54px"><i class="msym" data-ic="devices"></i></div><div style="font-size: 17px; color: var(--moss)">INSIDE<div class="nsub" style="color: var(--muted); font-weight: 400">internal · trusted · hidden</div></div></div>
+              <!-- external firewall -->
+              <div class="dmz-gate" id="dmzFw1" style="color: var(--ink)">
+                <div class="dg-fw"><div class="ic-badge ic-ink"><i class="msym" data-ic="shield"></i></div><span>EXTERNAL&nbsp;FW</span></div>
+                <div class="dg-track"></div>
+                <div class="dg-rule ok">permit :443 :25 :53</div>
+              </div>
+              <!-- DMZ — public-facing buffer subnet -->
+              <div class="dmz-zone dmz-box" id="dmzDmz" style="color: var(--plum)">
+                <div class="dz-name">DMZ</div>
+                <div class="dz-sub">public-facing buffer</div>
+                <div class="dmz-servers">
+                  <div class="dmz-srv"><div class="ic-badge ic-plum"><i class="msym" data-ic="dvr"></i></div>Web</div>
+                  <div class="dmz-srv"><div class="ic-badge ic-plum"><i class="msym" data-ic="storage"></i></div>Mail</div>
+                  <div class="dmz-srv"><div class="ic-badge ic-plum"><i class="msym" data-ic="dns"></i></div>DNS</div>
+                </div>
+              </div>
+              <!-- internal firewall -->
+              <div class="dmz-gate" id="dmzFw2" style="color: var(--ink)">
+                <div class="dg-fw"><div class="ic-badge ic-ink"><i class="msym" data-ic="shield"></i></div><span>INTERNAL&nbsp;FW</span></div>
+                <div class="dg-track"></div>
+                <div class="dg-rule deny">deny dmz → inside</div>
+              </div>
+              <!-- internal LAN — trusted, hidden -->
+              <div class="dmz-zone" id="dmzLan" style="color: var(--moss)">
+                <div class="ic-badge ic-moss"><i class="msym" data-ic="devices"></i></div>
+                <div class="dz-name">INTERNAL LAN</div>
+                <div class="dz-sub">trusted · hidden</div>
+              </div>
+            </div>
+
+            <!-- controls + narration (reuses the deck's sim styling) -->
+            <div class="sim-controls">
+              <div class="sim-status">
+                <span>STEP<span class="badge" id="dmzBadge">0 / 6</span></span>
+                <span class="narration" id="dmzNarrate" style="min-height: 78px; font-size: 17px; line-height: 1.5">Click <b>Next ▶</b> (or the diagram) to walk through the DMZ one step at a time.</span>
+              </div>
+              <div class="btns">
+                <button class="sim-btn" id="dmzPrev" disabled>◀ Back</button>
+                <button class="sim-btn primary" id="dmzNext">Next ▶</button>
+                <button class="sim-btn" id="dmzReplay" disabled>↺ Restart</button>
               </div>
             </div>
           </div>
-          <div class="grid-3" style="margin-top: 22px; gap: 26px">
-            <div class="card reveal" style="--i: 3"><div class="label" style="color: var(--cobalt-deep)">What it inspects</div><p style="margin-top: 6px; font-size: 17px; line-height: 1.5">Source/dest <strong>IP</strong> &amp; <strong>port</strong>, application &amp; URL, and — crucially — <strong>connection state</strong>: who opened it, tracked from the TCP <span class="mono">SYN</span>.</p></div>
-            <div class="card moss reveal" style="--i: 4"><div class="label">Zones &amp; the DMZ</div><p style="margin-top: 6px; font-size: 17px; line-height: 1.5">Inside → Outside allowed; Outside → Inside <strong>denied</strong>. Public servers sit in the <strong>DMZ</strong> so the Internet reaches <em>them</em>, never the internal LAN.</p></div>
-            <div class="card amber reveal" style="--i: 5"><div class="label">Stateful = return traffic</div><p style="margin-top: 6px; font-size: 17px; line-height: 1.5">Because it remembers each connection, replies to a request <strong>you</strong> started are let back automatically — no rule needed for the return path.</p></div>
-          </div>
-          <div class="reveal" style="--i: 6; margin-top: 16px; padding: 13px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-family: var(--font-mono); font-size: 16px; line-height: 1.7">
+
+          <div class="reveal" style="--i: 3; margin-top: 14px; padding: 12px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-family: var(--font-mono); font-size: 16px; line-height: 1.7">
             <span style="color: var(--moss)">permit</span> inside → any &nbsp;·&nbsp; <span style="color: var(--moss)">permit</span> any → dmz <span style="color: var(--cobalt-deep)">eq 443/25/53</span> &nbsp;·&nbsp; <span style="color: #b5301f">deny</span> any → inside &nbsp;·&nbsp; <span style="color: #b5301f">deny ip any any</span> <span style="color: var(--muted)">(implicit — default deny)</span>
           </div>
           <div class="page-num"></div>
         </section>
 
+        <script>
+          /* DMZ architecture — manual, click-through explainer (slide 76).
+             Pure class-toggle animation (no pixel math) so it is immune to
+             the scaled stage. The viewer advances one step at a time with the
+             Back / Next buttons — or by clicking anywhere on the diagram. */
+          (function () {
+            const stage = document.getElementById("dmzStage");
+            if (!stage) return;
+            const $ = (id) => document.getElementById(id);
+            const internet = $("dmzInternet"), fw1 = $("dmzFw1"),
+              dmz = $("dmzDmz"), fw2 = $("dmzFw2"), lan = $("dmzLan");
+            const narr = $("dmzNarrate"), badge = $("dmzBadge");
+            const prevBtn = $("dmzPrev"), nextBtn = $("dmzNext"), replayBtn = $("dmzReplay");
+            const all = [internet, fw1, dmz, fw2, lan];
+
+            const STEPS = [
+              { on: [internet], badge: "INTERNET",
+                html: "<b>① The request starts in the Internet — an untrusted zone.</b> The firewall trusts nothing out here, so its baseline rule is <i>default-deny</i>: unless a rule explicitly permits a packet, it is dropped." },
+              { on: [internet, fw1], flow: [fw1], badge: "EXTERNAL FW",
+                html: "<b>② The external (perimeter) firewall is the first gate.</b> It permits only the few public services the business must expose — <span class=\"mono\">:443</span> HTTPS, <span class=\"mono\">:25</span> mail, <span class=\"mono\">:53</span> DNS — and drops everything else, including any direct attempt to reach the internal network." },
+              { on: [fw1, dmz], flow: [fw1], badge: "DMZ",
+                html: "<b>③ Allowed traffic lands in the DMZ — not the LAN.</b> The DMZ is a separate buffer subnet holding only public-facing servers (web, mail, DNS). Outsiders talk to <i>these</i> machines; the internal network is never directly reachable from the Internet." },
+              { on: [dmz, fw2], deny: [fw2], badge: "INTERNAL FW",
+                html: "<b>④ A second, internal firewall guards the LAN.</b> It blocks the DMZ from <i>initiating</i> connections inward — so even if an attacker fully owns a DMZ server, they still cannot pivot into the internal network. The blast radius stays contained." },
+              { on: [lan], badge: "INTERNAL LAN",
+                html: "<b>⑤ The internal LAN stays hidden and trusted.</b> Inside hosts can reach out to the DMZ and the Internet (inside → out), but unsolicited outside → in traffic is denied — attackers cannot even see what lives in here." },
+              { on: all, badge: "STATEFUL",
+                html: "<b>↩ The firewalls are stateful, so replies just work.</b> Each one remembers connections opened from the trusted side and automatically allows their return packets — no separate inbound rule is needed for traffic you asked for." },
+            ];
+
+            let i = -1;
+            function clearAll() {
+              all.forEach((e) => e && e.classList.remove("on", "flow", "deny"));
+            }
+            function render() {
+              clearAll();
+              if (i < 0) {
+                narr.innerHTML =
+                  "Click <b>Next ▶</b> (or the diagram) to walk through the DMZ one step at a time.";
+                badge.textContent = "0 / " + STEPS.length;
+              } else {
+                const s = STEPS[i];
+                (s.on || []).forEach((e) => e && e.classList.add("on"));
+                (s.flow || []).forEach((e) => e && e.classList.add("flow"));
+                (s.deny || []).forEach((e) => e && e.classList.add("deny"));
+                narr.innerHTML = s.html;
+                badge.textContent = i + 1 + " / " + STEPS.length + " · " + s.badge;
+              }
+              prevBtn.disabled = i <= 0;
+              nextBtn.disabled = i >= STEPS.length - 1;
+              nextBtn.textContent = i >= STEPS.length - 1 ? "✓ Done" : "Next ▶";
+              replayBtn.disabled = i < 0;
+            }
+            function next() { if (i < STEPS.length - 1) { i++; render(); } }
+            function prev() { if (i > 0) { i--; render(); } }
+            function restart() { i = -1; render(); }
+
+            nextBtn.addEventListener("click", next);
+            prevBtn.addEventListener("click", prev);
+            replayBtn.addEventListener("click", restart);
+            // Clicking the diagram itself also advances (ignore clicks on the controls).
+            stage.addEventListener("click", (e) => {
+              if (e.target.closest(".sim-controls")) return;
+              next();
+            });
+
+            // Show the first step the first time the slide becomes active.
+            let primed = false;
+            const slide = document.getElementById("dmzSlide");
+            if (slide) {
+              new MutationObserver(() => {
+                if (slide.classList.contains("active") && !primed) {
+                  primed = true;
+                  i = 0;
+                  render();
+                }
+              }).observe(slide, { attributes: true, attributeFilter: ["class"] });
+            }
+            render();
+          })();
+        </script>
+
         <!-- ========================================================= IPS / IDS / NGFW ========================================================= -->
-        <section class="slide">
+        <section class="slide" id="idsipsSlide">
           <div class="masthead">
             <div class="left"><span class="tag">Defense</span><span>IPS · IDS · next-generation</span></div>
             <div class="right"></div>
           </div>
           <span class="eyebrow amber reveal" style="--i: 0">From "is it allowed?" to "is it an attack?"</span>
-          <h2 class="reveal" style="--i: 1; font-size: 50px">
-            Inspect the payload, <em class="display">block the exploit.</em>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Same signatures — <em class="display">one alerts, one blocks.</em>
           </h2>
-          <!-- full names -->
-          <div class="reveal" style="--i: 2; margin-top: 14px; display: flex; gap: 14px; flex-wrap: wrap">
-            <span class="atk-chip" style="color: var(--cobalt-deep)"><i class="msym" data-ic="search"></i>IDS — Intrusion <strong>Detection</strong> System</span>
-            <span class="atk-chip" style="color: var(--amber)"><i class="msym" data-ic="gpp_bad"></i>IPS — Intrusion <strong>Prevention</strong> System</span>
-            <span class="atk-chip" style="color: var(--moss)"><i class="msym" data-ic="shield"></i>NGFW — Next-Generation Firewall</span>
-          </div>
-          <!-- IDS out-of-band vs IPS in-line diagram -->
-          <div class="grid-2" style="margin-top: 18px; gap: 40px; align-items: stretch">
-            <div class="card reveal" style="--i: 3">
-              <div class="label label-ic" style="color: var(--cobalt-deep)"><i class="msym" data-ic="search"></i>IDS — detection, out-of-band</div>
-              <div style="display: flex; align-items: center; gap: 9px; margin: 12px 0 6px; font-family: var(--font-mono); font-weight: 700; font-size: 15px">
-                <span class="atk-chip" style="padding: 7px 11px">Internet</span><span style="color: var(--muted)">→</span><span class="atk-chip" style="padding: 7px 11px">Switch</span><span style="color: var(--muted)">→</span><span class="atk-chip" style="padding: 7px 11px">LAN</span>
+
+          <!-- Animated IDS (out-of-band) vs IPS (inline) comparison.
+               JS steps a malicious packet through each lane and drives the
+               narration: IDS only sees a copy and alerts late; IPS sits in
+               the path and drops the packet before it reaches the LAN. -->
+          <div class="iip-stage reveal" style="--i: 2" id="idsipsStage">
+            <!-- LANE A — IDS, out-of-band / passive -->
+            <div class="iip-lane" style="color: var(--cobalt-deep)">
+              <div class="iip-tag"><i class="msym" data-ic="search"></i>IDS — Intrusion Detection · out-of-band · passive</div>
+              <div class="iip-track">
+                <div class="iip-node" id="iipIdsSrc" style="color: var(--amber)"><div class="ic-badge ic-amber"><i class="msym" data-ic="public"></i></div><div class="nm">TRAFFIC</div><div class="sub">malicious packet</div></div>
+                <div class="iip-arrow" id="iipA1"></div>
+                <div class="iip-node" id="iipIdsSw" style="color: var(--cobalt-deep)"><div class="ic-badge ic-cobalt"><i class="msym" data-ic="hub"></i></div><div class="nm">SWITCH</div><div class="sub">SPAN / TAP</div></div>
+                <div class="iip-arrow" id="iipA2"></div>
+                <div class="iip-node" id="iipIdsLan" style="color: var(--moss)"><div class="ic-badge ic-moss"><i class="msym" data-ic="devices"></i></div><div class="nm">LAN</div><div class="sub">hosts</div></div>
               </div>
-              <div style="display: flex; align-items: center; gap: 9px; font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: var(--cobalt-deep)">↳ SPAN / TAP copy → <span class="atk-chip" style="padding: 7px 11px; color: var(--cobalt-deep)"><i class="msym" data-ic="search"></i>IDS</span> <i class="msym" data-ic="warning" style="width: 18px; height: 18px; color: var(--amber)"></i> alert</div>
-              <p style="margin-top: 10px; font-size: 17px; line-height: 1.5">Sees only a <strong>copy</strong> of traffic, so the packet has <strong>already passed</strong>. It <strong>logs &amp; alerts</strong> — it cannot stop the attack.</p>
-            </div>
-            <div class="card amber reveal" style="--i: 4">
-              <div class="label label-ic"><i class="msym" data-ic="gpp_bad"></i>IPS — prevention, in-line</div>
-              <div style="display: flex; align-items: center; gap: 9px; margin: 12px 0 6px; font-family: var(--font-mono); font-weight: 700; font-size: 15px">
-                <span class="atk-chip" style="padding: 7px 11px">Internet</span><span style="color: var(--muted)">→</span><span class="atk-chip" style="padding: 7px 11px; border-color: var(--amber); color: var(--amber)"><i class="msym" data-ic="gpp_bad"></i>IPS</span><span style="color: #b5301f; font-weight: 800">✕</span><span style="color: var(--muted)">→</span><span class="atk-chip" style="padding: 7px 11px">LAN</span>
+              <div class="iip-branch">↳ mirrored copy →
+                <div class="iip-node" id="iipIdsSensor" style="color: var(--cobalt-deep); min-width: 92px; padding: 8px 12px"><div class="ic-badge ic-cobalt" style="width: 32px; height: 32px"><i class="msym" data-ic="search"></i></div><div class="nm" style="font-size: 12px">IDS sensor</div></div>
+                <span class="iip-badge alert" id="iipIdsAlert"><i class="msym" data-ic="warning"></i>ALERT — after it passed</span>
               </div>
-              <div style="font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: var(--amber)">sits in the path → drops the bad packet</div>
-              <p style="margin-top: 10px; font-size: 17px; line-height: 1.5">Every packet flows <strong>through</strong> it and is matched to a <strong>signature database</strong>. On a hit it can <strong>drop / redirect</strong> in real time — <strong>before</strong> it lands.</p>
+            </div>
+
+            <!-- LANE B — IPS, inline / active -->
+            <div class="iip-lane" style="color: var(--amber)">
+              <div class="iip-tag"><i class="msym" data-ic="gpp_bad"></i>IPS — Intrusion Prevention · inline · active</div>
+              <div class="iip-track">
+                <div class="iip-node" id="iipIpsSrc" style="color: var(--amber)"><div class="ic-badge ic-amber"><i class="msym" data-ic="public"></i></div><div class="nm">TRAFFIC</div><div class="sub">malicious packet</div></div>
+                <div class="iip-arrow" id="iipB1"></div>
+                <div class="iip-node" id="iipIpsBox" style="color: var(--amber)"><div class="ic-badge ic-amber"><i class="msym" data-ic="gpp_bad"></i></div><div class="nm">IPS</div><div class="sub">in the path</div></div>
+                <span class="iip-badge drop" id="iipIpsDrop">✕ DROP · RESET · SHUN</span>
+                <div class="iip-arrow" id="iipB2"></div>
+                <div class="iip-node" id="iipIpsLan" style="color: var(--moss)"><div class="ic-badge ic-moss"><i class="msym" data-ic="devices"></i></div><div class="nm">LAN</div><div class="sub">protected</div></div>
+              </div>
+            </div>
+
+            <!-- controls + narration (reuses the deck's sim styling) -->
+            <div class="sim-controls">
+              <div class="sim-status">
+                <span>STEP<span class="badge" id="iipBadge">0 / 5</span></span>
+                <span class="narration" id="iipNarrate" style="min-height: 60px; font-size: 16px; line-height: 1.5">Click <b>Next ▶</b> (or the diagram) to step through how IDS and IPS each handle the same malicious packet.</span>
+              </div>
+              <div class="btns">
+                <button class="sim-btn" id="iipPrev" disabled>◀ Back</button>
+                <button class="sim-btn primary" id="iipNext">Next ▶</button>
+                <button class="sim-btn" id="iipReplay" disabled>↺ Restart</button>
+              </div>
             </div>
           </div>
-          <div class="reveal" style="--i: 5; margin-top: 16px; padding: 14px 24px; border: 1.5px solid var(--ink); background: var(--cobalt-soft); font-size: 18px; line-height: 1.5">
-            <strong>Same detection, different power to act</strong> — and signatures must be <strong>updated constantly</strong>. <strong>Next-Generation (NGFW + NGIPS):</strong> identify apps by <em>payload</em> not port, fold IPS into the firewall, add <strong>URL filtering</strong> &amp; <strong>AMP</strong> (anti-malware), fed by global threat intel (Cisco Talos).
+
+          <div class="reveal" style="--i: 3; margin-top: 12px; padding: 11px 22px; border: 1.5px solid var(--ink); background: var(--cobalt-soft); font-size: 16px; line-height: 1.5">
+            <strong>Same detection, different power to act.</strong> Both inspect deep into the <strong>payload (OSI L5–7)</strong>, where a firewall only allows/blocks <strong>L2–4</strong>. An inline IPS must <strong>"fail open"</strong> so a sensor outage can't take the network down. <strong>NGFW</strong> folds IPS into the firewall and adds app-ID, URL filtering &amp; anti-malware.
           </div>
           <div class="page-num"></div>
         </section>
+
+        <script>
+          /* IDS (out-of-band) vs IPS (inline) — manual click-through (slide 77).
+             Pure class-toggle animation; the viewer advances step by step with
+             Back / Next (or by clicking the diagram). */
+          (function () {
+            const stage = document.getElementById("idsipsStage");
+            if (!stage) return;
+            const $ = (id) => document.getElementById(id);
+            const idsSrc = $("iipIdsSrc"), idsSw = $("iipIdsSw"), idsLan = $("iipIdsLan"),
+              idsSensor = $("iipIdsSensor"), idsAlert = $("iipIdsAlert");
+            const ipsSrc = $("iipIpsSrc"), ipsBox = $("iipIpsBox"), ipsLan = $("iipIpsLan"),
+              ipsDrop = $("iipIpsDrop");
+            const A1 = $("iipA1"), A2 = $("iipA2"), B1 = $("iipB1"), B2 = $("iipB2");
+            const narr = $("iipNarrate"), badge = $("iipBadge");
+            const prevBtn = $("iipPrev"), nextBtn = $("iipNext"), replayBtn = $("iipReplay");
+            const nodes = [idsSrc, idsSw, idsLan, idsSensor, ipsSrc, ipsBox, ipsLan];
+            const arrows = [A1, A2, B1, B2];
+            const badges = [idsAlert, ipsDrop];
+
+            const STEPS = [
+              { on: [idsSrc, idsSw, idsSensor], flow: [A1], badge: "IDS · COPY",
+                html: "① A malicious packet enters. The IDS is <b>out-of-band</b> — the switch mirrors a <b>copy</b> to it via SPAN/TAP, while the original keeps flowing toward the LAN." },
+              { on: [idsSensor], flow: [A2], hit: [idsLan], showb: [idsAlert], badge: "IDS · ALERT",
+                html: "② The IDS matches the signature and <b>raises an alert</b> — but it only saw a copy, so the packet has <b>already reached the host</b>. Detection, not prevention." },
+              { on: [ipsSrc, ipsBox], flow: [B1], badge: "IPS · INLINE",
+                html: "③ The IPS sits <b>inline</b> — every packet must pass <i>through</i> it before it can reach the LAN." },
+              { on: [ipsBox, ipsLan], block: [B2], showb: [ipsDrop], badge: "IPS · DROP",
+                html: "④ On a signature hit it <b>drops / resets / shuns</b> in real time. The packet <b>never reaches the LAN</b> — prevention." },
+              { on: nodes.slice(), badge: "L5–7",
+                html: "⑤ Both inspect deep into the <b>payload (OSI L5–7)</b>, where a firewall only sees L2–4. The catch: an inline IPS must <b>“fail open”</b>, or a sensor outage takes the whole network down." },
+            ];
+
+            let i = -1;
+            function clearAll() {
+              nodes.forEach((e) => e && e.classList.remove("on", "hit"));
+              arrows.forEach((e) => e && e.classList.remove("flow", "block"));
+              badges.forEach((e) => e && e.classList.remove("show"));
+            }
+            function render() {
+              clearAll();
+              if (i < 0) {
+                narr.innerHTML =
+                  "Click <b>Next ▶</b> (or the diagram) to step through how IDS and IPS each handle the same malicious packet.";
+                badge.textContent = "0 / " + STEPS.length;
+              } else {
+                const s = STEPS[i];
+                (s.on || []).forEach((e) => e && e.classList.add("on"));
+                (s.hit || []).forEach((e) => e && e.classList.add("hit"));
+                (s.flow || []).forEach((e) => e && e.classList.add("flow"));
+                (s.block || []).forEach((e) => e && e.classList.add("block"));
+                (s.showb || []).forEach((e) => e && e.classList.add("show"));
+                narr.innerHTML = s.html;
+                badge.textContent = i + 1 + " / " + STEPS.length + " · " + s.badge;
+              }
+              prevBtn.disabled = i <= 0;
+              nextBtn.disabled = i >= STEPS.length - 1;
+              nextBtn.textContent = i >= STEPS.length - 1 ? "✓ Done" : "Next ▶";
+              replayBtn.disabled = i < 0;
+            }
+            function next() { if (i < STEPS.length - 1) { i++; render(); } }
+            function prev() { if (i > 0) { i--; render(); } }
+            function restart() { i = -1; render(); }
+
+            nextBtn.addEventListener("click", next);
+            prevBtn.addEventListener("click", prev);
+            replayBtn.addEventListener("click", restart);
+            stage.addEventListener("click", (e) => {
+              if (e.target.closest(".sim-controls")) return;
+              next();
+            });
+
+            let primed = false;
+            const slide = document.getElementById("idsipsSlide");
+            if (slide) {
+              new MutationObserver(() => {
+                if (slide.classList.contains("active") && !primed) {
+                  primed = true;
+                  i = 0;
+                  render();
+                }
+              }).observe(slide, { attributes: true, attributeFilter: ["class"] });
+            }
+            render();
+          })();
+        </script>
 
         <!-- ========================================================= ATTACK → DEFENSE MATRIX ========================================================= -->
         <section class="slide">
@@ -9208,45 +10136,110 @@
         </section>
 
         <!-- ========================================================= ANALYST MINDSET ========================================================= -->
-        <section class="slide">
+        <section class="slide" id="mindsetSlide">
           <div class="masthead">
             <div class="left"><span class="tag">Mindset</span><span>The analyst's habit</span></div>
             <div class="right"></div>
           </div>
           <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">You can't spot weird without knowing normal</span>
-          <h2 class="reveal" style="--i: 1">
-            Baseline first.<br />Then the <em class="display">anomalies pop.</em>
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            Baseline first. <em class="display">Then anomalies pop.</em>
           </h2>
-          <div class="grid-2" style="margin-top: 22px; gap: 48px">
-            <div class="card reveal" style="--i: 2">
-              <div class="label" style="color: var(--cobalt-deep)">Build the baseline</div>
-              <p style="margin-top: 8px; font-size: 19px; line-height: 1.55">Capture normal traffic: which hosts talk, to which ports, how often, what the gateway's MAC is. That's your "known good."</p>
-            </div>
-            <div class="card amber reveal" style="--i: 3">
-              <div class="label">Then flag the odd</div>
-              <p style="margin-top: 8px; font-size: 19px; line-height: 1.55">Unexpected ARP replies, a second DHCP server, DNS to a strange resolver, traffic spikes, odd ports — each stands out only <em>against</em> the baseline.</p>
-            </div>
-          </div>
-          <!-- the detection loop, step by step -->
-          <div class="reveal" style="--i: 4; margin-top: 22px">
-            <div class="label" style="font-size: 16px; margin-bottom: 12px">The detection loop</div>
-            <div style="display: flex; align-items: stretch; gap: 8px; font-family: var(--font-mono); font-weight: 700">
-              <div style="flex: 1; border: 1.5px solid var(--cobalt); background: var(--cobalt-soft); border-radius: 12px; padding: 14px 12px; text-align: center; color: var(--cobalt-deep)"><div class="ic-badge ic-cobalt" style="margin: 0 auto 8px"><i class="msym" data-ic="storage"></i></div>1 · Baseline<div style="font-size: 14px; color: var(--muted); font-weight: 400; margin-top: 3px">record "known good"</div></div>
-              <div style="display: flex; align-items: center; font-size: 26px; color: var(--muted)">→</div>
-              <div style="flex: 1; border: 1.5px solid var(--moss); background: var(--moss-soft); border-radius: 12px; padding: 14px 12px; text-align: center; color: var(--moss)"><div class="ic-badge ic-moss" style="margin: 0 auto 8px"><i class="msym" data-ic="search"></i></div>2 · Monitor<div style="font-size: 14px; color: var(--muted); font-weight: 400; margin-top: 3px">capture live traffic</div></div>
-              <div style="display: flex; align-items: center; font-size: 26px; color: var(--muted)">→</div>
-              <div style="flex: 1; border: 1.5px solid var(--amber); background: var(--amber-soft); border-radius: 12px; padding: 14px 12px; text-align: center; color: var(--amber)"><div class="ic-badge ic-amber" style="margin: 0 auto 8px"><i class="msym" data-ic="swap"></i></div>3 · Compare<div style="font-size: 14px; color: var(--muted); font-weight: 400; margin-top: 3px">live vs. baseline</div></div>
-              <div style="display: flex; align-items: center; font-size: 26px; color: var(--muted)">→</div>
-              <div style="flex: 1; border: 1.5px solid #c0392b; background: #f6d8d4; border-radius: 12px; padding: 14px 12px; text-align: center; color: #b5301f"><div class="ic-badge ic-danger" style="margin: 0 auto 8px"><i class="msym" data-ic="warning"></i></div>4 · Anomaly<div style="font-size: 14px; color: var(--muted); font-weight: 400; margin-top: 3px">odd ARP · 2nd DHCP · spike</div></div>
-              <div style="display: flex; align-items: center; font-size: 26px; color: var(--muted)">→</div>
-              <div style="flex: 1; border: 1.5px solid var(--ink); background: var(--paper-warm); border-radius: 12px; padding: 14px 12px; text-align: center; color: var(--ink)"><div class="ic-badge ic-ink" style="margin: 0 auto 8px"><i class="msym" data-ic="dvr"></i></div>5 · Investigate<div style="font-size: 14px; color: var(--muted); font-weight: 400; margin-top: 3px">follow stream · respond</div></div>
+
+          <!-- Animated circular detection loop: 5 stages on a flowing ring,
+               highlighted in turn, with the active stage detailed in the centre. -->
+          <div class="loop-stage reveal" style="--i: 2" id="loopStage">
+            <svg class="loop-ring" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <ellipse cx="50" cy="50" rx="33" ry="36"></ellipse>
+            </svg>
+            <div class="loop-node" id="loop0" style="left: 50%; top: 15%; color: var(--cobalt-deep)" data-i="0"><div class="ic-badge ic-cobalt"><i class="msym" data-ic="storage"></i></div><div class="ln-name">1 · Baseline</div><div class="ln-tag">record "known good"</div></div>
+            <div class="loop-node" id="loop1" style="left: 81%; top: 39%; color: var(--moss)" data-i="1"><div class="ic-badge ic-moss"><i class="msym" data-ic="search"></i></div><div class="ln-name">2 · Monitor</div><div class="ln-tag">capture live traffic</div></div>
+            <div class="loop-node" id="loop2" style="left: 69%; top: 80%; color: var(--amber)" data-i="2"><div class="ic-badge ic-amber"><i class="msym" data-ic="swap"></i></div><div class="ln-name">3 · Compare</div><div class="ln-tag">live vs. baseline</div></div>
+            <div class="loop-node" id="loop3" style="left: 31%; top: 80%; color: #b5301f" data-i="3"><div class="ic-badge ic-danger"><i class="msym" data-ic="warning"></i></div><div class="ln-name">4 · Anomaly</div><div class="ln-tag">the odd stands out</div></div>
+            <div class="loop-node" id="loop4" style="left: 19%; top: 39%; color: var(--ink)" data-i="4"><div class="ic-badge ic-ink"><i class="msym" data-ic="dvr"></i></div><div class="ln-name">5 · Investigate</div><div class="ln-tag">follow stream · respond</div></div>
+            <div class="loop-center">
+              <div class="lc-num" id="loopNum">↻ DETECTION LOOP</div>
+              <div class="lc-name" id="loopName">Know normal, spot weird</div>
+              <div class="lc-detail" id="loopDetail">An analyst never works from a single capture — they cycle these five stages continuously. Press ▶ or step through to see why.</div>
+              <div class="lc-note">↻ every confirmed incident updates the baseline</div>
             </div>
           </div>
-          <div class="reveal" style="--i: 5; margin-top: 18px; padding: 13px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 18px">
-            <strong>It's a loop, not a one-off:</strong> every confirmed incident updates the baseline, so the next anomaly is even easier to see. <span class="mono">Wireshark</span> Expert Info, <span class="mono">tshark</span>, and flow logs are where you look.
+
+          <div class="sim-controls" style="margin-top: 8px">
+            <div class="sim-status">
+              <span>STAGE<span class="badge" id="loopBadge">↻</span></span>
+              <span class="narration" style="font-size: 15px">Tools: <span class="mono">Wireshark</span> Expert Info · <span class="mono">tshark</span> · flow logs — where the loop actually runs.</span>
+            </div>
+            <div class="btns">
+              <button class="sim-btn" id="loopPrev">◀ Back</button>
+              <button class="sim-btn pause" id="loopPlay">❚❚ Pause</button>
+              <button class="sim-btn primary" id="loopNext">Next ▶</button>
+            </div>
           </div>
           <div class="page-num"></div>
         </section>
+
+        <script>
+          /* Analyst detection loop — auto-cycling animated loop (slide 84).
+             Five %-positioned stages on a flowing ring; the active one is
+             highlighted and detailed in the centre. Auto-plays, with manual
+             Back / Next, a Pause toggle, and click-to-select nodes. */
+          (function () {
+            const stage = document.getElementById("loopStage");
+            if (!stage) return;
+            const $ = (id) => document.getElementById(id);
+            const nodes = [0, 1, 2, 3, 4].map((k) => $("loop" + k));
+            const numEl = $("loopNum"), nameEl = $("loopName"), detailEl = $("loopDetail"), badge = $("loopBadge");
+            const prevBtn = $("loopPrev"), nextBtn = $("loopNext"), playBtn = $("loopPlay");
+            const STEPS = [
+              { name: "1 · Baseline", detail: "Capture normal traffic — which hosts talk, to which ports, how often, and what the gateway's MAC is. That's your <b>known good</b>." },
+              { name: "2 · Monitor", detail: "Keep capturing live traffic, continuously — with <span class=\"mono\">Wireshark</span>, <span class=\"mono\">tshark</span> or flow logs running in the background." },
+              { name: "3 · Compare", detail: "Diff the live traffic against the baseline. Most of it matches — you're hunting only the part that <i>doesn't</i>." },
+              { name: "4 · Anomaly", detail: "The odd stands out only against normal: unexpected ARP replies, a second DHCP server, DNS to a strange resolver, traffic spikes, odd ports." },
+              { name: "5 · Investigate", detail: "Follow the stream, confirm the incident, and respond — then fold what you learned <b>back into the baseline</b>." },
+            ];
+            let i = -1, timer = null, playing = false;
+            function paintNode() {
+              nodes.forEach((n, k) => n.classList.toggle("on", k === i));
+            }
+            function render() {
+              paintNode();
+              if (i < 0) {
+                numEl.textContent = "↻ DETECTION LOOP";
+                nameEl.textContent = "Know normal, spot weird";
+                detailEl.innerHTML = "An analyst never works from a single capture — they cycle these five stages continuously. Press ▶ or step through to see why.";
+                badge.textContent = "↻";
+              } else {
+                const s = STEPS[i];
+                numEl.textContent = "STAGE " + (i + 1) + " / 5";
+                nameEl.textContent = s.name.replace(/^\d+ · /, "");
+                detailEl.innerHTML = s.detail;
+                badge.textContent = i + 1 + " / 5";
+              }
+            }
+            function go(n) { i = (n + STEPS.length) % STEPS.length; render(); }
+            function stop() { if (timer) { clearInterval(timer); timer = null; } playing = false; playBtn.textContent = "▶ Play"; playBtn.classList.remove("pause"); }
+            function play() {
+              playing = true; playBtn.textContent = "❚❚ Pause"; playBtn.classList.add("pause");
+              if (i < 0) go(0);
+              if (timer) clearInterval(timer);
+              timer = setInterval(() => go(i + 1), 2400);
+            }
+            playBtn.addEventListener("click", () => (playing ? stop() : play()));
+            nextBtn.addEventListener("click", () => { stop(); go(i < 0 ? 0 : i + 1); });
+            prevBtn.addEventListener("click", () => { stop(); go(i < 0 ? STEPS.length - 1 : i - 1); });
+            nodes.forEach((n) => n.addEventListener("click", () => { stop(); go(+n.dataset.i); }));
+
+            const slide = document.getElementById("mindsetSlide");
+            if (slide) {
+              new MutationObserver(() => {
+                if (slide.classList.contains("active")) { if (!playing && i < 0) setTimeout(play, 500); }
+                else { stop(); }
+              }).observe(slide, { attributes: true, attributeFilter: ["class"] });
+            }
+            render();
+          })();
+        </script>
 
         <!-- ========================================================= STARTING LAB WORK (hands-on divider) ========================================================= -->
         <section class="slide divider-slide">
@@ -11941,6 +12934,10 @@
             "M20.7 4.3c-.16-.16-.4-.24-.69-.24H4c-.29 0-.53.08-.7.24-.18.18-.27.43-.25.7l.83 9.85c.04.45.27.92.6 1.23l3.32 3.13c.2.18.52.37.85.49.49.18 1.04.27 1.59.27h3.66c.55 0 1.1-.09 1.59-.27.33-.12.65-.31.85-.49l3.32-3.13c.33-.31.56-.78.6-1.23l.83-9.85c.02-.27-.07-.52-.27-.7zM8.5 13c-.83 0-1.5-.9-1.5-2s.67-2 1.5-2 1.5.9 1.5 2-.67 2-1.5 2zm7 0c-.83 0-1.5-.9-1.5-2s.67-2 1.5-2 1.5.9 1.5 2-.67 2-1.5 2z",
           travel:
             "M19 21H5c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2h3V5c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2h3c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2zM10 5v2h4V5h-4z",
+          // hooded "hacker": hood + shoulders, with a shadowed face band and
+          // two eyes (anonymous / masked look) cut as holes via fill winding.
+          hacker:
+            "M12 2.4c-4.6 0-8.3 3.7-8.3 8.3 0 1.6.5 3.1 1.3 4.4C3 16.5 2.3 19.2 2.3 22h19.4c0-2.8-.7-5.5-2.7-6.9.8-1.3 1.3-2.8 1.3-4.4 0-4.6-3.7-8.3-8.3-8.3zm0 4.7c2.2 0 4 1.9 4 4.2 0 .5-.1 1-.3 1.5-.9-.5-2.2-.8-3.7-.8s-2.8.3-3.7.8c-.2-.5-.3-1-.3-1.5 0-2.3 1.8-4.2 4-4.2zm-2.1 2.3c-.6 0-1 .5-1 1.1s.4 1.1 1 1.1 1-.5 1-1.1-.4-1.1-1-1.1zm4.2 0c-.6 0-1 .5-1 1.1s.4 1.1 1 1.1 1-.5 1-1.1-.4-1.1-1-1.1z",
         };
         document.querySelectorAll("i.msym[data-ic]").forEach((el) => {
           const d = P[el.getAttribute("data-ic")];
@@ -12653,38 +13650,8 @@
         ],
       });
 
-      /* TROJAN — disguised file → backdoor → C2 (animated) */
-      makePacketSim({
-        slide: "trojanSlide", stage: "tj-stage",
-        badge: "tjBadge", narr: "tjNarration",
-        start: "tjStart", pause: "tjPause", stop: "tjStop",
-        nodes: ["tj-vic", "tj-atk"],
-        idleNarr: "Click START — a file that looks useful quietly hands the attacker a backdoor.",
-        steps: [
-          { narr: "① The victim downloads a file that looks useful — a free game, a cracked app, an invoice PDF.",
-            light: [["tj-vic", "cobalt"]], hold: 2300,
-            packets: [
-              { from: "tj-atk", to: "tj-vic", color: "var(--cobalt)", cls: "big", label: "free_game.exe ✓ looks safe", travel: 1100, at: 0, hit: true },
-            ] },
-          { narr: "② They open it — and the hidden payload runs. The trojan installs itself quietly in the background.",
-            light: [["tj-vic", "amber"]], hold: 2100 },
-          { narr: "③ The trojan opens a backdoor and calls home to the attacker's command-and-control server.",
-            light: [["tj-vic", "danger"], ["tj-atk", "danger"]], hold: 2200,
-            packets: [
-              { from: "tj-vic", to: "tj-atk", color: "#c0392b", cls: "big", label: "backdoor open", travel: 1000, at: 0, hit: true },
-            ] },
-          { narr: "④ Now the attacker sends commands…",
-            light: [["tj-vic", "danger"], ["tj-atk", "danger"]], hold: 2000,
-            packets: [
-              { from: "tj-atk", to: "tj-vic", color: "#c0392b", cls: "big", label: "run command", travel: 1000, at: 0, hit: true },
-            ] },
-          { narr: "⑤ …and quietly steals the victim's files. Defense: never run untrusted files; endpoint AMP catches the payload.",
-            light: [["tj-vic", "danger"], ["tj-atk", "danger"]], hold: 1900,
-            packets: [
-              { from: "tj-vic", to: "tj-atk", color: "var(--amber)", cls: "big", label: "exfiltrate data", travel: 1000, at: 0, hit: true },
-            ] },
-        ],
-      });
+      /* TROJAN — now a self-contained 6-step click-through grid; its script
+         lives inline next to the slide markup (see #tjStage / slide 69). */
 
       /* ARP — flow sequence */
       makeStepSim({

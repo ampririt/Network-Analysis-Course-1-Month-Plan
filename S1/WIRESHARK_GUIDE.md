@@ -17,8 +17,14 @@
   - [A Quick Word on HTTP (the traffic we'll capture)](#a-quick-word-on-http-the-traffic-well-capture)
   - [Lab 1 — Taking Wireshark for a Test Run](#lab-1--taking-wireshark-for-a-test-run)
   - [Lab 1 Questions](#lab-1-questions)
-  - [Activity 2 — ARP: Who Has This IP?](#activity-2--arp-who-has-this-ip)
+  - [Activity 2 — Deep Packet Inspection (Layer by Layer)](#activity-2--deep-packet-inspection-layer-by-layer)
     - [Activity 2 Questions](#activity-2-questions)
+  - [Activity 3 — ARP: Who Has This IP?](#activity-3--arp-who-has-this-ip)
+    - [How ARP Works (the Mechanics)](#how-arp-works-the-mechanics)
+    - [Capture an ARP Exchange](#capture-an-arp-exchange)
+    - [Reading the ARP Packet Fields](#reading-the-arp-packet-fields)
+    - [Activity 3 Questions](#activity-3-questions)
+  - [Practice Exercises](#practice-exercises)
   - [Next Steps](#next-steps)
 
 ---
@@ -223,9 +229,121 @@ This is a hands-on step, not a fact to look up. Select the `GET` packet, **File 
 
 ---
 
-### Activity 2 — ARP: Who Has This IP?
+### Activity 2 — Deep Packet Inspection (Layer by Layer)
 
-Every time your computer sends a packet on the local network, it needs the **MAC address** of the next device (a LAN host, or your gateway). It already knows the *IP*, so it asks: *"Who has this IP? Tell me your MAC."* That question-and-answer is **ARP (Address Resolution Protocol)** — the glue between **Layer 3 (IP)** and **Layer 2 (MAC)**. This short activity makes ARP visible.
+A single packet on the wire is really a set of **nested headers** — each layer of the stack wraps the data from the layer above it (**encapsulation**). Wireshark's **packet-details pane** lets you peel those wrappers back **one layer at a time**; that's *deep packet inspection*. Here we dissect a single **TCP SYN** packet (the first packet of a TCP handshake) from the outermost wrapper to the innermost.
+
+> Select the packet in the list, then click the ▸ triangles in the details pane to expand each layer. We go top-to-bottom — **Frame → Ethernet II → IP → TCP** — which is also outermost-to-innermost on the wire.
+
+1. **Frame — Wireshark's capture metadata (not a real header).** The outermost item isn't a protocol that travelled on the wire; it's Wireshark's own record *about* the capture: the **frame number**, **arrival time**, total **length** (74 bytes), and the protocol stack it detected (`eth:ethertype:ip:tcp`). Think of it as the label Wireshark sticks on the packet.
+
+   <p align="center">
+     <img src="./img/Deep%20Packet%20Inspection%20(Layer%20by%20Layer)/Frame%20Network%20Packet%20Information.webp" alt="The Frame layer expanded in Wireshark" width="720"><br>
+     <em>Fig. 9 — The <strong>Frame</strong> layer: capture metadata (number, time, length, detected protocols <code>eth:ethertype:ip:tcp</code>).</em>
+   </p>
+2. **Ethernet II — Layer 2 (Data Link).** The frame header carries the **Source** and **Destination MAC** addresses for *this hop*, plus a **Type** field (`IPv4, 0x0800`) that says what's wrapped inside. This is the only layer rewritten at every hop.
+
+   <p align="center">
+     <img src="./img/Deep%20Packet%20Inspection%20(Layer%20by%20Layer)/Ethernet%20II%20Network%20Packet%20Information%20.webp" alt="The Ethernet II layer expanded in Wireshark" width="720"><br>
+     <em>Fig. 10 — The <strong>Ethernet II</strong> header (Layer 2): Source/Destination <strong>MAC</strong> and Type <code>IPv4 (0x0800)</code>.</em>
+   </p>
+3. **Internet Protocol Version 4 — Layer 3 (Network).** The IP header carries the **end-to-end** Source (`172.21.224.2`) and Destination (`142.250.1.139`) **IP** addresses, the **TTL** (`64`), the **Protocol** field (`TCP (6)` — what's nested next), the total length, and a header checksum.
+
+   <p align="center">
+     <img src="./img/Deep%20Packet%20Inspection%20(Layer%20by%20Layer)/Internet%20Protocol%20Packet%20Information%20.webp" alt="The IPv4 layer expanded in Wireshark" width="720"><br>
+     <em>Fig. 11 — The <strong>IPv4</strong> header (Layer 3): Source/Destination <strong>IP</strong>, <strong>TTL 64</strong>, Protocol <code>TCP (6)</code>.</em>
+   </p>
+4. **Transmission Control Protocol — Layer 4 (Transport).** The TCP header carries the **Source Port** (`49652`) and **Destination Port** (`80` = HTTP), **Sequence/Acknowledgement** numbers, and the **Flags** — here `0x002 (SYN)`, which marks this as the **first packet of the 3-way handshake**. Options include MSS, SACK, timestamps, and window scale.
+
+   <p align="center">
+     <img src="./img/Deep%20Packet%20Inspection%20(Layer%20by%20Layer)/TCP%20Packet%20Information.webp" alt="The TCP layer expanded in Wireshark" width="720"><br>
+     <em>Fig. 12 — The <strong>TCP</strong> header (Layer 4): Source/Destination <strong>Port</strong>, Sequence number, and Flags <code>0x002 (SYN)</code>.</em>
+   </p>
+
+Putting the four layers together shows the whole stack inside one packet — and which address each layer uses:
+
+| Details-pane layer | OSI layer | Key fields | Addresses by |
+| :--- | :--- | :--- | :--- |
+| **Frame** | — (Wireshark metadata) | frame #, time, length, protocol list | — |
+| **Ethernet II** | L2 — Data Link | Src/Dst MAC, Type | **MAC** (per hop) |
+| **Internet Protocol v4** | L3 — Network | Src/Dst IP, TTL, Protocol | **IP** (end-to-end) |
+| **Transmission Control Protocol** | L4 — Transport | Src/Dst Port, Seq/Ack, Flags | **Port** |
+| *(HTTP, when present)* | L7 — Application | the request/data itself | — |
+
+> This is **encapsulation in reverse**: the app data was wrapped in TCP, then IP, then Ethernet, then put on the wire — and Wireshark unwraps it for you, outermost first. Each layer's **Type/Protocol** field is the breadcrumb that tells the receiver how to parse the next layer in (`Ethernet Type 0x0800 → IPv4`, `IP Protocol 6 → TCP`).
+
+#### Activity 2 Questions
+
+**Try each one first, then click "Show answer".**
+
+**Q1.** The **Frame** section sits at the top of the tree — but it never travelled on the network. What is it?
+
+<details>
+<summary>💡 Show answer</summary>
+
+It's **Wireshark's own metadata** about the captured packet — frame number, arrival timestamp, captured length, and the list of protocols it detected. It's added by the capture tool, not sent by any host, so it has no bytes "on the wire."
+</details>
+
+**Q2.** Which layer holds **MAC** addresses, and which holds **IP** addresses? Which one changes at every hop?
+
+<details>
+<summary>💡 Show answer</summary>
+
+**Ethernet II (Layer 2)** holds **MAC** addresses; **IPv4 (Layer 3)** holds **IP** addresses. The **MAC** addresses are rewritten at **every router hop** (link by link), while the **IP** addresses stay the same end-to-end — the "IP stays, MAC changes per hop" rule.
+</details>
+
+**Q3.** The TCP **Flags** field reads `0x002 (SYN)`. What does that tell you about this packet?
+
+<details>
+<summary>💡 Show answer</summary>
+
+It's the **first packet of the TCP 3-way handshake** — a client opening a connection ("can we talk?"). You'll capture the full `SYN → SYN-ACK → ACK` exchange in **[Session 2](../S2/WIRESHARK_GUIDE.md)**.
+</details>
+
+**Q4.** The IPv4 header's **Protocol** field says `TCP (6)`. Why does that field matter to Wireshark (and to the receiving host)?
+
+<details>
+<summary>💡 Show answer</summary>
+
+It tells the receiver **what's nested inside** the IP payload, so it knows to parse the next layer as **TCP** (not UDP or ICMP). Each layer has such a "what's inside" field — Ethernet's **Type `0x0800`** likewise said "IPv4 is inside." That's how a decoder walks down the stack.
+</details>
+
+---
+
+### Activity 3 — ARP: Who Has This IP?
+
+Every time your computer sends a packet on the local network, it needs the **MAC address** of the next device (a LAN host, or your gateway). It already knows the *IP*, so it asks: *"Who has this IP? Tell me your MAC."* That question-and-answer is **ARP (Address Resolution Protocol)** — the glue between **Layer 3 (IP)** and **Layer 2 (MAC)**. This activity makes ARP visible and explains what's happening under the hood.
+
+#### How ARP Works (the Mechanics)
+
+A computer actually carries **two** addresses, and they live at different layers:
+
+In this example, **your computer is `172.20.2.203`** and you want to reach **`172.20.0.1`** (the gateway) — but you only know its *IP*, not its *MAC*. A computer actually carries **two** addresses, and they live at different layers:
+
+| | Address | Example (this lab) | Layer | Scope | Assigned by |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Logical** | IP | `172.20.2.203` (yours) · `172.20.0.1` (target) | Layer 3 | end-to-end, across the whole internet | DHCP / config |
+| **Physical** | MAC | `a4:83:e7:1c:09:5b` | Layer 2 | one local link only | burned into the NIC |
+
+Routing and applications work with **IP** addresses, but a frame can only physically be delivered on the wire to a **MAC** address. ARP is the lookup that turns "I want to reach IP X" into "send the frame to MAC Y." Here's the full cycle:
+
+1. **Check the cache first.** Your OS keeps an **ARP cache** (`arp -a`) of recently-learned IP→MAC pairs. If the IP is already there, no ARP traffic is needed.
+2. **Ask the whole segment (broadcast).** If it's a miss, your host broadcasts an **ARP Request** to `ff:ff:ff:ff:ff:ff` — *every* device on the local link receives it: *"Who has `172.20.0.1`? Tell `172.20.2.203`."*
+3. **Only the owner answers (unicast).** The device that owns that IP (`172.20.0.1`) sends an **ARP Reply** straight back to you: *"`172.20.0.1` is at `a4:83:e7:1c:09:5b`."* Everyone else stays silent.
+4. **Cache and reuse.** Both sides store the mapping so they don't have to ask again. Entries **age out** after a few minutes (or if the device goes quiet), keeping the table fresh.
+
+<p align="center">
+  <img src="./img/arp/How%20an%20ARP%20request%20works.gif" alt="Animation of an ARP request broadcast and unicast reply" width="640"><br>
+  <em>Fig. 13 — How ARP resolves an IP to a MAC: the request is flooded to everyone; only the owner replies.</em>
+</p>
+
+> [!NOTE]
+> **ARP never leaves the local link.** Because the request is a broadcast and **routers don't forward broadcasts**, ARP is confined to a single subnet / broadcast domain. That's the key to the cross-subnet question below. (ARP is IPv4-only; IPv6 does the same job with **NDP — Neighbor Discovery Protocol**.)
+
+> [!TIP]
+> A **gratuitous ARP** is an *unsolicited* reply a host sends about **its own** IP (target IP = sender IP). It's used to pre-populate neighbours' caches, announce a new device, or **detect IP conflicts** — if someone else answers, two machines share an IP. It's also the mechanism abused in **ARP spoofing** (covered in Session 3), because ARP has **no authentication** — any host can claim any IP.
+
+#### Capture an ARP Exchange
 
 1. **Look at your ARP cache.** In a terminal, run `arp -a` to see the IP→MAC mappings your computer already knows. To force fresh ARP traffic, flush it first:
    ```sh
@@ -235,24 +353,38 @@ Every time your computer sends a packet on the local network, it needs the **MAC
    arp -d *
    ```
 2. **Capture and filter.** Start a capture, then type **`arp`** in the filter bar and press **Enter**.
-3. **Generate an ARP exchange.** `ping` your gateway or another device on your LAN (e.g. `ping 192.168.1.1`). Your computer must resolve that IP's MAC before the ping can go out.
-4. **Spot the request and the reply.** You'll see a pair:
-   * **Request** — a **broadcast** (destination MAC `ff:ff:ff:ff:ff:ff`): *"Who has 192.168.1.1? Tell 192.168.1.x"*.
-   * **Reply** — a **unicast** back to you: *"192.168.1.1 is at `aa:bb:cc:dd:ee:ff`"*.
+3. **Generate an ARP exchange.** `ping` your gateway or another device on your LAN (here, `ping 172.20.0.1`). Your computer must resolve that IP's MAC before the ping can go out — so an ARP request/reply appears *just before* the first ICMP echo.
+4. **Examine the request.** Click the **broadcast** ARP packet and expand **Address Resolution Protocol**. Note **Opcode `request (1)`**, the **Ethernet Destination = `ff:ff:ff:ff:ff:ff`** (broadcast), your own **Sender MAC/IP**, and — crucially — the **Target MAC = `00:00:00:00:00:00`** (the blank to be filled). The Info column reads *"Who has 172.20.0.1? Tell 172.20.2.203."*
 
    <p align="center">
-     <img src="./img/labA-arp-pair.png" alt="ARP request and reply in the packet list" width="700"><br>
-     <em>Fig. 9 — the ARP request (broadcast "who has…") and the unicast reply ("…is at").</em>
+     <img src="./img/arp/arp_broadcast_request.png" alt="An ARP request: broadcast destination and all-zero target MAC" width="720"><br>
+     <em>Fig. 14 — the ARP <strong>request</strong>. Sent to the broadcast MAC; the Sender is <em>my</em> MAC/IP, and the <strong>Target MAC is all zeros</strong> because that's exactly what's being asked.</em>
    </p>
-5. **Read the ARP fields.** Click a packet and expand **Address Resolution Protocol**. Note the **Opcode** (request = `1`, reply = `2`) and the **Sender**/**Target** MAC + IP fields — together they carry the IP↔MAC mapping.
+5. **Examine the reply.** Click the matching **unicast** ARP packet. Now **Opcode = `reply (2)`**, and the **Sender MAC** is the answer you wanted (the owner of `172.20.0.1`), with the **Target MAC/IP** set to *your* address. Info reads *"172.20.0.1 is at `<wanted MAC>`."*
 
    <p align="center">
-     <img src="./img/labA-arp-detail.png" alt="The Address Resolution Protocol layer expanded, plus the arp -a cache" width="700"><br>
-     <em>Fig. 10 — the ARP layer expanded (opcode, sender/target) and the now-cached entry in <code>arp -a</code>.</em>
+     <img src="./img/arp/arp_response.png" alt="An ARP reply: the wanted MAC address filled in, sent unicast to my host" width="720"><br>
+     <em>Fig. 15 — the ARP <strong>reply</strong>. The <strong>wanted MAC</strong> now fills the Sender MAC field, addressed straight back to <em>my</em> MAC (unicast).</em>
    </p>
 6. **Confirm the cache.** Run `arp -a` again — the IP you pinged now has a MAC stored, so your computer won't need to ask again until the entry ages out.
 
-#### Activity 2 Questions
+#### Reading the ARP Packet Fields
+
+When you expand **Address Resolution Protocol**, every ARP message — request or reply — carries these fields. The trick is to compare them between the two packets (**Fig. 14** request vs **Fig. 15** reply):
+
+| Field | In the **Request** | In the **Reply** | What it means |
+| :--- | :--- | :--- | :--- |
+| **Hardware type** | `Ethernet (1)` | `Ethernet (1)` | the Layer-2 medium being used |
+| **Protocol type** | `IPv4 (0x0800)` | `IPv4 (0x0800)` | the Layer-3 address being resolved |
+| **Opcode** | `request (1)` | `reply (2)` | question vs. answer — same packet format either way |
+| **Sender MAC** | your MAC | the **answerer's** MAC ← *the prize* | who sent this ARP message |
+| **Sender IP** | `172.20.2.203` (yours) | `172.20.0.1` (the IP you asked about) | the sender's IP |
+| **Target MAC** | `00:00:00:00:00:00` *(unknown!)* | your MAC | the field being filled in |
+| **Target IP** | `172.20.0.1` (the IP you're asking about) | `172.20.2.203` (yours) | who the message is about |
+
+> The all-zero **Target MAC** in the request (Fig. 14) is the visual "fill in the blank" — that empty field is the entire reason ARP exists. The reply (Fig. 15) arrives with it (and the Sender MAC) filled in, and that's the IP→MAC mapping your computer caches.
+
+#### Activity 3 Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -287,6 +419,38 @@ ARP maps a **Layer-3 IP address** to a **Layer-2 MAC address**. You address pack
 
 Your **default gateway's** MAC, *not* the remote host's. ARP only works on the **local link**; a remote host's MAC is meaningless to you. So your computer ARPs for the gateway and hands the packet to it — the router then forwards it onward (and ARPs on the next link). This is the same "IP stays, MAC changes per hop" idea behind routing.
 </details>
+
+**Q5.** In the ARP **request**, the **Target MAC** field is all zeros (`00:00:00:00:00:00`). Why?
+
+<details>
+<summary>💡 Show answer</summary>
+
+Because the target's MAC is **exactly what the sender doesn't know yet** — it's the blank the request is trying to fill. The sender knows the *target IP*, so it fills that in and leaves the Target MAC empty; the reply comes back with that field (and the Sender MAC) populated.
+</details>
+
+**Q6.** ARP has **no authentication** — any host can answer for any IP. What attack does this enable, and where is it covered?
+
+<details>
+<summary>💡 Show answer</summary>
+
+**ARP spoofing / poisoning** — an attacker sends forged (often gratuitous) ARP replies claiming the gateway's IP belongs to *their* MAC, so victims send traffic to the attacker (a man-in-the-middle). You'll capture and analyse this in **[Session 3 — Network Security Analysis](../S3/WIRESHARK_GUIDE.md#lab-c--network-security-analysis)**.
+</details>
+
+---
+
+### Practice Exercises
+
+Work through these on your own to lock in the skills from this guide. **Tick each box** as you finish it, and save a screenshot or note of the result.
+
+- [ ] **1. Capture & identify.** Capture a fresh load of `http://example.com`, apply the `http` filter, and find both the `GET` request and the `200 OK` reply. *Record:* the server's IP address and the time gap between the two packets.
+- [ ] **2. Filter drill.** On that same capture, apply `dns`, then `icmp`, then `arp` one at a time. *Record:* how many packets each filter shows (the count appears in the bottom status bar as "Displayed").
+- [ ] **3. ARP your gateway.** Flush the ARP cache (`arp -d`), filter `arp`, then `ping` your default gateway. *Record:* the gateway's MAC address from the ARP **reply**, and confirm it now appears in `arp -a`.
+- [ ] **4. Local vs. remote ARP.** While filtering `arp`, run `ping 8.8.8.8` (an off-subnet host). *Record:* which IP your computer actually ARPs for — and explain in one line why it is **not** `8.8.8.8`.
+- [ ] **5. Follow the stream.** Right-click your HTTP `GET` → **Follow → TCP Stream**. *Record:* your ephemeral **source port**, the server's **destination port** (`80`), and one request header you can read in the stream.
+- [ ] **Stretch — Protocol mix.** Open **Statistics → Protocol Hierarchy** on a 30-second capture. *Record:* the top three protocols by packet count, and one protocol you didn't expect to see.
+
+> [!TIP]
+> Treat the *Record* line as your deliverable — together these six checkmarks prove you can capture, filter, follow a conversation, and read ARP without hand-holding.
 
 ---
 

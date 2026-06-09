@@ -22,9 +22,6 @@
     - [Step 6 — Verify the addressing](#step-6--verify-the-addressing)
     - [Step 7 — Test connectivity with `ping`](#step-7--test-connectivity-with-ping)
   - [Lab 2 Questions](#lab-2-questions)
-  - [Activity 2 — ARP in Action](#activity-2--arp-in-action)
-    - [Activity 2 Questions](#activity-2-questions)
-  - [Next Steps](#next-steps)
 
 ---
 
@@ -80,6 +77,8 @@ Once you're in, you'll see the main workspace:
 | **Device-type selector** | Bottom-left | Categories of hardware: Routers, Switches, End Devices, Connections… |
 | **Device list** | Bottom, next to selector | The specific models in the chosen category (e.g. the `2901` router). |
 | **Realtime / Simulation toggle** | Bottom-right | **Realtime** runs traffic instantly; **Simulation** lets you step through packets hop-by-hop. |
+
+> 📖 **Official reference:** For an interactive walkthrough of *every* panel — the **Menu Bar**, **Main Tool Bar**, **Common Tools Bar** (Select, Inspect, Delete, Place Note, PDU tools), the **Logical/Physical** workspace navigation, the **Realtime/Simulation Bar**, and the **Network Component Box** (the device & connection selector) — see Cisco's official [**Packet Tracer Interface Overview**](https://tutorials.ptnetacad.net/help/default/interfaceOverview.htm). It names each area exactly as Packet Tracer labels it.
 
 ---
 
@@ -300,90 +299,3 @@ At the router the packet comes **in** and is processed **up** to **Layer 3 (IP)*
 </details>
 
 ---
-
-### Activity 2 — ARP in Action
-
-In [Wireshark Activity 2](./WIRESHARK_GUIDE.md#activity-2--arp-who-has-this-ip) you saw ARP on a real network. Packet Tracer's **Simulation Mode** lets you watch the *same* exchange frame-by-frame on the two-subnet network you just built — and reveals a subtle but important detail about pinging *across* subnets.
-
-#### Step 1 — Check the starting ARP cache
-
-Open **`PC0` → Desktop → Command Prompt** and run `arp -a`. Note what's already known (often nothing, or just the gateway). This is the table ARP will fill in.
-
-#### Step 2 — Enter Simulation Mode
-
-Click **Simulation** (bottom-right). In **Edit Filters**, keep only **ARP** and **ICMP** checked so the view isn't cluttered.
-
-#### Step 3 — Ping and watch ARP go first
-
-From `PC0`'s Command Prompt, `ping 192.168.1.1` (the gateway). Click **Play/Forward** and watch: **an ARP request/reply happens *before* the first ICMP echo** — PC0 must learn the gateway's MAC before it can build the frame.
-
-<p align="center">
-  <img src="./img/labB-arp-sim.png" alt="An ARP broadcast leaving PC0 in Simulation Mode" width="640"><br>
-  <em>Fig. 13 — the ARP request (broadcast) leaving PC0 before the ICMP echo can be sent.</em>
-</p>
-
-#### Step 4 — Inspect the ARP PDU
-
-Click the ARP envelope → **PDU Information**. On the **Outbound** layer note the **Layer-2 destination = `FFFF.FFFF.FFFF`** (broadcast) and the **opcode** (request). The reply that comes back is a **unicast** straight to PC0.
-
-#### Step 5 — The cross-subnet twist
-
-Now `ping 10.1.1.100` (PC1, on the *other* subnet) and step through it. Watch **whose MAC PC0 asks for**: it ARPs for its **gateway `192.168.1.1`**, **not** for `10.1.1.100`. Because the destination is on a different network, PC0 hands the frame to the router's MAC; the router then ARPs on the `10.1.1.0` side for PC1.
-
-#### Step 6 — Confirm the learned tables
-
-Back in Realtime, run `arp -a` on PC0 (now shows the gateway's IP↔MAC), and on the router CLI run:
-
-```ios
-Router> enable
-Router# show ip arp
-```
-
-<p align="center">
-  <img src="./img/labB-arp-tables.png" alt="arp -a on PC0 and show ip arp on the router" width="700"><br>
-  <em>Fig. 14 — the learned mappings: <code>arp -a</code> on PC0 and <code>show ip arp</code> on Router0.</em>
-</p>
-
-#### Activity 2 Questions
-
-**Try each one first, then click "Show answer".**
-
-**Q1.** When PC0 pings `10.1.1.100` (a different subnet), **whose MAC** does it request with ARP?
-
-<details>
-<summary>💡 Show answer</summary>
-
-Its **default gateway's** MAC (`192.168.1.1`, the router's g0/0) — **not** `10.1.1.100`. The destination is off-subnet, so PC0 can't reach it directly; it delivers the frame to the router, which forwards it. ARP only ever resolves addresses on the **local** link.
-</details>
-
-**Q2.** Why is the ARP **request a broadcast** but the **reply a unicast**?
-
-<details>
-<summary>💡 Show answer</summary>
-
-The request must reach **everyone** because the sender doesn't know which device owns the IP — so it's broadcast (`FFFF.FFFF.FFFF`). The reply, however, is addressed straight **back to the asker**, whose MAC is now known, so it's a unicast — no need to bother the whole segment.
-</details>
-
-**Q3.** Why doesn't PC0's ARP broadcast ever reach a device on the `10.1.1.0` subnet?
-
-<details>
-<summary>💡 Show answer</summary>
-
-Because **routers don't forward broadcasts**. An ARP request is confined to its own **broadcast domain** (the local subnet). That's exactly why cross-subnet traffic must go *through* the router rather than ARP-ing for the remote host directly.
-</details>
-
-**Q4.** What does `show ip arp` on the router list?
-
-<details>
-<summary>💡 Show answer</summary>
-
-The router's own ARP table — the **IP↔MAC mappings** it has learned for directly-connected hosts on **each** of its interfaces (e.g. PC0 on the `192.168.1.0` side, PC1 on the `10.1.1.0` side), along with the interface and age of each entry.
-</details>
-
----
-
-### Next Steps
-
-- Re-run the ping in **Simulation Mode** and map each animation step to the **encapsulation/de-encapsulation** walkthrough from the [Session 1 lecture](./README.md#lecture).
-- Back in the [Wireshark guide](./WIRESHARK_GUIDE.md), compare what a *simulated* packet looks like here versus a *real* captured packet in Wireshark.
-- Complete the [Session 1 Homework](./README.md#homework).

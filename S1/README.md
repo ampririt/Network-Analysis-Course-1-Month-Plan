@@ -4,6 +4,10 @@
   - [Lecture](#lecture)
   - [Break (10 min)](#break-10-min)
   - [Hands-on Lab](#hands-on-lab)
+  - [Deep Dive: Reading Your Network Config with `ipconfig` (Before You `ping`)](#deep-dive-reading-your-network-config-with-ipconfig-before-you-ping)
+    - [Reading the `ipconfig` Output Fields:](#reading-the-ipconfig-output-fields)
+    - [Analyze Before You `ping`: Is the Target Local or Remote?](#analyze-before-you-ping-is-the-target-local-or-remote)
+    - [The Troubleshooting Ladder: What to `ping` First](#the-troubleshooting-ladder-what-to-ping-first)
   - [Deep Dive: The `ping` Command \& Options](#deep-dive-the-ping-command--options)
     - [Analyzing the `ping` Output Fields:](#analyzing-the-ping-output-fields)
     - [Crucial `ping` Command Options:](#crucial-ping-command-options)
@@ -17,10 +21,10 @@
 **Learning Objectives**: Understand what network analysis is and why it matters. Learn the OSI model and TCP/IP stack. Set up tools.
 
 ### Lecture
-- **Introduction**: What is network analysis? Real-world use cases (troubleshooting, security, performance) (15 min)
-- **The OSI 7-Layer Model**: Detailed breakdown of the purpose and function of each layer (15 min)
-- **TCP/IP 4-Layer Model**: Understanding the modern mapping to OSI layers (10 min)
-- **Encapsulation & De-encapsulation**: Step-by-step visual walkthrough of how data becomes frames (10 min)
+- **Introduction**: What is network analysis? Real-world use cases (troubleshooting, security, performance)
+- **The OSI 7-Layer Model**: Detailed breakdown of the purpose and function of each layer
+- **TCP/IP 4-Layer Model**: Understanding the modern mapping to OSI layers
+- **Encapsulation & De-encapsulation**: Step-by-step visual walkthrough of how data becomes frames
 
 ### Break (10 min)
 - Step away, stretch, and grab a drink before diving into the hands-on labs.
@@ -44,6 +48,56 @@ Build a network from scratch in **Cisco Packet Tracer**, a free network simulato
 
 > 📖 **Full step-by-step instructions, screenshots, and lab questions are in the companion guide:**
 > 👉 **[Cisco Packet Tracer — Getting Started & Lab 2](./PACKET_TRACER_GUIDE.md)**
+
+---
+
+### Deep Dive: Reading Your Network Config with `ipconfig` (Before You `ping`)
+
+Before you can sensibly `ping` anything, you need to know **your own address, your gateway, and your subnet**. The `ipconfig` family of commands prints exactly that — it's the *first* command any analyst runs to understand where a machine sits on the network.
+
+| OS | Command | Notes |
+| :--- | :--- | :--- |
+| **Windows** | `ipconfig` | Add `/all` for MAC address, DNS servers, and DHCP lease info. |
+| **macOS** | `ifconfig` | Or `ipconfig getifaddr en0` for just the Wi-Fi IP; `networksetup -getinfo Wi-Fi` for a summary. |
+| **Linux** | `ip addr` (`ip a`) | Older systems: `ifconfig`. Use `ip route` to see the default gateway. |
+
+#### Reading the `ipconfig` Output Fields:
+```text
+   IPv4 Address. . . . . . . . . . . : 192.168.1.37
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 192.168.1.1
+   DNS Servers . . . . . . . . . . . : 192.168.1.1
+```
+* **`IPv4 Address` (`192.168.1.37`)**: *Your* host's address on the local network — the source IP of everything you send.
+* **`Subnet Mask` (`255.255.255.0`)**: Splits the address into a **network part** and a **host part**. Here `/24` means the first three octets (`192.168.1`) are the network — so every `192.168.1.x` host is **local**.
+* **`Default Gateway` (`192.168.1.1`)**: The **router**. Any packet whose destination is *not* on your local network is handed here to be forwarded onward.
+* **`DNS Servers` (`192.168.1.1`)**: Who turns names (`google.com`) into IP addresses. If `ping <name>` fails but `ping <IP>` works, suspect DNS.
+
+#### Analyze Before You `ping`: Is the Target Local or Remote?
+
+Apply your subnet mask to decide *how* a packet will travel — this predicts what a `ping` actually tests:
+
+| You are `192.168.1.37 /24`, pinging… | Same network? | Path the packet takes |
+| :--- | :--- | :--- |
+| `192.168.1.50` | ✅ Yes (`192.168.1.x`) | **Direct** — ARP resolves its MAC, frame sent on the local link (no router). |
+| `10.0.0.5` | ❌ No | **Via the gateway** — sent to `192.168.1.1`'s MAC, then routed onward. |
+| `8.8.8.8` | ❌ No | **Via the gateway → internet** — tests routing, NAT, and your ISP. |
+
+> [!TIP]
+> This is *why* the [bonus ARP activity](./WIRESHARK_GUIDE.md#activity-3--arp-who-has-this-ip) matters: for a **local** target your PC ARPs for the target itself; for a **remote** target it ARPs for the **gateway**. Reading `ipconfig` first tells you which case you're in.
+
+#### The Troubleshooting Ladder: What to `ping` First
+
+When connectivity breaks, `ping` outward **one rung at a time** — each step isolates a different layer, so the first rung that fails points at the problem:
+
+1. **`ping 127.0.0.1`** (loopback) → is the **TCP/IP stack** on this machine working at all?
+2. **`ping <your own IPv4>`** (e.g. `192.168.1.37`) → is your **network adapter** configured correctly?
+3. **`ping <default gateway>`** (e.g. `192.168.1.1`) → can you reach the **local router**? (a Layer-1/2/local-subnet check)
+4. **`ping 8.8.8.8`** (a public IP) → is **routing + NAT to the internet** working?
+5. **`ping google.com`** (a name) → is **DNS** resolving names? (If 4 works but 5 fails, it's DNS, not connectivity.)
+
+> [!NOTE]
+> Climbing the ladder turns "the internet is down" into a precise diagnosis: fails at step 3 → local network issue; works to step 4 but not 5 → DNS issue.
 
 ---
 
