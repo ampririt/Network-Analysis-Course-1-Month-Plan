@@ -4,8 +4,6 @@
   - [Lecture](#lecture)
   - [Break (10 min)](#break-10-min)
   - [Hands-on Lab](#hands-on-lab)
-    - [Packet Tracer — Lab A + Design Challenge guide →](./PACKET_TRACER_GUIDE.md)
-    - [Wireshark — Lab B guide →](./WIRESHARK_GUIDE.md)
   - [Homework](#homework)
 
 
@@ -22,7 +20,6 @@
 - **Subnetting Refresher**: Network/host portions, subnet mask, CIDR notation, calculating usable hosts & subnet ranges
 - **First-Hop & Address Services**: Default gateway role, ARP at Layer 2, DHCP relay across subnets
 - **Packet Walk-through**: Trace a single packet PC → switch → router → switch → PC, watching MAC rewrites vs. IP preservation at each hop
-- Live demo: `show ip route`, `show vlan brief`, `show mac address-table`, `show interfaces trunk`, `show ip arp` in Packet Tracer
 
 ### Break (10 min)
 - Step away, stretch, and grab a drink before diving into the hands-on labs.

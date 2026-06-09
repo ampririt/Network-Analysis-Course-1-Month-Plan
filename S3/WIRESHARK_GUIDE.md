@@ -1,33 +1,29 @@
-## Wireshark — Labs A & C: Network Services & Security Analysis
+## Wireshark — Lab A: DHCP & DNS Analysis
 
 > Companion guide to [Session 3 — Network Services & Security](./README.md).
-> Read this **before** doing **Lab A** and **Lab C** in the [README](./README.md#hands-on-lab).
+> Read this **before** doing **Lab A** in the [README](./README.md#hands-on-lab).
 > New to Wireshark? Start with the [Session 1 Wireshark guide](../S1/WIRESHARK_GUIDE.md) for installation and the basics, and the [Session 2 guide](../S2/WIRESHARK_GUIDE.md) for filters & Follow-Stream.
 
 ---
 
-- [Wireshark — Labs A \& C: Network Services \& Security Analysis](#wireshark--labs-a--c-network-services--security-analysis)
-  - [Lab A — DHCP & DNS Analysis](#lab-a--dhcp--dns-analysis)
-    - [Background: DORA & name resolution](#background-dora--name-resolution)
-    - [Step A1 — Start capturing](#step-a1--start-capturing)
-    - [Step A2 — Release & renew your IP](#step-a2--release--renew-your-ip)
-    - [Step A3 — Find the 4 DORA packets](#step-a3--find-the-4-dora-packets)
-    - [Step A4 — Inspect a DNS query](#step-a4--inspect-a-dns-query)
-    - [Step A5 — Inspect the DNS response](#step-a5--inspect-the-dns-response)
-    - [Lab A Questions](#lab-a-questions)
-  - [Lab C — Network Security Analysis](#lab-c--network-security-analysis)
-    - [Step C1 — Spot an ARP anomaly](#step-c1--spot-an-arp-anomaly)
-    - [Step C2 — Identify a port scan](#step-c2--identify-a-port-scan)
-    - [Step C3 — Plaintext vs. encrypted](#step-c3--plaintext-vs-encrypted)
-    - [Step C4 — Reflect: which defense stops which attack?](#step-c4--reflect-which-defense-stops-which-attack)
-    - [Lab C Questions](#lab-c-questions)
-  - [Next Steps](#next-steps)
+- [Wireshark — Lab A: DHCP \& DNS Analysis](#wireshark--lab-a-dhcp--dns-analysis)
+- [Lab A — DHCP \& DNS Analysis](#lab-a--dhcp--dns-analysis)
+  - [Background: DORA \& name resolution](#background-dora--name-resolution)
+  - [Step A1 — Gather a DHCP trace](#step-a1--gather-a-dhcp-trace)
+  - [Step A2 — Read the four DORA messages](#step-a2--read-the-four-dora-messages)
+  - [Step A3 — Explore names with nslookup](#step-a3--explore-names-with-nslookup)
+  - [Step A4 — Capture DNS while browsing](#step-a4--capture-dns-while-browsing)
+  - [Step A5 — Inspect the DNS query \& response](#step-a5--inspect-the-dns-query--response)
+  - [Lab A Questions](#lab-a-questions)
+- [Next Steps](#next-steps)
 
 ---
 
 ## Lab A — DHCP & DNS Analysis
 
-**⏱️ ~20 min · Objective:** watch a device **get an address (DHCP)** and **resolve a name (DNS)** — two services that make "the network just work."
+**Objective:** capture a device **getting an address (DHCP/DORA)** and **resolving names (DNS)** — the two services that make "the network just work."
+
+> *Adapted from "Wireshark Lab: DHCP v9" and "Wireshark Lab: DNS v9.0", supplements to* Computer Networking: A Top-Down Approach*, J.F. Kurose & K.W. Ross.*
 
 ### Background: DORA & name resolution
 
@@ -40,201 +36,183 @@ When a device joins a network it has no IP yet, so it asks for one. **DHCP** (Dy
 | 3 | **R**equest | Client → broadcast | "I'll take that offered address." |
 | 4 | **A**ck | Server → client | "It's yours — here's your lease, gateway, and DNS server." |
 
-DHCP runs over **UDP** — server port **67**, client port **68**. Once addressed, the device uses **DNS** (Domain Name System, **UDP port 53**) to turn names like `google.com` into IP addresses via a **query → response** pair.
+> Only **Request** and **ACK** are *mandatory* — Discover/Offer can be skipped when a host simply **renews** an address it already had. All four messages of one exchange share a single **Transaction ID (xid)**, which is how the client matches the Offer/ACK to its own Discover/Request.
 
-### Step A1 — Start capturing
+DHCP runs over **UDP** — server port **67**, client port **68**. Once addressed, the device uses **DNS** (Domain Name System, **UDP port 53**) to turn names like `gaia.cs.umass.edu` into IP addresses via a **query → response** to its **local DNS server**.
 
-Open Wireshark and double-click your active interface to begin a live capture, then leave it running.
+---
 
-<p align="center">
-  <!-- ![Start capture](./img/labA-step1-capture.png) -->
-  <em>Fig. 1 — 📸 <code>img/labA-step1-capture.png</code>: live capture started on the active interface.</em>
-</p>
+**Part 1 — DHCP: watch a host get an address**
 
-### Step A2 — Release & renew your IP
+### Step A1 — Gather a DHCP trace
 
-Force a fresh DHCP exchange from a terminal:
+To capture *all four* DORA messages you must force a full **release + renew**. First find your interface name in Wireshark via **Capture → Options**, then run the de-configure command, **start the capture**, and run the renew command:
 
 ```sh
-# Windows
-ipconfig /release
-ipconfig /renew
+# macOS  (en0 = your interface)
+sudo ipconfig set en0 none      # ← de-configure, THEN start Wireshark
+sudo ipconfig set en0 dhcp      # ← triggers Discover→Offer→Request→ACK
 
-# macOS / Linux
-sudo dhclient -r && sudo dhclient
-# (macOS alt: sudo ipconfig set en0 NONE && sudo ipconfig set en0 DHCP)
+# Windows
+ipconfig /release               # ← give up the address, THEN start Wireshark
+ipconfig /renew                 # ← triggers DORA
+
+# Linux  (eth0 = your interface)
+sudo ip addr flush dev eth0 && sudo dhclient -r   # ← THEN start Wireshark
+sudo dhclient eth0                                # ← triggers DORA
 ```
 
+Wait a few seconds after the renew, then **stop** the capture.
+
+> Can't capture live (or didn't catch all four)? Use the author's trace **`dhcp-wireshark-trace1-1.pcapng`** from `gaia.cs.umass.edu/wireshark-labs/wireshark-traces-9e.zip`.
+
 <p align="center">
-  <!-- ![Release renew](./img/labA-step2-renew.png) -->
-  <em>Fig. 2 — 📸 <code>img/labA-step2-renew.png</code>: the release/renew commands in a terminal.</em>
+  <!-- ![DORA capture](./img/labA-step1-dora.png) -->
+  <em>Fig. 1 — 📸 <code>img/labA-step1-dora.png</code>: the <code>dhcp</code> filter showing Discover, Offer, Request, and ACK.</em>
 </p>
 
-### Step A3 — Find the 4 DORA packets
+### Step A2 — Read the four DORA messages
 
-1. In the filter bar type **`dhcp`** (older builds: **`bootp`**) and press **Enter**.
-2. Identify the four messages: **Discover → Offer → Request → ACK**.
-3. Click the **ACK** and expand **Dynamic Host Configuration Protocol → Options** to read the **lease time**, **router (gateway)**, and **DNS server** handed to you.
+Type **`dhcp`** (older builds: **`bootp`**) in the filter, then click each message and read its key fields:
+
+| Message | Source IP | Dest IP | Notable fields to read |
+|:---|:---|:---|:---|
+| **Discover** | `0.0.0.0` *(no address yet!)* | `255.255.255.255` *(broadcast)* | **Transaction ID**; the **Parameter Request List** in Options — the list of settings the client *wants* (subnet mask, router, DNS server, domain…) |
+| **Offer** | the DHCP server's IP | client / broadcast | same Transaction ID; the offered address + options |
+| **Request** | `0.0.0.0` | `255.255.255.255` | UDP **source port 68 → destination port 67**; same Transaction ID |
+| **ACK** | the DHCP server's IP | client | **Your (client) IP Address**, **IP Address Lease Time**, **Router** (gateway), **Domain Name Server** |
+
+Expand the **ACK → Dynamic Host Configuration Protocol → Options** to read the **lease time**, **router (gateway)**, and **DNS server** you were granted — these are the values that let your host reach the rest of the network.
 
 <p align="center">
-  <!-- ![DORA packets](./img/labA-step3-dora.png) -->
-  <em>Fig. 3 — 📸 <code>img/labA-step3-dora.png</code>: the four DORA packets, with the ACK's Option fields expanded.</em>
+  <!-- ![ACK options](./img/labA-step2-ack-options.png) -->
+  <em>Fig. 2 — 📸 <code>img/labA-step2-ack-options.png</code>: the DHCP <strong>ACK</strong> with the assigned IP, lease time, Router, and DNS Server options expanded.</em>
 </p>
 
-### Step A4 — Inspect a DNS query
+---
 
-1. Clear the filter, type **`dns`**, press **Enter**.
-2. Find a **Standard query** for a name such as `google.com` (browse to it if needed to generate one).
-3. Expand **Domain Name System (query) → Queries** to see the **Name** and **Type** requested.
+**Part 2 — DNS: turn names into addresses**
+
+### Step A3 — Explore names with nslookup
+
+Before capturing, get a feel for DNS with **`nslookup`** (built into Windows, macOS, and Linux). It asks a DNS server for a specific **record type**:
+
+```sh
+nslookup www.iitb.ac.in        # Type=A  — a name → its IPv4 (and IPv6/AAAA) address
+nslookup -type=NS umass.edu    # Type=NS — the domain's authoritative name servers
+nslookup 128.119.245.12        # reverse — an IP → its name (gaia.cs.umass.edu)
+```
+
+The output names **which DNS server answered** and whether the answer is **authoritative** (from the domain's own server) or **non-authoritative** (served from a cache). *(More on the nslookup output in the [Session 2 UDP lab](../S2/WIRESHARK_GUIDE.md#what-nslookup-is-and-why-it-uses-udp).)*
 
 <p align="center">
-  <!-- ![DNS query](./img/labA-step4-dnsquery.png) -->
-  <em>Fig. 4 — 📸 <code>img/labA-step4-dnsquery.png</code>: a DNS standard query for <code>google.com</code>.</em>
+  <!-- ![nslookup A and NS](./img/labA-step3-nslookup.png) -->
+  <em>Fig. 3 — 📸 <code>img/labA-step3-nslookup.png</code>: an <code>nslookup</code> A query and a <code>-type=NS</code> query.</em>
 </p>
 
-### Step A5 — Inspect the DNS response
+### Step A4 — Capture DNS while browsing
 
-Click the matching **Standard query response** and expand **Answers**. Note the **record type** (e.g. **A** = IPv4, **AAAA** = IPv6, **CNAME** = alias) and the **IP address(es)** returned.
+1. **Clear your DNS cache** so the lookup actually hits the network (a cached record sends *no* query):
+   ```sh
+   sudo killall -HUP mDNSResponder        # macOS
+   ipconfig /flushdns                     # Windows
+   sudo resolvectl flush-caches           # Linux (Ubuntu 22.04+)
+   ```
+2. Clear your **browser** cache, then **start a capture**.
+3. Visit **`http://gaia.cs.umass.edu/kurose_ross/`** and **stop** the capture.
+4. Filter **`dns`**. Find the **Standard query** that resolves `gaia.cs.umass.edu` and its matching **Standard query response** (Wireshark pairs them by the same Transaction ID).
 
 <p align="center">
-  <!-- ![DNS response](./img/labA-step5-dnsresponse.png) -->
-  <em>Fig. 5 — 📸 <code>img/labA-step5-dnsresponse.png</code>: the DNS response Answers section with the A record.</em>
+  <!-- ![DNS capture](./img/labA-step4-dns-capture.png) -->
+  <em>Fig. 4 — 📸 <code>img/labA-step4-dns-capture.png</code>: the DNS query/response pair generated by loading the page.</em>
+</p>
+
+### Step A5 — Inspect the DNS query & response
+
+Select the query, then the response, and confirm:
+
+- Both ride **UDP**; the **query's destination port is 53** and the **response's source port is 53**.
+- The **IP the query was sent to** is your **local / default DNS server** (the one DHCP handed you in the ACK).
+- Expand **Queries** and **Answers**: the **query** has **1 question, 0 answers**; the **response** echoes that **1 question** plus **one or more answers**.
+- Read each answer's **record type** — **A** (IPv4), **AAAA** (IPv6), **CNAME** (alias), or **NS** (name server) — and the address it returns.
+
+<p align="center">
+  <!-- ![DNS response answers](./img/labA-step5-dns-response.png) -->
+  <em>Fig. 5 — 📸 <code>img/labA-step5-dns-response.png</code>: the DNS response Answers section with the A record for <code>gaia.cs.umass.edu</code>.</em>
 </p>
 
 ### Lab A Questions
 
 **Try each one first, then click "Show answer".**
 
-**Q1.** Name the **four DHCP messages** in order. Which ones are **broadcast** and why?
+**Q1.** Is the **DHCP Discover** sent over UDP or TCP? What is special about its **source** and **destination** IP addresses?
 
 <details>
 <summary>💡 Show answer</summary>
 
-**Discover → Offer → Request → ACK** (DORA). The client's **Discover** and **Request** are **broadcast** because the client has *no IP yet* and doesn't know the server's address — it must shout to everyone. (The server's Offer/ACK can be unicast or broadcast depending on the client's flags.)
+**UDP** (server port 67, client port 68). The **source IP is `0.0.0.0`** — the client has *no address yet*, so it can't use a real one. The **destination is `255.255.255.255`** — the limited broadcast address, because the client doesn't know any DHCP server's address and must reach every host on the segment.
 </details>
 
-**Q2.** What **transport protocol and ports** does DHCP use?
+**Q2.** What field ties the **Discover, Offer, Request, and ACK** together as one exchange?
 
 <details>
 <summary>💡 Show answer</summary>
 
-**UDP**, with the **server on port 67** and the **client on port 68**. (UDP because the client has no IP/connection state yet — a lightweight broadcast fits better than setting up TCP.)
+The **Transaction ID (xid)** — a random number the client puts in the Discover/Request, which the server copies into the Offer/ACK. It lets the client match replies to its own request even when several clients (or servers) are active at once.
 </details>
 
-**Q3.** In your DHCP **ACK**, which option fields told the client how to reach the rest of the network?
+**Q3.** In the **DHCP Request**, what are the **UDP source and destination ports**? Why are they that way?
 
 <details>
 <summary>💡 Show answer</summary>
 
-The **Router (default gateway)** option and the **Domain Name Server** option — plus the **IP Address Lease Time**. Without the gateway the client couldn't leave its subnet; without the DNS server it couldn't resolve names.
+**Source port 68 (client) → destination port 67 (server).** DHCP fixes these "well-known" ports so the server always listens on 67 and the client on 68 — necessary because the client has no other way to be addressed before it owns an IP. (The Offer/ACK travel the opposite way, 67 → 68.)
 </details>
 
-**Q4.** In the DNS response, which **record type** maps a hostname to an **IPv4** address? What about IPv6?
+**Q4.** In the **DHCP ACK**, which field carries the **assigned client IP**, and which options give the **lease time** and the **default gateway**?
 
 <details>
 <summary>💡 Show answer</summary>
 
-An **`A`** record maps a name → **IPv4** address. An **`AAAA`** ("quad-A") record maps a name → **IPv6** address. A **`CNAME`** is an alias pointing one name at another name.
+The assigned address is in the **"Your (client) IP Address"** field. The **IP Address Lease Time** option says how long the lease is valid, and the **Router** option is the **default gateway** (first-hop router). The **Domain Name Server** option lists the DNS resolver(s).
 </details>
 
----
-
-## Lab C — Network Security Analysis
-
-**⏱️ ~25 min · Objective:** recognise the *signatures* of common attacks (ARP spoofing, port scans) in a capture, and see why **HTTPS** matters.
-
-> ⚠️ **Authorized use only.** Run scans/spoofing **only on your own lab network or a host you control**. Scanning or spoofing networks you don't own may be illegal.
-
-### Step C1 — Spot an ARP anomaly
-
-1. Filter **`arp`**. Note your normal **request/reply** pairs and the gateway's MAC.
-2. Look for the spoofing signature: **two different MACs claiming the same IP**, or a **flood of gratuitous ARP** replies.
-3. Use **Analyze → Expert Information** — Wireshark flags **"duplicate IP address detected"** when an IP maps to more than one MAC.
-
-<p align="center">
-  <!-- ![ARP anomaly](./img/labC-step1-arp.png) -->
-  <em>Fig. 6 — 📸 <code>img/labC-step1-arp.png</code>: two MACs claiming one IP (the ARP-spoofing signature).</em>
-</p>
-
-### Step C2 — Identify a port scan
-
-1. From another machine you control, run a SYN scan against a lab host:
-   ```sh
-   nmap -sS <target-ip>
-   ```
-2. In Wireshark, filter for bare SYNs:
-   ```text
-   tcp.flags.syn == 1 && tcp.flags.ack == 0
-   ```
-3. Observe **many SYNs to sequential ports** from one source — the classic scan pattern. Compare replies: a **SYN-ACK = open** port, a **RST = closed** port.
-
-<p align="center">
-  <!-- ![Port scan](./img/labC-step2-scan.png) -->
-  <em>Fig. 7 — 📸 <code>img/labC-step2-scan.png</code>: a burst of SYNs to sequential ports from one host.</em>
-</p>
-
-### Step C3 — Plaintext vs. encrypted
-
-1. While capturing, visit an **`http://`** site and an **`https://`** site.
-2. Filter **`http`** → use **Follow → TCP Stream** and confirm you can **read the content in plaintext**.
-3. Filter **`tls`** → confirm the payload is **encrypted** (only the handshake and the SNI server name are visible). *This is why HTTPS matters.*
-
-<p align="center">
-  <!-- ![Plaintext vs encrypted](./img/labC-step3-tls.png) -->
-  <em>Fig. 8 — 📸 <code>img/labC-step3-tls.png</code>: readable HTTP stream vs. an opaque encrypted TLS payload.</em>
-</p>
-
-### Step C4 — Reflect: which defense stops which attack?
-
-Match each defense to the attack it neutralises:
-
-| Attack (signature you found) | Defense that stops it |
-|:---|:---|
-| ARP spoofing / duplicate-IP | **Dynamic ARP Inspection (DAI)** |
-| Rogue DHCP server | **DHCP Snooping** |
-| Plaintext credential capture | **HTTPS / TLS** (and SSH over Telnet) |
-| DNS spoofing / cache poisoning | **DNSSEC** |
-
-### Lab C Questions
-
-**Try each one first, then click "Show answer".**
-
-**Q1.** What exactly in the `arp` capture reveals **ARP spoofing**?
+**Q5.** Is the **DNS** query/response over UDP or TCP? What is the query's **destination port** and the response's **source port**?
 
 <details>
 <summary>💡 Show answer</summary>
 
-The same **IP address mapped to two different MAC addresses** (often the attacker rapidly sending **gratuitous ARP** replies to overwrite the gateway's entry in victims' ARP caches). Wireshark's Expert Info calls this **"duplicate IP address detected."** ARP has no authentication, so anyone on the LAN can claim any IP.
+**UDP**, both on port **53** — the query is sent *to* destination port 53, and the response comes *from* source port 53 (the ports swap on the way back). DNS uses UDP for these small, single-shot lookups; it only falls back to TCP for large responses (e.g. zone transfers).
 </details>
 
-**Q2.** Under the filter `tcp.flags.syn == 1 && tcp.flags.ack == 0`, how do you tell which ports are **open**?
+**Q6.** To what **IP address** is your DNS query sent, and what server is that?
 
 <details>
 <summary>💡 Show answer</summary>
 
-You're seeing the scanner's outbound **SYNs**. Look at the **replies**: an **open** port answers with a **SYN-ACK** (and the scanner usually sends RST to avoid completing the handshake — a "half-open"/stealth scan); a **closed** port replies with **RST**. No reply at all often means a firewall is **filtering** it.
+To your **local / default DNS server** — the resolver address your host was given in the DHCP **ACK** (Domain Name Server option). Your computer always asks *its* resolver, which then does the recursive/iterative work of contacting root, TLD, and authoritative servers on your behalf.
 </details>
 
-**Q3.** Under `tls`, what can you **still see**, and what is **hidden**?
+**Q7.** How many **"questions"** and **"answers"** are in the DNS **query** versus the **response**?
 
 <details>
 <summary>💡 Show answer</summary>
 
-You can still see **metadata**: the IP addresses, ports, the TLS handshake, and often the **SNI** (the server hostname being requested). What's **hidden** is the **application payload** — URLs, headers, credentials, page content are all encrypted. So HTTPS protects the *content*, not the fact that you talked to a given server.
+The **query** has **1 question and 0 answers** (you're asking, not telling). The **response** repeats that **1 question** and adds **one or more answers** (e.g. the A record, often an AAAA too, sometimes a CNAME chain). Wireshark shows these counts in the DNS header's *Questions* / *Answer RRs* fields.
 </details>
 
-**Q4.** A rogue DHCP server handed a victim a malicious gateway. Which **switch defense** would have stopped it, and how?
+**Q8.** What record type maps a name → **IPv4**? What does a **`-type=NS`** query return, and how does **DNS caching** change a repeated lookup?
 
 <details>
 <summary>💡 Show answer</summary>
 
-**DHCP Snooping.** It lets the switch mark only specific ports as **trusted** to send DHCP Offers/ACKs (the ports leading to the real server). Offers arriving on **untrusted** ports — where a rogue server sits — are **dropped**, so victims never accept the bad gateway/DNS.
+An **`A`** record maps name → IPv4 (**`AAAA`** → IPv6). A **`-type=NS`** query returns the **authoritative name servers** for a domain (and usually their IPs "for free"). With **caching**, a second lookup of a name you just resolved sends **no DNS query at all** — your host (or the local server) answers from its **resolver cache** until the record's TTL expires, which is why clearing the cache (Step A4) is needed to *see* the query on the wire.
 </details>
 
 ---
 
 ## Next Steps
 
-- Build the matching **server side** in [Packet Tracer Lab B](./PACKET_TRACER_GUIDE.md) — configure a DHCP pool + DNS records and watch DORA happen in Simulation Mode.
+- Build the **server side** in [Packet Tracer Labs B & C](./PACKET_TRACER_GUIDE.md): secure the router with **SSH** + an **FTP** service (Lab B), then run your own **DHCP & DNS server** so PCs auto-configure and browse by name (Lab C).
 - **Homework (from the README):** complete the Kurose & Ross **DNS** Wireshark lab and write a one-paragraph summary of **DNS poisoning/spoofing**.
 - Revisit the [Session 2 Wireshark guide](../S2/WIRESHARK_GUIDE.md) and contrast the **TCP** handshake (HTTP) with the **connectionless UDP** you saw in DHCP/DNS here.

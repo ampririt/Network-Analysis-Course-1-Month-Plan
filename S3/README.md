@@ -3,8 +3,6 @@
 - [Session 3 — Network Services\& Security](#session-3--network-services-security)
   - [Lecture](#lecture)
   - [Hands-on Lab](#hands-on-lab)
-    - [Wireshark — Labs A & C guide →](./WIRESHARK_GUIDE.md)
-    - [Packet Tracer — Lab B guide →](./PACKET_TRACER_GUIDE.md)
   - [Homework](#homework)
 
 
@@ -54,23 +52,21 @@ Watch a device get an address and resolve a name. You'll release/renew your IP, 
 
 ---
 
-**Lab B — Cisco Packet Tracer: DHCP & DNS Server Setup (~25 min)**
+**Lab B — Cisco Packet Tracer: Secure Management & File Transfer (SSH & FTP)**
 
-Build the **server side** of those services. You'll configure a router **DHCP pool** (network, default-router, dns-server), set PCs to obtain addresses automatically, add a **DNS A record** (`www.lab.com` → `192.168.1.100`), watch **DORA** unfold in Simulation Mode, and finally browse to the site **by name** from a PC.
+Reuse the **multi-subnet network from Session 2** and add two application-layer services. You'll harden the router for **SSH** remote management (generate an RSA key, restrict the vty lines to SSH so Telnet is refused), stand up an **FTP** server on the Management subnet, transfer a file from a PC across the router, and see why SSH is safe to sniff but plaintext FTP is not.
 
 > 📖 **Full instructions, figures, and questions:**
-> 👉 **[Packet Tracer — Lab B: DHCP & DNS Server Setup](./PACKET_TRACER_GUIDE.md)**
+> 👉 **[Packet Tracer — Lab B: Secure Management & File Transfer (SSH & FTP)](./PACKET_TRACER_GUIDE.md)**
 
 ---
 
-**Lab C — Wireshark: Network Security Analysis (~25 min)**
+**Lab C — Cisco Packet Tracer: DHCP & DNS (continuing from Lab B)**
 
-> ⚠️ Run only on your own lab network / a host you control. Scanning or spoofing networks you don't own may be illegal.
-
-Learn to recognise attack *signatures* in a capture: spot **ARP spoofing** (two MACs claiming one IP), identify a **port scan** (a burst of SYNs to sequential ports, open vs. closed via SYN-ACK/RST), and compare **plaintext HTTP vs. encrypted TLS** to see why HTTPS matters — then map each attack to the defense that stops it.
+**Continue from your Lab B file.** Make the same multi-subnet network self-configuring: add a **DNS** service to the FTP-server (`ftp.lab.local → 192.168.0.98`), configure **per-department DHCP pools** on the router, switch the PCs from static to **DHCP**, then reach the server **by name** — running the server side of the very DORA/DNS exchanges you captured in Lab A.
 
 > 📖 **Full instructions, figures, and questions:**
-> 👉 **[Wireshark — Lab C: Network Security Analysis](./WIRESHARK_GUIDE.md#lab-c--network-security-analysis)**
+> 👉 **[Packet Tracer — Lab C: DHCP & DNS, continuing from Lab B](./PACKET_TRACER_GUIDE.md#lab-c--dhcp--dns-continuing-from-lab-b)**
 
 ### Homework
 - Kurose & Ross Wireshark Lab: **DNS**

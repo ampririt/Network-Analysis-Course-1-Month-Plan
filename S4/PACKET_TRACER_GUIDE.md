@@ -150,7 +150,7 @@ Router(config-subif)# end
 
 ### Step A6 — DHCP per VLAN
 
-Give each VLAN its own DHCP pool so PCs auto-address. *(Refresher on the pool commands: [Session 3 guide](../S3/PACKET_TRACER_GUIDE.md#step-b2--configure-the-routers-dhcp-pool).)*
+Give each VLAN its own DHCP pool so PCs auto-address — the same `ip dhcp pool` pattern, one per VLAN.
 
 ```ios
 Router(config)# ip dhcp pool VLAN10

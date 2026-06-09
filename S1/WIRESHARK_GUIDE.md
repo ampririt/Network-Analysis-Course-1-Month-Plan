@@ -433,7 +433,7 @@ Because the target's MAC is **exactly what the sender doesn't know yet** — it'
 <details>
 <summary>💡 Show answer</summary>
 
-**ARP spoofing / poisoning** — an attacker sends forged (often gratuitous) ARP replies claiming the gateway's IP belongs to *their* MAC, so victims send traffic to the attacker (a man-in-the-middle). You'll capture and analyse this in **[Session 3 — Network Security Analysis](../S3/WIRESHARK_GUIDE.md#lab-c--network-security-analysis)**.
+**ARP spoofing / poisoning** — an attacker sends forged (often gratuitous) ARP replies claiming the gateway's IP belongs to *their* MAC, so victims send traffic to the attacker (a man-in-the-middle). The defence is **Dynamic ARP Inspection (DAI)** on the switch, which drops ARP replies that don't match a trusted IP↔MAC binding.
 </details>
 
 ---
