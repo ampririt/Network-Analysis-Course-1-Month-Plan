@@ -1,158 +1,33 @@
-## Cisco Packet Tracer — Labs B & C: Protocol Walk + Multi-Subnet Design
+## Cisco Packet Tracer — Lab B: Multi-Subnet IP Design Build
 
 > Companion guide to [Session 2 — The Protocol Stack Deep Dive](./README.md).
-> Read this **before** doing **Lab B** and **Lab C** in the [README](./README.md#hands-on-lab).
+> Read this **before** doing **Lab B** in the [README](./README.md#hands-on-lab).
 > New to Packet Tracer? Start with the [Session 1 Packet Tracer guide](../S1/PACKET_TRACER_GUIDE.md) for installation, the window tour, and CLI basics.
 
 ---
 
-- [Cisco Packet Tracer — Labs B \& C](#cisco-packet-tracer--labs-b--c-protocol-walk--multi-subnet-design)
-  - [Lab B — Simulation-Mode Protocol Walk](#lab-b--simulation-mode-protocol-walk)
-    - [Step B1 — Build the topology](#step-b1--build-the-topology)
-    - [Step B2 — Address the devices](#step-b2--address-the-devices)
-    - [Step B3 — Enter Simulation Mode](#step-b3--enter-simulation-mode)
-    - [Step B4 — Send a ping and step through](#step-b4--send-a-ping-and-step-through)
-    - [Step B5 — Inspect the PDU layers](#step-b5--inspect-the-pdu-layers)
-    - [Lab B Questions](#lab-b-questions)
-  - [Lab C — Multi-Subnet IP Design Build](#lab-c--multi-subnet-ip-design-build)
-    - [Step C1 — Subnet on paper (do this first!)](#step-c1--subnet-on-paper-do-this-first)
-    - [Step C2 — Build the topology](#step-c2--build-the-topology)
-    - [Step C3 — Configure the router](#step-c3--configure-the-router)
-    - [Step C4 — Assign PC IPs](#step-c4--assign-pc-ips)
-    - [Step C5 — Verify connectivity](#step-c5--verify-connectivity)
-    - [Step C6 — Break it on purpose](#step-c6--break-it-on-purpose)
-    - [Lab C Questions](#lab-c-questions)
-  - [Self-Check & Submission](#self-check--submission)
-  - [Next Steps](#next-steps)
+- [Cisco Packet Tracer — Lab B: Multi-Subnet IP Design Build](#cisco-packet-tracer--lab-b-multi-subnet-ip-design-build)
+- [Lab B — Multi-Subnet IP Design Build](#lab-b--multi-subnet-ip-design-build)
+  - [Step B1 — Subnet on paper (do this first!)](#step-b1--subnet-on-paper-do-this-first)
+  - [Step B2 — Build the topology](#step-b2--build-the-topology)
+  - [Step B3 — Configure the router](#step-b3--configure-the-router)
+  - [Step B4 — Assign PC IPs](#step-b4--assign-pc-ips)
+  - [Step B5 — Verify connectivity](#step-b5--verify-connectivity)
+  - [Step B6 — Break it on purpose](#step-b6--break-it-on-purpose)
+  - [Lab B Questions](#lab-b-questions)
+- [Practice Exercises](#practice-exercises)
+- [Next Steps](#next-steps)
 
 ---
 
-## Lab B — Simulation-Mode Protocol Walk
-
-**⏱️ ~20 min · Objective:** watch encapsulation (**ICMP → IP → Ethernet**) and **ARP** resolution happen *hop-by-hop*.
-
-### Step B1 — Build the topology
-
-Drag the devices onto the workspace and cable them with **Copper Straight-Through**:
-
-```text
-PC1 ──┐
-      ├── Switch ── Router ── Server
-PC2 ──┘
-```
-
-* PCs → Switch: Copper Straight-Through
-* Switch → Router: Copper Straight-Through
-* Router → Server: Copper Straight-Through (or place the Server on a second switch)
-
-<p align="center">
-  <!-- ![Lab B topology](./img/labB-step1-topology.png) -->
-  <em>Fig. 1 — 📸 <code>img/labB-step1-topology.png</code>: the finished topology on the workspace.</em>
-</p>
-
-### Step B2 — Address the devices
-
-Put the PCs and the Server on **different subnets** so traffic *must* cross the router.
-
-| Device | IP | Mask | Gateway |
-|:---|:---|:---|:---|
-| PC1 | `192.168.1.10` | `255.255.255.0` | `192.168.1.1` |
-| PC2 | `192.168.1.11` | `255.255.255.0` | `192.168.1.1` |
-| Server | `192.168.2.10` | `255.255.255.0` | `192.168.2.1` |
-
-Configure the router interfaces (CLI tab):
-
-```ios
-Router> enable
-Router# configure terminal
-Router(config)# interface g0/0
-Router(config-if)# ip address 192.168.1.1 255.255.255.0
-Router(config-if)# no shutdown
-Router(config-if)# exit
-Router(config)# interface g0/1
-Router(config-if)# ip address 192.168.2.1 255.255.255.0
-Router(config-if)# no shutdown
-```
-
-> 💡 Need a refresher on `enable`, `configure terminal`, and what `ip address … 255.255.255.0` means? See the [Session 1 router-config explainer](../S1/PACKET_TRACER_GUIDE.md#step-5--configure-the-router).
-
-<p align="center">
-  <!-- ![Addressing](./img/labB-step2-addressing.png) -->
-  <em>Fig. 2 — 📸 <code>img/labB-step2-addressing.png</code>: PC IP Configuration + router CLI showing interfaces up.</em>
-</p>
-
-### Step B3 — Enter Simulation Mode
-
-1. Click **Simulation** (bottom-right corner) to pause real-time traffic.
-2. In **Edit Filters**, keep only **ICMP** and **ARP** checked to cut the noise.
-
-<p align="center">
-  <!-- ![Simulation mode](./img/labB-step3-simulation.png) -->
-  <em>Fig. 3 — 📸 <code>img/labB-step3-simulation.png</code>: the Simulation panel with ICMP + ARP filters selected.</em>
-</p>
-
-### Step B4 — Send a ping and step through
-
-1. Use the **Add Simple PDU** (envelope) tool: click **PC1**, then the **Server**.
-2. Click **Play / Capture-Forward** repeatedly to advance **one hop at a time**.
-3. Watch the sequence:
-   * **ARP request/reply** — PC1 learns the router's MAC (and the router learns the Server's).
-   * **ICMP echo** travelling *inside* IP *inside* Ethernet.
-
-<p align="center">
-  <!-- ![Ping stepping](./img/labB-step4-ping.png) -->
-  <em>Fig. 4 — 📸 <code>img/labB-step4-ping.png</code>: a packet mid-flight between switch and router.</em>
-</p>
-
-### Step B5 — Inspect the PDU layers
-
-1. Click a coloured packet square → the **PDU Information** window opens.
-2. Use the **OSI Model** tab to read each layer; use **Inbound/Outbound PDU Details** to see the real header fields (Ethernet → IP → ICMP).
-3. Confirm the key idea of routing: the **destination MAC changes at the router**, but the **destination IP stays the same** end-to-end.
-
-<p align="center">
-  <!-- ![PDU inspection](./img/labB-step5-pdu.png) -->
-  <em>Fig. 5 — 📸 <code>img/labB-step5-pdu.png</code>: PDU Details showing the Ethernet + IP + ICMP headers.</em>
-</p>
-
-### Lab B Questions
-
-**Try each one first, then click "Show answer".**
-
-**Q1.** Before the very first ICMP echo could be sent, an **ARP** exchange happened. What was PC1 actually asking for, and why?
-
-<details>
-<summary>💡 Show answer</summary>
-
-PC1 needed the **MAC address of its default gateway** (the router's `192.168.1.1`). It already knows the *IP* it wants to reach, but to build the **Ethernet frame** it must fill in a **destination MAC** — and on its own subnet that has to be the gateway's MAC (since the Server is on a different network). ARP is the "what MAC owns this IP?" broadcast that resolves it.
-</details>
-
-**Q2.** As the ping crossed the router, the **destination MAC changed** but the **destination IP did not**. Why?
-
-<details>
-<summary>💡 Show answer</summary>
-
-**IP addresses identify the original source and final destination** — they stay constant for the whole journey. **MAC addresses only identify devices on the current physical link**, so they're rewritten at every hop: PC1→router uses the router's MAC; router→Server uses the Server's MAC. "IP stays, MAC changes per hop" is the heart of how routing works.
-</details>
-
-**Q3.** In the PDU's **OSI Model** tab, which layers does the **switch** process versus the **router**?
-
-<details>
-<summary>💡 Show answer</summary>
-
-The **switch** is a Layer-2 device — it only looks at **Layer 2 (Ethernet/MAC)** to forward the frame, leaving Layers 3+ untouched. The **router** goes up to **Layer 3 (IP)** to read the destination IP, decide the next hop, decrement TTL, then re-encapsulate down to Layer 2 on the way out.
-</details>
-
----
-
-## Lab C — Multi-Subnet IP Design Build
+## Lab B — Multi-Subnet IP Design Build
 
 **⏱️ ~40 min · Objective:** design an IP scheme **from scratch** and build a routed, multi-subnet network. *This is the foundation lab for every later session.*
 
 **Scenario:** one company, base network `192.168.0.0/24`, three departments:
 **Engineering** (50 hosts), **Marketing** (25 hosts), **Management** (10 hosts).
 
-### Step C1 — Subnet on paper (do this first!)
+### Step B1 — Subnet on paper (do this first!)
 
 Pick the smallest subnet that fits each department (size = next power of two **above** *hosts + 2*, to leave room for the network and broadcast addresses).
 
@@ -164,27 +39,53 @@ Pick the smallest subnet that fits each department (size = next power of two **a
 
 > 💡 Check your math with the [quick formula](./README.md#how-to-subnet-step-by-step): `/26` → size `256 / 2² = 64`, usable `64 − 2 = 62`. ✅
 
+**Why these particular blocks?** Work **largest department first** and lay each subnet down **immediately after** the previous one, so nothing overlaps and nothing is wasted:
+
+- **Engineering** (50 hosts) → first `/26` block: `192.168.0.0` – `.63`.
+- **Marketing** (25 hosts) → starts at the *next free address* `.64` as a `/27`: `.64` – `.95`.
+- **Management** (10 hosts) → starts at `.96` as a `/28`: `.96` – `.111`.
+
+Each block's size is the **next power of two ≥ (hosts + 2)** — the **+2** reserves the **network address** (all host bits `0`) and the **broadcast address** (all host bits `1`), which can never be assigned to a PC. The leftover `.112` – `.255` stays free for future growth.
+
 <p align="center">
-  <!-- ![Subnet plan](./img/labC-step1-subnetplan.png) -->
-  <em>Fig. 6 — 📸 <code>img/labC-step1-subnetplan.png</code>: your handwritten / spreadsheet subnet table.</em>
+  <img src="./img/labB-step1-subnetplan.png" alt="The subnet plan mapped to the three departments" width="720"><br>
+  <em>Fig. 1 — The subnet plan: each department gets a right-sized block out of <code>192.168.0.0/24</code> — Engineering <code>/26</code> (50 hosts), Marketing <code>/27</code> (25), Management <code>/28</code> (10).</em>
 </p>
 
-### Step C2 — Build the topology
+### Step B2 — Build the topology
 
-Drag on **6 PCs** (2 per dept), **3 switches** (one per dept), and **1 router** with **three Ethernet ports** — a Cisco **2911** works well (it has `g0/0`, `g0/1`, `g0/2` on-board). Cable each department's PCs to its own switch, then connect **each switch to its own router port** (one physical interface per subnet).
+Drag these **exact devices** from the bottom-left device panel onto the workspace:
+
+| Qty | Device | Packet Tracer model | Where to find it | Name it |
+|:---:|:---|:---|:---|:---|
+| 6 | **PC** | `PC-PT` | **End Devices → End Devices → PC** | `PC1`–`PC6` |
+| 3 | **Switch** | Cisco **`2960`** (`2960-24TT`) | **Network Devices → Switches → 2960** | `SW-Eng`, `SW-Mkt`, `SW-Mgt` |
+| 1 | **Router** | Cisco **`2911`** | **Network Devices → Routers → 2911** | `Router0` |
+
+> 💡 Use the **`2911`** router specifically — it has **three on-board GigabitEthernet ports** (`g0/0`, `g0/1`, `g0/2`), one per department subnet. The default `2901` only has two, and the `2960` is a *switch* (Layer 2) — it can't route between subnets. The **`2960`** switch is the standard access switch and is plenty for the two PCs in each department.
+
+Cable everything with **Copper Straight-Through**. Connect each department's two PCs to its own switch, then connect **each switch to its own router port**:
+
+| Link | From | To |
+|:---|:---|:---|
+| Engineering | `SW-Eng` `Fa0/24` | `Router0` `g0/0` |
+| Marketing | `SW-Mkt` `Fa0/24` | `Router0` `g0/1` |
+| Management | `SW-Mgt` `Fa0/24` | `Router0` `g0/2` |
 
 ```text
-[ENG]  PC1 PC2 ── SW-Eng ─┐
-[MKT]  PC3 PC4 ── SW-Mkt ─┼── Router
-[MGT]  PC5 PC6 ── SW-Mgt ─┘
+[ENG]  PC1 PC2 ── SW-Eng (2960) ─┐ g0/0
+[MKT]  PC3 PC4 ── SW-Mkt (2960) ─┼─ Router0 (2911)
+[MGT]  PC5 PC6 ── SW-Mgt (2960) ─┘ g0/2
 ```
 
+> 💡 **Watch the link lights.** A new link shows a **red triangle** (down) at each end. The PC–switch links go **green** almost immediately; the **switch–router** links stay **red until you give the router interface an IP and `no shutdown`** it in Step B3. Red switch–router links *after* configuring usually mean you cabled the wrong router port.
+
 <p align="center">
-  <!-- ![Lab C topology](./img/labC-step2-topology.png) -->
-  <em>Fig. 7 — 📸 <code>img/labC-step2-topology.png</code>: the three-department topology.</em>
+  <img src="./img/labB-step2-topology.png" alt="The three-department topology in Packet Tracer" width="760"><br>
+  <em>Fig. 2 — The built topology: <strong>Router2 (2911)</strong> with one <strong>2960-24TT</strong> switch per department, each department on its own subnet. Each PC is labelled with the address you'll assign in Step B4.</em>
 </p>
 
-### Step C3 — Configure the router
+### Step B3 — Configure the router
 
 Give the router **one physical interface per subnet** — each becomes that department's **gateway**. This keeps the focus on *subnetting*: one interface, one network, one gateway IP. Assign each department's gateway address and bring the interface up with `no shutdown`:
 
@@ -212,16 +113,25 @@ Router(config-if)# end
 ```
 
 > [!NOTE]
-> Notice each interface's **mask matches its department's subnet size** (`/26`, `/27`, `/28`) — the same numbers from your Step C1 plan. No VLANs or trunking here; that's a Session 4 topic. One subnet = one router port = one gateway.
+> Notice each interface's **mask matches its department's subnet size** (`/26`, `/27`, `/28`) — the same numbers from your Step B1 plan. No VLANs or trunking here; that's a Session 4 topic. One subnet = one router port = one gateway.
+
+**Read the CLI feedback.** After each `no shutdown`, the router prints two lines:
+
+```text
+%LINK-5-CHANGED: Interface GigabitEthernet0/0, changed state to up
+%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0, changed state to up
+```
+
+The first means **Layer 1 is up** (the cable/port is live); the second means **Layer 2 is up** (the line protocol is working). Seeing *both* for all three interfaces is your confirmation the router side is fully ready — and it's exactly why the red switch–router triangles from Step B2 turn **green** now.
 
 <p align="center">
-  <!-- ![Router config](./img/labC-step3-router.png) -->
-  <em>Fig. 8 — 📸 <code>img/labC-step3-router.png</code>: router CLI after configuring the three interfaces.</em>
+  <img src="./img/labB-step3-router.png" alt="Router CLI after configuring the three interfaces" width="440"><br>
+  <em>Fig. 3 — The router CLI: each interface (<code>g0/0</code>, <code>g0/1</code>, <code>g0/2</code>) given its subnet's gateway IP + mask and brought up, with the "changed state to up" confirmations.</em>
 </p>
 
-### Step C4 — Assign PC IPs
+### Step B4 — Assign PC IPs
 
-Give each PC an address **inside its subnet's usable range**, pointing at its gateway:
+On each PC, open the **`Config`** tab (or **Desktop → IP Configuration**), choose **Static**, and fill in three fields — an address **inside its subnet's usable range**, the **matching mask**, and the **gateway = its router interface's IP**:
 
 | PC | Dept | IP | Mask | Gateway |
 |:---|:---:|:---|:---|:---|
@@ -232,43 +142,72 @@ Give each PC an address **inside its subnet's usable range**, pointing at its ga
 | PC5 | MGT | `192.168.0.100` | `255.255.255.240` | `192.168.0.97` |
 | PC6 | MGT | `192.168.0.101` | `255.255.255.240` | `192.168.0.97` |
 
-<p align="center">
-  <!-- ![PC addressing](./img/labC-step4-pcip.png) -->
-  <em>Fig. 9 — 📸 <code>img/labC-step4-pcip.png</code>: one PC's IP Configuration filled in.</em>
-</p>
-
-### Step C5 — Verify connectivity
-
-Open a PC's **Command Prompt** (Desktop tab) and test:
-
-1. **Same subnet** — `ping 192.168.0.11` from PC1 → should reply immediately.
-2. **Across subnets** — `ping 192.168.0.70` (Marketing) from PC1 → should reply via the router.
-3. On the router, confirm every interface is `up/up`:
-   ```ios
-   Router# show ip interface brief
-   ```
+> [!NOTE]
+> **Two things must line up or cross-subnet pings will fail:** (1) the **mask must match the department's** (e.g. `/26` = `255.255.255.192` for Engineering — *not* the default `/24`); and (2) the **gateway must equal the router interface IP on that same subnet** (PC1's gateway is `192.168.0.1`, which is `g0/0`). A wrong mask or gateway is the #1 cause of "it pings locally but not across" — which you'll prove on purpose in Step B6.
 
 <p align="center">
-  <!-- ![Verification](./img/labC-step5-verify.png) -->
-  <em>Fig. 10 — 📸 <code>img/labC-step5-verify.png</code>: a successful cross-subnet ping + <code>show ip interface brief</code> output.</em>
+  <img src="./img/labB-step4-pcip.png" alt="PC1's IP Configuration filled in: address, mask, and gateway" width="720"><br>
+  <em>Fig. 4 — Configuring <strong>PC1</strong>: the <code>Config</code> tab (①), <strong>Default Gateway</strong> <code>192.168.0.1</code> (②), the <code>FastEthernet0</code> interface (③), and the static <strong>IPv4 Address</strong> <code>192.168.0.10</code> / mask <code>255.255.255.192</code> (④).</em>
 </p>
 
-### Step C6 — Break it on purpose
+### Step B5 — Verify connectivity
 
-Failures teach faster than successes — reproduce these two, then fix them:
-
-1. **Wrong mask:** set PC1's mask to `255.255.255.0` and re-ping Marketing → it now thinks Marketing is *local*, skips the gateway, and **fails**. Explain why, then restore `/26`.
-2. **IP conflict:** give PC2 the same IP as PC1 (`192.168.0.10`) → observe the conflict warning. Discuss why **IPAM** (IP Address Management) matters in real networks.
+**Open the test console.** Click a PC → the **Desktop** tab → **Command Prompt**. This is a mini DOS-style shell where `ping` and `ipconfig` work just like on a real machine.
 
 <p align="center">
-  <!-- ![Failure demo](./img/labC-step6-failure.png) -->
-  <em>Fig. 11 — 📸 <code>img/labC-step6-failure.png</code>: the failed ping and/or the IP-conflict popup.</em>
+  <img src="./img/labB-terminal-verify.png" alt="Opening the Command Prompt from a PC's Desktop tab" width="700"><br>
+  <em>Fig. 5 — Open the test console: on the PC, click <strong>Desktop</strong> (①) → <strong>Command Prompt</strong> (②).</em>
 </p>
+
+**Run two pings** from PC1 — one *inside* its subnet, one *across* the router:
+
+1. **Same subnet** — `ping 192.168.0.11` (PC2, also Engineering) → replies **immediately**; this stays on the local switch, no router involved.
+2. **Across subnets** — `ping 192.168.0.70` (PC3, Marketing) → replies **via Router2**.
+
+> 💡 **The first cross-subnet ping often shows `Request timed out`, then succeeds.** That's normal: before PC1 can send, it must **ARP** for its gateway's MAC, and the very first echo can expire while that resolution happens. Packets 2–4 then get through — so "1 lost, 3 received" on the *first* run is a success, not a fault. Run it again and all four reply.
+
+<p align="center">
+  <img src="./img/labB-ping-verify.png" alt="Ping results: same-subnet success and cross-subnet success" width="400"><br>
+  <em>Fig. 6 — PC1's pings: <code>192.168.0.11</code> (same subnet) replies at once; <code>192.168.0.70</code> (across the router) times out once while ARP resolves the gateway, then replies.</em>
+</p>
+
+**Confirm the router side.** On **Router2 → CLI**, list the interfaces:
+
+```ios
+Router> enable
+Router# show ip interface brief
+```
+
+Every interface you configured should read **`up` / `up`** (Status / Protocol). Read the columns:
+
+| Column | Healthy value | What it means |
+|:---|:---|:---|
+| **IP-Address** | the gateway you set | the address hosts point at |
+| **Status** | `up` | Layer 1 — the port/cable is live |
+| **Protocol** | `up` | Layer 2 — the line protocol is working |
+
+> The unused **`Vlan1`** line showing `administratively down` is **normal** — it's a built-in virtual interface you never enabled, not an error. If a *GigabitEthernet* line shows `administratively down`, you forgot its **`no shutdown`**; `up / down` usually means a cabling or speed/duplex mismatch.
+
+<p align="center">
+  <img src="./img/show_ip_interface_brief.png" alt="show ip interface brief output with all three interfaces up/up" width="680"><br>
+  <em>Fig. 7 — <code>show ip interface brief</code>: <code>g0/0</code>/<code>g0/1</code>/<code>g0/2</code> all <strong>up/up</strong> with their gateway IPs; <code>Vlan1</code> is unused (administratively down) — that's expected.</em>
+</p>
+
+### Step B6 — Break it on purpose
+
+Failures teach faster than successes — reproduce these two, watch them fail, then fix them:
+
+1. **Wrong mask.** On PC1, change the mask from `255.255.255.192` (`/26`) to `255.255.255.0` (`/24`) and re-ping Marketing (`192.168.0.70`).
+   - **What happens:** the ping **fails**. With a `/24` mask PC1 now believes the *entire* `192.168.0.x` range — including Marketing — is its **own local subnet**, so it tries to reach `.70` **directly with ARP** instead of handing the packet to its gateway. Nothing on the Engineering switch answers for `.70`, so it times out.
+   - **The lesson:** the **mask**, not the IP, decides "local vs. remote." Restore `/26` and the ping works again.
+2. **IP conflict.** Give PC2 the *same* address as PC1 (`192.168.0.10`).
+   - **What happens:** Packet Tracer pops an **IP-address-conflict** warning, and traffic to `.10` becomes unreliable (two NICs answer for one address).
+   - **The lesson:** every address must be unique — this is why real networks track allocations with **IPAM** (IP Address Management) instead of assigning addresses by hand-memory. Set PC2 back to `192.168.0.11`.
 
 > [!IMPORTANT]
-> **Save your `.pkt` file** — you'll extend this topology in later sessions.
+> **Save your `.pkt` file** — you'll extend this topology in Session 3 (DHCP/DNS) and Session 4 (routing/VLANs).
 
-### Lab C Questions
+### Lab B Questions
 
 **Try each one first, then click "Show answer".**
 
@@ -280,7 +219,7 @@ Failures teach faster than successes — reproduce these two, then fix them:
 A subnet loses 2 addresses (network + broadcast), so usable = size − 2. **`/27`** = 32 addresses → only **30 usable** — too few for 50. **`/26`** = 64 addresses → **62 usable** — fits 50 with room to grow. **`/25`** = 126 usable would also fit, but it **wastes** addresses and would overlap the space the other departments need. `/26` is the smallest block that fits — the efficient choice.
 </details>
 
-**Q2.** After setting PC1's mask to `255.255.255.0` (Step C6), why did the ping to Marketing **fail**?
+**Q2.** After setting PC1's mask to `255.255.255.0` (Step B6), why did the ping to Marketing **fail**?
 
 <details>
 <summary>💡 Show answer</summary>
@@ -306,22 +245,24 @@ Because the addressing plan drives **everything** — gateway IPs, masks, and wh
 
 ---
 
-## Self-Check & Submission
+## Practice Exercises
 
-Tick every box before you call Session 2 done:
+Work through these to lock in subnetting and building a routed network. **Tick each box** as you finish it, and save a screenshot or note of the result (e.g. into `S2/img/`).
 
-- [ ] **Lab A:** captured and labelled a real `SYN / SYN-ACK / ACK` sequence *(see the [Wireshark guide](./WIRESHARK_GUIDE.md))*
-- [ ] **Lab A:** explained one difference between the TCP and UDP (DNS) conversations
-- [ ] **Lab B:** stepped a ping through Simulation Mode and identified where the **MAC changes but the IP doesn't**
-- [ ] **Lab C:** subnet table calculated **on paper** before building
-- [ ] **Lab C:** same-subnet **and** cross-subnet pings succeed
-- [ ] **Lab C:** reproduced and explained both the **wrong-mask** and **IP-conflict** failures
-- [ ] All screenshots saved into [`S2/img/`](./img/) and rendering in these guides
+- [ ] **1. Build & address.** Construct the three-department network exactly as in the tables (3 × `2960` switches, 1 × `2911` router, 6 PCs). *Record:* a `show ip interface brief` with `g0/0`, `g0/1`, `g0/2` all **up/up**.
+- [ ] **2. Prove routing.** From an Engineering PC, ping a PC in **each** other department. *Record:* the replies (and note the first cross-subnet packet may time out while ARP resolves the gateway).
+- [ ] **3. Trace the path.** From PC1 run `tracert 192.168.0.100` (Management). *Record:* the hop(s) — confirm the packet leaves via the gateway `192.168.0.1`.
+- [ ] **4. Break the mask.** Set PC1's mask to `255.255.255.0` and re-ping Marketing. *Record:* the failure, and explain in one line why the **mask** (not the IP) caused it. Then restore `/26`.
+- [ ] **5. Cause a conflict.** Give two PCs the same IP. *Record:* the conflict warning, and how you'd prevent it at scale (**IPAM**).
+- [ ] **Stretch — Add a 4th department.** Add **HR (5 hosts)** to your plan: pick the next free block after Management (`192.168.0.112/28`), wire a 4th switch to a spare router port, address a PC, and verify a cross-subnet ping.
+
+> [!TIP]
+> Treat each *Record* line as your deliverable — together they prove you can **design** an IP scheme, **build** it, **verify** routing, and **diagnose** the two most common addressing faults.
 
 ---
 
 ## Next Steps
 
-- **Homework (from the README):** complete the [`10.0.0.0/16` 5-department design](./README.md#homework) and build it in Packet Tracer — this is the subnetting *repetition* that turns the one-off Lab C into fluency.
+- **Homework (from the README):** complete the [`10.0.0.0/16` 5-department design](./README.md#homework) and build it in Packet Tracer — this is the subnetting *repetition* that turns the one-off Lab B into fluency.
 - Keep your `.pkt` file; later sessions extend this multi-subnet topology with DHCP/DNS (Session 3) and routing/VLANs (Session 4).
 - Revisit the [Wireshark guide](./WIRESHARK_GUIDE.md) and capture a **TCP teardown** (`tcp.flags.fin == 1`) for a complete picture of a connection's life cycle.

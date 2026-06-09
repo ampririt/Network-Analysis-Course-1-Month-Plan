@@ -2,8 +2,8 @@
 
 > **This walkthrough has moved.** To match the Session 1 layout, the labs are now split into two focused companion guides:
 >
-> - 🦈 **[Wireshark — Lab A: The TCP 3-Way Handshake](./WIRESHARK_GUIDE.md)**
-> - 📦 **[Packet Tracer — Labs B & C: Protocol Walk + Multi-Subnet Design](./PACKET_TRACER_GUIDE.md)**
+> - 🦈 **[Wireshark — Lab A: TCP & UDP in Action](./WIRESHARK_GUIDE.md)**
+> - 📦 **[Packet Tracer — Lab B: Multi-Subnet IP Design Build](./PACKET_TRACER_GUIDE.md)**
 >
 > See the [Session 2 README](./README.md#hands-on-lab) for the lab introductions.
 
@@ -28,12 +28,12 @@ To show a picture: save your screenshot into [`S2/img/`](./img/) with the **exac
 
 **Short answer: yes for the core objectives, with two suggested top-ups.**
 
-✅ **Well covered by Labs A–C:**
-- Reading real protocol headers (Ethernet / IP / TCP / UDP) — Lab A + Lab B
+✅ **Well covered by Labs A–B:**
+- Reading real protocol headers (Ethernet / IP / TCP / UDP) — Lab A
 - TCP vs. UDP behaviour (handshake vs. connectionless) — Lab A
-- Encapsulation and ARP hop-by-hop — Lab B
-- Subnet *design from scratch*, building it, and verifying routing — Lab C
-- The two most common real-world failures (wrong mask, IP conflict) — Lab C
+- TCP reliability — sequence/ack numbers, segmentation, and congestion control on a graph — Lab A
+- Subnet *design from scratch*, building it, and verifying routing — Lab B
+- The two most common real-world failures (wrong mask, IP conflict) — Lab B
 
 🔹 **Recommended additions for stronger retention** (each ~10–15 min, optional):
 1. **Subnetting drills without a calculator.** The labs build *one* scheme; fluency comes from repetition. Treat the [homework `10.0.0.0/16` exercise](./README.md#homework) as required, not optional.
@@ -41,4 +41,4 @@ To show a picture: save your screenshot into [`S2/img/`](./img/) with the **exac
 
 🔸 **Deliberately deferred to later sessions:** VLAN theory & trunking → **Session 4**; DHCP/DNS/ARP services in depth → **Session 3**; routing protocols → **Session 4**.
 
-**Verdict:** Labs A–C fully exercise every Session 2 learning objective. Add the subnetting drills (via the homework) for fluency, and the optional FIN/HTTPS capture for depth — then S2 practice is complete.
+**Verdict:** Labs A–B fully exercise every Session 2 learning objective. Add the subnetting drills (via the homework) for fluency, and the optional FIN/HTTPS capture for depth — then S2 practice is complete.

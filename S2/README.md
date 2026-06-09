@@ -62,16 +62,7 @@ Capture live traffic and watch a real **`SYN → SYN-ACK → ACK`** handshake se
 
 ---
 
-**Lab B — Cisco Packet Tracer: Simulation-Mode Protocol Walk**
-
-Build a small **PCs → Switch → Router → Server** network across two subnets, then drop into **Simulation Mode** and step a ping through it one hop at a time. You'll see **ARP** resolve MAC addresses and **ICMP encapsulated inside IP inside Ethernet**, and confirm the core routing idea: the **MAC changes at each hop while the IP stays the same**.
-
-> 📖 **Full instructions, figures, and questions:**
-> 👉 **[Packet Tracer — Lab B: Simulation-Mode Protocol Walk](./PACKET_TRACER_GUIDE.md#lab-b--simulation-mode-protocol-walk)**
-
----
-
-**Lab C — Cisco Packet Tracer: IP Network Design & Multi-Subnet Build**
+**Lab B — Cisco Packet Tracer: IP Network Design & Multi-Subnet Build**
 
 > [!IMPORTANT]
 > This lab builds the foundation for all future Packet Tracer exercises. Students design an IP scheme **from scratch**.
@@ -79,7 +70,7 @@ Build a small **PCs → Switch → Router → Server** network across two subnet
 Design and build a real, routed network for a company with three departments — **Engineering** (50 hosts), **Marketing** (25 hosts), **Management** (10 hosts) — out of `192.168.0.0/24`. You'll subnet on paper first (`/26`, `/27`, `/28`), build the three-department topology, configure the router, verify same-subnet **and** cross-subnet connectivity, then deliberately break it (wrong mask, IP conflict) to learn why addressing discipline matters.
 
 > 📖 **Full subnet tables, router config, verification, and questions:**
-> 👉 **[Packet Tracer — Lab C: Multi-Subnet IP Design Build](./PACKET_TRACER_GUIDE.md#lab-c--multi-subnet-ip-design-build)**
+> 👉 **[Packet Tracer — Lab B: Multi-Subnet IP Design Build](./PACKET_TRACER_GUIDE.md#lab-b--multi-subnet-ip-design-build)**
 
 ---
 
