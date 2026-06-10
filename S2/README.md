@@ -1,5 +1,7 @@
 ## Session 2 — The Protocol Stack Deep Dive: Ethernet, IP, TCP & UDP
 
+> 🌐 **English** | [日本語](./README.ja.md)
+
 - [Session 2 — The Protocol Stack Deep Dive: Ethernet, IP, TCP \& UDP](#session-2--the-protocol-stack-deep-dive-ethernet-ip-tcp--udp)
   - [Lecture](#lecture)
   - [Break (10 min)](#break-10-min)

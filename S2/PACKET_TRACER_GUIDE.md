@@ -1,5 +1,7 @@
 ## Cisco Packet Tracer — Lab B: Multi-Subnet IP Design Build
 
+> 🌐 **English** | [日本語](./PACKET_TRACER_GUIDE.ja.md)
+
 > Companion guide to [Session 2 — The Protocol Stack Deep Dive](./README.md).
 > Read this **before** doing **Lab B** in the [README](./README.md#hands-on-lab).
 > New to Packet Tracer? Start with the [Session 1 Packet Tracer guide](../S1/PACKET_TRACER_GUIDE.md) for installation, the window tour, and CLI basics.

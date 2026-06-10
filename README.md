@@ -1,5 +1,7 @@
 # 🌎Network Analysis Course — 1-Month Plan
 
+> 🌐 **English** | [日本語](./README.ja.md)
+
 > **Duration**: 4 Weeks | **Schedule**: 1 Class/Week | **Class Length**: 3 Hours (including 10 min break)  
 > **Total Sessions**: 4 | **Total Contact Hours**: 12 Hours
 

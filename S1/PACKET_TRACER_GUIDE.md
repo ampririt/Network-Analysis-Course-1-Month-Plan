@@ -1,5 +1,7 @@
 ## Cisco Packet Tracer — Getting Started & Lab 2
 
+> 🌐 **English** | [日本語](./PACKET_TRACER_GUIDE.ja.md)
+
 > Companion guide to [Session 1 — Introduction to Network Analysis & The OSI Model](./README.md).
 > Read this **before** doing **Lab B — Cisco Packet Tracer: Build Your First Network** in the [README](./README.md#hands-on-lab).
 > Pairs with the [Wireshark — Getting Started & Lab 1 guide](./WIRESHARK_GUIDE.md).

@@ -1,5 +1,7 @@
 ## Wireshark — Lab A: TCP & UDP in Action
 
+> 🌐 **English** | [日本語](./WIRESHARK_GUIDE.ja.md)
+
 > Companion guide to [Session 2 — The Protocol Stack Deep Dive](./README.md).
 > Read this **before** doing **Lab A** in the [README](./README.md#hands-on-lab).
 > New to Wireshark? Start with the [Session 1 Wireshark guide](../S1/WIRESHARK_GUIDE.md) for installation and the basics.

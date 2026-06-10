@@ -1,5 +1,7 @@
 ## Cisco Packet Tracer — Labs B & C: SSH/FTP + DHCP/DNS Server
 
+> 🌐 **English** | [日本語](./PACKET_TRACER_GUIDE.ja.md)
+
 > Companion guide to [Session 3 — Network Services & Security](./README.md).
 > Read this **before** doing **Lab B** and **Lab C** in the [README](./README.md#hands-on-lab).
 > New to Packet Tracer? Start with the [Session 1 Packet Tracer guide](../S1/PACKET_TRACER_GUIDE.md) for installation, the window tour, and CLI basics.

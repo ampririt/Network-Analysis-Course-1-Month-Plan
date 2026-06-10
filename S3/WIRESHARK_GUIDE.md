@@ -1,5 +1,7 @@
 ## Wireshark — Lab A: DHCP & DNS Analysis
 
+> 🌐 **English** | [日本語](./WIRESHARK_GUIDE.ja.md)
+
 > Companion guide to [Session 3 — Network Services & Security](./README.md).
 > Read this **before** doing **Lab A** in the [README](./README.md#hands-on-lab).
 > New to Wireshark? Start with the [Session 1 Wireshark guide](../S1/WIRESHARK_GUIDE.md) for installation and the basics, and the [Session 2 guide](../S2/WIRESHARK_GUIDE.md) for filters & Follow-Stream.

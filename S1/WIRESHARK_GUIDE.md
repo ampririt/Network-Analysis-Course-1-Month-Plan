@@ -1,5 +1,7 @@
 ## Wireshark — Getting Started & Lab 1
 
+> 🌐 **English** | [日本語](./WIRESHARK_GUIDE.ja.md)
+
 > Companion guide to [Session 1 — Introduction to Network Analysis & The OSI Model](./README.md).
 > Read this **before** doing **Lab A — Wireshark: First Capture** in the [README](./README.md#hands-on-lab).
 >

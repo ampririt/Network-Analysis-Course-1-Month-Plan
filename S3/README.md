@@ -1,5 +1,7 @@
 ## Session 3 — Network Services& Security
 
+> 🌐 **English** | [日本語](./README.ja.md)
+
 - [Session 3 — Network Services\& Security](#session-3--network-services-security)
   - [Lecture](#lecture)
   - [Hands-on Lab](#hands-on-lab)

@@ -6725,6 +6725,48 @@
         border-color: var(--amber);
         background: var(--amber-soft);
       }
+      .stp-pill.ndp {
+        color: var(--plum);
+        border-color: var(--plum);
+        background: var(--plum-soft);
+      }
+      /* fa0/x port labels on the topology */
+      .stp-port {
+        position: absolute;
+        z-index: 3;
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      /* animated path-cost badge (springs in during the Root-Port phase) */
+      .stp-cb {
+        position: absolute;
+        z-index: 3;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 15px;
+        padding: 2px 8px;
+        border-radius: 6px;
+        color: var(--paper);
+        background: var(--ink-soft);
+        opacity: 0;
+        transform: scale(0.5);
+        transition:
+          opacity 0.4s ease,
+          transform 0.45s var(--ease-spring),
+          background 0.4s ease;
+      }
+      .stp-cb.in {
+        opacity: 1;
+        transform: scale(1);
+      }
+      .stp-cb.win {
+        background: var(--moss);
+      }
+      .stp-cb.lose {
+        background: #b34a28;
+      }
       .stp-cost {
         position: absolute;
         z-index: 3;
@@ -6790,27 +6832,42 @@
            reveals each role one decision at a time,
            driven by a four-rung "decision ladder".
            =========================================== */
+      /* PDF-style chevron "process bar" — the four STP decisions as
+         interlocking arrows that light up one phase at a time. */
       #stpSim .stp-ladder {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
+        display: flex;
+        gap: 5px;
         max-width: 1180px;
         margin: 16px auto 0;
       }
       #stpSim .lstep {
+        flex: 1;
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 10px 16px;
-        border: 1.5px solid var(--rule);
-        border-radius: 10px;
-        background: rgba(255, 252, 244, 0.5);
+        gap: 11px;
+        padding: 11px 16px 11px 34px;
+        background: var(--paper-warm);
+        color: var(--ink);
         opacity: 0.5;
-        transition:
-          opacity 0.35s ease,
-          border-color 0.35s ease,
-          background 0.35s ease,
-          box-shadow 0.35s ease;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 18px) 0,
+          100% 50%,
+          calc(100% - 18px) 100%,
+          0 100%,
+          18px 50%
+        );
+        transition: opacity 0.35s ease, background 0.35s ease, color 0.35s ease;
+      }
+      #stpSim .lstep:first-child {
+        padding-left: 20px;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 18px) 0,
+          100% 50%,
+          calc(100% - 18px) 100%,
+          0 100%
+        );
       }
       #stpSim .lstep .n {
         flex: none;
@@ -6825,37 +6882,57 @@
         font-weight: 700;
         font-size: 15px;
         color: var(--ink);
+        background: rgba(255, 255, 255, 0.4);
         transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
       }
       #stpSim .lstep .lx b {
         display: block;
         font-weight: 700;
-        font-size: 17px;
+        font-size: 16.5px;
         line-height: 1.15;
       }
       #stpSim .lstep .lx span {
         font-family: var(--font-mono);
-        font-size: 13.5px;
+        font-size: 13px;
         color: var(--muted);
       }
+      /* a phase that is active or already decided fills with its phase colour */
+      #stpSim .lstep.active,
       #stpSim .lstep.done {
         opacity: 1;
       }
-      #stpSim .lstep.done .n {
-        background: var(--moss);
-        color: var(--paper);
-        border-color: var(--moss);
+      #stpSim .lstep.done {
+        opacity: 0.82;
       }
-      #stpSim .lstep.active {
-        opacity: 1;
-        border-color: var(--cobalt);
-        background: var(--cobalt-soft);
-        box-shadow: 0 4px 14px rgba(29, 63, 184, 0.18);
-      }
-      #stpSim .lstep.active .n {
+      #stpSim .lstep:nth-child(1).active,
+      #stpSim .lstep:nth-child(1).done {
         background: var(--cobalt);
         color: var(--paper);
-        border-color: var(--cobalt-deep);
+      }
+      #stpSim .lstep:nth-child(2).active,
+      #stpSim .lstep:nth-child(2).done {
+        background: var(--moss);
+        color: var(--paper);
+      }
+      #stpSim .lstep:nth-child(3).active,
+      #stpSim .lstep:nth-child(3).done {
+        background: var(--amber);
+        color: var(--paper);
+      }
+      #stpSim .lstep:nth-child(4).active,
+      #stpSim .lstep:nth-child(4).done {
+        background: var(--plum);
+        color: var(--paper);
+      }
+      #stpSim .lstep.active .n,
+      #stpSim .lstep.done .n {
+        background: var(--paper);
+        color: var(--ink);
+        border-color: var(--paper);
+      }
+      #stpSim .lstep.active .lx span,
+      #stpSim .lstep.done .lx span {
+        color: rgba(255, 255, 255, 0.82);
       }
       #stpSim .stp-topo {
         margin: 12px auto 0;
@@ -8337,15 +8414,16 @@
               <h3>Inside one LAN</h3>
               <p style="margin-top: 8px">
                 The <strong>MAC address table</strong>, learning &amp;
-                flooding, broadcast vs. unicast — how a switch moves frames.
+                flooding, then redundancy, broadcast storms &amp;
+                loop-prevention with <strong>STP</strong>.
               </p>
             </div>
             <div class="card plum reveal" style="--i: 3">
               <div class="label">Part 2 · VLANs</div>
               <h3>Carving it up</h3>
               <p style="margin-top: 8px">
-                Why we segment, <strong>802.1Q</strong> tagging, access vs.
-                trunk ports, and loop-prevention with <strong>STP</strong>.
+                Why we segment, <strong>802.1Q</strong> tagging, and
+                access vs. trunk ports across a campus.
               </p>
             </div>
             <div class="card amber reveal" style="--i: 4">
@@ -8579,6 +8657,95 @@
           <div class="page-num"></div>
         </section>
 
+        <!-- ========================================================= SLIDE 7b — STEP-BY-STEP: HOW THE MAC TABLE FILLS & FLOODS ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Switching</span><span>Learning &amp; flooding · step by step</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">Before you try it — the rule the switch runs on every frame</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Learn the source, <em class="display">flood the unknown.</em>
+          </h2>
+
+          <!-- per-frame algorithm, as three numbered steps -->
+          <div class="decision-flow reveal" style="--i: 2; margin-top: 18px">
+            <div class="dstep">
+              <div class="dn">1</div>
+              <div class="dtag">Always · every frame</div>
+              <h4>Learn the source</h4>
+              <p>Read the frame's <strong>source MAC</strong> and write <strong>MAC → ingress port</strong> into the table (refresh the timer if it's already there). <em>This is the only way the table fills.</em></p>
+            </div>
+            <div class="darrow">→</div>
+            <div class="dstep">
+              <div class="dn">2</div>
+              <div class="dtag">Where does it go?</div>
+              <h4>Look up the destination</h4>
+              <p>Search the table for the frame's <strong>destination MAC</strong> to find which single port (if any) leads to it.</p>
+            </div>
+            <div class="darrow">→</div>
+            <div class="dstep">
+              <div class="dn">3</div>
+              <div class="dtag">The decision</div>
+              <h4>Forward or flood</h4>
+              <p><strong style="color: var(--moss)">Found</strong> → unicast out that one port. <strong style="color: var(--amber)">Not found</strong> (or a broadcast <span class="mono">ff:ff:…</span>) → <strong style="color: var(--amber)">flood</strong> a copy out <em>every other</em> port.</p>
+            </div>
+          </div>
+
+          <div class="reveal" style="--i: 3; margin-top: 22px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 34px; align-items: stretch">
+            <!-- flooding fan-out diagram: one frame in, copies out every other port -->
+            <div style="border: 1.5px solid var(--rule); border-radius: 12px; padding: 14px 22px; background: rgba(255, 252, 244, 0.6)">
+              <div style="font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); margin-bottom: 4px">Flooding · one in, many out</div>
+              <svg viewBox="0 0 480 210" style="width: 100%; height: auto; display: block" aria-hidden="true">
+                <defs>
+                  <marker id="mIn" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1d3fb8" /></marker>
+                  <marker id="mOut" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#d9621a" /></marker>
+                </defs>
+                <!-- switch -->
+                <rect x="196" y="81" width="92" height="48" rx="9" fill="#0f2030" />
+                <text x="242" y="110" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#f4efe4" letter-spacing="1">SWITCH</text>
+                <!-- inbound frame (cobalt) from PC-A -->
+                <rect x="14" y="85" width="96" height="40" rx="7" fill="#d6deff" stroke="#1d3fb8" stroke-width="1.5" />
+                <text x="62" y="102" text-anchor="middle" font-size="14" font-weight="700" font-family="'JetBrains Mono', monospace" fill="#112879">PC-A</text>
+                <text x="62" y="118" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" fill="#1d3fb8">sends</text>
+                <line x1="110" y1="105" x2="190" y2="105" stroke="#1d3fb8" stroke-width="3" marker-end="url(#mIn)" />
+                <text x="150" y="95" text-anchor="middle" font-size="11" font-family="'JetBrains Mono', monospace" fill="#1d3fb8">Fa0/1 in</text>
+                <!-- outbound copies (amber) to B, C, D -->
+                <g font-family="'JetBrains Mono', monospace" font-weight="700">
+                  <rect x="372" y="14" width="96" height="40" rx="7" fill="#f5d9bf" stroke="#d9621a" stroke-width="1.5" /><text x="420" y="38" text-anchor="middle" font-size="14" fill="#0f2030">PC-B</text>
+                  <rect x="372" y="85" width="96" height="40" rx="7" fill="#f5d9bf" stroke="#d9621a" stroke-width="1.5" /><text x="420" y="109" text-anchor="middle" font-size="14" fill="#0f2030">PC-C</text>
+                  <rect x="372" y="156" width="96" height="40" rx="7" fill="#f5d9bf" stroke="#d9621a" stroke-width="1.5" /><text x="420" y="180" text-anchor="middle" font-size="14" fill="#0f2030">PC-D</text>
+                </g>
+                <line x1="288" y1="99" x2="370" y2="36" stroke="#d9621a" stroke-width="3" marker-end="url(#mOut)" />
+                <line x1="288" y1="105" x2="370" y2="105" stroke="#d9621a" stroke-width="3" marker-end="url(#mOut)" />
+                <line x1="288" y1="111" x2="370" y2="174" stroke="#d9621a" stroke-width="3" marker-end="url(#mOut)" />
+              </svg>
+              <div style="margin-top: 4px; font-size: 16px; line-height: 1.5">Destination unknown (or a broadcast)? The switch copies the frame out <strong>every port except Fa0/1</strong>. Only the real owner answers; the rest drop it. ARP and DHCP discovery rely on exactly this.</div>
+            </div>
+
+            <!-- the table fills one source at a time -->
+            <div style="border: 1.5px solid var(--ink); border-radius: 12px; padding: 14px 20px; background: var(--paper-warm)">
+              <div style="font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cobalt-deep); margin-bottom: 12px">The table fills one source at a time</div>
+              <div style="display: flex; flex-direction: column; gap: 11px; font-family: var(--font-mono); font-size: 16px">
+                <div style="display: flex; align-items: center; gap: 11px">
+                  <span style="flex: none; width: 23px; height: 23px; border-radius: 50%; background: var(--ink); color: var(--paper); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">1</span>
+                  <span style="color: var(--muted); font-style: italic">— empty — (just powered on)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 11px">
+                  <span style="flex: none; width: 23px; height: 23px; border-radius: 50%; background: var(--ink); color: var(--paper); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">2</span>
+                  <span><strong>A</strong> sends → <span style="background: var(--moss-soft); padding: 1px 7px; border-radius: 4px">aa:aa&nbsp;&nbsp;Fa0/1</span></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 11px">
+                  <span style="flex: none; width: 23px; height: 23px; border-radius: 50%; background: var(--ink); color: var(--paper); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">3</span>
+                  <span><strong>B</strong> replies → +<span style="background: var(--moss-soft); padding: 1px 7px; border-radius: 4px">bb:bb&nbsp;&nbsp;Fa0/2</span></span>
+                </div>
+              </div>
+              <div style="margin-top: 13px; font-size: 15px; color: var(--ink-soft); line-height: 1.5">Receiving a flood <em>doesn't</em> add an entry — a switch only ever learns from a frame's <strong>source</strong>, so each device must send once before it's known. Entries <strong>age out</strong> after <span class="mono">300 s</span> idle.</div>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
         <!-- ========================================================= SLIDE 8 — INTERACTIVE: MAC LEARNING SIM ========================================================= -->
         <section class="slide" id="macSim" data-noscale>
           <div class="masthead">
@@ -8635,6 +8802,42 @@
             <button class="sim-btn primary" id="macStart">▶ Start</button>
             <button class="sim-btn" id="macNext">Step ▸</button>
             <button class="sim-btn" id="macReset">↺ Reset</button>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 8c — ARP FLOODING vs SWITCH FLOODING (don't confuse them) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Switching</span><span>A classic mix-up · ARP vs switch flooding</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">Both spray the network — but they answer different questions</span>
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            Don't confuse ARP with <em class="display">flooding.</em>
+          </h2>
+
+          <div class="reveal" style="--i: 2; margin-top: 18px; padding: 12px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 19px">
+            <strong>The one-line difference:</strong> ARP knows the <strong>IP</strong> but not the MAC; switch flooding knows the <strong>MAC</strong> but not which <strong>port</strong> it sits behind.
+          </div>
+
+          <table class="data reveal" style="--i: 3; margin-top: 20px; font-size: 18px">
+            <thead>
+              <tr><th style="width: 18%"></th><th style="color: var(--cobalt-deep)">ARP “flooding” (broadcast)</th><th style="color: var(--amber)">Switch flooding</th></tr>
+            </thead>
+            <tbody>
+              <tr><td style="color: var(--muted)">Layer</td><td>L3 ↔ L2 bridge (IP→MAC)</td><td>L2 only (MAC→port)</td></tr>
+              <tr><td style="color: var(--muted)">The question</td><td>“What MAC owns this <strong>IP</strong>?”</td><td>“Which <strong>port</strong> is this MAC behind?”</td></tr>
+              <tr><td style="color: var(--muted)">What is sent</td><td>an <strong>ARP request</strong> (a broadcast frame)</td><td>the ordinary frame, dest port unknown</td></tr>
+              <tr><td style="color: var(--muted)">Goes to</td><td>every host (broadcast <span class="mono">ff:ff:…</span>)</td><td>every port except the ingress</td></tr>
+              <tr><td style="color: var(--muted)">The reply</td><td>the host with that IP sends an <strong>ARP reply</strong></td><td>the dest's reply lets the switch <strong>learn its port</strong></td></tr>
+              <tr><td style="color: var(--muted)">Updates</td><td><strong>ARP table</strong> (IP ↔ MAC)</td><td><strong>MAC table</strong> (MAC ↔ port)</td></tr>
+              <tr><td style="color: var(--muted)">Example</td><td class="mono">“Who has 192.168.1.10?”</td><td class="mono">“Where is 00:11:22:33:44:55?”</td></tr>
+            </tbody>
+          </table>
+
+          <div class="reveal" style="--i: 4; margin-top: 16px; font-size: 17px; color: var(--ink-soft)">
+            They often happen together: ARP <em>uses</em> broadcast to find a MAC, and the switch carrying that broadcast may <em>flood</em> it — but ARP is, strictly, a <strong>Layer-3</strong> protocol.
           </div>
           <div class="page-num"></div>
         </section>
@@ -8700,6 +8903,443 @@
           <div class="page-num"></div>
         </section>
 
+        <!-- ========================================================= SLIDE 14a0 — REDUNDANCY → BROADCAST STORM (the problem STP solves) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Switching</span><span>Redundancy &amp; the broadcast storm</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">The problem that makes STP necessary</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Redundancy saves you — until it <em class="display">storms.</em>
+          </h2>
+
+          <div class="grid-3" style="margin-top: 26px; gap: 30px; align-items: stretch">
+            <div class="card moss reveal" style="--i: 2">
+              <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">backup</span>1 · Why add a backup</div>
+              <h3 style="font-size: 24px; margin-top: 6px">One path is a single point of failure</h3>
+              <p style="margin-top: 8px; font-size: 18px">A 24/7 service can't rest on one cable: if that link or switch dies, <strong>everything drops</strong>. So we wire a <strong>second, backup path</strong> between switches for reliability. This is <strong>redundancy</strong> — and we genuinely need it.</p>
+            </div>
+            <div class="card amber reveal" style="--i: 3">
+              <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">all_inclusive</span>2 · The trap — a loop</div>
+              <h3 style="font-size: 24px; margin-top: 6px">Two paths = a Layer-2 loop</h3>
+              <p style="margin-top: 8px; font-size: 18px">That backup means <strong>two ways</strong> between the same switches — a physical <strong>loop</strong>. And an Ethernet frame has <strong>no TTL</strong> (unlike an IP packet), so nothing ever makes a looping frame expire.</p>
+            </div>
+            <div class="card plum reveal" style="--i: 4">
+              <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">cyclone</span>3 · Broadcast storm</div>
+              <h3 style="font-size: 24px; margin-top: 6px">One broadcast, copied forever</h3>
+              <p style="margin-top: 8px; font-size: 18px">A single broadcast (e.g. an <strong>ARP request</strong>) is flooded, loops back, and is flooded again — <strong>doubling at every switch</strong>. Links hit 100% and switch CPUs overload until the whole LAN <strong>crashes</strong>.</p>
+            </div>
+          </div>
+
+          <div class="reveal" style="--i: 5; margin-top: 24px; padding: 14px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 19px">
+            We <strong>can't</strong> drop the redundancy — it's what keeps the service alive. The fix is to keep all the wiring but <strong>logically block one port</strong> so no loop exists. That is exactly what <strong>STP</strong> does — next.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14a — WHY STP ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Switching</span><span>Spanning Tree · why we need it</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">Ethernet has no TTL — a looped frame never dies</span>
+          <h2 class="reveal" style="--i: 1; font-size: 48px">
+            Why does a LAN <em class="display">need STP?</em>
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 20px; margin-top: 8px; max-width: 1540px">
+            We <em>want</em> redundant links for reliability — but two paths
+            between switches form a Layer-2 <strong>loop</strong>. An IP packet
+            has a TTL that expires; an Ethernet frame does <strong>not</strong>.
+            So a single broadcast circulates forever, multiplying at every
+            switch.
+          </p>
+          <div class="grid-2" style="margin-top: 22px; gap: 44px; align-items: stretch">
+            <div class="card reveal" style="--i: 3; display: flex; align-items: center; justify-content: center">
+              <div class="stp-loop">
+                <svg viewBox="0 0 560 250" aria-hidden="true">
+                  <defs>
+                    <marker id="stpah" markerWidth="9" markerHeight="9" refX="5.5" refY="3" orient="auto">
+                      <path d="M0,0 L6,3 L0,6 Z" fill="#1d3fb8" />
+                    </marker>
+                  </defs>
+                  <path d="M174,78 C 232,16 328,16 386,78" fill="none" stroke="#1d3fb8" stroke-width="3" marker-end="url(#stpah)" />
+                  <path d="M386,106 C 328,168 232,168 174,106" fill="none" stroke="#1d3fb8" stroke-width="3" marker-end="url(#stpah)" />
+                </svg>
+                <div class="lp-sw a"><span class="m-icon">lan</span>SW-A</div>
+                <div class="lp-sw b"><span class="m-icon">lan</span>SW-B</div>
+                <div class="lp-storm"><span class="m-icon">cyclone</span>LOOP</div>
+              </div>
+            </div>
+            <div class="stack reveal" style="--i: 4; gap: 14px">
+              <div class="card amber" style="padding: 14px 20px">
+                <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">cyclone</span>Broadcast storm</div>
+                <p style="margin-top: 4px; font-size: 17px">Broadcasts &amp; unknown-unicast are flooded, loop back, and are flooded again — link use hits 100% and the LAN freezes in seconds.</p>
+              </div>
+              <div class="card plum" style="padding: 14px 20px">
+                <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">swap_horiz</span>MAC table instability</div>
+                <p style="margin-top: 4px; font-size: 17px">The same source MAC keeps arriving on two ports — the CAM table "flaps", so forwarding decisions go wrong.</p>
+              </div>
+              <div class="card moss" style="padding: 14px 20px">
+                <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">content_copy</span>Duplicate frames</div>
+                <p style="margin-top: 4px; font-size: 17px">Hosts receive multiple copies of every frame, confusing upper-layer protocols.</p>
+              </div>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 5; margin-top: 20px; padding: 13px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 19px">
+            That's why <strong>STP (802.1D)</strong> runs by default on every
+            switch: it keeps the physical redundancy but logically
+            <strong>removes the loop</strong> by blocking one port.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14b — STP ROLE-FINDING DIAGRAM ========================================================= -->
+        <section class="slide" data-noscale>
+          <div class="masthead">
+            <div class="left"><span class="tag">Switching</span><span>Spanning Tree · finding the roles</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">One root · one Root Port per switch · one Designated Port per segment</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Where does STP <em class="display">block?</em>
+          </h2>
+          <div class="reveal" style="--i: 2">
+            <div class="stp-topo">
+              <svg viewBox="0 0 1180 396" aria-hidden="true">
+                <!-- active tree links (cobalt) -->
+                <line x1="590" y1="44" x2="150" y2="338" stroke="#1d3fb8" stroke-width="3" />
+                <line x1="590" y1="44" x2="1030" y2="338" stroke="#1d3fb8" stroke-width="3" />
+                <!-- redundant segment that STP blocks (amber, dashed) -->
+                <line x1="150" y1="338" x2="1030" y2="338" stroke="#d9621a" stroke-width="3" stroke-dasharray="11 8" />
+              </svg>
+
+              <!-- switches -->
+              <div class="stp-sw root" style="left: 480px; top: 6px">
+                <div class="nm"><span class="m-icon crown">workspace_premium</span> SW1</div>
+                <div class="bid">ROOT BRIDGE · prio 4096</div>
+              </div>
+              <div class="stp-sw" style="left: 40px; top: 300px">
+                <div class="nm"><span class="m-icon">lan</span> SW2</div>
+                <div class="bid">prio 32768</div>
+              </div>
+              <div class="stp-sw" style="left: 920px; top: 300px">
+                <div class="nm"><span class="m-icon">lan</span> SW3</div>
+                <div class="bid">prio 32768</div>
+              </div>
+
+              <!-- cost labels -->
+              <div class="stp-cost" style="left: 346px; top: 178px">cost 19</div>
+              <div class="stp-cost" style="left: 786px; top: 178px">cost 19</div>
+              <div class="stp-cost" style="left: 560px; top: 350px">cost 19</div>
+
+              <!-- port-role pills -->
+              <div class="stp-pill dp" style="left: 386px; top: 150px">DP</div>
+              <div class="stp-pill dp" style="left: 742px; top: 150px">DP</div>
+              <div class="stp-pill rp" style="left: 260px; top: 238px">RP</div>
+              <div class="stp-pill rp" style="left: 882px; top: 238px">RP</div>
+              <div class="stp-pill dp" style="left: 346px; top: 310px">DP</div>
+              <div class="stp-pill blk" style="left: 800px; top: 310px">BLK</div>
+
+              <!-- block marker -->
+              <div class="stp-xmark" style="left: 960px; top: 322px"><span class="m-icon">block</span></div>
+            </div>
+          </div>
+          <div class="stp-legend reveal" style="--i: 3">
+            <span class="it"><span class="dot root"></span> Root Bridge</span>
+            <span class="it"><span class="dot rp"></span> RP — Root Port (best path to root)</span>
+            <span class="it"><span class="dot dp"></span> DP — Designated Port (forwards on a segment)</span>
+            <span class="it"><span class="dot blk"></span> BLK — Blocking (loop-free backup)</span>
+          </div>
+          <div class="reveal" style="--i: 4; margin-top: 16px; padding: 13px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 19px">
+            SW2 and SW3 both reach the root at <strong>cost 19</strong>, so the
+            SW2–SW3 link is a tie. The lower Bridge ID (<strong>SW2</strong>)
+            keeps the Designated Port; <strong>SW3 blocks</strong> — the loop is
+            gone, the link waits as instant backup.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14c — STP CALCULATION ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Switching</span><span>Spanning Tree · how the roles are calculated</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">Four decisions, always in this order</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Lowest <em class="display">ID</em>, then lowest <em class="display">cost.</em>
+          </h2>
+          <div class="grid-2" style="margin-top: 24px; gap: 44px; align-items: start">
+            <div class="stack reveal" style="--i: 2; gap: 16px">
+              <div class="card" style="padding: 16px 22px">
+                <div class="label" style="color: var(--cobalt-deep); display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">badge</span>Bridge ID — who can be root</div>
+                <p style="margin-top: 6px; font-size: 18px"><span class="mono">Bridge ID = Priority + MAC</span><br />Priority defaults to <strong>32768</strong> (set in steps of 4096); the <strong>lowest</strong> Bridge ID wins. Tie on priority → lowest MAC. Switches advertise these in <strong>BPDUs</strong> (Bridge Protocol Data Units).</p>
+              </div>
+              <div class="card amber" style="padding: 16px 22px">
+                <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">speed</span>Port cost — by link speed</div>
+                <table class="data" style="margin-top: 8px; font-size: 18px">
+                  <tbody>
+                    <tr><td class="mono">10 Mbps</td><td class="mono">100</td><td class="mono">1 Gbps</td><td class="mono">4</td></tr>
+                    <tr><td class="mono">100 Mbps</td><td class="mono">19</td><td class="mono">10 Gbps</td><td class="mono">2</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="stack reveal" style="--i: 3; gap: 12px">
+              <div class="card" style="padding: 13px 20px"><div class="label" style="color: var(--cobalt-deep)">1 · Root Bridge</div><p style="margin-top: 3px; font-size: 17px">Lowest <strong>Bridge ID</strong> in the whole network. Every other switch builds its tree toward it.</p></div>
+              <div class="card moss" style="padding: 13px 20px"><div class="label">2 · Root Port (per switch)</div><p style="margin-top: 3px; font-size: 17px">Lowest <strong>Root Path Cost</strong> — the sum of port costs back to the root. Tie-break: lowest sender Bridge ID, then lowest port ID.</p></div>
+              <div class="card" style="padding: 13px 20px"><div class="label" style="color: var(--cobalt-deep)">3 · Designated Port (per segment)</div><p style="margin-top: 3px; font-size: 17px">On each link, the port advertising the <strong>lowest Root Path Cost</strong> forwards. The root's ports are always Designated.</p></div>
+              <div class="card amber" style="padding: 13px 20px"><div class="label">4 · Blocking</div><p style="margin-top: 3px; font-size: 17px">Every remaining port is put into <strong>blocking</strong> — no loop, ready as backup.</p></div>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 4; margin-top: 18px; padding: 13px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 18px">
+            <strong>Worked example (the diagram):</strong> all links are 100 Mbps
+            (<span class="mono">cost 19</span>). SW2 &amp; SW3 each reach root at
+            cost 19 → Root Ports. On SW2–SW3 the cost is tied, so SW2's lower
+            Bridge ID makes it Designated and SW3 blocks. RSTP (802.1w) is the
+            faster modern version.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14d — STP STEP-BY-STEP SIM ========================================================= -->
+        <section class="slide" id="stpSim" data-noscale>
+          <div class="masthead">
+            <div class="left"><span class="tag">Interactive</span><span>Spanning Tree · find the answer, step by step</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">Live simulation · four switches, one loop — find the blocked port</span>
+          <h2 class="reveal" style="--i: 1; font-size: 40px">
+            Find the <em class="display">spanning tree.</em>
+          </h2>
+
+          <!-- four-phase chevron process bar -->
+          <div class="stp-ladder reveal" style="--i: 2">
+            <div class="lstep" data-rung="0"><span class="n">1</span><span class="lx"><b>Root Bridge</b><span>elect · lowest Bridge&nbsp;ID</span></span></div>
+            <div class="lstep" data-rung="1"><span class="n">2</span><span class="lx"><b>Root Port</b><span>lowest path cost</span></span></div>
+            <div class="lstep" data-rung="2"><span class="n">3</span><span class="lx"><b>Designated Port</b><span>one per segment</span></span></div>
+            <div class="lstep" data-rung="3"><span class="n">4</span><span class="lx"><b>Non-Designated</b><span>block the loser</span></span></div>
+          </div>
+
+          <!-- four-switch square ring (mirrors the worked example) -->
+          <div class="stp-topo reveal" style="--i: 3">
+            <svg viewBox="0 0 1180 396" aria-hidden="true">
+              <line id="lnTop" x1="280" y1="46" x2="900" y2="46" stroke="#c9bfa8" stroke-width="3" />
+              <line id="lnLeft" x1="170" y1="88" x2="170" y2="232" stroke="#c9bfa8" stroke-width="3" />
+              <line id="lnRight" x1="1010" y1="88" x2="1010" y2="232" stroke="#c9bfa8" stroke-width="3" />
+              <line id="lnBottom" x1="280" y1="274" x2="900" y2="274" stroke="#c9bfa8" stroke-width="3" />
+            </svg>
+
+            <div class="stp-sw" id="ssw1" style="left: 60px; top: 4px">
+              <div class="nm"><span class="m-icon stp-crown" id="sswCrown">workspace_premium</span> SW1</div>
+              <div class="bid">priority <strong>4096</strong> · MAC …11</div>
+            </div>
+            <div class="stp-sw" id="ssw2" style="left: 900px; top: 4px">
+              <div class="nm"><span class="m-icon">lan</span> SW2</div>
+              <div class="bid">priority <strong>16384</strong> · MAC …22</div>
+            </div>
+            <div class="stp-sw" id="ssw3" style="left: 60px; top: 232px">
+              <div class="nm"><span class="m-icon">lan</span> SW3</div>
+              <div class="bid">priority 32768 · MAC …33</div>
+            </div>
+            <div class="stp-sw" id="ssw4" style="left: 900px; top: 232px">
+              <div class="nm"><span class="m-icon">lan</span> SW4</div>
+              <div class="bid">priority 32768 · MAC …44</div>
+            </div>
+
+            <!-- all links are 100 Mbps → path cost 19 each -->
+            <div class="stp-cost" style="left: 560px; top: 24px">cost 19</div>
+            <div class="stp-cost" style="left: 100px; top: 152px">cost 19</div>
+            <div class="stp-cost" style="left: 1024px; top: 152px">cost 19</div>
+            <div class="stp-cost" style="left: 560px; top: 252px">cost 19</div>
+
+            <!-- port labels -->
+            <div class="stp-port" style="left: 286px; top: 26px">fa0/2</div>
+            <div class="stp-port" style="left: 120px; top: 96px">fa0/1</div>
+            <div class="stp-port" style="left: 842px; top: 26px">fa0/2</div>
+            <div class="stp-port" style="left: 1018px; top: 96px">fa0/1</div>
+            <div class="stp-port" style="left: 120px; top: 198px">fa0/1</div>
+            <div class="stp-port" style="left: 286px; top: 250px">fa0/2</div>
+            <div class="stp-port" style="left: 1018px; top: 198px">fa0/1</div>
+            <div class="stp-port" style="left: 842px; top: 250px">fa0/2</div>
+
+            <!-- accumulated path-cost badges (Root-Port phase) -->
+            <div class="stp-cb" id="c_s2f2" style="left: 812px; top: 50px">19</div>
+            <div class="stp-cb" id="c_s2f1" style="left: 1018px; top: 120px">57</div>
+            <div class="stp-cb" id="c_s3f1" style="left: 120px; top: 218px">19</div>
+            <div class="stp-cb" id="c_s3f2" style="left: 296px; top: 288px">57</div>
+            <div class="stp-cb" id="c_s4f1" style="left: 1018px; top: 218px">38</div>
+            <div class="stp-cb" id="c_s4f2" style="left: 842px; top: 288px">38</div>
+
+            <!-- role pills -->
+            <div class="stp-pill dp" id="p_s1f2" style="left: 300px; top: 4px">DP</div>
+            <div class="stp-pill dp" id="p_s1f1" style="left: 58px; top: 110px">DP</div>
+            <div class="stp-pill rp" id="p_s2f2" style="left: 812px; top: 4px">RP</div>
+            <div class="stp-pill dp" id="p_s2f1" style="left: 1066px; top: 120px">DP</div>
+            <div class="stp-pill rp" id="p_s3f1" style="left: 58px; top: 166px">RP</div>
+            <div class="stp-pill dp" id="p_s3f2" style="left: 340px; top: 288px">DP</div>
+            <div class="stp-pill rp" id="p_s4f1" style="left: 1066px; top: 218px">RP</div>
+            <div class="stp-pill ndp" id="p_s4f2" style="left: 790px; top: 322px">NDP</div>
+
+            <!-- X marks on the 57-cost ports (lost the root-port race) -->
+            <div class="stp-xmark" id="x_s2f1" style="left: 1052px; top: 116px"><span class="m-icon">close</span></div>
+            <div class="stp-xmark" id="x_s3f2" style="left: 332px; top: 284px"><span class="m-icon">close</span></div>
+
+            <!-- block icon on the single blocking port -->
+            <div class="stp-xmark" id="blk_s4f2" style="left: 884px; top: 320px"><span class="m-icon">block</span></div>
+
+            <!-- SW4 tie-break note -->
+            <div class="stp-tie" id="stpTie" style="left: 524px; top: 150px">SW4: 38 = 38 tie → SW2's lower Bridge&nbsp;ID wins → fa0/1 = RP</div>
+          </div>
+
+          <div class="stp-narr" id="stpNarr">
+            Four switches in a square — a Layer-2 <strong>loop</strong>. They exchange <strong>BPDUs</strong> and run four decisions to leave exactly one port blocking. All links are 100 Mbps (<span class="mono">cost 19</span>). Press <strong>Start</strong>.
+          </div>
+
+          <div class="sim-controls reveal" style="--i: 4">
+            <button class="sim-btn primary" id="stpStart">▶ Start</button>
+            <button class="sim-btn" id="stpNext">Step ▸</button>
+            <button class="sim-btn" id="stpReset">↺ Reset</button>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14e — STP PORT ROLES (RP / DP / BLK) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Switching</span><span>Spanning Tree · the three port roles</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">Every switch port ends up as exactly one of these</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Root, Designated, or <em class="display">blocked.</em>
+          </h2>
+          <div class="grid-3" style="margin-top: 24px; gap: 30px; align-items: start">
+            <div class="card moss reveal" style="--i: 2">
+              <div class="label">RP · Root Port</div>
+              <h3>The way up to root</h3>
+              <table class="data" style="margin-top: 12px; font-size: 16.5px; width: 100%">
+                <tbody>
+                  <tr><td style="color: var(--muted)">Scope</td><td>one per switch <em>(root: none)</em></td></tr>
+                  <tr><td style="color: var(--muted)">Chosen by</td><td>lowest <strong>Root Path Cost</strong></td></tr>
+                  <tr><td style="color: var(--muted)">State</td><td>forwarding</td></tr>
+                  <tr><td style="color: var(--muted)">Tie-break</td><td>nbr BID → nbr port → local port</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card reveal" style="--i: 3">
+              <div class="label" style="color: var(--cobalt-deep)">DP · Designated Port</div>
+              <h3>Serves one segment</h3>
+              <table class="data" style="margin-top: 12px; font-size: 16.5px; width: 100%">
+                <tbody>
+                  <tr><td style="color: var(--muted)">Scope</td><td>one per <strong>segment</strong> / link</td></tr>
+                  <tr><td style="color: var(--muted)">Chosen by</td><td>lowest RPC <em>onto</em> that link</td></tr>
+                  <tr><td style="color: var(--muted)">Always</td><td>every root-bridge port is DP</td></tr>
+                  <tr><td style="color: var(--muted)">Tie-break</td><td>lower <strong>Bridge ID</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card amber reveal" style="--i: 4">
+              <div class="label">BLK · Blocking</div>
+              <h3>Everything else</h3>
+              <table class="data" style="margin-top: 12px; font-size: 16.5px; width: 100%">
+                <tbody>
+                  <tr><td style="color: var(--muted)">Scope</td><td>not RP and not DP</td></tr>
+                  <tr><td style="color: var(--muted)">Does</td><td>no data — but <strong>hears BPDUs</strong></td></tr>
+                  <tr><td style="color: var(--muted)">State</td><td>blocking (loop removed)</td></tr>
+                  <tr><td style="color: var(--muted)">Backup</td><td>unblocks if the tree breaks</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 5; margin-top: 22px; padding: 15px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 19px">
+            <strong>The per-link rule:</strong> on every link exactly one end is the <strong>DP</strong>; the far end is the <strong>RP</strong> (if it is that switch's best path up) or <strong>BLK</strong>. A port is never both. <span class="mono" style="margin-left: 10px; color: var(--ink-soft)">DP ●━━━● RP &nbsp;·&nbsp; DP ●╌╌╌○ BLK</span>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14f — STP PORT STATES (state machine) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Switching</span><span>Spanning Tree · port states &amp; convergence</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">A role is reached by walking through states (802.1D)</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Blocking to <em class="display">forwarding.</em>
+          </h2>
+
+          <div class="pstate-flow reveal" style="--i: 2">
+            <div class="pstate blk"><div class="ps-n">Blocking</div><div class="ps-s">drops data</div></div>
+            <div class="pstate-arrow"><span class="ps-t">max-age 20 s</span><span class="m-icon">east</span></div>
+            <div class="pstate"><div class="ps-n">Listening</div><div class="ps-s">no learning yet</div></div>
+            <div class="pstate-arrow"><span class="ps-t">fwd delay 15 s</span><span class="m-icon">east</span></div>
+            <div class="pstate"><div class="ps-n">Learning</div><div class="ps-s">builds CAM</div></div>
+            <div class="pstate-arrow"><span class="ps-t">fwd delay 15 s</span><span class="m-icon">east</span></div>
+            <div class="pstate fwd"><div class="ps-n">Forwarding</div><div class="ps-s">passes traffic</div></div>
+          </div>
+
+          <div class="reveal" style="--i: 3; margin-top: 28px">
+            <table class="data" style="font-size: 18px">
+              <thead><tr><th>State</th><th>Forwards data</th><th>Learns MACs</th><th>Hears BPDUs</th><th>Time</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Blocking</strong></td><td>✗</td><td>✗</td><td>✓</td><td class="mono">—</td></tr>
+                <tr><td><strong>Listening</strong></td><td>✗</td><td>✗</td><td>✓</td><td class="mono">15 s</td></tr>
+                <tr><td><strong>Learning</strong></td><td>✗</td><td>✓</td><td>✓</td><td class="mono">15 s</td></tr>
+                <tr><td><strong>Forwarding</strong></td><td>✓</td><td>✓</td><td>✓</td><td class="mono">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="reveal" style="--i: 4; margin-top: 22px; padding: 15px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 19px">
+            That's <strong>~30–50 s</strong> from blocking to forwarding — which is exactly why <strong>RSTP (802.1w)</strong> collapses these into <span class="mono">Discarding / Learning / Forwarding</span> and converges in <strong>seconds</strong>. RSTP is the modern default.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 14g — RSTP (802.1w) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Switching</span><span>Spanning Tree · RSTP (802.1w)</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0; font-size: 18px">STP's faster successor — the modern default</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            RSTP: <em class="display">seconds</em>, not minutes.
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 19px; margin-top: 8px; max-width: 1580px">
+            RSTP keeps the same loop-free goal but converges in well under a second — by replacing STP's timers with a handshake, and by giving every blocked port a pre-computed backup role ready to take over.
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 22px">
+            <div class="card reveal" style="--i: 3; padding: 18px 24px">
+              <div class="label" style="color: var(--cobalt-deep)">New backup roles</div>
+              <h3 style="font-size: 24px">Alternate &amp; Backup</h3>
+              <p style="margin-top: 8px; font-size: 17.5px">Root and Designated stay. RSTP adds <strong>Alternate</strong> (a ready backup path to the root) and <strong>Backup</strong> (a backup for a Designated port on the same segment). A failed Root Port is replaced by its Alternate <strong>instantly</strong>.</p>
+            </div>
+            <div class="card moss reveal" style="--i: 4; padding: 18px 24px">
+              <div class="label">Three states, not five</div>
+              <h3 style="font-size: 24px">Discarding · Learning · Forwarding</h3>
+              <p style="margin-top: 8px; font-size: 17.5px">STP's Disabled, Blocking and Listening all collapse into one <strong>Discarding</strong> state — so a port is only ever Discarding, Learning, or Forwarding.</p>
+            </div>
+            <div class="card amber reveal" style="--i: 5; padding: 18px 24px">
+              <div class="label">Proposal / agreement</div>
+              <h3 style="font-size: 24px">A handshake, not a timer</h3>
+              <p style="margin-top: 8px; font-size: 17.5px">Instead of waiting out ~50 s of timers, neighbouring switches do a quick <strong>proposal–agreement</strong> exchange on point-to-point links and go active at once → <strong>sub-second</strong> convergence.</p>
+            </div>
+            <div class="card plum reveal" style="--i: 6; padding: 18px 24px">
+              <div class="label">Edge ports</div>
+              <h3 style="font-size: 24px">PortFast &amp; BPDU Guard</h3>
+              <p style="margin-top: 8px; font-size: 17.5px"><strong>PortFast</strong> sends host ports straight to Forwarding. <strong>BPDU Guard</strong> err-disables an edge port the instant a BPDU appears — protecting the tree from a rogue switch plugged into a desk port.</p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 7; margin-top: 22px; padding: 15px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 18px">
+            <strong>Inside a BPDU</strong> (sent every 2 s): root Bridge ID · sender Bridge ID · root path cost · sender port ID · the timers. That handful of fields is all the election needs.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
         <!-- ========================================================= RECAP — PART 1 · SWITCHING ========================================================= -->
         <section class="slide">
           <div class="masthead">
@@ -8708,7 +9348,7 @@
           </div>
           <span class="eyebrow moss reveal" style="--i: 0">30-second self-check before we move on</span>
           <h2 class="reveal" style="--i: 1; font-size: 50px">
-            Switching, <em class="display">in three questions.</em>
+            Switching &amp; STP, <em class="display">in three.</em>
           </h2>
           <div class="grid-3" style="margin-top: 36px; gap: 32px">
             <div class="card reveal" style="--i: 2; padding: 24px 28px">
@@ -8718,17 +9358,17 @@
             </div>
             <div class="card amber reveal" style="--i: 3; padding: 24px 28px">
               <div class="label">Q2</div>
-              <h3 style="font-size: 25px">When does a switch flood a frame?</h3>
-              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">When the destination MAC is <strong>unknown</strong>, or it's a <strong>broadcast</strong> — out every port except the one it arrived on.</p>
+              <h3 style="font-size: 25px">When does a switch flood — and why is that dangerous on a loop?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">It floods an <strong>unknown</strong> destination or a <strong>broadcast</strong> out every other port. On a looped LAN that frame never dies — a <strong>broadcast storm</strong>.</p>
             </div>
             <div class="card moss reveal" style="--i: 4; padding: 24px 28px">
               <div class="label">Q3</div>
-              <h3 style="font-size: 25px">Unicast, broadcast, multicast — who receives each?</h3>
-              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)"><strong>One</strong> host · <strong>every</strong> host in the broadcast domain · only the hosts that <strong>joined the group</strong>.</p>
+              <h3 style="font-size: 25px">How does STP keep the backup link but kill the loop?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">It elects a <strong>Root Bridge</strong>, then picks Root &amp; Designated ports by lowest <strong>cost</strong>/Bridge&nbsp;ID and puts the one loser into <strong>blocking</strong> — a loop-free tree, with the wire ready as backup.</p>
             </div>
           </div>
           <div class="reveal" style="--i: 5; margin-top: 30px; padding: 16px 26px; border-left: 4px solid var(--moss); background: var(--paper-warm); font-size: 20px">
-            <strong>One sentence to keep:</strong> a switch is a self-teaching table — learn the source, forward to the known, flood the unknown.
+            <strong>One sentence to keep:</strong> a switch learns the source, floods the unknown — and STP blocks one port so that flooding can't loop forever.
           </div>
           <div class="page-num"></div>
         </section>
@@ -9154,372 +9794,6 @@
           <div class="page-num"></div>
         </section>
 
-        <!-- ========================================================= SLIDE 14a — WHY STP ========================================================= -->
-        <section class="slide">
-          <div class="masthead">
-            <div class="left"><span class="tag">VLANs</span><span>Spanning Tree · why we need it</span></div>
-            <div class="right"></div>
-          </div>
-          <span class="eyebrow amber reveal" style="--i: 0">Ethernet has no TTL — a looped frame never dies</span>
-          <h2 class="reveal" style="--i: 1; font-size: 48px">
-            Why does a LAN <em class="display">need STP?</em>
-          </h2>
-          <p class="reveal" style="--i: 2; font-size: 20px; margin-top: 8px; max-width: 1540px">
-            We <em>want</em> redundant links for reliability — but two paths
-            between switches form a Layer-2 <strong>loop</strong>. An IP packet
-            has a TTL that expires; an Ethernet frame does <strong>not</strong>.
-            So a single broadcast circulates forever, multiplying at every
-            switch.
-          </p>
-          <div class="grid-2" style="margin-top: 22px; gap: 44px; align-items: stretch">
-            <div class="card reveal" style="--i: 3; display: flex; align-items: center; justify-content: center">
-              <div class="stp-loop">
-                <svg viewBox="0 0 560 250" aria-hidden="true">
-                  <defs>
-                    <marker id="stpah" markerWidth="9" markerHeight="9" refX="5.5" refY="3" orient="auto">
-                      <path d="M0,0 L6,3 L0,6 Z" fill="#1d3fb8" />
-                    </marker>
-                  </defs>
-                  <path d="M174,78 C 232,16 328,16 386,78" fill="none" stroke="#1d3fb8" stroke-width="3" marker-end="url(#stpah)" />
-                  <path d="M386,106 C 328,168 232,168 174,106" fill="none" stroke="#1d3fb8" stroke-width="3" marker-end="url(#stpah)" />
-                </svg>
-                <div class="lp-sw a"><span class="m-icon">lan</span>SW-A</div>
-                <div class="lp-sw b"><span class="m-icon">lan</span>SW-B</div>
-                <div class="lp-storm"><span class="m-icon">cyclone</span>LOOP</div>
-              </div>
-            </div>
-            <div class="stack reveal" style="--i: 4; gap: 14px">
-              <div class="card amber" style="padding: 14px 20px">
-                <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">cyclone</span>Broadcast storm</div>
-                <p style="margin-top: 4px; font-size: 17px">Broadcasts &amp; unknown-unicast are flooded, loop back, and are flooded again — link use hits 100% and the LAN freezes in seconds.</p>
-              </div>
-              <div class="card plum" style="padding: 14px 20px">
-                <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">swap_horiz</span>MAC table instability</div>
-                <p style="margin-top: 4px; font-size: 17px">The same source MAC keeps arriving on two ports — the CAM table "flaps", so forwarding decisions go wrong.</p>
-              </div>
-              <div class="card moss" style="padding: 14px 20px">
-                <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">content_copy</span>Duplicate frames</div>
-                <p style="margin-top: 4px; font-size: 17px">Hosts receive multiple copies of every frame, confusing upper-layer protocols.</p>
-              </div>
-            </div>
-          </div>
-          <div class="reveal" style="--i: 5; margin-top: 20px; padding: 13px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 19px">
-            That's why <strong>STP (802.1D)</strong> runs by default on every
-            switch: it keeps the physical redundancy but logically
-            <strong>removes the loop</strong> by blocking one port.
-          </div>
-          <div class="page-num"></div>
-        </section>
-
-        <!-- ========================================================= SLIDE 14b — STP ROLE-FINDING DIAGRAM ========================================================= -->
-        <section class="slide" data-noscale>
-          <div class="masthead">
-            <div class="left"><span class="tag">VLANs</span><span>Spanning Tree · finding the roles</span></div>
-            <div class="right"></div>
-          </div>
-          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">One root · one Root Port per switch · one Designated Port per segment</span>
-          <h2 class="reveal" style="--i: 1; font-size: 46px">
-            Where does STP <em class="display">block?</em>
-          </h2>
-          <div class="reveal" style="--i: 2">
-            <div class="stp-topo">
-              <svg viewBox="0 0 1180 396" aria-hidden="true">
-                <!-- active tree links (cobalt) -->
-                <line x1="590" y1="44" x2="150" y2="338" stroke="#1d3fb8" stroke-width="3" />
-                <line x1="590" y1="44" x2="1030" y2="338" stroke="#1d3fb8" stroke-width="3" />
-                <!-- redundant segment that STP blocks (amber, dashed) -->
-                <line x1="150" y1="338" x2="1030" y2="338" stroke="#d9621a" stroke-width="3" stroke-dasharray="11 8" />
-              </svg>
-
-              <!-- switches -->
-              <div class="stp-sw root" style="left: 480px; top: 6px">
-                <div class="nm"><span class="m-icon crown">workspace_premium</span> SW1</div>
-                <div class="bid">ROOT BRIDGE · prio 4096</div>
-              </div>
-              <div class="stp-sw" style="left: 40px; top: 300px">
-                <div class="nm"><span class="m-icon">lan</span> SW2</div>
-                <div class="bid">prio 32768</div>
-              </div>
-              <div class="stp-sw" style="left: 920px; top: 300px">
-                <div class="nm"><span class="m-icon">lan</span> SW3</div>
-                <div class="bid">prio 32768</div>
-              </div>
-
-              <!-- cost labels -->
-              <div class="stp-cost" style="left: 346px; top: 178px">cost 19</div>
-              <div class="stp-cost" style="left: 786px; top: 178px">cost 19</div>
-              <div class="stp-cost" style="left: 560px; top: 350px">cost 19</div>
-
-              <!-- port-role pills -->
-              <div class="stp-pill dp" style="left: 386px; top: 150px">DP</div>
-              <div class="stp-pill dp" style="left: 742px; top: 150px">DP</div>
-              <div class="stp-pill rp" style="left: 260px; top: 238px">RP</div>
-              <div class="stp-pill rp" style="left: 882px; top: 238px">RP</div>
-              <div class="stp-pill dp" style="left: 346px; top: 310px">DP</div>
-              <div class="stp-pill blk" style="left: 800px; top: 310px">BLK</div>
-
-              <!-- block marker -->
-              <div class="stp-xmark" style="left: 960px; top: 322px"><span class="m-icon">block</span></div>
-            </div>
-          </div>
-          <div class="stp-legend reveal" style="--i: 3">
-            <span class="it"><span class="dot root"></span> Root Bridge</span>
-            <span class="it"><span class="dot rp"></span> RP — Root Port (best path to root)</span>
-            <span class="it"><span class="dot dp"></span> DP — Designated Port (forwards on a segment)</span>
-            <span class="it"><span class="dot blk"></span> BLK — Blocking (loop-free backup)</span>
-          </div>
-          <div class="reveal" style="--i: 4; margin-top: 16px; padding: 13px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 19px">
-            SW2 and SW3 both reach the root at <strong>cost 19</strong>, so the
-            SW2–SW3 link is a tie. The lower Bridge ID (<strong>SW2</strong>)
-            keeps the Designated Port; <strong>SW3 blocks</strong> — the loop is
-            gone, the link waits as instant backup.
-          </div>
-          <div class="page-num"></div>
-        </section>
-
-        <!-- ========================================================= SLIDE 14c — STP CALCULATION ========================================================= -->
-        <section class="slide">
-          <div class="masthead">
-            <div class="left"><span class="tag">VLANs</span><span>Spanning Tree · how the roles are calculated</span></div>
-            <div class="right"></div>
-          </div>
-          <span class="eyebrow amber reveal" style="--i: 0">Four decisions, always in this order</span>
-          <h2 class="reveal" style="--i: 1; font-size: 46px">
-            Lowest <em class="display">ID</em>, then lowest <em class="display">cost.</em>
-          </h2>
-          <div class="grid-2" style="margin-top: 24px; gap: 44px; align-items: start">
-            <div class="stack reveal" style="--i: 2; gap: 16px">
-              <div class="card" style="padding: 16px 22px">
-                <div class="label" style="color: var(--cobalt-deep); display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">badge</span>Bridge ID — who can be root</div>
-                <p style="margin-top: 6px; font-size: 18px"><span class="mono">Bridge ID = Priority + MAC</span><br />Priority defaults to <strong>32768</strong> (set in steps of 4096); the <strong>lowest</strong> Bridge ID wins. Tie on priority → lowest MAC.</p>
-              </div>
-              <div class="card amber" style="padding: 16px 22px">
-                <div class="label" style="display: flex; align-items: center; gap: 9px"><span class="m-icon" style="font-size: 22px">speed</span>Port cost — by link speed</div>
-                <table class="data" style="margin-top: 8px; font-size: 18px">
-                  <tbody>
-                    <tr><td class="mono">10 Mbps</td><td class="mono">100</td><td class="mono">1 Gbps</td><td class="mono">4</td></tr>
-                    <tr><td class="mono">100 Mbps</td><td class="mono">19</td><td class="mono">10 Gbps</td><td class="mono">2</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div class="stack reveal" style="--i: 3; gap: 12px">
-              <div class="card" style="padding: 13px 20px"><div class="label" style="color: var(--cobalt-deep)">1 · Root Bridge</div><p style="margin-top: 3px; font-size: 17px">Lowest <strong>Bridge ID</strong> in the whole network. Every other switch builds its tree toward it.</p></div>
-              <div class="card moss" style="padding: 13px 20px"><div class="label">2 · Root Port (per switch)</div><p style="margin-top: 3px; font-size: 17px">Lowest <strong>Root Path Cost</strong> — the sum of port costs back to the root. Tie-break: lowest sender Bridge ID, then lowest port ID.</p></div>
-              <div class="card" style="padding: 13px 20px"><div class="label" style="color: var(--cobalt-deep)">3 · Designated Port (per segment)</div><p style="margin-top: 3px; font-size: 17px">On each link, the port advertising the <strong>lowest Root Path Cost</strong> forwards. The root's ports are always Designated.</p></div>
-              <div class="card amber" style="padding: 13px 20px"><div class="label">4 · Blocking</div><p style="margin-top: 3px; font-size: 17px">Every remaining port is put into <strong>blocking</strong> — no loop, ready as backup.</p></div>
-            </div>
-          </div>
-          <div class="reveal" style="--i: 4; margin-top: 18px; padding: 13px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 18px">
-            <strong>Worked example (the diagram):</strong> all links are 100 Mbps
-            (<span class="mono">cost 19</span>). SW2 &amp; SW3 each reach root at
-            cost 19 → Root Ports. On SW2–SW3 the cost is tied, so SW2's lower
-            Bridge ID makes it Designated and SW3 blocks. RSTP (802.1w) is the
-            faster modern version.
-          </div>
-          <div class="page-num"></div>
-        </section>
-
-        <!-- ========================================================= SLIDE 14d — STP STEP-BY-STEP SIM ========================================================= -->
-        <section class="slide" id="stpSim" data-noscale>
-          <div class="masthead">
-            <div class="left"><span class="tag">Interactive</span><span>Spanning Tree · find the answer, step by step</span></div>
-            <div class="right"></div>
-          </div>
-          <span class="eyebrow amber reveal" style="--i: 0">Live simulation · Press START or step through</span>
-          <h2 class="reveal" style="--i: 1; font-size: 40px">
-            Watch STP <em class="display">block the loop.</em>
-          </h2>
-
-          <!-- four-rung decision ladder -->
-          <div class="stp-ladder reveal" style="--i: 2">
-            <div class="lstep" data-rung="0"><span class="n">1</span><span class="lx"><b>Root Bridge</b><span>lowest Bridge&nbsp;ID</span></span></div>
-            <div class="lstep" data-rung="1"><span class="n">2</span><span class="lx"><b>Root Ports</b><span>lowest cost to root</span></span></div>
-            <div class="lstep" data-rung="2"><span class="n">3</span><span class="lx"><b>Designated</b><span>one per segment</span></span></div>
-            <div class="lstep" data-rung="3"><span class="n">4</span><span class="lx"><b>Block</b><span>the loser port</span></span></div>
-          </div>
-
-          <!-- topology (same geometry as the role diagram, roles revealed per step) -->
-          <div class="stp-topo reveal" style="--i: 3">
-            <svg viewBox="0 0 1180 396" aria-hidden="true">
-              <line id="sl12" x1="590" y1="44" x2="150" y2="338" stroke="#c9bfa8" stroke-width="3" />
-              <line id="sl13" x1="590" y1="44" x2="1030" y2="338" stroke="#c9bfa8" stroke-width="3" />
-              <line id="sl23" x1="150" y1="338" x2="1030" y2="338" stroke="#c9bfa8" stroke-width="3" />
-            </svg>
-
-            <div class="stp-sw" id="ssw1" style="left: 480px; top: 6px">
-              <div class="nm"><span class="m-icon stp-crown" id="sswCrown">workspace_premium</span> SW1</div>
-              <div class="bid">priority 4096<span class="rpc-tag" id="rpc1">RPC 0 · root</span></div>
-            </div>
-            <div class="stp-sw" style="left: 40px; top: 300px">
-              <div class="nm"><span class="m-icon">lan</span> SW2</div>
-              <div class="bid">priority 32768<span class="rpc-tag" id="rpc2">RPC 19</span></div>
-            </div>
-            <div class="stp-sw" style="left: 920px; top: 300px">
-              <div class="nm"><span class="m-icon">lan</span> SW3</div>
-              <div class="bid">priority 32768<span class="rpc-tag" id="rpc3">RPC 19</span></div>
-            </div>
-
-            <div class="stp-cost" style="left: 346px; top: 178px">cost 19</div>
-            <div class="stp-cost" style="left: 786px; top: 178px">cost 19</div>
-            <div class="stp-cost" style="left: 560px; top: 350px">cost 19</div>
-
-            <div class="stp-pill dp" id="sp_dp1l" style="left: 386px; top: 150px">DP</div>
-            <div class="stp-pill dp" id="sp_dp1r" style="left: 742px; top: 150px">DP</div>
-            <div class="stp-pill rp" id="sp_rp2" style="left: 260px; top: 238px">RP</div>
-            <div class="stp-pill rp" id="sp_rp3" style="left: 882px; top: 238px">RP</div>
-            <div class="stp-pill dp" id="sp_dp2" style="left: 346px; top: 310px">DP</div>
-            <div class="stp-pill blk" id="sp_blk3" style="left: 800px; top: 310px">BLK</div>
-            <div class="stp-xmark" id="sp_x" style="left: 960px; top: 322px"><span class="m-icon">block</span></div>
-            <div class="stp-tie" id="stpTie" style="left: 458px; top: 262px">tie 19 = 19 → lower BID (SW2) wins DP</div>
-          </div>
-
-          <div class="stp-narr" id="stpNarr">
-            Three switches wired in a triangle — a physical <strong>loop</strong>. STP runs four decisions to pick the single port to block. Press <strong>Start</strong>.
-          </div>
-
-          <div class="sim-controls reveal" style="--i: 4">
-            <button class="sim-btn primary" id="stpStart">▶ Start</button>
-            <button class="sim-btn" id="stpNext">Step ▸</button>
-            <button class="sim-btn" id="stpReset">↺ Reset</button>
-          </div>
-          <div class="page-num"></div>
-        </section>
-
-        <!-- ========================================================= SLIDE 14e — STP PORT ROLES (RP / DP / BLK) ========================================================= -->
-        <section class="slide">
-          <div class="masthead">
-            <div class="left"><span class="tag">VLANs</span><span>Spanning Tree · the three port roles</span></div>
-            <div class="right"></div>
-          </div>
-          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">Every switch port ends up as exactly one of these</span>
-          <h2 class="reveal" style="--i: 1; font-size: 46px">
-            Root, Designated, or <em class="display">blocked.</em>
-          </h2>
-          <div class="grid-3" style="margin-top: 24px; gap: 30px; align-items: start">
-            <div class="card moss reveal" style="--i: 2">
-              <div class="label">RP · Root Port</div>
-              <h3>The way up to root</h3>
-              <table class="data" style="margin-top: 12px; font-size: 16.5px; width: 100%">
-                <tbody>
-                  <tr><td style="color: var(--muted)">Scope</td><td>one per switch <em>(root: none)</em></td></tr>
-                  <tr><td style="color: var(--muted)">Chosen by</td><td>lowest <strong>Root Path Cost</strong></td></tr>
-                  <tr><td style="color: var(--muted)">State</td><td>forwarding</td></tr>
-                  <tr><td style="color: var(--muted)">Tie-break</td><td>nbr BID → nbr port → local port</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="card reveal" style="--i: 3">
-              <div class="label" style="color: var(--cobalt-deep)">DP · Designated Port</div>
-              <h3>Serves one segment</h3>
-              <table class="data" style="margin-top: 12px; font-size: 16.5px; width: 100%">
-                <tbody>
-                  <tr><td style="color: var(--muted)">Scope</td><td>one per <strong>segment</strong> / link</td></tr>
-                  <tr><td style="color: var(--muted)">Chosen by</td><td>lowest RPC <em>onto</em> that link</td></tr>
-                  <tr><td style="color: var(--muted)">Always</td><td>every root-bridge port is DP</td></tr>
-                  <tr><td style="color: var(--muted)">Tie-break</td><td>lower <strong>Bridge ID</strong></td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="card amber reveal" style="--i: 4">
-              <div class="label">BLK · Blocking</div>
-              <h3>Everything else</h3>
-              <table class="data" style="margin-top: 12px; font-size: 16.5px; width: 100%">
-                <tbody>
-                  <tr><td style="color: var(--muted)">Scope</td><td>not RP and not DP</td></tr>
-                  <tr><td style="color: var(--muted)">Does</td><td>no data — but <strong>hears BPDUs</strong></td></tr>
-                  <tr><td style="color: var(--muted)">State</td><td>blocking (loop removed)</td></tr>
-                  <tr><td style="color: var(--muted)">Backup</td><td>unblocks if the tree breaks</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="reveal" style="--i: 5; margin-top: 22px; padding: 15px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 19px">
-            <strong>The per-link rule:</strong> on every link exactly one end is the <strong>DP</strong>; the far end is the <strong>RP</strong> (if it is that switch's best path up) or <strong>BLK</strong>. A port is never both. <span class="mono" style="margin-left: 10px; color: var(--ink-soft)">DP ●━━━● RP &nbsp;·&nbsp; DP ●╌╌╌○ BLK</span>
-          </div>
-          <div class="page-num"></div>
-        </section>
-
-        <!-- ========================================================= SLIDE 14f — STP PORT STATES (state machine) ========================================================= -->
-        <section class="slide">
-          <div class="masthead">
-            <div class="left"><span class="tag">VLANs</span><span>Spanning Tree · port states &amp; convergence</span></div>
-            <div class="right"></div>
-          </div>
-          <span class="eyebrow amber reveal" style="--i: 0">A role is reached by walking through states (802.1D)</span>
-          <h2 class="reveal" style="--i: 1; font-size: 46px">
-            Blocking to <em class="display">forwarding.</em>
-          </h2>
-
-          <div class="pstate-flow reveal" style="--i: 2">
-            <div class="pstate blk"><div class="ps-n">Blocking</div><div class="ps-s">drops data</div></div>
-            <div class="pstate-arrow"><span class="ps-t">max-age 20 s</span><span class="m-icon">east</span></div>
-            <div class="pstate"><div class="ps-n">Listening</div><div class="ps-s">no learning yet</div></div>
-            <div class="pstate-arrow"><span class="ps-t">fwd delay 15 s</span><span class="m-icon">east</span></div>
-            <div class="pstate"><div class="ps-n">Learning</div><div class="ps-s">builds CAM</div></div>
-            <div class="pstate-arrow"><span class="ps-t">fwd delay 15 s</span><span class="m-icon">east</span></div>
-            <div class="pstate fwd"><div class="ps-n">Forwarding</div><div class="ps-s">passes traffic</div></div>
-          </div>
-
-          <div class="reveal" style="--i: 3; margin-top: 28px">
-            <table class="data" style="font-size: 18px">
-              <thead><tr><th>State</th><th>Forwards data</th><th>Learns MACs</th><th>Hears BPDUs</th><th>Time</th></tr></thead>
-              <tbody>
-                <tr><td><strong>Blocking</strong></td><td>✗</td><td>✗</td><td>✓</td><td class="mono">—</td></tr>
-                <tr><td><strong>Listening</strong></td><td>✗</td><td>✗</td><td>✓</td><td class="mono">15 s</td></tr>
-                <tr><td><strong>Learning</strong></td><td>✗</td><td>✓</td><td>✓</td><td class="mono">15 s</td></tr>
-                <tr><td><strong>Forwarding</strong></td><td>✓</td><td>✓</td><td>✓</td><td class="mono">—</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="reveal" style="--i: 4; margin-top: 22px; padding: 15px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 19px">
-            That's <strong>~30–50 s</strong> from blocking to forwarding — which is exactly why <strong>RSTP (802.1w)</strong> collapses these into <span class="mono">Discarding / Learning / Forwarding</span> and converges in <strong>seconds</strong>. RSTP is the modern default.
-          </div>
-          <div class="page-num"></div>
-        </section>
-
-        <!-- ========================================================= SLIDE 14g — RSTP (802.1w) ========================================================= -->
-        <section class="slide">
-          <div class="masthead">
-            <div class="left"><span class="tag">VLANs</span><span>Spanning Tree · RSTP (802.1w)</span></div>
-            <div class="right"></div>
-          </div>
-          <span class="eyebrow moss reveal" style="--i: 0; font-size: 18px">STP's faster successor — the modern default</span>
-          <h2 class="reveal" style="--i: 1; font-size: 46px">
-            RSTP: <em class="display">seconds</em>, not minutes.
-          </h2>
-          <p class="reveal" style="--i: 2; font-size: 19px; margin-top: 8px; max-width: 1580px">
-            RSTP keeps the same loop-free goal but converges in well under a second — by replacing STP's timers with a handshake, and by giving every blocked port a pre-computed backup role ready to take over.
-          </p>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 22px">
-            <div class="card reveal" style="--i: 3; padding: 18px 24px">
-              <div class="label" style="color: var(--cobalt-deep)">New backup roles</div>
-              <h3 style="font-size: 24px">Alternate &amp; Backup</h3>
-              <p style="margin-top: 8px; font-size: 17.5px">Root and Designated stay. RSTP adds <strong>Alternate</strong> (a ready backup path to the root) and <strong>Backup</strong> (a backup for a Designated port on the same segment). A failed Root Port is replaced by its Alternate <strong>instantly</strong>.</p>
-            </div>
-            <div class="card moss reveal" style="--i: 4; padding: 18px 24px">
-              <div class="label">Three states, not five</div>
-              <h3 style="font-size: 24px">Discarding · Learning · Forwarding</h3>
-              <p style="margin-top: 8px; font-size: 17.5px">STP's Disabled, Blocking and Listening all collapse into one <strong>Discarding</strong> state — so a port is only ever Discarding, Learning, or Forwarding.</p>
-            </div>
-            <div class="card amber reveal" style="--i: 5; padding: 18px 24px">
-              <div class="label">Proposal / agreement</div>
-              <h3 style="font-size: 24px">A handshake, not a timer</h3>
-              <p style="margin-top: 8px; font-size: 17.5px">Instead of waiting out ~50 s of timers, neighbouring switches do a quick <strong>proposal–agreement</strong> exchange on point-to-point links and go active at once → <strong>sub-second</strong> convergence.</p>
-            </div>
-            <div class="card plum reveal" style="--i: 6; padding: 18px 24px">
-              <div class="label">Edge ports</div>
-              <h3 style="font-size: 24px">PortFast &amp; BPDU Guard</h3>
-              <p style="margin-top: 8px; font-size: 17.5px"><strong>PortFast</strong> sends host ports straight to Forwarding. <strong>BPDU Guard</strong> err-disables an edge port the instant a BPDU appears — protecting the tree from a rogue switch plugged into a desk port.</p>
-            </div>
-          </div>
-          <div class="reveal" style="--i: 7; margin-top: 22px; padding: 15px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 18px">
-            <strong>Inside a BPDU</strong> (sent every 2 s): root Bridge ID · sender Bridge ID · root path cost · sender port ID · the timers. That handful of fields is all the election needs.
-          </div>
-          <div class="page-num"></div>
-        </section>
-
         <!-- ========================================================= RECAP — PART 2 · VLANs & STP ========================================================= -->
         <section class="slide">
           <div class="masthead">
@@ -9528,7 +9802,7 @@
           </div>
           <span class="eyebrow moss reveal" style="--i: 0">30-second self-check before we move on</span>
           <h2 class="reveal" style="--i: 1; font-size: 50px">
-            VLANs &amp; STP, <em class="display">in three questions.</em>
+            VLANs, <em class="display">in three questions.</em>
           </h2>
           <div class="grid-3" style="margin-top: 36px; gap: 32px">
             <div class="card reveal" style="--i: 2; padding: 24px 28px">
@@ -9543,12 +9817,12 @@
             </div>
             <div class="card moss reveal" style="--i: 4; padding: 24px 28px">
               <div class="label">Q3</div>
-              <h3 style="font-size: 25px">Which port does STP block?</h3>
-              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">After electing the root (lowest <strong>Bridge ID</strong>) and picking Root + Designated ports by <strong>lowest cost</strong>, whatever port is left over gets blocked — the loop is gone, the backup waits.</p>
+              <h3 style="font-size: 25px">Why segment a flat LAN into VLANs at all?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">To <strong>shrink broadcast domains</strong>, isolate departments for <strong>security</strong>, and group users logically — regardless of which switch or floor they sit on.</p>
             </div>
           </div>
           <div class="reveal" style="--i: 5; margin-top: 30px; padding: 16px 26px; border-left: 4px solid var(--moss); background: var(--paper-warm); font-size: 20px">
-            <strong>One sentence to keep:</strong> VLANs draw the walls, trunks carry them between switches, and STP makes sure the redundant wiring never becomes a loop.
+            <strong>One sentence to keep:</strong> VLANs draw the walls in software, and trunks carry every VLAN between switches on one tagged link.
           </div>
           <div class="page-num"></div>
         </section>
@@ -11066,11 +11340,12 @@
       })();
 
       /* ===========================================================
-   SESSION 4 · SIM 3 — STP STEP-BY-STEP
-   Reveals the four STP decisions one at a time on the triangle
-   topology: elect the Root, pick each Root Port, choose the
-   Designated Port per segment, then block the loser. Start
-   auto-plays; Step advances one rung; Reset clears all roles.
+   SESSION 4 · SIM 3 — STP STEP-BY-STEP (four-switch worked example)
+   Square ring SW1–SW4. Reveals the four STP decisions one phase at
+   a time: elect the Root (SW1), accumulate path cost to pick each
+   Root Port (with the SW4 38=38 tie broken by Bridge ID), choose a
+   Designated Port per segment, then block the one Non-Designated
+   port (SW4 fa0/2). Start auto-plays; Step advances; Reset clears.
    =========================================================== */
       (function () {
         const slide = document.getElementById("stpSim");
@@ -11083,26 +11358,26 @@
         const resetBtn = slide.querySelector("#stpReset");
         const sw1 = slide.querySelector("#ssw1");
         const crown = slide.querySelector("#sswCrown");
-        const rpc = {
-          1: slide.querySelector("#rpc1"),
-          2: slide.querySelector("#rpc2"),
-          3: slide.querySelector("#rpc3"),
-        };
         const tie = slide.querySelector("#stpTie");
         const lines = {
-          l12: slide.querySelector("#sl12"),
-          l13: slide.querySelector("#sl13"),
-          l23: slide.querySelector("#sl23"),
+          top: slide.querySelector("#lnTop"),
+          left: slide.querySelector("#lnLeft"),
+          right: slide.querySelector("#lnRight"),
+          bottom: slide.querySelector("#lnBottom"),
         };
-        const pills = {
-          rp2: slide.querySelector("#sp_rp2"),
-          rp3: slide.querySelector("#sp_rp3"),
-          dp1l: slide.querySelector("#sp_dp1l"),
-          dp1r: slide.querySelector("#sp_dp1r"),
-          dp2: slide.querySelector("#sp_dp2"),
-          blk3: slide.querySelector("#sp_blk3"),
+        const cb = {};
+        ["c_s2f2", "c_s2f1", "c_s3f1", "c_s3f2", "c_s4f1", "c_s4f2"].forEach(
+          (id) => (cb[id] = slide.querySelector("#" + id)),
+        );
+        const pill = {};
+        ["p_s1f2", "p_s1f1", "p_s2f2", "p_s2f1", "p_s3f1", "p_s3f2", "p_s4f1", "p_s4f2"].forEach(
+          (id) => (pill[id] = slide.querySelector("#" + id)),
+        );
+        const xm = {
+          s2f1: slide.querySelector("#x_s2f1"),
+          s3f2: slide.querySelector("#x_s3f2"),
         };
-        const xmark = slide.querySelector("#sp_x");
+        const blk = slide.querySelector("#blk_s4f2");
 
         const GREY = "#c9bfa8",
           COB = "#1d3fb8",
@@ -11112,57 +11387,66 @@
           timers.forEach(clearTimeout);
           timers = [];
         };
-
-        // ladder: rung i active, everything before it "done"
         const setLadder = (active) =>
           ladder.forEach((l, i) => {
             l.classList.toggle("active", i === active);
             l.classList.toggle("done", i < active);
           });
-        const show = (el) => el.classList.add("in");
+        const show = (el) => el && el.classList.add("in");
+        const hide = (el) => el && el.classList.remove("in");
+        const allLinks = (c) =>
+          Object.values(lines).forEach((l) => l.setAttribute("stroke", c));
 
-        // Each entry is one decision; roles accumulate (no clearing between steps).
         const steps = [
-          // 1 — elect the Root Bridge
+          // 1 — Root Bridge election
           () => {
             setLadder(0);
             sw1.classList.add("root", "is-root");
             show(crown);
-            show(rpc[1]);
-            lines.l12.setAttribute("stroke", COB);
-            lines.l13.setAttribute("stroke", COB);
+            allLinks(COB);
             narr.innerHTML =
-              "<strong>1 · Root Bridge.</strong> Compare every switch's <strong>Bridge ID</strong> (priority + MAC). SW1's priority <strong>4096</strong> is the lowest, so SW1 becomes the <strong>Root</strong> — its Root Path Cost is <strong>0</strong> and every other switch now builds its tree toward it.";
+              "<strong>1 · Root Bridge election.</strong> Every switch floods a <strong>BPDU</strong> carrying its <strong>Bridge ID</strong> (priority + MAC). The <strong>lowest</strong> wins: SW1's priority <strong>4096</strong> beats 16384 and 32768, so <strong>SW1 is the Root Bridge</strong> (Root Path Cost 0). Every other switch now measures its distance to SW1.";
           },
-          // 2 — each non-root switch picks its Root Port
+          // 2 — Root Port selection (cost accumulation + SW4 tie-break)
           () => {
             setLadder(1);
-            show(pills.rp2);
-            show(pills.rp3);
-            show(rpc[2]);
-            show(rpc[3]);
-            narr.innerHTML =
-              "<strong>2 · Root Port</strong> (one per non-root switch). SW2's direct link to the Root costs <strong>19</strong> (Root Path Cost = 19); reaching it via SW3 would cost 38. Lowest RPC wins, so that up-link is SW2's <strong>Root Port</strong> — and the same is true for SW3.";
-          },
-          // 3 — Designated Port per segment
-          () => {
-            setLadder(2);
-            show(pills.dp1l);
-            show(pills.dp1r);
-            show(pills.dp2);
+            allLinks(GREY);
+            Object.values(cb).forEach(show);
+            cb.c_s2f2.classList.add("win");
+            cb.c_s3f1.classList.add("win");
+            cb.c_s4f1.classList.add("win");
+            cb.c_s2f1.classList.add("lose");
+            cb.c_s3f2.classList.add("lose");
+            show(pill.p_s2f2);
+            show(pill.p_s3f1);
+            show(pill.p_s4f1);
+            show(xm.s2f1);
+            show(xm.s3f2);
             show(tie);
             narr.innerHTML =
-              "<strong>3 · Designated Port</strong> (one per segment — the side advertising the <strong>lowest cost to root</strong> forwards). The Root's two ports are always Designated. On the SW2–SW3 link both sides reach root at cost 19 — a <strong>tie</strong>, broken by the lower Bridge&nbsp;ID, so <strong>SW2</strong> is Designated.";
+              '<strong>2 · Root Port selection.</strong> Path cost adds up per hop (100 Mbps = <span class="mono">19</span>): direct = 19, two hops = 38, three = 57. Each switch keeps its <strong>lowest-cost</strong> port: SW2 &rarr; <strong>fa0/2 (19)</strong>, SW3 &rarr; <strong>fa0/1 (19)</strong>. SW4 ties <strong>38 = 38</strong>, broken by the lower sender Bridge ID (SW2 &lt; SW3) &rarr; <strong>fa0/1</strong>. The 57-cost ports lose (&#10007;).';
           },
-          // 4 — block the loser
+          // 3 — Designated Port selection
+          () => {
+            setLadder(2);
+            hide(xm.s2f1);
+            hide(xm.s3f2);
+            show(pill.p_s1f2);
+            show(pill.p_s1f1);
+            show(pill.p_s2f1);
+            show(pill.p_s3f2);
+            narr.innerHTML =
+              "<strong>3 · Designated Port selection</strong> (one forwarding port per segment &mdash; the side with the <strong>lower root cost</strong>). The Root's ports are always Designated (SW1 fa0/1 + fa0/2). Each Root Port's far end is Designated too, so SW2 fa0/1 becomes DP; and on the bottom link SW3 (cost 19) beats SW4 (cost 38) &rarr; <strong>SW3 fa0/2 = DP</strong>.";
+          },
+          // 4 — Non-Designated (blocking) port
           () => {
             setLadder(3);
-            show(pills.blk3);
-            show(xmark);
-            lines.l23.setAttribute("stroke", AMB);
-            lines.l23.setAttribute("stroke-dasharray", "11 8");
+            show(pill.p_s4f2);
+            show(blk);
+            lines.bottom.setAttribute("stroke", AMB);
+            lines.bottom.setAttribute("stroke-dasharray", "11 8");
             narr.innerHTML =
-              "<strong>4 · Block.</strong> SW3's port on that segment lost, so it moves to <strong>Blocking</strong>. The physical loop is gone — yet the link stays up, waiting as an <strong>instant backup</strong> if the active tree ever breaks.";
+              "<strong>4 · Non-Designated Port.</strong> One port is left &mdash; <strong>SW4 fa0/2</strong>. It is neither a Root nor a Designated port, so it <strong>blocks</strong> and the loop is gone. It keeps <em>receiving</em> BPDUs (but forwards no user frames and learns no MACs), ready as an instant backup if a link ever fails.";
           },
           // 5 — summary
           () => {
@@ -11170,8 +11454,11 @@
               l.classList.remove("active");
               l.classList.add("done");
             });
+            allLinks(GREY);
+            lines.bottom.setAttribute("stroke", AMB);
+            lines.bottom.setAttribute("stroke-dasharray", "11 8");
             narr.innerHTML =
-              "<strong>Done.</strong> One Root, one Root Port per switch, one Designated Port per segment — and exactly <strong>one Blocking port</strong> removes the loop. That is the loop-free spanning tree. (RSTP / 802.1w reaches the same result, just faster.)";
+              "<strong>Done &mdash; one loop-free tree.</strong> SW1 is Root; every switch has exactly one Root Port; every segment one Designated Port; and the single <strong>blocking</strong> port (SW4 fa0/2) breaks the loop while standing by as backup. (RSTP / 802.1w reaches the same answer in well under a second.)";
           },
         ];
 
@@ -11188,17 +11475,20 @@
           setLadder(-1);
           ladder.forEach((l) => l.classList.remove("done"));
           sw1.classList.remove("root", "is-root");
-          crown.classList.remove("in");
-          Object.values(pills).forEach((p) => p.classList.remove("in"));
-          Object.values(rpc).forEach((r) => r.classList.remove("in"));
-          tie.classList.remove("in");
-          xmark.classList.remove("in");
-          lines.l12.setAttribute("stroke", GREY);
-          lines.l13.setAttribute("stroke", GREY);
-          lines.l23.setAttribute("stroke", GREY);
-          lines.l23.removeAttribute("stroke-dasharray");
+          hide(crown);
+          Object.values(cb).forEach((c) => {
+            hide(c);
+            c.classList.remove("win", "lose");
+          });
+          Object.values(pill).forEach(hide);
+          hide(xm.s2f1);
+          hide(xm.s3f2);
+          hide(blk);
+          hide(tie);
+          allLinks(GREY);
+          lines.bottom.removeAttribute("stroke-dasharray");
           narr.innerHTML =
-            "Three switches wired in a triangle — a physical <strong>loop</strong>. STP runs four decisions to pick the single port to block. Press <strong>Start</strong>.";
+            'Four switches in a square &mdash; a Layer-2 <strong>loop</strong>. They exchange <strong>BPDUs</strong> and run four decisions to leave exactly one port blocking. All links are 100 Mbps (<span class="mono">cost 19</span>). Press <strong>Start</strong>.';
           nextBtn.disabled = false;
         }
 
@@ -11212,7 +11502,7 @@
                 setTimeout(() => {
                   i++;
                   tick();
-                }, 2600),
+                }, 2800),
               );
           };
           tick();

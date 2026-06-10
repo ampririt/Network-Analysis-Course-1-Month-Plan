@@ -1,5 +1,7 @@
 # Session 2 — Hands-on Lab Walkthrough
 
+> 🌐 **English** | [日本語](./LAB_TUTORIAL.ja.md)
+
 > **This walkthrough has moved.** To match the Session 1 layout, the labs are now split into two focused companion guides:
 >
 > - 🦈 **[Wireshark — Lab A: TCP & UDP in Action](./WIRESHARK_GUIDE.md)**

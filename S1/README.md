@@ -1,5 +1,7 @@
 ## Session 1 — Introduction to Network Analysis & The OSI Model
 
+> 🌐 **English** | [日本語](./README.ja.md)
+
 - [Session 1 — Introduction to Network Analysis \& The OSI Model](#session-1--introduction-to-network-analysis--the-osi-model)
   - [Lecture](#lecture)
   - [Break (10 min)](#break-10-min)
