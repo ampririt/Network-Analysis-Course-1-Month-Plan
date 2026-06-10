@@ -3,6 +3,11 @@
 - [Session 3 — Network Services\& Security](#session-3--network-services-security)
   - [Lecture](#lecture)
   - [Hands-on Lab](#hands-on-lab)
+  - [Deep Dive: Core Network Services Reference](#deep-dive-core-network-services-reference)
+    - [Well-Known Ports \& Transports](#well-known-ports--transports)
+    - [DNS Record Types](#dns-record-types)
+    - [DHCP DORA \& Key Options](#dhcp-dora--key-options)
+  - [Deep Dive: Attacks \& Defenses](#deep-dive-attacks--defenses)
   - [Homework](#homework)
 
 
@@ -67,6 +72,86 @@ Reuse the **multi-subnet network from Session 2** and add two application-layer 
 
 > 📖 **Full instructions, figures, and questions:**
 > 👉 **[Packet Tracer — Lab C: DHCP & DNS, continuing from Lab B](./PACKET_TRACER_GUIDE.md#lab-c--dhcp--dns-continuing-from-lab-b)**
+
+---
+
+### Deep Dive: Core Network Services Reference
+
+#### Well-Known Ports & Transports
+
+| Service | Transport · Port | Role |
+|:---|:---|:---|
+| **DHCP** | UDP **67** (server) / **68** (client) | hands out IP, mask, gateway, DNS |
+| **DNS** | UDP/TCP **53** | name → IP resolution |
+| **HTTP** | TCP **80** | web (plaintext) |
+| **HTTPS** | TCP **443** | web (TLS-encrypted) |
+| **FTP** | TCP **21** (control) / **20** (data) | file transfer (plaintext) |
+| **SSH / SFTP** | TCP **22** | secure remote shell + file transfer |
+| **Telnet** | TCP **23** | remote shell (plaintext — avoid) |
+| **SMTP** | TCP **25** / **587** | sending email |
+| **POP3 / IMAP** | TCP **110** / **143** | retrieving email |
+| **NTP** | UDP **123** | time synchronisation |
+| **SNMP** | UDP **161 / 162** | device monitoring |
+| **ARP** | *none* (Layer 2) | IP → MAC on the local link |
+| **ICMP** | *none* (Layer 3) | `ping`, errors, traceroute |
+
+> [!NOTE]
+> **ARP and ICMP have no port number** — they aren't carried inside UDP/TCP. ARP rides directly in an Ethernet frame (Layer 2); ICMP rides directly in an IP packet (Layer 3).
+
+#### DNS Record Types
+
+| Record | Maps… | Example |
+|:---|:---|:---|
+| **A** | name → **IPv4** | `gaia.cs.umass.edu → 128.119.245.12` |
+| **AAAA** | name → **IPv6** | `… → 2607:f600:1002:6113::100` |
+| **CNAME** | name → another **name** (alias) | `www → web.example.com` |
+| **MX** | domain → **mail server** | `example.com → mail.example.com` |
+| **NS** | domain → its **authoritative name servers** | `umass.edu → ns1.umass.edu` |
+| **PTR** | IP → name (**reverse lookup**) | `128.119.245.12 → gaia…` |
+| **TXT** | name → free **text** (SPF, domain verification) | `v=spf1 …` |
+| **SOA** | the zone's **Start Of Authority** record | who owns/serves the zone |
+
+#### DHCP DORA & Key Options
+
+| Step | Message | Direction | Carries |
+|:---:|:---|:---|:---|
+| 1 | **D**iscover | client → broadcast | xid, **Parameter Request List** |
+| 2 | **O**ffer | server → client | offered IP (`yiaddr`) + options |
+| 3 | **R**equest | client → broadcast | **Option 50** (requested IP), **Option 54** (server ID) |
+| 4 | **A**CK | server → client | the lease + the options below |
+
+Common options delivered in the **ACK**:
+
+| Option | Name | What the client receives |
+|:---:|:---|:---|
+| **1** | Subnet Mask | its subnet size |
+| **3** | Router | the default gateway |
+| **6** | Domain Name Server | the DNS resolver(s) |
+| **51** | IP Address Lease Time | how long the address is valid |
+| **53** | DHCP Message Type | Discover / Offer / Request / ACK |
+
+> [!TIP]
+> All four DORA messages share one **Transaction ID (xid)** — that's how the client pairs an Offer/ACK with its own Discover/Request when several exchanges are in flight at once.
+
+---
+
+### Deep Dive: Attacks & Defenses
+
+Core services (ARP, DHCP, DNS) ship with **no built-in authentication**, so each is easy to spoof. Match every attack to the control that stops it — and to what it looks like on the wire:
+
+| Attack | What it does | Signature in a capture | Defense |
+|:---|:---|:---|:---|
+| **ARP spoofing / poisoning** | claims the gateway's IP → MITM | **two MACs for one IP**; gratuitous-ARP flood | **Dynamic ARP Inspection (DAI)** |
+| **Rogue DHCP server** | hands out bad gateway/DNS | an **Offer from an unexpected server** | **DHCP Snooping** (trusted ports only) |
+| **DNS spoofing / cache poisoning** | forges a reply → wrong IP | a response with a **mismatched/forged address** | **DNSSEC**, validating resolvers |
+| **MAC flooding** | overflows the switch CAM table → it floods | a **storm of new source MACs** | **Port Security** (max MACs per port) |
+| **Plaintext sniffing** | reads credentials in transit | **readable passwords** in Follow-Stream | **SSH / SFTP / HTTPS** (encryption) |
+| **DoS / DDoS** | floods a service to exhaust it | huge volume from one/many sources | rate-limiting, firewalls, scrubbing |
+
+> [!NOTE]
+> **The analyst's mindset:** first learn what *normal* looks like — a **baseline**. Anomalies (an unexpected ARP reply, a second DHCP server, a spike of SYNs to sequential ports) only stand out *against* that baseline.
+
+---
 
 ### Homework
 - Kurose & Ross Wireshark Lab: **DNS**

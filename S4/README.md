@@ -4,6 +4,15 @@
   - [Lecture](#lecture)
   - [Break (10 min)](#break-10-min)
   - [Hands-on Lab](#hands-on-lab)
+  - [Deep Dive: VLANs \& 802.1Q Trunking](#deep-dive-vlans--8021q-trunking)
+    - [Access vs. Trunk Ports](#access-vs-trunk-ports)
+    - [The 802.1Q Tag (4 bytes)](#the-8021q-tag-4-bytes)
+    - [Inter-VLAN Routing: two ways](#inter-vlan-routing-two-ways)
+  - [Deep Dive: Switching, Routing \& Useful `show` Commands](#deep-dive-switching-routing--useful-show-commands)
+    - [MAC Table vs. Routing Table](#mac-table-vs-routing-table)
+    - [Static vs. Dynamic Routing](#static-vs-dynamic-routing)
+    - [Administrative Distance](#administrative-distance-who-wins-when-sources-disagree)
+    - [Verify Commands](#verify-commands-packet-tracer--ios)
   - [Homework](#homework)
 
 
@@ -43,24 +52,98 @@ Build a 6-PC, 2-switch, 1-router office with **three VLANs** (Admin / Sales / IT
 
 ---
 
-**👥 Workgroup Design Challenge — Design It, Build It, Prove It (~40 min)**
-
-> [!IMPORTANT]
-> The **proof-of-competency** activity: one design challenge that shows students can turn requirements into a working network using everything from Sessions 2–4.
-
-Given only a **business brief** (the "BrightByte" startup, base network `172.16.0.0/24`, three growth-sized departments + a server), each workgroup **designs an IP/VLAN scheme from scratch (VLSM), implements it in Packet Tracer, and demonstrates it passing a fixed 6-point acceptance test**. No step-by-step snippets — the students supply the design and apply Lab A's skills; success = the test passes.
-
-> 📖 **The brief, deliverables, and acceptance test:**
-> 👉 **[Workgroup Design Challenge](./PACKET_TRACER_GUIDE.md#workgroup-design-challenge--design-it-build-it-prove-it)**
-
----
-
 **Lab B — Wireshark: VLAN & Routing Traffic Analysis (~25 min)**
 
 Read VLANs and routing straight out of a capture. You'll filter `vlan` to find VLAN IDs, expand the Ethernet header to inspect the **802.1Q tag** (TPID `0x8100`), filter `icmp` to watch **TTL decrement at each router hop**, and use **Statistics → Endpoints / Conversations** to map the active subnets and inter-VLAN flows.
 
 > 📖 **Full instructions, figures, and questions:**
 > 👉 **[Wireshark — Lab B: VLAN & Routing Traffic Analysis](./WIRESHARK_GUIDE.md)**
+
+---
+
+### Deep Dive: VLANs & 802.1Q Trunking
+
+#### Access vs. Trunk Ports
+
+| | **Access port** | **Trunk port** |
+|:---|:---|:---|
+| **Carries** | exactly **one** VLAN | **many** VLANs |
+| **Frames** | untagged | **802.1Q-tagged** (except the native VLAN) |
+| **Connects to** | end devices (PC, printer, AP) | another switch, or a router (Router-on-a-Stick) |
+| **Config** | `switchport mode access` + `switchport access vlan N` | `switchport mode trunk` |
+
+#### The 802.1Q Tag (4 bytes)
+
+Inserted into the Ethernet header right after the **source MAC**:
+
+| Field | Bits | Meaning |
+|:---|:---:|:---|
+| **TPID** | 16 | always `0x8100` — the flag that says "an 802.1Q tag follows" |
+| **PCP** | 3 | priority / QoS class (0–7) |
+| **DEI** | 1 | drop-eligible indicator |
+| **VLAN ID** | 12 | the VLAN number (**1–4094**) |
+
+> [!NOTE]
+> The **native VLAN** (default VLAN 1) is the one VLAN sent **untagged** on a trunk. Both ends must agree on it — a *native VLAN mismatch* causes traffic to leak between VLANs.
+
+#### Inter-VLAN Routing: two ways
+
+| Approach | How it works | Best when |
+|:---|:---|:---|
+| **Router-on-a-Stick (ROAS)** | one trunk link to a router with **one sub-interface per VLAN** (`g0/0.10`, `.20`…) tagged via `encapsulation dot1Q` | a few VLANs, using a router you already have |
+| **Layer-3 switch (SVI)** | a `vlan N` **Switched Virtual Interface** holds the gateway IP and routes in hardware | many VLANs, high throughput |
+
+---
+
+### Deep Dive: Switching, Routing & Useful `show` Commands
+
+#### MAC Table vs. Routing Table
+
+| | **Switch** MAC address table | **Router** routing table |
+|:---|:---|:---|
+| **Layer** | 2 (MAC) | 3 (IP) |
+| **Maps** | MAC → switch **port** | destination **network** → next hop / interface |
+| **Learns by** | reading the **source MAC** of arriving frames | connected interfaces, static routes, routing protocols |
+| **Unknown entry** | **floods** out every port | drops it (or uses the default route) |
+| **Ages out** | ~5 min idle | static = never; dynamic = protocol timers |
+
+#### Static vs. Dynamic Routing
+
+| | **Static** | **Dynamic** (RIP / OSPF) |
+|:---|:---|:---|
+| **Set by** | typed by hand (`ip route …`) | routers advertise & learn automatically |
+| **Scales to** | small networks | medium → large |
+| **Reacts to failure** | no (manual fix) | yes (reconverges) |
+| **Overhead** | none | CPU/bandwidth for routing updates |
+
+#### Administrative Distance (who wins when sources disagree)
+
+| Route source | AD |
+|:---|:---:|
+| Connected interface | **0** |
+| Static route | **1** |
+| OSPF | **110** |
+| RIP | **120** |
+| Unknown / unreachable | **255** |
+
+> [!TIP]
+> **Lower AD wins.** A static route (AD 1) beats an OSPF-learned route (AD 110) to the *same* network. The **metric** only breaks ties **within** a single protocol.
+
+#### Verify Commands (Packet Tracer / IOS)
+
+| Command | Shows |
+|:---|:---|
+| `show vlan brief` | which ports are in which VLAN |
+| `show interfaces trunk` | trunk links, allowed VLANs, native VLAN |
+| `show mac address-table` | learned MAC → port mappings |
+| `show ip route` | the routing table (connected / static / dynamic) |
+| `show ip interface brief` | interfaces, IPs, up/down status |
+| `show ip arp` | the router's IP → MAC cache |
+
+> [!NOTE]
+> **Packet walk-through (one frame, PC → PC across a router):** the **Layer-3 IP** addresses stay the same end-to-end, but the **Layer-2 MAC** addresses are **rewritten at every hop**, and the IP **TTL drops by 1** at each router — the three facts that tie this whole session together.
+
+---
 
 ### Homework
 - Save the Small Office `.pkt` file for future practice

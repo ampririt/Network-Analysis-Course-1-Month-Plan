@@ -136,6 +136,6 @@ The switch-to-switch link is a **trunk**, which **tags** every frame so the othe
 
 ## Next Steps
 
-- Cross-check against your build: the VLAN IDs and subnets you see here should match the VLAN plan from [Packet Tracer Lab A](./PACKET_TRACER_GUIDE.md) and the **Workgroup Design Challenge**.
+- Cross-check against your build: the VLAN IDs and subnets you see here should match the VLAN plan from [Packet Tracer Lab A](./PACKET_TRACER_GUIDE.md).
 - **Homework (from the README):** write a paragraph on **OSPF vs static routing**, and try **port security** on an access port (max 1 MAC).
 - Compare with earlier captures: the **TTL** mechanic here is the same one behind `ping`/`traceroute` from [Session 1](../S1/README.md#deep-dive-the-ping-command--options).

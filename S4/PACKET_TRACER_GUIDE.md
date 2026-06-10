@@ -1,12 +1,12 @@
-## Cisco Packet Tracer — Lab A + Workgroup Design Challenge: VLANs & Routing
+## Cisco Packet Tracer — Lab A: Small Office Network (VLANs & Routing)
 
 > Companion guide to [Session 4 — Routing, Switching & VLANs](./README.md).
-> Read this **before** doing **Lab A** and the **Workgroup Lab** in the [README](./README.md#hands-on-lab).
+> Read this **before** doing **Lab A** in the [README](./README.md#hands-on-lab).
 > New to Packet Tracer? Start with the [Session 1 Packet Tracer guide](../S1/PACKET_TRACER_GUIDE.md) for installation, the window tour, and CLI basics. This session uses the VLAN/Router-on-a-Stick concepts that Sessions 2–3 deliberately deferred.
 
 ---
 
-- [Cisco Packet Tracer — Lab A + Workgroup Design Challenge](#cisco-packet-tracer--lab-a--workgroup-design-challenge-vlans--routing)
+- [Cisco Packet Tracer — Lab A: Small Office Network (VLANs & Routing)](#cisco-packet-tracer--lab-a-small-office-network-vlans--routing)
   - [Lab A — "Small Office Network" Mega-Lab](#lab-a--small-office-network-mega-lab)
     - [Addressing & VLAN plan](#addressing--vlan-plan)
     - [Step A1 — Build the topology](#step-a1--build-the-topology)
@@ -17,12 +17,6 @@
     - [Step A6 — DHCP per VLAN](#step-a6--dhcp-per-vlan)
     - [Step A7 — Test & verify](#step-a7--test--verify)
     - [Lab A Questions](#lab-a-questions)
-  - [Workgroup Design Challenge — Design It, Build It, Prove It](#workgroup-design-challenge--design-it-build-it-prove-it)
-    - [The brief](#the-brief)
-    - [Deliverable 1 — The design (on paper first)](#deliverable-1--the-design-on-paper-first)
-    - [Deliverable 2 — The implementation](#deliverable-2--the-implementation)
-    - [Deliverable 3 — The proof (acceptance test)](#deliverable-3--the-proof-acceptance-test)
-    - [Design-Challenge Questions](#design-challenge-questions)
   - [Self-Check](#self-check)
   - [Next Steps](#next-steps)
 
@@ -229,111 +223,12 @@ Confirm the PC's **switch port is in the correct VLAN** (and in `access` mode). 
 
 ---
 
-## Workgroup Design Challenge — Design It, Build It, Prove It
-
-**⏱️ ~40 min (in workgroups) · Objective:** given only a **business brief**, your group **designs an IP/VLAN scheme from scratch and implements it in Packet Tracer** — then demonstrates it passing a fixed **acceptance test**. This is the one activity that *proves* you can take everything from Sessions 2–4 (subnetting, VLANs, trunking, Router-on-a-Stick, DHCP) and turn requirements into a working network.
-
-> [!IMPORTANT]
-> This is a **proof-of-competency** activity, not a guided walkthrough. There are **no step-by-step CLI snippets here** — you decide the design and apply the skills from Lab A. The grade is simple: **does it pass the acceptance test?**
-
-### The brief
-
-> **Client: "BrightByte" — a startup moving into a new office.** They've handed you their requirements and the base network **`172.16.0.0/24`**. Design and build their network.
-
-**Requirements:**
-1. **Three user departments**, each isolated in its own VLAN/subnet, sized with room to grow:
-   - **Engineering** — 40 hosts now (plan for ~60)
-   - **Sales** — 20 hosts
-   - **Management** — 8 hosts
-2. **One Server VLAN** for an internal server (static IP) running DHCP-free.
-3. **All user PCs get their addresses automatically** (DHCP); the server is static.
-4. **Inter-department traffic must route** (any department can reach the server).
-5. Use **one router (Router-on-a-Stick)** and as many switches as you need.
-
-### Deliverable 1 — The design (on paper first)
-
-Before touching Packet Tracer, your group produces a **design document** — this *is* the engineering, and it's half the proof:
-
-* **Subnet plan (VLSM):** pick the smallest block that fits each department from `172.16.0.0/24`. Record **CIDR, mask, network, usable range, broadcast, gateway** for each (Engineering, Sales, Management, Server).
-* **VLAN table:** VLAN ID → name → subnet → gateway.
-* **A topology diagram:** devices, switch ports, trunk links, and the router sub-interfaces.
-
-> 💡 Apply the [Session 2 subnetting method](../S2/README.md#how-to-subnet-step-by-step): 60 hosts → needs `/26` (62 usable); 20 → `/27` (30); 8 → `/28` (14); server → `/29` or `/28`. **Lay them out so the blocks don't overlap.**
-
-<p align="center">
-  <!-- ![Design doc](./img/workgroup-design-plan.png) -->
-  <em>Fig. 8 — 📸 <code>img/workgroup-design-plan.png</code>: the group's VLSM subnet table + VLAN plan + topology sketch.</em>
-</p>
-
-### Deliverable 2 — The implementation
-
-Build your design in Packet Tracer using the skills from **Lab A** — create the VLANs, assign access ports, trunk the links, configure the router sub-interfaces (one gateway per VLAN), set up a DHCP pool per user VLAN, and give the server its static address.
-
-<p align="center">
-  <!-- ![Built network](./img/workgroup-build.png) -->
-  <em>Fig. 9 — 📸 <code>img/workgroup-build.png</code>: the BrightByte network built and addressed in Packet Tracer.</em>
-</p>
-
-### Deliverable 3 — The proof (acceptance test)
-
-Your network is "done" only when it **passes every check below** — demonstrate each live (and screenshot it). This is the objective evidence that you can *implement*, not just describe:
-
-| # | Test | Expected result | Proves you can… |
-|:---:|:---|:---|:---|
-| 1 | An Engineering PC runs **`ipconfig`** | Correct IP **in the Engineering range**, correct gateway, **from DHCP** | configure VLAN DHCP + access ports |
-| 2 | **Ping within** Engineering (PC→PC) | Success | build a working L2 VLAN |
-| 3 | **Ping across** VLANs (Eng → Management) | Success **via the router** | configure Router-on-a-Stick / inter-VLAN routing |
-| 4 | **Ping the Server** from each department | Success | integrate a static host into a routed design |
-| 5 | `show vlan brief` + `show ip interface brief` | Ports in correct VLANs; all sub-interfaces **up/up** | verify your own work |
-| 6 | Pick any PC — its address **fits the subnet plan** with no overlap | Matches your design doc | translate a paper design into a real build |
-
-<p align="center">
-  <!-- ![Acceptance test](./img/workgroup-acceptance.png) -->
-  <em>Fig. 10 — 📸 <code>img/workgroup-acceptance.png</code>: the acceptance tests passing (DHCP address + cross-VLAN ping + server reach).</em>
-</p>
-
-> [!TIP]
-> **Stretch goals** (if you finish early): add a rule so **only Management** can reach the Server VLAN (a basic ACL); add a second switch and prove a PC keeps its VLAN when moved to it; add a guest VLAN with no route to the others.
-
-### Design-Challenge Questions
-
-**Discuss in your group, then click "Show answer".**
-
-**Q1.** Engineering needs 40 hosts now but "plan for ~60." Which subnet size did you pick, and why not just `/27`?
-
-<details>
-<summary>💡 Show answer</summary>
-
-**`/26`** (64 addresses, **62 usable**). A `/27` gives only **30 usable** — fine for 40? No: 30 < 40, it doesn't even fit *today*. `/26` fits 40 now **and** the projected 60 with headroom. Designing for **growth** (not just today's count) is the point — re-addressing a live department later is painful.
-</details>
-
-**Q2.** Test 3 (cross-VLAN ping) failed but Test 2 (same-VLAN) passed. Where do you look first?
-
-<details>
-<summary>💡 Show answer</summary>
-
-Same-VLAN works, so switching/access ports are fine — the break is at **Layer 3 / the router**. Check: is the **trunk to the router up and allowing the VLANs**? Are the **sub-interfaces** configured with the right `encapsulation dot1Q` **and** gateway IP, and `no shutdown`? Do the PCs have the **correct default gateway** (matching the sub-interface IP)? `show ip interface brief` and `show ip route` confirm it fast.
-</details>
-
-**Q3.** How does this single activity prove you've mastered Sessions 2–4, more than a guided lab would?
-
-<details>
-<summary>💡 Show answer</summary>
-
-A guided lab gives you the commands; here **you supply the design** (subnetting from S2), **the segmentation** (VLANs/trunking from S4), **the addressing services** (DHCP from S3), and **the routing** that ties them together — then prove it with an objective test. Producing a *correct, conflict-free, growth-aware design* and a build that **passes acceptance** is exactly what the job requires. If it passes, you can do it for real.
-</details>
-
----
-
 ## Self-Check
 
 - [ ] **Lab A:** 3 VLANs created on both switches; PC ports in the right VLANs (`show vlan brief`)
 - [ ] **Lab A:** switch–switch and switch–router links are **trunks** (`show interfaces trunk`)
 - [ ] **Lab A:** Router-on-a-Stick sub-interfaces up; **inter-VLAN ping succeeds**
 - [ ] **Lab A:** each VLAN gets DHCP addresses automatically
-- [ ] **Design Challenge:** VLSM subnet plan + VLAN table + topology produced **on paper first** (no overlaps, sized for growth)
-- [ ] **Design Challenge:** network built in Packet Tracer from your own design
-- [ ] **Design Challenge:** **all 6 acceptance tests pass** (DHCP address, same-VLAN ping, cross-VLAN ping, server reach, `show` verification, addresses match the plan)
 - [ ] Screenshots saved into [`S4/img/`](./img/) and rendering in this guide
 
 ---
@@ -342,4 +237,4 @@ A guided lab gives you the commands; here **you supply the design** (subnetting 
 
 - Analyse your own VLAN traffic in [Wireshark Lab B](./WIRESHARK_GUIDE.md): capture/open 802.1Q-tagged frames and find the VLAN tag and per-hop TTL decrements you just engineered.
 - **Homework (from the README):** save the Small Office `.pkt`, write a paragraph on **OSPF vs static routing**, and try **port security** (max 1 MAC per access port).
-- The BrightByte design is a great base for later experiments — add a DMZ, an ACL restricting the Server VLAN, or a second switch link for redundancy (STP).
+- The Small Office network is a great base for later experiments — add a DMZ, an ACL restricting a VLAN, or a second switch link for redundancy (STP).

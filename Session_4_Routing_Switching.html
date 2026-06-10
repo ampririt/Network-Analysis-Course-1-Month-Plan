@@ -6375,6 +6375,24 @@
         text-transform: uppercase;
         color: var(--cobalt-deep);
         margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      #macSim .mac-count {
+        font-size: 15px;
+        letter-spacing: 0.06em;
+        padding: 2px 11px;
+        border-radius: 999px;
+        border: 1.5px solid var(--cobalt);
+        color: var(--cobalt-deep);
+        background: var(--cobalt-soft);
+        transition: all 0.3s ease;
+      }
+      #macSim .mac-count.full {
+        border-color: var(--moss);
+        color: var(--moss);
+        background: var(--moss-soft);
       }
       #macSim table.mac-table {
         width: 100%;
@@ -7156,6 +7174,378 @@
         border-radius: 0 8px 8px 0;
         min-height: 58px;
       }
+      /* second racing packet (RIP) + race scoreboard for the compare mode */
+      #rtSim .rt-packet.alt {
+        background: var(--amber);
+      }
+      #rtSim .rt-rtr.land-o {
+        box-shadow: 0 0 0 5px rgba(58, 125, 68, 0.35);
+      }
+      #rtSim .rt-rtr.land-r {
+        box-shadow: 0 0 0 5px rgba(217, 98, 26, 0.35);
+      }
+      #rtSim .sim-btn.race {
+        border-color: var(--ink);
+      }
+      #rtSim .sim-btn.race.active {
+        background: var(--ink);
+        border-color: var(--ink);
+      }
+      /* race scoreboard rows shown inside the metric slot in compare mode */
+      #rtSim .rt-score {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      #rtSim .rt-score .row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        opacity: 0.4;
+        transition: opacity 0.3s ease;
+      }
+      #rtSim .rt-score .row.lit {
+        opacity: 1;
+      }
+      #rtSim .rt-score .dot {
+        flex: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+      }
+      #rtSim .rt-score .dot.o {
+        background: var(--moss);
+      }
+      #rtSim .rt-score .dot.r {
+        background: var(--amber);
+      }
+      #rtSim .rt-score .pos {
+        margin-left: auto;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 15px;
+        padding: 1px 9px;
+        border-radius: 999px;
+        border: 1.5px solid var(--rule);
+        color: var(--muted);
+      }
+      #rtSim .rt-score .row.lit .pos.win {
+        border-color: var(--moss);
+        color: var(--moss);
+      }
+      #rtSim .rt-score .row.lit .pos.lose {
+        border-color: var(--amber);
+        color: var(--amber);
+      }
+
+      /* ===========================================
+           SESSION 4 — RIP "routing by rumour" propagation diagram
+           Flex chips so it scales; a pulse travels A→B→C→D.
+           =========================================== */
+      .rip-prop {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        margin: 18px 0 4px;
+        position: relative;
+      }
+      .rip-node {
+        flex: 1;
+        border: 2px solid var(--ink);
+        border-radius: 12px;
+        background: var(--paper);
+        padding: 12px 10px 13px;
+        text-align: center;
+        position: relative;
+      }
+      .rip-node .rh {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 22px;
+      }
+      .rip-node .rmeta {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--cobalt-deep);
+        margin-top: 5px;
+        line-height: 1.45;
+      }
+      .rip-node .rmeta b {
+        color: var(--amber);
+      }
+      .rip-node.dest {
+        border-color: var(--moss);
+        background: var(--moss-soft);
+      }
+      .rip-link {
+        flex: 0 0 64px;
+        align-self: center;
+        height: 3px;
+        background: var(--rule);
+        position: relative;
+      }
+      /* the rumour pulse travels the whole chain on a loop */
+      .rip-pulse {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 14px;
+        height: 14px;
+        margin: -7px 0 0 -7px;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 0 4px rgba(217, 98, 26, 0.2);
+      }
+      .slide.visible .rip-pulse {
+        animation: ripPulse 4.5s linear infinite;
+      }
+      @keyframes ripPulse {
+        0% {
+          left: 0;
+          opacity: 0;
+        }
+        6% {
+          opacity: 1;
+        }
+        94% {
+          opacity: 1;
+        }
+        100% {
+          left: 100%;
+          opacity: 0;
+        }
+      }
+
+      /* ===========================================
+           SESSION 4 — OSPF three-phase flow + decision-flow chips
+           =========================================== */
+      .ospf-flow {
+        display: grid;
+        grid-template-columns: 1fr 44px 1fr 44px 1fr;
+        align-items: stretch;
+        margin: 20px 0 6px;
+      }
+      .ospf-step {
+        border: 2px solid var(--ink);
+        border-radius: 14px;
+        background: var(--paper);
+        padding: 18px 20px 20px;
+      }
+      .ospf-step .num {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--cobalt);
+      }
+      .ospf-step h4 {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 24px;
+        margin: 4px 0 8px;
+        color: var(--ink);
+      }
+      .ospf-step p {
+        font-size: 16px;
+        line-height: 1.45;
+      }
+      .ospf-step.two {
+        border-color: var(--cobalt);
+        background: var(--cobalt-soft);
+      }
+      .ospf-step.three {
+        border-color: var(--moss);
+        background: var(--moss-soft);
+      }
+      .ospf-arrow {
+        align-self: center;
+        text-align: center;
+        font-size: 30px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      /* decision-flow (slide 18d "who wins") */
+      .decision-flow {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        margin: 22px 0 4px;
+      }
+      .dstep {
+        flex: 1;
+        border: 2px solid var(--ink);
+        border-radius: 14px;
+        background: var(--paper);
+        padding: 18px 22px 20px;
+      }
+      .dstep .dn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--ink);
+        color: var(--paper);
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 17px;
+        margin-bottom: 10px;
+      }
+      .dstep h4 {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 23px;
+        margin-bottom: 7px;
+      }
+      .dstep p {
+        font-size: 17px;
+        line-height: 1.45;
+      }
+      .dstep .dtag {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--cobalt-deep);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .darrow {
+        flex: 0 0 50px;
+        align-self: center;
+        text-align: center;
+        font-size: 30px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      /* ===========================================
+           SESSION 4 — ROUTING FAMILY-TREE overview chart
+           Static vs Dynamic, with the dynamic sub-types.
+           =========================================== */
+      .route-tree {
+        margin-top: 24px;
+      }
+      .rt-root {
+        width: max-content;
+        max-width: 820px;
+        margin: 0 auto;
+        text-align: center;
+        background: var(--ink);
+        color: var(--paper);
+        border-radius: 14px;
+        padding: 14px 34px;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 30px;
+        letter-spacing: -0.01em;
+      }
+      .rt-root span {
+        display: block;
+        font-family: var(--font-body);
+        font-weight: 400;
+        font-size: 16px;
+        color: var(--paper-warm);
+        margin-top: 3px;
+        opacity: 0.85;
+      }
+      .rt-stem {
+        width: 3px;
+        height: 24px;
+        background: var(--rule);
+        margin: 0 auto;
+      }
+      .rt-tier2 {
+        display: grid;
+        grid-template-columns: 0.82fr 1.7fr;
+        gap: 38px;
+        align-items: start;
+      }
+      .rt-cat {
+        border: 2px solid var(--ink);
+        border-radius: 14px;
+        padding: 18px 24px 20px;
+        background: var(--paper);
+      }
+      .rt-cat-h {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+      .rt-cat.static {
+        border-color: var(--cobalt);
+      }
+      .rt-cat.static .rt-cat-h {
+        color: var(--cobalt-deep);
+      }
+      .rt-cat.dynamic {
+        border-color: var(--moss);
+      }
+      .rt-cat.dynamic .rt-cat-h {
+        color: var(--moss);
+      }
+      .rt-cat p {
+        font-size: 18px;
+        line-height: 1.45;
+      }
+      .rt-cat p b {
+        color: var(--ink);
+      }
+      .rt-kids {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-top: 16px;
+      }
+      .rt-kid {
+        border: 1.5px solid var(--rule);
+        border-radius: 10px;
+        padding: 12px 15px 13px;
+        background: var(--paper-warm);
+      }
+      .rt-kid b {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 19px;
+        display: block;
+        line-height: 1.1;
+      }
+      .rt-kid .proto {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 17px;
+        display: block;
+        margin: 4px 0 5px;
+      }
+      .rt-kid em {
+        font-style: normal;
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        color: var(--muted);
+        line-height: 1.4;
+        display: block;
+      }
+      .rt-kid.dv {
+        border-color: var(--amber);
+      }
+      .rt-kid.dv .proto {
+        color: var(--amber);
+      }
+      .rt-kid.ls {
+        border-color: var(--moss);
+      }
+      .rt-kid.ls .proto {
+        color: var(--moss);
+      }
+      .rt-kid.pv .proto {
+        color: var(--plum);
+      }
+      .rt-kid.pv {
+        opacity: 0.78;
+      }
 
       /* ===========================================
            SESSION 4 — "VLANs vs PHYSICAL" mini diagrams
@@ -7771,6 +8161,89 @@
         background: var(--paper-warm);
       }
 
+      /* ===========================================
+           ANIMATION POLISH — smoother, livelier sims
+           (overrides; appended last so they win)
+           =========================================== */
+      /* travelling packets: a soft radiating pulse so the eye tracks them */
+      @keyframes pktPulse {
+        0%, 100% { box-shadow: 0 2px 10px rgba(15, 32, 48, 0.4), 0 0 0 0 rgba(15, 32, 48, 0.28); }
+        60%      { box-shadow: 0 3px 12px rgba(15, 32, 48, 0.45), 0 0 0 11px rgba(15, 32, 48, 0); }
+      }
+      #macSim .mac-frame,
+      #castSim .cast-frame,
+      #vlanSim .vlan-frame,
+      #rtSim .rt-packet {
+        animation: pktPulse 1.05s ease-in-out infinite;
+        will-change: left, top;
+      }
+      /* smoother glide: accelerate out, settle in */
+      #macSim .mac-frame {
+        transition:
+          left 0.65s cubic-bezier(0.55, 0.06, 0.22, 1),
+          top 0.65s cubic-bezier(0.55, 0.06, 0.22, 1),
+          opacity 0.32s ease,
+          background 0.3s ease;
+      }
+      #castSim .cast-frame {
+        transition:
+          left 0.6s cubic-bezier(0.55, 0.06, 0.22, 1),
+          top 0.6s cubic-bezier(0.55, 0.06, 0.22, 1),
+          opacity 0.32s ease,
+          background 0.3s ease;
+      }
+      #vlanSim .vlan-frame {
+        transition:
+          left 0.65s cubic-bezier(0.55, 0.06, 0.22, 1),
+          top 0.65s cubic-bezier(0.55, 0.06, 0.22, 1),
+          opacity 0.32s ease,
+          background 0.3s ease;
+      }
+      #rtSim .rt-packet {
+        transition:
+          left 0.7s cubic-bezier(0.55, 0.06, 0.22, 1),
+          top 0.7s cubic-bezier(0.55, 0.06, 0.22, 1),
+          opacity 0.32s ease,
+          background 0.3s ease;
+      }
+      #walkSim .walk-packet {
+        transition:
+          left 0.78s cubic-bezier(0.55, 0.06, 0.22, 1),
+          opacity 0.32s ease;
+        will-change: left;
+      }
+      /* the busy switch breathes instead of a static halo */
+      @keyframes swBusy {
+        0%, 100% { box-shadow: 0 0 0 4px rgba(217, 98, 26, 0.26); }
+        50%      { box-shadow: 0 0 0 10px rgba(217, 98, 26, 0.08); }
+      }
+      #macSim .mac-switch.busy {
+        animation: swBusy 1.1s ease-in-out infinite;
+      }
+      /* hosts pop softly when they send / receive */
+      #macSim .mac-host {
+        transition:
+          border-color 0.3s ease,
+          box-shadow 0.3s ease,
+          background 0.3s ease,
+          transform 0.4s var(--ease-spring);
+      }
+      #macSim .mac-host.send,
+      #macSim .mac-host.recv {
+        transform: scale(1.05);
+      }
+      /* faster, more deliberate wire flow while a frame is in flight */
+      #macSim .mac-wire.live,
+      #macSim .mac-wire.flood {
+        animation-duration: 0.45s;
+      }
+      #vlanSim .vlan-wire.v10,
+      #vlanSim .vlan-wire.v20 {
+        animation-duration: 0.45s;
+      }
+      #castSim .cast-wire.on {
+        animation-duration: 0.45s;
+      }
     </style>
   </head>
   <body>
@@ -8022,6 +8495,11 @@
             One table, three decisions: learn the source, forward to the known
             port, or flood when you don't know yet.
           </p>
+          <div class="reveal" style="--i: 4; margin-top: 44px; display: flex; gap: 16px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 17px">
+            <span style="padding: 12px 20px; border: 1.5px solid var(--rule); border-radius: 999px; background: rgba(255,252,244,.7); color: var(--ink-soft)"><strong style="color: var(--cobalt)">✓</strong>&nbsp; explain how the MAC table fills</span>
+            <span style="padding: 12px 20px; border: 1.5px solid var(--rule); border-radius: 999px; background: rgba(255,252,244,.7); color: var(--ink-soft)"><strong style="color: var(--cobalt)">✓</strong>&nbsp; predict: forward or flood?</span>
+            <span style="padding: 12px 20px; border: 1.5px solid var(--rule); border-radius: 999px; background: rgba(255,252,244,.7); color: var(--ink-soft)"><strong style="color: var(--cobalt)">✓</strong>&nbsp; tell unicast / broadcast / multicast apart</span>
+          </div>
           <div class="page-num"></div>
         </section>
 
@@ -8141,7 +8619,7 @@
               <div class="mac-frame" data-f="D"></div>
             </div>
             <div class="mac-side">
-              <div class="mac-table-title">MAC ADDRESS TABLE</div>
+              <div class="mac-table-title">MAC ADDRESS TABLE<span class="mac-count" id="macCount">0 / 4</span></div>
               <table class="mac-table" id="macTable">
                 <thead><tr><th>MAC</th><th>Port</th></tr></thead>
                 <tbody><tr class="mac-empty"><td colspan="2">— empty —</td></tr></tbody>
@@ -8150,7 +8628,7 @@
                 <span><i class="cob"></i> unicast / learn</span>
                 <span><i class="amb"></i> flood (all ports)</span>
               </div>
-              <div class="mac-narr" id="macNarr">Press <strong>START</strong> to send a frame from PC&nbsp;A to PC&nbsp;D — watch the link light up and the table fill in.</div>
+              <div class="mac-narr" id="macNarr">Press <strong>START</strong> — each PC sends in turn, so you can watch the switch learn <strong>all four MACs</strong> and the table fill to <strong>4 / 4</strong>.</div>
             </div>
           </div>
           <div class="sim-controls reveal" style="--i: 3">
@@ -8222,6 +8700,39 @@
           <div class="page-num"></div>
         </section>
 
+        <!-- ========================================================= RECAP — PART 1 · SWITCHING ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Checkpoint</span><span>Part 1 · can you answer these?</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0">30-second self-check before we move on</span>
+          <h2 class="reveal" style="--i: 1; font-size: 50px">
+            Switching, <em class="display">in three questions.</em>
+          </h2>
+          <div class="grid-3" style="margin-top: 36px; gap: 32px">
+            <div class="card reveal" style="--i: 2; padding: 24px 28px">
+              <div class="label" style="color: var(--cobalt-deep)">Q1</div>
+              <h3 style="font-size: 25px">How does a switch learn where a MAC lives?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">It reads the <strong>source MAC</strong> of every incoming frame and records it against the arrival port. The table builds itself — no configuration.</p>
+            </div>
+            <div class="card amber reveal" style="--i: 3; padding: 24px 28px">
+              <div class="label">Q2</div>
+              <h3 style="font-size: 25px">When does a switch flood a frame?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">When the destination MAC is <strong>unknown</strong>, or it's a <strong>broadcast</strong> — out every port except the one it arrived on.</p>
+            </div>
+            <div class="card moss reveal" style="--i: 4; padding: 24px 28px">
+              <div class="label">Q3</div>
+              <h3 style="font-size: 25px">Unicast, broadcast, multicast — who receives each?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)"><strong>One</strong> host · <strong>every</strong> host in the broadcast domain · only the hosts that <strong>joined the group</strong>.</p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 5; margin-top: 30px; padding: 16px 26px; border-left: 4px solid var(--moss); background: var(--paper-warm); font-size: 20px">
+            <strong>One sentence to keep:</strong> a switch is a self-teaching table — learn the source, forward to the known, flood the unknown.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
         <!-- ========================================================= DIVIDER — PART 2 · VLANs ========================================================= -->
         <section class="slide divider-slide">
           <div class="marker reveal" style="--i: 0">— Session 04 / Part 2 —</div>
@@ -8234,6 +8745,11 @@
             domains — for security, for order, and to stop broadcasts from
             flooding the whole building.
           </p>
+          <div class="reveal" style="--i: 4; margin-top: 44px; display: flex; gap: 16px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 17px">
+            <span style="padding: 12px 20px; border: 1.5px solid var(--rule); border-radius: 999px; background: rgba(255,252,244,.7); color: var(--ink-soft)"><strong style="color: var(--cobalt)">✓</strong>&nbsp; say why we segment a network</span>
+            <span style="padding: 12px 20px; border: 1.5px solid var(--rule); border-radius: 999px; background: rgba(255,252,244,.7); color: var(--ink-soft)"><strong style="color: var(--cobalt)">✓</strong>&nbsp; read an 802.1Q tag · access vs trunk</span>
+            <span style="padding: 12px 20px; border: 1.5px solid var(--rule); border-radius: 999px; background: rgba(255,252,244,.7); color: var(--ink-soft)"><strong style="color: var(--cobalt)">✓</strong>&nbsp; explain which port STP blocks, and why</span>
+          </div>
           <div class="page-num"></div>
         </section>
 
@@ -9004,6 +9520,39 @@
           <div class="page-num"></div>
         </section>
 
+        <!-- ========================================================= RECAP — PART 2 · VLANs & STP ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Checkpoint</span><span>Part 2 · can you answer these?</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0">30-second self-check before we move on</span>
+          <h2 class="reveal" style="--i: 1; font-size: 50px">
+            VLANs &amp; STP, <em class="display">in three questions.</em>
+          </h2>
+          <div class="grid-3" style="margin-top: 36px; gap: 32px">
+            <div class="card reveal" style="--i: 2; padding: 24px 28px">
+              <div class="label" style="color: var(--cobalt-deep)">Q1</div>
+              <h3 style="font-size: 25px">What exactly does a VLAN create?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">A separate <strong>broadcast domain</strong>, drawn in software. Hosts in different VLANs cannot talk at Layer 2 — only through a <strong>router</strong>.</p>
+            </div>
+            <div class="card amber reveal" style="--i: 3; padding: 24px 28px">
+              <div class="label">Q2</div>
+              <h3 style="font-size: 25px">Where does the 802.1Q tag appear — and where never?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">Only on <strong>trunk links</strong> (between switches/routers). On an <strong>access port</strong> the frame is always untagged — the PC never sees the tag.</p>
+            </div>
+            <div class="card moss reveal" style="--i: 4; padding: 24px 28px">
+              <div class="label">Q3</div>
+              <h3 style="font-size: 25px">Which port does STP block?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">After electing the root (lowest <strong>Bridge ID</strong>) and picking Root + Designated ports by <strong>lowest cost</strong>, whatever port is left over gets blocked — the loop is gone, the backup waits.</p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 5; margin-top: 30px; padding: 16px 26px; border-left: 4px solid var(--moss); background: var(--paper-warm); font-size: 20px">
+            <strong>One sentence to keep:</strong> VLANs draw the walls, trunks carry them between switches, and STP makes sure the redundant wiring never becomes a loop.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
         <!-- ========================================================= DIVIDER — PART 3 · ROUTING ========================================================= -->
         <section class="slide divider-slide">
           <div class="marker reveal" style="--i: 0">— Session 04 / Part 3 —</div>
@@ -9015,6 +9564,50 @@
             A router's whole job is one question, asked for every packet:
             "which way is the destination network, and what's the next hop?"
           </p>
+          <div class="reveal" style="--i: 4; margin-top: 44px; display: flex; gap: 16px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 17px">
+            <span style="padding: 12px 20px; border: 1.5px solid var(--rule); border-radius: 999px; background: rgba(255,252,244,.7); color: var(--ink-soft)"><strong style="color: var(--cobalt)">✓</strong>&nbsp; read a routing table (longest prefix wins)</span>
+            <span style="padding: 12px 20px; border: 1.5px solid var(--rule); border-radius: 999px; background: rgba(255,252,244,.7); color: var(--ink-soft)"><strong style="color: var(--cobalt)">✓</strong>&nbsp; choose static vs RIP vs OSPF</span>
+            <span style="padding: 12px 20px; border: 1.5px solid var(--rule); border-radius: 999px; background: rgba(255,252,244,.7); color: var(--ink-soft)"><strong style="color: var(--cobalt)">✓</strong>&nbsp; route between VLANs &amp; trace a packet hop by hop</span>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 20 — SUBNETTING REFRESHER (moved first: the math every routing slide builds on) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Refresher</span><span>Subnetting</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">The address math behind every gateway — refresh it before reading routing tables</span>
+          <h2 class="reveal" style="--i: 1; font-size: 50px">
+            Network part, <em class="display">host part.</em>
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 21px; margin-top: 10px; max-width: 1520px">
+            The <strong>subnet mask</strong> (or <strong>/CIDR</strong>) splits
+            an IP: the network portion identifies the subnet, the host portion
+            identifies the device. A router only ever looks at the
+            <strong>network portion</strong> — every slide in this part builds
+            on that split.
+          </p>
+          <div class="grid-3" style="margin-top: 30px">
+            <div class="card reveal" style="--i: 3">
+              <div class="label" style="color: var(--cobalt-deep)">The split</div>
+              <p style="margin-top: 8px; font-size: 18px"><span class="mono">192.168.10.0/24</span><br />mask <span class="mono">255.255.255.0</span><br />→ 24 network bits, 8 host bits.</p>
+            </div>
+            <div class="card moss reveal" style="--i: 4">
+              <div class="label">Usable hosts</div>
+              <p style="margin-top: 8px; font-size: 18px"><span class="mono">2^host − 2</span><br />/24 → <strong>254 hosts</strong><br />(minus network &amp; broadcast).</p>
+            </div>
+            <div class="card amber reveal" style="--i: 5">
+              <div class="label">The endpoints</div>
+              <p style="margin-top: 8px; font-size: 18px"><span class="mono">.0</span> = network ID<br /><span class="mono">.255</span> = broadcast<br /><span class="mono">.1</span> = our gateway.</p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 6; margin-top: 24px; padding: 14px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 19px">
+            Each lab VLAN is its own <span class="mono">/24</span>: Admin
+            <span class="mono">192.168.10.0</span>, Sales
+            <span class="mono">.20.0</span>, IT <span class="mono">.30.0</span> — 254 hosts each, gateway on <span class="mono">.1</span>.
+          </div>
           <div class="page-num"></div>
         </section>
 
@@ -9031,8 +9624,10 @@
           <p class="reveal" style="--i: 2; font-size: 21px; margin-top: 10px; max-width: 1520px">
             For each packet the router scans its table for entries whose
             network matches the destination IP, then picks the <strong>most
-            specific</strong> one — the longest prefix. That entry's next-hop /
-            exit interface is where the packet goes.
+            specific</strong> one — the longest prefix. Think of a postal
+            address: <em>"Bangkok, Sukhumvit Soi 4"</em> beats just
+            <em>"Thailand"</em> — the more specific match always wins. That
+            entry's next-hop / exit interface is where the packet goes.
           </p>
           <div class="reveal" style="--i: 3; margin-top: 26px">
             <table class="data">
@@ -9040,8 +9635,8 @@
               <tbody>
                 <tr><td class="mono">192.168.10.0/24</td><td class="mono">G0/0.10 (connected)</td><td>C — direct</td><td class="mono">/24</td></tr>
                 <tr><td class="mono">192.168.20.0/24</td><td class="mono">G0/0.20 (connected)</td><td>C — direct</td><td class="mono">/24</td></tr>
-                <tr><td class="mono">10.0.0.0/8</td><td class="mono">via 203.0.113.1</td><td>S — static</td><td class="mono">/8</td></tr>
-                <tr><td class="mono">0.0.0.0/0</td><td class="mono">via 203.0.113.1</td><td>S* — default</td><td class="mono">/0</td></tr>
+                <tr style="background: var(--amber-soft)"><td class="mono"><strong>10.0.0.0/8</strong> ← matches 10.5.5.5</td><td class="mono">via 203.0.113.1</td><td>S — static</td><td class="mono"><strong>/8 wins</strong></td></tr>
+                <tr><td class="mono">0.0.0.0/0 ← also matches, less specific</td><td class="mono">via 203.0.113.1</td><td>S* — default</td><td class="mono">/0</td></tr>
               </tbody>
             </table>
           </div>
@@ -9082,9 +9677,62 @@
           </div>
           <div class="reveal" style="--i: 5; margin-top: 26px; padding: 16px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 19px">
             <strong>When two sources offer the same route, who wins?</strong>
-            <strong>Administrative distance</strong> ranks the <em>source</em>
-            (connected 0 &lt; static 1 &lt; OSPF 110 &lt; RIP 120); the
-            <strong>metric</strong> then picks the best path <em>within</em> a protocol.
+            <strong>Administrative distance</strong> is simply a trust score for
+            <em>where the route came from</em> — lower is more trusted:
+            connected <span class="mono">0</span> &lt; static <span class="mono">1</span> &lt; OSPF <span class="mono">110</span> &lt; RIP <span class="mono">120</span>.
+            Within a single protocol, the <strong>metric</strong> then picks the best path.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 17b — ROUTING FAMILY TREE (big-picture chart before the detail) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Routing</span><span>The big picture — one chart before the detail</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">One question · a small family of answers</span>
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            The routing <em class="display">family tree.</em>
+          </h2>
+
+          <div class="route-tree reveal" style="--i: 2">
+            <div class="rt-root">
+              ROUTING
+              <span>How does a router learn where to send each packet?</span>
+            </div>
+            <div class="rt-stem"></div>
+            <div class="rt-tier2">
+              <div class="rt-cat static">
+                <div class="rt-cat-h">STATIC · you configure it</div>
+                <p>You type each route by hand. Predictable and cheap with zero protocol traffic — but <b>nothing reroutes</b> if a link dies, and it doesn't scale. Trust score <b>AD&nbsp;1</b>. Best for small / stub networks.</p>
+              </div>
+              <div class="rt-cat dynamic">
+                <div class="rt-cat-h">DYNAMIC · routers learn it</div>
+                <p>Routers run a <b>protocol</b> to share reachability and re-route automatically around failures. Essential as the network grows. Split by <b>how</b> they learn:</p>
+                <div class="rt-kids">
+                  <div class="rt-kid dv">
+                    <b>Distance-vector</b>
+                    <span class="proto">RIP</span>
+                    <em>"by rumour" · trust a neighbour's hop count · simple, slow</em>
+                  </div>
+                  <div class="rt-kid ls">
+                    <b>Link-state</b>
+                    <span class="proto">OSPF</span>
+                    <em>"whole map" · flood + Dijkstra on cost · fast, scales</em>
+                  </div>
+                  <div class="rt-kid pv">
+                    <b>Path-vector</b>
+                    <span class="proto">BGP</span>
+                    <em>between networks · policy, not speed · runs the internet</em>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="reveal" style="--i: 3; margin-top: 22px; padding: 14px 24px; border-left: 4px solid var(--moss); background: var(--paper-warm); font-size: 19px">
+            In this course we use <strong>static</strong> for stubs and <strong>OSPF</strong> inside our network; <strong>RIP</strong> only survives on tiny / legacy nets. <strong>BGP</strong> glues separate networks together (a later topic). The next slides open up the two you'll actually meet — <strong>RIP</strong> and <strong>OSPF</strong>.
           </div>
           <div class="page-num"></div>
         </section>
@@ -9120,9 +9768,11 @@
             </div>
           </div>
           <div class="reveal" style="--i: 4; margin-top: 26px; padding: 16px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 20px">
-            <strong>The headline difference:</strong> RIP knows only "how far",
-            OSPF knows "the whole topology". That's why OSPF reacts to a failed
-            link in seconds while RIP can take minutes. <em>(Homework dives into OSPF.)</em>
+            <strong>The headline difference:</strong> RIP is like asking your
+            neighbours for directions and counting the turns; OSPF is like
+            everyone holding the same city map and computing the fastest road.
+            RIP knows only "how far" — OSPF knows "the whole shape", which is
+            why it reroutes in seconds while RIP can take minutes. <em>(Homework dives into OSPF.)</em>
           </div>
           <div class="page-num"></div>
         </section>
@@ -9179,7 +9829,110 @@
             </div>
           </div>
           <div class="reveal" style="--i: 5; margin-top: 22px; padding: 14px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 19px">
-            The metric is everything: on the same wires, <strong>RIP and OSPF can pick different paths</strong>. The next slide lets you try all three on one network.
+            The metric is everything: on the same wires, <strong>RIP and OSPF can pick different paths</strong>. Next we open up each one — then a live sim lets you race them on one network.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 18r — INSIDE RIP (distance-vector mechanism) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Routing</span><span>Distance-vector · how RIP actually learns</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">A router that never sees the whole map</span>
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            RIP — routing by <em class="display">rumour.</em>
+          </h2>
+
+          <!-- distance-vector propagation: the route to Net D spreads one hop per 30s round -->
+          <div class="rip-prop reveal" style="--i: 2">
+            <div class="rip-node">
+              <div class="rh">R-A</div>
+              <div class="rmeta">to Net&nbsp;D<br /><b>3 hops</b></div>
+            </div>
+            <div class="rip-link"></div>
+            <div class="rip-node">
+              <div class="rh">R-B</div>
+              <div class="rmeta">to Net&nbsp;D<br /><b>2 hops</b></div>
+            </div>
+            <div class="rip-link"></div>
+            <div class="rip-node">
+              <div class="rh">R-C</div>
+              <div class="rmeta">to Net&nbsp;D<br /><b>1 hop</b></div>
+            </div>
+            <div class="rip-link"></div>
+            <div class="rip-node dest">
+              <div class="rh">R-D</div>
+              <div class="rmeta" style="color: var(--moss)">10.0.3.0/24<br />origin</div>
+            </div>
+            <div class="rip-pulse"></div>
+          </div>
+          <p class="reveal" style="--i: 3; font-size: 18px; text-align: center; color: var(--muted); margin: 6px 0 2px">
+            Every 30&nbsp;s each router hands its <em>whole table</em> to its neighbour. The route to Net&nbsp;D travels <strong>one hop per round</strong> — a 4-router line needs ~3 rounds (~90&nbsp;s) to fully converge.
+          </p>
+
+          <div class="grid-3 reveal" style="--i: 4; margin-top: 18px; gap: 28px">
+            <div class="card amber">
+              <div class="label">The metric</div>
+              <h3 style="font-size: 24px">Hop count only</h3>
+              <p style="margin-top: 8px; font-size: 17px">Distance = number of routers to cross. <strong>Max 15</strong>; <strong>16 = unreachable (∞)</strong>. Completely <strong>blind to bandwidth</strong> — a 1-hop dial-up beats a 2-hop fibre.</p>
+            </div>
+            <div class="card">
+              <div class="label" style="color: var(--cobalt-deep)">The updates</div>
+              <h3 style="font-size: 24px">Whole table, every 30 s</h3>
+              <p style="margin-top: 8px; font-size: 17px">RIPv2 multicasts its <strong>entire table</strong> to <span class="mono">224.0.0.9</span> every 30&nbsp;s (plus <strong>triggered updates</strong> on change). Classless — carries the mask, so VLSM works.</p>
+            </div>
+            <div class="card moss">
+              <div class="label">The danger + guardrails</div>
+              <h3 style="font-size: 24px">Count-to-infinity</h3>
+              <p style="margin-top: 8px; font-size: 17px">A lost route can loop, each pass +1 toward 16. Tamed by <strong>split horizon</strong>, <strong>poison reverse</strong> and <strong>holddown</strong> timers — slower still, but loop-safe.</p>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 18o — INSIDE OSPF (link-state mechanism) ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Routing</span><span>Link-state · how OSPF actually learns</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">How every router ends up holding the same map</span>
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            OSPF — flood the facts, then <em class="display">compute.</em>
+          </h2>
+
+          <!-- three-phase link-state flow -->
+          <div class="ospf-flow reveal" style="--i: 2">
+            <div class="ospf-step">
+              <div class="num">1 · Neighbours</div>
+              <h4>Say hello</h4>
+              <p><strong>Hello</strong> packets every 10&nbsp;s find neighbours and build adjacencies (Down→2-Way→Full). On Ethernet a <strong>DR/BDR</strong> is elected so everyone syncs through one router, not N×N.</p>
+            </div>
+            <div class="ospf-arrow">→</div>
+            <div class="ospf-step two">
+              <div class="num">2 · Flood</div>
+              <h4>Share every link</h4>
+              <p>Each router originates <strong>LSAs</strong> describing its own links and floods them reliably. They keep flooding until every router's <strong>Link-State Database</strong> is <strong>identical</strong> within the area.</p>
+            </div>
+            <div class="ospf-arrow">→</div>
+            <div class="ospf-step three">
+              <div class="num">3 · Compute</div>
+              <h4>Run Dijkstra</h4>
+              <p>From that shared map each router runs <strong>SPF (Dijkstra)</strong> to build its own shortest-path tree. <strong>Cost = 100&nbsp;Mbps ÷ bandwidth</strong> — so faster links win.</p>
+            </div>
+          </div>
+
+          <div class="grid-2 reveal" style="--i: 3; margin-top: 22px; gap: 40px">
+            <div class="card">
+              <div class="label" style="color: var(--cobalt-deep)">Areas keep it scalable</div>
+              <p style="margin-top: 6px; font-size: 18px">Big domains split into <strong>areas</strong>; every area touches <strong>Area&nbsp;0</strong> (the backbone). Flooding and SPF stay <em>inside</em> an area, so the map each router computes never grows out of hand.</p>
+            </div>
+            <div class="card moss">
+              <div class="label">Why it wins</div>
+              <p style="margin-top: 6px; font-size: 18px">Because every router holds the <strong>whole topology</strong>, a failure means one quick re-run of SPF — OSPF <strong>reroutes in seconds</strong> (vs RIP's minutes) and scales to large networks. Trust score <span class="mono">AD&nbsp;110</span>.</p>
+            </div>
           </div>
           <div class="page-num"></div>
         </section>
@@ -9223,6 +9976,7 @@
               <div class="rt-lbl" style="left: 392px; top: 262px">Serial T1 · cost 64 · 1 hop</div>
 
               <div class="rt-packet" id="rtPacket"></div>
+              <div class="rt-packet alt" id="rtPacket2"></div>
             </div>
 
             <div class="rt-panel">
@@ -9249,50 +10003,61 @@
             <button class="sim-btn" data-mode="static">Static</button>
             <button class="sim-btn" data-mode="rip">RIP</button>
             <button class="sim-btn" data-mode="ospf">OSPF</button>
+            <button class="sim-btn race" data-mode="compare">⚑ Race RIP vs OSPF</button>
             <button class="sim-btn" id="rtReset">↺ Reset</button>
           </div>
           <div class="page-num"></div>
         </section>
 
-        <!-- ========================================================= SLIDE 18d — INSIDE OSPF & RIP ========================================================= -->
+        <!-- ========================================================= SLIDE 18d — WHEN ROUTES COLLIDE: WHO WINS ========================================================= -->
         <section class="slide">
           <div class="masthead">
-            <div class="left"><span class="tag">Routing</span><span>Dynamic protocols · the internals</span></div>
+            <div class="left"><span class="tag">Routing</span><span>When sources disagree · who wins</span></div>
             <div class="right"></div>
           </div>
-          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt); font-size: 18px">What the protocols actually do under the hood</span>
+          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">Static, RIP and OSPF can all offer a route — only one goes in the table</span>
           <h2 class="reveal" style="--i: 1; font-size: 46px">
-            Inside <em class="display">OSPF</em> &amp; RIP.
+            Three filters pick the <em class="display">winner.</em>
           </h2>
-          <div class="grid-2" style="margin-top: 22px; gap: 40px; align-items: stretch">
-            <div class="card reveal" style="--i: 2; padding: 20px 26px">
-              <div class="label" style="color: var(--cobalt-deep)">OSPF · link-state</div>
-              <h3 style="font-size: 25px">Everyone builds the same map</h3>
-              <!-- mini area diagram -->
-              <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0 4px">
-                <span style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; padding: 10px 14px; border-radius: 8px; border: 2px solid var(--moss); background: var(--moss-soft); color: var(--moss)">Area 1</span>
-                <span style="flex: none; width: 26px; height: 3px; background: var(--rule)"></span>
-                <span style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; padding: 12px 16px; border-radius: 8px; background: var(--ink); color: var(--paper)">Area 0 · backbone</span>
-                <span style="flex: none; width: 26px; height: 3px; background: var(--rule)"></span>
-                <span style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; padding: 10px 14px; border-radius: 8px; border: 2px solid var(--plum); background: var(--plum-soft); color: var(--plum)">Area 2</span>
-              </div>
-              <p style="margin-top: 10px; font-size: 17px"><strong>Hello/Dead</strong> timers form adjacencies; on Ethernet a <strong>DR/BDR</strong> is elected to cut flooding; routers exchange <strong>LSAs</strong> and each runs <strong>Dijkstra (SPF)</strong>. Cost = <span class="mono">100 Mbps ÷ link bandwidth</span> — every area touches <strong>Area 0</strong>.</p>
+
+          <div class="decision-flow reveal" style="--i: 2">
+            <div class="dstep">
+              <div class="dn">1</div>
+              <div class="dtag">Most specific</div>
+              <h4>Longest-prefix match</h4>
+              <p>Per packet, the router picks the <strong>narrowest</strong> matching prefix — <span class="mono">/24</span> beats <span class="mono">/16</span> beats <span class="mono">0.0.0.0/0</span> — no matter who taught it.</p>
             </div>
-            <div class="stack reveal" style="--i: 3; gap: 18px">
-              <div class="card amber" style="padding: 16px 22px">
-                <div class="label">RIP · distance-vector</div>
-                <h3 style="font-size: 22px">Rumour, with guardrails</h3>
-                <p style="margin-top: 6px; font-size: 17px">Hop count only (<strong>max 15</strong>, 16 = unreachable), full table every 30 s. Loops are fought with <strong>split horizon</strong>, <strong>route poisoning</strong> and <strong>holddown</strong> — but it's still slow to converge.</p>
-              </div>
-              <div class="card moss" style="padding: 16px 22px">
-                <div class="label">Choosing the winner</div>
-                <h3 style="font-size: 22px">Prefix → distance → metric</h3>
-                <p style="margin-top: 6px; font-size: 17px">Per packet: <strong>longest-prefix match</strong> first. If two protocols offer the same prefix, <strong>administrative distance</strong> breaks the tie (<span class="mono">OSPF 110 &lt; RIP 120</span>); within one protocol, the <strong>metric</strong> decides.</p>
-              </div>
+            <div class="darrow">→</div>
+            <div class="dstep">
+              <div class="dn">2</div>
+              <div class="dtag">Most trusted source</div>
+              <h4>Administrative distance</h4>
+              <p>Same prefix from two sources? The <strong>lower AD</strong> (more trusted) is installed. OSPF&nbsp;<span class="mono">110</span> beats RIP&nbsp;<span class="mono">120</span>; the loser is held in reserve.</p>
+            </div>
+            <div class="darrow">→</div>
+            <div class="dstep">
+              <div class="dn">3</div>
+              <div class="dtag">Best path within it</div>
+              <h4>The metric</h4>
+              <p>Inside the winning protocol, the <strong>metric</strong> decides: RIP counts <strong>hops</strong>, OSPF totals <strong>cost</strong>. Ties can load-balance across equal paths.</p>
             </div>
           </div>
-          <div class="reveal" style="--i: 4; margin-top: 20px; padding: 15px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 18px">
-            Rule of thumb: <strong>RIP knows only "how far"; OSPF knows "the whole shape".</strong> That topology view is why OSPF reroutes in seconds and scales to large networks.
+
+          <div class="grid-2 reveal" style="--i: 3; margin-top: 24px; gap: 40px; align-items: center">
+            <table class="data" style="font-size: 19px">
+              <thead>
+                <tr><th>Source</th><th>Admin distance</th><th>Trust</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Connected</td><td class="mono">0</td><td style="color: var(--moss)">highest</td></tr>
+                <tr><td>Static</td><td class="mono">1</td><td>↑</td></tr>
+                <tr><td>OSPF</td><td class="mono">110</td><td>↓</td></tr>
+                <tr><td>RIP</td><td class="mono">120</td><td style="color: var(--amber)">lowest</td></tr>
+              </tbody>
+            </table>
+            <div style="padding: 16px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 19px">
+              Rule of thumb: <strong>RIP knows only "how far"; OSPF knows "the whole shape".</strong> Lower AD = the router trusts that source more — which is why a hand-typed <strong>static</strong> route (AD&nbsp;1) overrides anything a protocol learns.
+            </div>
           </div>
           <div class="page-num"></div>
         </section>
@@ -9308,8 +10073,10 @@
             They can't, until a <em class="display">router</em> joins them.
           </h2>
           <p class="reveal" style="--i: 2; font-size: 21px; margin-top: 10px; max-width: 1520px">
-            VLANs are separate networks, so VLAN 10 reaching VLAN 20 is a
-            routing problem. Two ways to solve it:
+            Each VLAN is its own network with its own subnet and gateway —
+            so VLAN 10 reaching VLAN 20 is a <strong>routing problem</strong>,
+            exactly like reaching any other network. Something has to own
+            those gateways and forward between them. Two ways to do it:
           </p>
           <div class="grid-2" style="margin-top: 26px; gap: 44px">
             <div class="card reveal" style="--i: 3">
@@ -9333,44 +10100,6 @@
               </p>
               <p style="margin-top: 10px; font-family: var(--font-mono); font-size: 15px; color: var(--ink-soft)">ip routing<br />interface vlan 10<br />&nbsp;ip address 192.168.10.1 255.255.255.0</p>
             </div>
-          </div>
-          <div class="page-num"></div>
-        </section>
-
-        <!-- ========================================================= SLIDE 20 — SUBNETTING REFRESHER ========================================================= -->
-        <section class="slide">
-          <div class="masthead">
-            <div class="left"><span class="tag">Refresher</span><span>Subnetting</span></div>
-            <div class="right"></div>
-          </div>
-          <span class="eyebrow reveal" style="--i: 0; color: var(--cobalt)">The address math behind every gateway</span>
-          <h2 class="reveal" style="--i: 1; font-size: 50px">
-            Network part, <em class="display">host part.</em>
-          </h2>
-          <p class="reveal" style="--i: 2; font-size: 21px; margin-top: 10px; max-width: 1520px">
-            The <strong>subnet mask</strong> (or <strong>/CIDR</strong>) splits
-            an IP: the network portion identifies the subnet, the host portion
-            identifies the device. The router's job is purely about that
-            network portion.
-          </p>
-          <div class="grid-3" style="margin-top: 30px">
-            <div class="card reveal" style="--i: 3">
-              <div class="label" style="color: var(--cobalt-deep)">The split</div>
-              <p style="margin-top: 8px; font-size: 18px"><span class="mono">192.168.10.0/24</span><br />mask <span class="mono">255.255.255.0</span><br />→ 24 network bits, 8 host bits.</p>
-            </div>
-            <div class="card moss reveal" style="--i: 4">
-              <div class="label">Usable hosts</div>
-              <p style="margin-top: 8px; font-size: 18px"><span class="mono">2^host − 2</span><br />/24 → <strong>254 hosts</strong><br />(minus network &amp; broadcast).</p>
-            </div>
-            <div class="card amber reveal" style="--i: 5">
-              <div class="label">The endpoints</div>
-              <p style="margin-top: 8px; font-size: 18px"><span class="mono">.0</span> = network ID<br /><span class="mono">.255</span> = broadcast<br /><span class="mono">.1</span> = our gateway.</p>
-            </div>
-          </div>
-          <div class="reveal" style="--i: 6; margin-top: 24px; padding: 14px 24px; border: 1.5px solid var(--ink); background: var(--paper-warm); font-size: 19px">
-            Each lab VLAN is its own <span class="mono">/24</span>: Admin
-            <span class="mono">192.168.10.0</span>, Sales
-            <span class="mono">.20.0</span>, IT <span class="mono">.30.0</span> — 254 hosts each, gateway on <span class="mono">.1</span>.
           </div>
           <div class="page-num"></div>
         </section>
@@ -9408,41 +10137,6 @@
           <div class="reveal" style="--i: 4; margin-top: 26px; padding: 16px 24px; border-left: 4px solid var(--cobalt); background: var(--paper-warm); font-size: 20px">
             In the Mega-Lab the router itself is the DHCP server for all three
             VLANs — so each sub-interface hands its VLAN the right gateway, mask and DNS.
-          </div>
-          <div class="page-num"></div>
-        </section>
-
-        <!-- ========================================================= SLIDE 22 — INTERACTIVE: PACKET WALK ========================================================= -->
-        <section class="slide" id="walkSim" data-noscale>
-          <div class="masthead">
-            <div class="left"><span class="tag">Interactive</span><span>Packet walk · MAC rewrite &amp; TTL</span></div>
-            <div class="right"></div>
-          </div>
-          <span class="eyebrow amber reveal" style="--i: 0">Live simulation · Press START</span>
-          <h2 class="reveal" style="--i: 1; font-size: 44px">
-            IPs stay. MACs <em class="display">change.</em> TTL <em class="display">drops.</em>
-          </h2>
-          <div class="walk-stage reveal" style="--i: 2">
-            <div class="walk-track" id="walkTrack">
-              <div class="walk-node" data-node="0"><span class="m-icon wn-ico">computer</span><span class="wn-label">PC A</span><span class="wn-sub">192.168.10.5 · VLAN 10</span></div>
-              <div class="walk-node sw" data-node="1"><span class="m-icon wn-ico">lan</span><span class="wn-label">Switch</span><span class="wn-sub">L2 trunk</span></div>
-              <div class="walk-node rt" data-node="2"><span class="m-icon wn-ico">router</span><span class="wn-label">Router</span><span class="wn-sub">gateways · TTL−1</span></div>
-              <div class="walk-node sw" data-node="3"><span class="m-icon wn-ico">lan</span><span class="wn-label">Switch</span><span class="wn-sub">L2 trunk</span></div>
-              <div class="walk-node" data-node="4"><span class="m-icon wn-ico">computer</span><span class="wn-label">PC B</span><span class="wn-sub">192.168.20.7 · VLAN 20</span></div>
-              <div class="walk-packet" id="walkPacket">
-                <div class="wp-row"><span>SRC&nbsp;IP</span><b id="wpSip">192.168.10.5</b></div>
-                <div class="wp-row"><span>DST&nbsp;IP</span><b id="wpDip">192.168.20.7</b></div>
-                <div class="wp-row hl"><span>SRC&nbsp;MAC</span><b id="wpSmac">aa:aa</b></div>
-                <div class="wp-row hl"><span>DST&nbsp;MAC</span><b id="wpDmac">gw:10</b></div>
-                <div class="wp-row ttl"><span>TTL</span><b id="wpTtl">64</b></div>
-              </div>
-            </div>
-            <div class="walk-narr" id="walkNarr">Press <strong>START</strong> to follow one packet from PC&nbsp;A (VLAN 10) to PC&nbsp;B (VLAN 20).</div>
-          </div>
-          <div class="sim-controls reveal" style="--i: 3">
-            <button class="sim-btn primary" id="walkStart">▶ Start</button>
-            <button class="sim-btn" id="walkNext">Step ▸</button>
-            <button class="sim-btn" id="walkReset">↺ Reset</button>
           </div>
           <div class="page-num"></div>
         </section>
@@ -9488,7 +10182,75 @@
             </div>
           </div>
           <div class="reveal" style="--i: 8; margin-top: 20px; padding: 14px 24px; border-left: 4px solid var(--amber); background: var(--paper-warm); font-size: 18px">
-            That gateway is a single point of failure — <strong>HSRP / VRRP</strong> let two routers share one virtual gateway IP so the first hop survives a failure. This is exactly the MAC the packet-walk sim used.
+            That gateway is a single point of failure — <strong>HSRP / VRRP</strong> let two routers share one virtual gateway IP so the first hop survives a failure. Watch for the gateway's MAC in the packet-walk simulation next.
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= SLIDE 22 — INTERACTIVE: PACKET WALK (Part 3 capstone — everything in one journey) ========================================================= -->
+        <section class="slide" id="walkSim" data-noscale>
+          <div class="masthead">
+            <div class="left"><span class="tag">Interactive</span><span>Packet walk · MAC rewrite &amp; TTL</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0">Live simulation · Press START</span>
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            IPs stay. MACs <em class="display">change.</em> TTL <em class="display">drops.</em>
+          </h2>
+          <div class="walk-stage reveal" style="--i: 2">
+            <div class="walk-track" id="walkTrack">
+              <div class="walk-node" data-node="0"><span class="m-icon wn-ico">computer</span><span class="wn-label">PC A</span><span class="wn-sub">192.168.10.5 · VLAN 10</span></div>
+              <div class="walk-node sw" data-node="1"><span class="m-icon wn-ico">lan</span><span class="wn-label">Switch</span><span class="wn-sub">L2 trunk</span></div>
+              <div class="walk-node rt" data-node="2"><span class="m-icon wn-ico">router</span><span class="wn-label">Router</span><span class="wn-sub">gateways · TTL−1</span></div>
+              <div class="walk-node sw" data-node="3"><span class="m-icon wn-ico">lan</span><span class="wn-label">Switch</span><span class="wn-sub">L2 trunk</span></div>
+              <div class="walk-node" data-node="4"><span class="m-icon wn-ico">computer</span><span class="wn-label">PC B</span><span class="wn-sub">192.168.20.7 · VLAN 20</span></div>
+              <div class="walk-packet" id="walkPacket">
+                <div class="wp-row"><span>SRC&nbsp;IP</span><b id="wpSip">192.168.10.5</b></div>
+                <div class="wp-row"><span>DST&nbsp;IP</span><b id="wpDip">192.168.20.7</b></div>
+                <div class="wp-row hl"><span>SRC&nbsp;MAC</span><b id="wpSmac">aa:aa</b></div>
+                <div class="wp-row hl"><span>DST&nbsp;MAC</span><b id="wpDmac">gw:10</b></div>
+                <div class="wp-row ttl"><span>TTL</span><b id="wpTtl">64</b></div>
+              </div>
+            </div>
+            <div class="walk-narr" id="walkNarr">Press <strong>START</strong> to follow one packet from PC&nbsp;A (VLAN 10) to PC&nbsp;B (VLAN 20) — everything from this part of the session, in one journey.</div>
+          </div>
+          <div class="sim-controls reveal" style="--i: 3">
+            <button class="sim-btn primary" id="walkStart">▶ Start</button>
+            <button class="sim-btn" id="walkNext">Step ▸</button>
+            <button class="sim-btn" id="walkReset">↺ Reset</button>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- ========================================================= RECAP — PART 3 · ROUTING ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left"><span class="tag">Checkpoint</span><span>Part 3 · can you answer these?</span></div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0">30-second self-check before the lab</span>
+          <h2 class="reveal" style="--i: 1; font-size: 50px">
+            Routing, <em class="display">in three questions.</em>
+          </h2>
+          <div class="grid-3" style="margin-top: 36px; gap: 32px">
+            <div class="card reveal" style="--i: 2; padding: 24px 28px">
+              <div class="label" style="color: var(--cobalt-deep)">Q1</div>
+              <h3 style="font-size: 25px">How does a router choose between matching routes?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">In strict order: <strong>longest prefix</strong> first → if tied, lowest <strong>administrative distance</strong> → if still tied, best <strong>metric</strong>.</p>
+            </div>
+            <div class="card amber reveal" style="--i: 3; padding: 24px 28px">
+              <div class="label">Q2</div>
+              <h3 style="font-size: 25px">What changes — and what stays — as a packet crosses a router?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)">Source &amp; destination <strong>IPs stay</strong> end-to-end. The <strong>MACs are rewritten</strong> every hop, and <strong>TTL drops by 1</strong>.</p>
+            </div>
+            <div class="card moss reveal" style="--i: 4; padding: 24px 28px">
+              <div class="label">Q3</div>
+              <h3 style="font-size: 25px">Two ways to route between VLANs?</h3>
+              <p style="margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--ink-soft)"><strong>Router-on-a-stick</strong> (one trunk, a sub-interface per VLAN) or a <strong>Layer-3 switch</strong> with SVIs — the campus standard.</p>
+            </div>
+          </div>
+          <div class="reveal" style="--i: 5; margin-top: 30px; padding: 16px 26px; border-left: 4px solid var(--moss); background: var(--paper-warm); font-size: 20px">
+            <strong>One sentence to keep:</strong> a router asks "which network?" for every packet, answers with the most specific route it knows, and rewrites the MACs to hand it to the next hop.
           </div>
           <div class="page-num"></div>
         </section>
@@ -9668,7 +10430,13 @@
 
           this.renumber();
           this.bindNav();
-          this.show(0);
+          // deep-link: open directly on a slide via #12 (1-based) in the URL
+          const fromHash = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
+          this.show(fromHash ? fromHash - 1 : 0);
+          window.addEventListener("hashchange", () => {
+            const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
+            if (n) this.show(n - 1);
+          });
           this.bindAutoFadeControls();
         }
 
@@ -9960,13 +10728,21 @@
             h.classList.remove("send", "recv", "flood"),
           );
 
+        const countEl = slide.querySelector("#macCount");
         function renderTable(freshHost) {
+          if (countEl) {
+            countEl.textContent = table.length + " / 4";
+            countEl.classList.toggle("full", table.length >= 4);
+          }
           if (!table.length) {
             tbody.innerHTML =
               '<tr class="mac-empty"><td colspan="2">— empty —</td></tr>';
             return;
           }
+          // keep entries in port order so the table reads like a real CAM dump
           tbody.innerHTML = table
+            .slice()
+            .sort((a, b) => a.port.localeCompare(b.port))
             .map(
               (e) =>
                 `<tr class="${e.host === freshHost ? "fresh" : ""}"><td>${e.mac}</td><td>${e.port}</td></tr>`,
@@ -10003,58 +10779,91 @@
         // Each step clears the previous lighting, then choreographs frames
         // along the wires while the CAM table fills in.
         const steps = [
-          // 0 — A → switch; switch learns the SOURCE mac on the arrival port
+          // 0 — A → D: learn SOURCE aa:aa on Fa0/1, then flood (dest unknown)
           () => {
             clearHosts(); clearWires(); hideFrames();
             sw.classList.add("busy");
             hosts.A.classList.add("send");
             narr.innerHTML =
-              "<strong>PC A → PC D.</strong> The frame rides up its link into <strong>Fa0/1</strong>. The switch reads the <em>source</em> address and records <strong>aa:aa → Fa0/1</strong> in the table.";
+              "<strong>PC A → PC D.</strong> The frame enters <strong>Fa0/1</strong>. The switch reads the <em>source</em> and records <strong>aa:aa → Fa0/1</strong>. Destination dd:dd is unknown…";
             ingress("A", "live");
             later(() => {
               learn("A");
               renderTable("A");
             }, 580);
+            later(() => {
+              clearWires(); hideFrames();
+              narr.innerHTML =
+                "…so the switch <strong>floods</strong> the frame out <strong>every other port</strong> (Fa0/2–4). Only D keeps it. Note: flooding never teaches the switch about B, C or D — a switch <em>only learns from a source address</em>.";
+              ["B", "C", "D"].forEach((h) => hosts[h].classList.add("flood"));
+              egress(["B", "C", "D"], "flood");
+            }, 1300);
           },
-          // 1 — destination unknown → flood out every OTHER port
-          () => {
-            clearHosts(); clearWires(); hideFrames();
-            sw.classList.add("busy");
-            narr.innerHTML =
-              "Destination <strong>dd:dd is not in the table</strong>, so the switch <strong>floods</strong> a copy out <strong>every other port</strong> — Fa0/2, Fa0/3 and Fa0/4. B, C and D all receive it.";
-            ["B", "C", "D"].forEach((h) => hosts[h].classList.add("flood"));
-            egress(["B", "C", "D"], "flood");
-          },
-          // 2 — D replies; learn D, then unicast back to the known A
+          // 1 — D → A: learn dd:dd on Fa0/4; A already known → unicast
           () => {
             clearHosts(); clearWires(); hideFrames();
             sw.classList.add("busy");
             hosts.D.classList.add("send");
             narr.innerHTML =
-              "<strong>PC D replies.</strong> Its frame arrives on <strong>Fa0/4</strong>, so the switch learns <strong>dd:dd → Fa0/4</strong>. <strong>aa:aa is already known</strong>, so it <strong>unicasts</strong> the reply out Fa0/1 only.";
+              "<strong>PC D replies → PC A.</strong> Frame in on <strong>Fa0/4</strong> → learn <strong>dd:dd → Fa0/4</strong>. aa:aa is already known, so the reply is a clean <strong>unicast</strong> out Fa0/1 — no flooding.";
             ingress("D", "live");
             later(() => {
               learn("D");
               renderTable("D");
             }, 560);
             later(() => {
-              clearWires();
-              hideFrames();
+              clearWires(); hideFrames();
               hosts.A.classList.add("recv");
               egress(["A"], "live");
             }, 1150);
           },
-          // 3 — both known → clean unicast, only two ports light
+          // 2 — B → A: learn bb:bb on Fa0/2; A known → unicast
+          () => {
+            clearHosts(); clearWires(); hideFrames();
+            sw.classList.add("busy");
+            hosts.B.classList.add("send");
+            narr.innerHTML =
+              "Now <strong>PC B → PC A.</strong> Frame in on <strong>Fa0/2</strong> → learn <strong>bb:bb → Fa0/2</strong>. A is known, so it unicasts straight out Fa0/1. The table is filling one source at a time.";
+            ingress("B", "live");
+            later(() => {
+              learn("B");
+              renderTable("B");
+            }, 560);
+            later(() => {
+              clearWires(); hideFrames();
+              hosts.A.classList.add("recv");
+              egress(["A"], "live");
+            }, 1150);
+          },
+          // 3 — C → B: learn cc:cc on Fa0/3 → table now complete (4/4)
+          () => {
+            clearHosts(); clearWires(); hideFrames();
+            sw.classList.add("busy");
+            hosts.C.classList.add("send");
+            narr.innerHTML =
+              "Finally <strong>PC C → PC B.</strong> Frame in on <strong>Fa0/3</strong> → learn <strong>cc:cc → Fa0/3</strong>. That's the <strong>last device</strong> — every MAC is now in the table, <strong>4 / 4</strong>.";
+            ingress("C", "live");
+            later(() => {
+              learn("C");
+              renderTable("C");
+            }, 560);
+            later(() => {
+              clearWires(); hideFrames();
+              hosts.B.classList.add("recv");
+              egress(["B"], "live");
+            }, 1150);
+          },
+          // 4 — fully converged: every frame is now a unicast, never a flood
           () => {
             clearHosts(); clearWires(); hideFrames();
             sw.classList.add("busy");
             hosts.A.classList.add("send");
             narr.innerHTML =
-              "Both MACs are now known, so <strong>A → D is a clean unicast</strong>. Only <strong>Fa0/1 and Fa0/4</strong> light up — B and C never see the frame, no flooding.";
+              "<strong>Table complete.</strong> With all four MACs learned, the switch <strong>unicasts every frame</strong> — here A → C lights only <strong>Fa0/1 + Fa0/3</strong>. Flooding only ever happened for that first unknown destination.";
             ingress("A", "live");
             later(() => {
-              hosts.D.classList.add("recv");
-              egress(["D"], "live");
+              hosts.C.classList.add("recv");
+              egress(["C"], "live");
             }, 720);
           },
         ];
@@ -10076,7 +10885,7 @@
           hideFrames();
           sw.classList.remove("busy");
           narr.innerHTML =
-            "Press <strong>START</strong> to send a frame from PC&nbsp;A to PC&nbsp;D — watch the link light up and the table fill in.";
+            "Press <strong>START</strong> — each PC sends in turn, so you can watch the switch learn <strong>all four MACs</strong> and the table fill to <strong>4 / 4</strong>.";
           nextBtn.disabled = false;
         }
 
@@ -10201,16 +11010,21 @@
           const s = steps[i];
           clearChanged();
           if (s.show) packet.style.opacity = "1";
-          s.set();
           activate(s.node);
           moveTo(s.node);
-          if (s.changed.length)
+          // Rewrite fields only when the packet has visually arrived,
+          // so students see the change happen AT the router.
+          if (s.changed.length) {
+            timers.push(setTimeout(() => s.set(), 720));
             timers.push(
               setTimeout(
                 () => s.changed.forEach((r) => r.classList.add("changed")),
-                380,
+                780,
               ),
             );
+          } else {
+            s.set();
+          }
           narr.innerHTML = s.narr;
           nextBtn.disabled = i >= steps.length - 1;
         }
@@ -10422,6 +11236,7 @@
         if (!slide) return;
 
         const packet = slide.querySelector("#rtPacket");
+        const packet2 = slide.querySelector("#rtPacket2"); // RIP racer in compare mode
         const rtrs = [...slide.querySelectorAll(".rt-rtr")]; // 0=R1, 1=R2, 2=R3
         const lines = {
           l12: slide.querySelector("#rl12"),
@@ -10432,6 +11247,8 @@
         const cfgEl = slide.querySelector("#rtConfig");
         const metricEl = slide.querySelector("#rtMetric");
         const narr = slide.querySelector("#rtNarr");
+        const pts = [...slide.querySelectorAll(".rt-panel .pt")];
+        const ptDefaults = pts.map((p) => p.textContent);
         const modeBtns = [...slide.querySelectorAll(".sim-btn[data-mode]")];
         const resetBtn = slide.querySelector("#rtReset");
 
@@ -10493,24 +11310,43 @@
             l.setAttribute("stroke", "#c9bfa8");
             l.setAttribute("stroke-width", "3");
           });
-          rtrs.forEach((r) => r.classList.remove("on"));
+          rtrs.forEach((r) => r.classList.remove("on", "land-o", "land-r"));
         }
+        // set a per-packet animation speed (compare mode races at different speeds)
+        function setSpeed(p, secs) {
+          p.style.transition =
+            "left " + secs + "s var(--ease-out-expo), top " + secs +
+            "s var(--ease-out-expo), opacity .3s ease, background .3s ease";
+        }
+        function park(p) {
+          p.style.opacity = "0";
+          p.style.left = C[0].x + "px";
+          p.style.top = C[0].y + "px";
+        }
+        // undo everything the compare/race view changed
+        function clearCompareUI() {
+          pts.forEach((p, i) => (p.textContent = ptDefaults[i]));
+          packet.style.transition = "";
+          packet2.style.transition = "";
+          park(packet2);
+        }
+
         function reset() {
           clearTimers();
           resetLinks();
+          clearCompareUI();
           modeBtns.forEach((b) => b.classList.remove("active"));
-          packet.style.opacity = "0";
-          packet.style.left = C[0].x + "px";
-          packet.style.top = C[0].y + "px";
+          park(packet);
           tableEl.innerHTML = '<span class="none">— pick a protocol —</span>';
           cfgEl.textContent = "";
           metricEl.innerHTML = "";
           narr.innerHTML =
-            "Pick <strong>Static</strong>, <strong>RIP</strong> or <strong>OSPF</strong> to see which path R1 chooses to reach 10.0.3.0/24 — and why the metric makes them disagree.";
+            "Pick <strong>Static</strong>, <strong>RIP</strong> or <strong>OSPF</strong> — or hit <strong>Race</strong> to send a RIP packet and an OSPF packet at once and watch which reaches 10.0.3.0/24 first.";
         }
 
         function run(mode) {
           clearTimers();
+          clearCompareUI();
           const d = data[mode];
           modeBtns.forEach((b) =>
             b.classList.toggle("active", b.dataset.mode === mode),
@@ -10525,9 +11361,7 @@
           metricEl.innerHTML = d.metric;
           narr.innerHTML = d.narr;
           packet.style.background = d.stroke;
-          packet.style.opacity = "0";
-          packet.style.left = C[0].x + "px";
-          packet.style.top = C[0].y + "px";
+          park(packet);
           rtrs.forEach((r) => r.classList.remove("on"));
           later(() => {
             packet.style.opacity = "1";
@@ -10545,8 +11379,93 @@
           });
         }
 
+        /* RACE: send both protocols' packets at once. OSPF takes the 2-hop
+           Gigabit path (fast); RIP takes the 1-hop serial (slow). Travel time
+           is proportional to bandwidth, so OSPF's packet arrives first despite
+           more hops — the whole point of why hop-count is a poor metric. */
+        function runCompare() {
+          clearTimers();
+          clearCompareUI();
+          modeBtns.forEach((b) =>
+            b.classList.toggle("active", b.dataset.mode === "compare"),
+          );
+          resetLinks();
+          // light both paths: green Gigabit (OSPF) + amber serial (RIP)
+          ["l12", "l23"].forEach((k) => {
+            lines[k].setAttribute("stroke", "#3a7d44");
+            lines[k].setAttribute("stroke-width", "6");
+          });
+          lines.l13.setAttribute("stroke", "#d9621a");
+          lines.l13.setAttribute("stroke-width", "6");
+
+          pts[0].textContent = "Both R1 routes";
+          pts[1].textContent = "Why they disagree";
+          pts[2].textContent = "Who arrives first";
+          tableEl.innerHTML =
+            '<span class="hot" style="color:#9fe0a8">O</span>&nbsp;&nbsp;10.0.3.0/24 [110/<strong style="color:#9fe0a8">2</strong>] via R2 — cost<br>' +
+            '<span class="hot">R</span>&nbsp;&nbsp;10.0.3.0/24 [120/<strong>1</strong>] via serial — hops';
+          cfgEl.textContent =
+            "RIP  → metric = hop count\n  serial = 1 hop  → RIP picks serial\nOSPF → metric = cost (bandwidth)\n  Gig×2 = 2  <  serial = 64\n  → OSPF picks the Gigabit path\nSame wires, different metric.";
+          metricEl.innerHTML =
+            '<div class="rt-score">' +
+            '<div class="row" id="scoreO"><span class="dot o"></span><span><strong>OSPF</strong> · 2× Gigabit</span><span class="pos"></span></div>' +
+            '<div class="row" id="scoreR"><span class="dot r"></span><span><strong>RIP</strong> · 1× serial T1</span><span class="pos"></span></div>' +
+            "</div>";
+          const scoreO = metricEl.querySelector("#scoreO");
+          const scoreR = metricEl.querySelector("#scoreR");
+          narr.innerHTML =
+            "<strong>Race.</strong> Same destination, same wires. <strong style=\"color:var(--amber)\">RIP</strong> counts hops and takes the 1-hop serial; <strong style=\"color:var(--moss)\">OSPF</strong> weighs bandwidth and takes the 2-hop Gigabit path. Watch which packet arrives first…";
+
+          packet.style.background = "#3a7d44";
+          packet2.style.background = "#d9621a";
+          setSpeed(packet, 0.7);
+          setSpeed(packet2, 2.4);
+          park(packet);
+          park(packet2);
+          rtrs.forEach((r) => r.classList.remove("on", "land-o", "land-r"));
+
+          later(() => {
+            packet.style.opacity = "1";
+            packet2.style.opacity = "1";
+            rtrs[0].classList.add("on");
+          }, 60);
+          // OSPF green: R1 → R2 → R3 (two fast hops)
+          later(() => {
+            packet.style.left = C[1].x + "px";
+            packet.style.top = C[1].y + "px";
+            rtrs[1].classList.add("on");
+          }, 160);
+          later(() => {
+            packet.style.left = C[2].x + "px";
+            packet.style.top = C[2].y + "px";
+          }, 1010);
+          later(() => {
+            rtrs[2].classList.add("on", "land-o");
+            scoreO.classList.add("lit");
+            const p = scoreO.querySelector(".pos");
+            p.textContent = "1st 🏁";
+            p.classList.add("win");
+          }, 1730);
+          // RIP amber: R1 → R3 (one slow hop), parked a touch lower so it doesn't hide the green dot
+          later(() => {
+            packet2.style.left = C[2].x + "px";
+            packet2.style.top = C[2].y + 18 + "px";
+          }, 160);
+          later(() => {
+            rtrs[2].classList.add("land-r");
+            scoreR.classList.add("lit");
+            const p = scoreR.querySelector(".pos");
+            p.textContent = "2nd";
+            p.classList.add("lose");
+            narr.innerHTML =
+              "<strong>OSPF's packet arrived first — with more hops.</strong> The Gigabit links move data far faster than the T1 serial, so 2 fast hops beat 1 slow hop. That is exactly why RIP's hop-count metric mis-chooses, and why OSPF weighs bandwidth instead.";
+          }, 2620);
+        }
+
         modeBtns.forEach((b) =>
-          b.addEventListener("click", () => run(b.dataset.mode)),
+          b.addEventListener("click", () =>
+            b.dataset.mode === "compare" ? runCompare() : run(b.dataset.mode),
+          ),
         );
         resetBtn.addEventListener("click", reset);
         reset();

@@ -25,7 +25,7 @@
   - [Step C5 — Open the browser and see the web page](#step-c5--open-the-browser-and-see-the-web-page)
   - [Step C6 — Watch DORA in Simulation Mode](#step-c6--watch-dora-in-simulation-mode)
 - [Lab C Questions](#lab-c-questions)
-- [Self-Check](#self-check)
+    - [Practice Exercises](#practice-exercises)
 - [Next Steps](#next-steps)
 
 ---
@@ -334,18 +334,23 @@ One box can serve **web pages**, **resolve names**, *and* serve files at once. W
   <em>Fig. 11 — 📸 <code>img/labC-step1-http.png</code>: the HTTP service On with its default <code>index.html</code> page.</em>
 </p>
 
-**2. Turn on DNS and add the names.** Click **Services → DNS**, set the service **On**, and add two **A records** pointing at this server:
+**2. Turn on DNS and add the names.** Click **Services → DNS**, set the service **On**, and add two **A records** pointing at this server. For each: type the **Name** and **Address**, leave Type = **A Record**, and click **Add**.
 
 | Name | Type | Address |
 |:---|:---:|:---|
 | `www.lab.local` | A | `192.168.0.98` |
 | `ftp.lab.local` | A | `192.168.0.98` |
 
-Type each Name + Address and click **Add**.
+<p align="center">
+  <img src="./img/DHCP%26DNS/labC-DNS-setting.png" alt="Adding an A record on the server's DNS service" width="760"><br>
+  <em>Fig. 12 — DNS service turned <strong>On</strong>; enter Name + Address and click <strong>Add</strong> (here <code>ftp.lab.local → 192.168.0.98</code>).</em>
+</p>
+
+After adding both, the **Resource Records** list shows the two names resolving to the one server:
 
 <p align="center">
-  <!-- ![DNS A records](./img/labC-step1-dns.png) -->
-  <em>Fig. 12 — 📸 <code>img/labC-step1-dns.png</code>: the DNS service On with the <code>www.lab.local</code> and <code>ftp.lab.local</code> A records (both → <code>192.168.0.98</code>).</em>
+  <img src="./img/DHCP%26DNS/labC-DNS-HTTP-table.png" alt="The DNS resource-records table with both A records" width="680"><br>
+  <em>Fig. 13 — Both A records: <code>ftp.lab.local</code> and <code>www.lab.local</code> → <code>192.168.0.98</code>.</em>
 </p>
 
 ## Step C2 — Configure DHCP pools on the router
@@ -378,11 +383,39 @@ R-CORE(dhcp-config)# dns-server 192.168.0.98
 R-CORE(dhcp-config)# end
 ```
 
-> 💡 **Why three pools?** A pool's `network` is tied to one subnet and one gateway. With three subnets behind the router you need **three pools** — the router picks the right one by which interface the request arrives on. The `dns-server 192.168.0.98` line is what makes every PC learn the resolver automatically (DHCP Option 6).
+**What each command does.** The config has two parts: a few **global** exclusions, then one **pool block** per subnet.
+
+| Command | Mode | What it does |
+|:---|:---|:---|
+| `ip dhcp excluded-address 192.168.0.1` | global config | **Reserves** the Engineering **gateway** so DHCP never leases it to a PC. (`.65` and `.97` do the same for the other two gateways.) |
+| `ip dhcp excluded-address 192.168.0.97 192.168.0.98` | global config | The two-address form reserves a **range** — here the Management gateway **and** the server. Without this, DHCP could hand out `.98` and collide with the server. |
+| `ip dhcp pool ENG` | global config | **Creates a pool** named `ENG` and drops you into pool-config mode (prompt changes to `(dhcp-config)#`). The name is just a label for *you*. |
+| `network 192.168.0.0 255.255.255.192` | dhcp-config | The **subnet to lease from** — every address in `192.168.0.0/26` *except* the excluded ones and the network/broadcast addresses. The mask is also handed to clients. |
+| `default-router 192.168.0.1` | dhcp-config | The **gateway** clients receive (**DHCP Option 3**). Must be this subnet's router interface, or PCs can't leave the subnet. |
+| `dns-server 192.168.0.98` | dhcp-config | The **DNS resolver** clients receive (**DHCP Option 6**) — the same for all three pools, since one server resolves names for everyone. |
+| `exit` | dhcp-config | Leaves pool-config so you can start the **next** pool. (`end` jumps straight back to privileged EXEC.) |
+
+> 🔑 **How does the router know which pool to use?** You don't tell it. When a PC's broadcast **DHCP Discover** arrives on an interface (say `g0/1`, which has IP `192.168.0.65`), the router looks at **that interface's own subnet** and serves the pool whose `network` matches — here `MKT`. So **the pool's `network` must line up with a router interface's subnet**, and the `default-router` should be that same interface's IP. That's why one router can run three pools at once and each department gets the right gateway automatically.
+
+**But how does it know which switch is ENG vs MKT vs MGT?** It doesn't — *not by name*. The router never sees "`SW-Eng`"; it only knows **which of its own interfaces a frame came in on**. The link is **the cabling**: each department's switch is wired to exactly **one** router interface, and you gave that interface an IP inside that department's subnet. So the chain is fixed by *how you plugged it in*:
+
+| Department | Switch | → cabled to router | Interface IP | matches `network` | Pool served |
+|:---|:---|:---:|:---|:---|:---:|
+| Engineering | `SW-Eng` | **`g0/0`** | `192.168.0.1` | `192.168.0.0/26` | **ENG** |
+| Marketing | `SW-Mkt` | **`g0/1`** | `192.168.0.65` | `192.168.0.64/27` | **MKT** |
+| Management | `SW-Mgt` | **`g0/2`** | `192.168.0.97` | `192.168.0.96/28` | **MGT** |
+
+Read a row left-to-right: a Marketing PC's Discover travels `SW-Mkt → g0/1`; the router sees it **arrived on `g0/1`**, whose `192.168.0.65` lives in `192.168.0.64/27`, so it answers from the **MKT** pool and hands back the `.65` gateway. The "department" is really just **a switch + a router interface + a subnet that all line up** — the names (`SW-Eng`, `ENG`) are only labels for *you*.
+
+> ⚠️ **This is the #1 thing to get right.** If you cable `SW-Mgt` into `g0/0` by mistake, Management PCs will be offered **Engineering** addresses (wrong subnet, wrong gateway) and nothing will route. The switch, the router interface, and the pool's `network` must all describe the **same subnet**.
+
+> 💡 **Why three pools (not one)?** A single pool serves a single `network`/gateway pair. Three departments = three subnets (`/26`, `/27`, `/28`) with three different gateways, so you need **three pools**. The `dns-server` line is identical in all three because one DNS server (`192.168.0.98`) answers for the whole company.
+
+> ⚠️ **Order & prompt matter:** set the `excluded-address` lines **before** PCs request leases (or the router may already have handed one out), and remember `network`/`default-router`/`dns-server` only work **inside** a pool (`R-CORE(dhcp-config)#`) — *after* `ip dhcp pool …`.
 
 <p align="center">
-  <!-- ![DHCP pools](./img/labC-step2-dhcp.png) -->
-  <em>Fig. 13 — 📸 <code>img/labC-step2-dhcp.png</code>: the router CLI after defining the three per-department DHCP pools.</em>
+  <img src="./img/DHCP%26DNS/labC-step2-dhcp.png" alt="Router CLI after defining the three DHCP pools" width="760"><br>
+  <em>Fig. 14 — The router CLI: the three excluded addresses, then one pool per department (ENG/MKT/MGT), each with its <code>network</code>, <code>default-router</code>, and the shared <code>dns-server 192.168.0.98</code>.</em>
 </p>
 
 ## Step C3 — Switch the PCs to DHCP
@@ -390,20 +423,26 @@ R-CORE(dhcp-config)# end
 On each PC: **Desktop → IP Configuration → DHCP**. Each PC drops its static address and **leases one from its department's pool**, plus the gateway and the DNS server (`192.168.0.98`).
 
 <p align="center">
-  <!-- ![PC to DHCP](./img/labC-step3-pcdhcp.png) -->
-  <em>Fig. 14 — 📸 <code>img/labC-step3-pcdhcp.png</code>: a PC switched to DHCP, showing the leased address, gateway, and DNS server.</em>
+  <img src="./img/DHCP%26DNS/labC-step3-pcdhcp.png" alt="A PC's IP Configuration set to DHCP" width="560"><br>
+  <em>Fig. 15 — PC1 set to <strong>DHCP</strong> — it leased <code>192.168.0.2</code> / <code>255.255.255.192</code> from the Engineering pool, no typing required.</em>
 </p>
 
 ## Step C4 — Verify: auto-address & reach the server by name
 
-First, on a PC's **Desktop → Command Prompt**:
+First, on a PC's **Desktop → Command Prompt**, check what DHCP gave you:
 
-1. `ipconfig /all` — confirm the **DHCP-leased** address, gateway, and **DNS Server `192.168.0.98`**.
-2. `ping www.lab.local` — the name resolves (via DNS) to `192.168.0.98` and replies. (`ftp.lab.local` works too.)
+1. `ipconfig /all` — confirm the **DHCP-leased** IPv4 address, the **gateway**, the **DHCP Server**, and the **DNS Server `192.168.0.98`** — all learned automatically.
 
 <p align="center">
-  <!-- ![Resolve by name](./img/labC-step4-verify.png) -->
-  <em>Fig. 15 — 📸 <code>img/labC-step4-verify.png</code>: a PC that DHCP-addressed itself, then resolves <code>www.lab.local</code> to <code>192.168.0.98</code> with <code>ping</code>.</em>
+  <img src="./img/DHCP%26DNS/labC-IPconfig.png" alt="ipconfig /all output on PC1" width="640"><br>
+  <em>Fig. 16 — <code>ipconfig /all</code>: IPv4 <code>192.168.0.2</code>, gateway <code>192.168.0.1</code>, <strong>DHCP Server</strong> <code>192.168.0.1</code>, and <strong>DNS Server</strong> <code>192.168.0.98</code>.</em>
+</p>
+
+2. `ping www.lab.local` — the **name** resolves (via DNS) to `192.168.0.98` and replies. (`ftp.lab.local` works too.)
+
+<p align="center">
+  <img src="./img/DHCP%26DNS/labC-ping-www.lab.local.png" alt="ping www.lab.local resolving to the server" width="540"><br>
+  <em>Fig. 17 — <code>ping www.lab.local</code> resolves to <code>192.168.0.98</code> and gets 4 replies — DNS is working.</em>
 </p>
 
 ## Step C5 — Open the browser and see the web page
@@ -415,8 +454,8 @@ Now the payoff — reach the site **by name** in a browser, exactly like the rea
 3. The page loads — with **no IP typed anywhere**.
 
 <p align="center">
-  <!-- ![Browse by name](./img/labC-step5-browser.png) -->
-  <em>Fig. 16 — 📸 <code>img/labC-step5-browser.png</code>: a PC's Web Browser showing the page at <code>http://www.lab.local</code> (resolved by your DNS server).</em>
+  <img src="./img/DHCP%26DNS/labC-step5-browser.png" alt="PC web browser showing the page at www.lab.local" width="680"><br>
+  <em>Fig. 18 — PC1's <strong>Web Browser</strong> open at <code>http://www.lab.local</code> — the server's page loads, no IP typed.</em>
 </p>
 
 **The key idea — the client always asks DNS *first*, then the web server.** A browser can only open a connection to an **IP address**, but you gave it a **name**. So that one click triggered **two separate conversations**:
@@ -432,17 +471,23 @@ Now the payoff — reach the site **by name** in a browser, exactly like the rea
 
 **See it happen (Simulation Mode):**
 
-1. Switch to **Simulation** (bottom-right) and **Edit Filters** → keep only **DNS** and **HTTP**.
-2. In the PC's Web Browser, type `http://www.lab.local` and click **Go**.
-3. Click **Play / Capture-Forward** and watch the order: a **DNS** packet leaves the PC for the server **first**; its reply comes back; **then** an **HTTP** packet goes to the server.
-4. Click each coloured packet → **PDU Information** to confirm: packet 1 is **DNS to UDP port 53**, packet 3 is **HTTP to TCP port 80**. Same destination IP, two different services — DNS answered before HTTP could even start.
-
-> 💡 This is the whole point of DNS: it lets people use memorable **names** while computers keep working in **numbers** — and the lookup always happens *before* the real connection.
+1. Switch to **Simulation** (bottom-right) → **Edit Filters** → keep only **DNS** and **HTTP** so nothing else clutters the view.
 
 <p align="center">
-  <!-- ![DNS then HTTP in Simulation](./img/labC-step5-dns-then-http.png) -->
-  <em>Fig. 17 — 📸 <code>img/labC-step5-dns-then-http.png</code>: Simulation Mode showing the <strong>DNS</strong> query/response, then the <strong>HTTP</strong> request — name-resolution-before-connection.</em>
+  <img src="./img/DHCP%26DNS/labC-fliter-edit.png" alt="Edit Filters set to DNS and HTTP" width="700"><br>
+  <em>Fig. 19 — <strong>Edit Filters</strong> → tick only <strong>DNS</strong> and <strong>HTTP</strong>.</em>
 </p>
+
+2. In the PC's Web Browser, type `http://www.lab.local` and click **Go**, then click **Play / Capture-Forward** and watch the order: a **DNS** packet leaves the PC **first**; its reply comes back; **then** an **HTTP** packet goes out.
+3. Click each coloured packet → **PDU Information → OSI Model** to read its layers. The **DNS** reply is **UDP, source port 53**; the **HTTP** reply is **TCP, source port 80** — same server IP (`192.168.0.98`), two different services, and **DNS answered before HTTP could even start**:
+
+<p align="center">
+  <img src="./img/DHCP%26DNS/labC-pdu-dns-53.png" alt="PDU showing the DNS reply on UDP port 53" width="440">
+  <img src="./img/DHCP%26DNS/labC-pdu-http-80.png" alt="PDU showing the HTTP reply on TCP port 80" width="440"><br>
+  <em>Fig. 20 &amp; 21 — Left: the <strong>DNS</strong> reply (Layer 4 <strong>UDP src port 53</strong>, Layer 7 DNS). Right: the <strong>HTTP</strong> reply (Layer 4 <strong>TCP src port 80</strong>, Layer 7 HTTP). Both from <code>192.168.0.98</code> — the lookup first, the page second.</em>
+</p>
+
+> 💡 This is the whole point of DNS: it lets people use memorable **names** while computers keep working in **numbers** — and the lookup always happens *before* the real connection.
 
 ## Step C6 — Watch DORA in Simulation Mode
 
@@ -451,8 +496,15 @@ Now the payoff — reach the site **by name** in a browser, exactly like the rea
 3. Step through the **Discover → Offer → Request → ACK** packets — the very messages you read in [Wireshark Lab A](./WIRESHARK_GUIDE.md#step-a2--read-the-four-dora-messages), now produced by *your* router.
 
 <p align="center">
-  <!-- ![DORA simulation](./img/labC-step6-dora.png) -->
-  <em>Fig. 18 — 📸 <code>img/labC-step6-dora.png</code>: the DORA exchange stepping through Simulation Mode.</em>
+  <img src="./img/DHCP%26DNS/labC-step6-dora.png" alt="DHCP packets stepping through Simulation Mode" width="700"><br>
+  <em>Fig. 22 — Simulation Mode: a DHCP packet travelling PC1 → SW-Eng → Router2 in the Event List.</em>
+</p>
+
+Click a DHCP packet → **PDU Information** to confirm it's a real DHCP message: **UDP, server port 67 → client port 68**, sent from the router (`192.168.0.1`) to the broadcast address.
+
+<p align="center">
+  <img src="./img/DHCP%26DNS/labC-DORA-ack.png" alt="PDU of a DHCP packet showing UDP ports 67 and 68" width="460"><br>
+  <em>Fig. 23 — A DHCP PDU: Layer 7 <strong>DHCP</strong>, Layer 4 <strong>UDP src 67 → dst 68</strong>, broadcast to <code>255.255.255.255</code> — exactly the DORA mechanics from Wireshark Lab A.</em>
 </p>
 
 ---
@@ -495,22 +547,23 @@ From the **DHCP ACK** — the `dns-server 192.168.0.98` line in each pool is del
 
 ---
 
-# Self-Check
+### Practice Exercises
+
+Work through these to prove the build end-to-end. **Tick each box** as you finish it, and save a screenshot or note of the result (e.g. into `S3/img/`).
 
 **Lab B — SSH & FTP:**
-- [ ] Reused the **Session 2 multi-subnet network** and added **FTP-server** at `192.168.0.98` on `SW-Mgt`
-- [ ] Router hardened: hostname + domain set, **RSA key generated**, `username`/`enable secret` set, vty lines **`transport input ssh`**
-- [ ] **SSH login** from a PC succeeds; **Telnet is refused**
-- [ ] FTP service **On**; a file **`put`/`get`** succeeds from a PC on another subnet
-- [ ] Can explain why **SSH is safe to sniff but FTP is not**
+- [ ] **1. Harden + log in.** Configure SSH on the router, then `ssh -l admin 192.168.0.1` from a PC. *Record:* the `R-CORE#` prompt reached over SSH, and confirm `telnet 192.168.0.1` is **refused**.
+- [ ] **2. Move a file across subnets.** From a PC in another department, `ftp 192.168.0.98`, log in as `student`, and `put` then `get` a file. *Record:* a successful round-trip (it crossed the `2911` router).
+- [ ] **3. Why FTP is unsafe.** *Record:* in one line, why a sniffer can read your FTP login but not your SSH session — and what to use instead (**SFTP/FTPS**).
 
-**Lab C — DHCP & DNS (same file):**
-- [ ] **HTTP + DNS** services **On** on the server, with `www.lab.local` / `ftp.lab.local` → `192.168.0.98` A records
-- [ ] **Three** DHCP pools defined (ENG/MKT/MGT), with the gateways and server **excluded**
-- [ ] All PCs switched to **DHCP** and leased a correct per-department address
-- [ ] A PC opens **`http://www.lab.local`** in the browser and the page loads (DNS → HTTP)
-- [ ] Stepped the **DORA** exchange in Simulation Mode
-- [ ] Screenshots saved into [`S3/img/`](./img/) and rendering in this guide
+**Lab C — DHCP & DNS:**
+- [ ] **4. Auto-address a PC.** Switch a PC to **DHCP**, then run `ipconfig /all`. *Record:* the leased IP, gateway, **DHCP Server**, and **DNS Server** it received — and which **pool** it came from.
+- [ ] **5. Reach the server by name.** From a PC, `ping www.lab.local`, then open **`http://www.lab.local`** in the Web Browser. *Record:* the page loading with **no IP typed anywhere**.
+- [ ] **6. See DNS-then-HTTP.** In **Simulation Mode** (filter DNS + HTTP), browse the name. *Record:* that a **DNS / UDP-53** packet fires **before** the **HTTP / TCP-80** packet.
+- [ ] **Stretch — break the cabling on purpose.** Move `SW-Mgt`'s uplink to the **wrong** router interface (`g0/0` instead of `g0/2`) and renew a Management PC. *Record:* the **wrong (Engineering) address** it now leases, and explain — using the switch → interface → subnet → pool chain — why it broke.
+
+> [!TIP]
+> Treat each *Record* line as your deliverable — together they prove you can **secure** a router (SSH), **serve** files and pages (FTP/HTTP/DNS), and make a network **self-configure** (DHCP) — then diagnose it when the wiring is wrong.
 
 ---
 

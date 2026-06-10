@@ -15,6 +15,7 @@
   - [Step A4 — Capture DNS while browsing](#step-a4--capture-dns-while-browsing)
   - [Step A5 — Inspect the DNS query \& response](#step-a5--inspect-the-dns-query--response)
   - [Lab A Questions](#lab-a-questions)
+  - [Practice Exercises](#practice-exercises)
 - [Next Steps](#next-steps)
 
 ---
@@ -37,6 +38,11 @@ When a device joins a network it has no IP yet, so it asks for one. **DHCP** (Dy
 | 4 | **A**ck | Server → client | "It's yours — here's your lease, gateway, and DNS server." |
 
 > Only **Request** and **ACK** are *mandatory* — Discover/Offer can be skipped when a host simply **renews** an address it already had. All four messages of one exchange share a single **Transaction ID (xid)**, which is how the client matches the Offer/ACK to its own Discover/Request.
+
+<p align="center">
+  <img src="./img/wireshark_DHCP%26DNS/dhcp_client_server_interaction.png" alt="Diagram of the DHCP DORA client-server interaction" width="420"><br>
+  <em>Fig. 1 — The DORA exchange between a DHCP server and an arriving client: each message carries the offered address (<code>yiaddr</code>), the shared transaction ID, and the lease lifetime.</em>
+</p>
 
 DHCP runs over **UDP** — server port **67**, client port **68**. Once addressed, the device uses **DNS** (Domain Name System, **UDP port 53**) to turn names like `gaia.cs.umass.edu` into IP addresses via a **query → response** to its **local DNS server**.
 
@@ -66,9 +72,11 @@ Wait a few seconds after the renew, then **stop** the capture.
 
 > Can't capture live (or didn't catch all four)? Use the author's trace **`dhcp-wireshark-trace1-1.pcapng`** from `gaia.cs.umass.edu/wireshark-labs/wireshark-traces-9e.zip`.
 
+Apply the **`dhcp`** filter and you should see the four messages in order — all sharing **one Transaction ID** (here `0x184eabb6`):
+
 <p align="center">
-  <!-- ![DORA capture](./img/labA-step1-dora.png) -->
-  <em>Fig. 1 — 📸 <code>img/labA-step1-dora.png</code>: the <code>dhcp</code> filter showing Discover, Offer, Request, and ACK.</em>
+  <img src="./img/wireshark_DHCP%26DNS/labA-step1-dora.png" alt="Wireshark dhcp filter showing Discover, Offer, Request, ACK" width="900"><br>
+  <em>Fig. 2 — The <code>dhcp</code> filter showing <strong>Discover → Offer → Request → ACK</strong>. Note the addresses: Discover and Request come <strong>from <code>0.0.0.0</code> to the <code>255.255.255.255</code> broadcast</strong> (the client has no IP yet); Offer and ACK come <strong>from the server <code>172.20.0.1</code> to the client <code>172.20.2.203</code></strong> — and all four share xid <code>0x184eabb6</code>.</em>
 </p>
 
 ### Step A2 — Read the four DORA messages
@@ -82,11 +90,34 @@ Type **`dhcp`** (older builds: **`bootp`**) in the filter, then click each messa
 | **Request** | `0.0.0.0` | `255.255.255.255` | UDP **source port 68 → destination port 67**; same Transaction ID |
 | **ACK** | the DHCP server's IP | client | **Your (client) IP Address**, **IP Address Lease Time**, **Router** (gateway), **Domain Name Server** |
 
-Expand the **ACK → Dynamic Host Configuration Protocol → Options** to read the **lease time**, **router (gateway)**, and **DNS server** you were granted — these are the values that let your host reach the rest of the network.
+Here is each of the four, expanded in Wireshark (all share Transaction ID `0x184eabb6`):
+
+**① Discover** — the client (`0.0.0.0`) broadcasts "is anyone a DHCP server?" — a *Boot Request* over UDP **68 → 67**, with a **Parameter Request List** naming the options it wants.
 
 <p align="center">
-  <!-- ![ACK options](./img/labA-step2-ack-options.png) -->
-  <em>Fig. 2 — 📸 <code>img/labA-step2-ack-options.png</code>: the DHCP <strong>ACK</strong> with the assigned IP, lease time, Router, and DNS Server options expanded.</em>
+  <img src="./img/wireshark_DHCP%26DNS/dhcp_discover.png" alt="DHCP Discover packet expanded in Wireshark" width="840"><br>
+  <em>Fig. 3 — <strong>Discover</strong>: Boot Request, Client IP <code>0.0.0.0</code>, Message Type = Discover, plus the <strong>Parameter Request List</strong> (subnet mask, router, DNS…).</em>
+</p>
+
+**② Offer** — a server replies (*Boot Reply*, UDP **67 → 68**) proposing an address in the **Your (client) IP address** field, with the lease, mask, router, and DNS options attached.
+
+<p align="center">
+  <img src="./img/wireshark_DHCP%26DNS/dhcp_offer.png" alt="DHCP Offer packet expanded in Wireshark" width="840"><br>
+  <em>Fig. 4 — <strong>Offer</strong>: <strong>Your (client) IP address <code>172.20.2.203</code></strong>, DHCP Server Identifier <code>192.168.99.2</code>, with Lease Time, Subnet Mask, Router, and Domain Name Server options.</em>
+</p>
+
+**③ Request** — the client broadcasts that it accepts that offer, echoing the chosen address in **Option 50 (Requested IP Address)** and the chosen server in **Option 54**.
+
+<p align="center">
+  <img src="./img/wireshark_DHCP%26DNS/dhcp_request.png" alt="DHCP Request packet expanded in Wireshark" width="840"><br>
+  <em>Fig. 5 — <strong>Request</strong>: Message Type = Request, <strong>Option 50 Requested IP <code>172.20.2.203</code></strong>, Option 54 DHCP Server Identifier <code>192.168.99.2</code>.</em>
+</p>
+
+**④ ACK** — the server confirms (UDP **67 → 68**); the lease is now official. Expand its **Options** to read the **lease time**, **Router (gateway)**, **Subnet Mask**, and **Domain Name Server** — the values that let your host reach the rest of the network.
+
+<p align="center">
+  <img src="./img/wireshark_DHCP%26DNS/dhcp_ack.png" alt="DHCP ACK packet expanded in Wireshark" width="840"><br>
+  <em>Fig. 6 — <strong>ACK</strong>: Message Type = ACK, Your IP <code>172.20.2.203</code>, plus Lease Time, Subnet Mask <code>255.255.240.0</code>, Router, and Domain Name Server.</em>
 </p>
 
 ---
@@ -106,8 +137,8 @@ nslookup 128.119.245.12        # reverse — an IP → its name (gaia.cs.umass.e
 The output names **which DNS server answered** and whether the answer is **authoritative** (from the domain's own server) or **non-authoritative** (served from a cache). *(More on the nslookup output in the [Session 2 UDP lab](../S2/WIRESHARK_GUIDE.md#what-nslookup-is-and-why-it-uses-udp).)*
 
 <p align="center">
-  <!-- ![nslookup A and NS](./img/labA-step3-nslookup.png) -->
-  <em>Fig. 3 — 📸 <code>img/labA-step3-nslookup.png</code>: an <code>nslookup</code> A query and a <code>-type=NS</code> query.</em>
+  <img src="./img/wireshark_DNS/labA-step3-nslookup.png" alt="nslookup A, NS, and reverse queries" width="480"><br>
+  <em>Fig. 7 — <code>nslookup www.iitb.ac.in</code> (A record → <code>103.21.124.133</code>), <code>nslookup -type=NS umass.edu</code> (the <code>ns1/ns2/ns3.umass.edu</code> name servers), and a reverse lookup of <code>128.119.245.12</code> → <code>gaia.cs.umass.edu</code>.</em>
 </p>
 
 ### Step A4 — Capture DNS while browsing
@@ -120,25 +151,63 @@ The output names **which DNS server answered** and whether the answer is **autho
    ```
 2. Clear your **browser** cache, then **start a capture**.
 3. Visit **`http://gaia.cs.umass.edu/kurose_ross/`** and **stop** the capture.
-4. Filter **`dns`**. Find the **Standard query** that resolves `gaia.cs.umass.edu` and its matching **Standard query response** (Wireshark pairs them by the same Transaction ID).
+4. Filter on **just this name** so every other lookup disappears:
+   ```text
+   dns.qry.name == "gaia.cs.umass.edu"
+   ```
+   (Plain **`dns`** works too, but `dns.qry.name == "…"` shows *only* the packets asking about this one host — far easier to read.)
+
+**Reading the packet list.** Each row is one DNS message; the **Info** column says which is which. Match the colours to the screenshot below:
+
+| In the **Info** column | What it is |
+|:---|:---|
+| `Standard query 0x8d6a A gaia.cs.umass.edu` | a **query** — your PC *asking* for the **A** (IPv4) record |
+| `Standard query response 0x8d6a A … 128.119.245.12` | the **response** — the server *answering* with the address |
+| the matching **`0x8d6a`** | the **Transaction ID** that pairs a query with its response |
+| **Source / Destination** | your PC (`172.20.2.203`) ↔ your DNS server (`192.168.99.2`) |
+
+Wireshark even cross-links the pair: click the **query** and the DNS layer shows **`[Response In: 5794]`**; click the **response** and it shows **`[Request In: 5791]`**.
 
 <p align="center">
-  <!-- ![DNS capture](./img/labA-step4-dns-capture.png) -->
-  <em>Fig. 4 — 📸 <code>img/labA-step4-dns-capture.png</code>: the DNS query/response pair generated by loading the page.</em>
+  <img src="./img/wireshark_DNS/1.png" alt="dns.qry.name filter showing query and response packets for gaia.cs.umass.edu" width="780"><br>
+  <em>Fig. 8 — Filtered by <code>dns.qry.name == "gaia.cs.umass.edu"</code>: the <strong>Standard query</strong> rows and their matching <strong>Standard query response</strong> rows, paired by Transaction ID. (You'll see two pairs — the browser sends an <strong>A</strong> query <em>and</em> an <strong>HTTPS</strong>-type query.)</em>
 </p>
 
 ### Step A5 — Inspect the DNS query & response
 
-Select the query, then the response, and confirm:
+Click a packet and expand its layers in the middle pane. Read it top-down (Frame → Ethernet → IP → UDP → DNS); the two parts that matter are **UDP** (the ports) and **Domain Name System** (the question and answer).
 
-- Both ride **UDP**; the **query's destination port is 53** and the **response's source port is 53**.
-- The **IP the query was sent to** is your **local / default DNS server** (the one DHCP handed you in the ACK).
-- Expand **Queries** and **Answers**: the **query** has **1 question, 0 answers**; the **response** echoes that **1 question** plus **one or more answers**.
-- Read each answer's **record type** — **A** (IPv4), **AAAA** (IPv6), **CNAME** (alias), or **NS** (name server) — and the address it returns.
+**The query — Fig. 9.** Expand **User Datagram Protocol**: the **Destination Port is `53`** (the well-known DNS port); the source is a random high port your PC picked. Then expand **Domain Name System (query)**:
+
+- **Transaction ID `0x8d6a`** — the tag the response must echo back.
+- **Flags `0x0100 Standard query`** — the "this is a question" marker.
+- **Questions: 1 · Answer RRs: 0** — one thing asked, nothing answered yet.
+- **Queries → `gaia.cs.umass.edu: type A`** — the exact name and record type requested.
+- **`[Response In: 5794]`** — Wireshark's clickable link to the reply.
 
 <p align="center">
-  <!-- ![DNS response answers](./img/labA-step5-dns-response.png) -->
-  <em>Fig. 5 — 📸 <code>img/labA-step5-dns-response.png</code>: the DNS response Answers section with the A record for <code>gaia.cs.umass.edu</code>.</em>
+  <img src="./img/wireshark_DNS/2.png" alt="The DNS query: UDP to port 53, Questions 1, Answer RRs 0" width="780"><br>
+  <em>Fig. 9 — The <strong>query</strong> for <code>gaia.cs.umass.edu</code>: <strong>UDP → Dst Port 53</strong>, Transaction ID <code>0x8d6a</code>, <strong>Questions: 1, Answer RRs: 0</strong> — you're asking, not telling.</em>
+</p>
+
+**The response — Fig. 10.** Select the matching reply (same `0x8d6a`). In **UDP**, the **Source Port is now `53`** — the ports have **swapped** (server → you). In **Domain Name System (response)**:
+
+- Same **Transaction ID `0x8d6a`** — proof it answers *your* query.
+- **Flags `0x8180 Standard query response, No error`**.
+- **Questions: 1 · Answer RRs: 1** — it repeats your question and adds **one answer**.
+- **Answers → `gaia.cs.umass.edu: type A, addr 128.119.245.12`** — the actual **name → IPv4** mapping. *This is the line that lets your browser connect.*
+- **`[Request In: 5791]`** and **`[Time: … ms]`** — the matching query, and how long the lookup took.
+
+<p align="center">
+  <img src="./img/wireshark_DNS/4.png" alt="The DNS response carrying the A record answer" width="780"><br>
+  <em>Fig. 10 — The <strong>response</strong> (Transaction ID <code>0x8d6a</code>): UDP <strong>Src Port 53</strong>, <strong>Answer RRs: 1</strong> — an <strong>A</strong> record resolving <code>gaia.cs.umass.edu → 128.119.245.12</code>.</em>
+</p>
+
+> 💡 **Not every response carries an address.** Modern browsers also fire an **HTTPS-type** query (an HTTP/3 hint). Because this host has no `HTTPS` record, the reply comes back with **Answer RRs: 0** plus an **Authority** (**SOA**) record — the zone's authority info instead of an address. It's perfectly normal; the **A** response in Fig. 10 is the one that actually resolved the name.
+
+<p align="center">
+  <img src="./img/wireshark_DNS/3.png" alt="A DNS response with an authority SOA record and no answers" width="780"><br>
+  <em>Fig. 11 — The browser's <strong>HTTPS-type</strong> query response (Transaction ID <code>0x3e15</code>): <strong>Answer RRs: 0, Authority RRs: 1</strong> — an SOA record, no address.</em>
 </p>
 
 ### Lab A Questions
@@ -208,6 +277,22 @@ The **query** has **1 question and 0 answers** (you're asking, not telling). The
 
 An **`A`** record maps name → IPv4 (**`AAAA`** → IPv6). A **`-type=NS`** query returns the **authoritative name servers** for a domain (and usually their IPs "for free"). With **caching**, a second lookup of a name you just resolved sends **no DNS query at all** — your host (or the local server) answers from its **resolver cache** until the record's TTL expires, which is why clearing the cache (Step A4) is needed to *see* the query on the wire.
 </details>
+
+---
+
+### Practice Exercises
+
+Work through these on your own to lock in DHCP and DNS. **Tick each box** as you finish it, and save a screenshot or note of the result.
+
+- [ ] **1. Capture your own DORA.** Force a release + renew while capturing, then filter **`dhcp`**. *Record:* the **Transaction ID** shared by all four messages, and confirm Discover/Request are `0.0.0.0 → 255.255.255.255` while Offer/ACK come from the server.
+- [ ] **2. Read the ACK.** Open the **DHCP ACK** and expand its **Options**. *Record:* the **assigned IP** (Your client IP), the **lease time**, the **Router** (gateway), and the **Domain Name Server** — these are what your host now uses.
+- [ ] **3. Three nslookups.** Run `nslookup <a-name>`, `nslookup -type=NS <a-domain>`, and a **reverse** lookup of an IP. *Record:* the A address returned, the domain's name servers, and which DNS server answered (authoritative or not).
+- [ ] **4. Catch a live DNS lookup.** Flush your DNS cache, capture, browse to a fresh site, then filter `dns.qry.name == "<that host>"`. *Record:* the **query's destination port** and the **response's source port**, and the **Questions/Answer RRs** counts in each.
+- [ ] **5. Find the answer.** In the matching **response**, open **Answers**. *Record:* the **record type** (A / AAAA / CNAME) and the **IP address** the name resolved to.
+- [ ] **Stretch — Prove caching.** Run the same `nslookup` (or browse the same name) **twice** while capturing. *Record:* why the **second** lookup sends **no DNS packet** — and what clears the cache so it does.
+
+> [!TIP]
+> Treat each *Record* line as your deliverable — together they prove you can read a full **DORA** exchange, decode the **ACK options**, and follow a **DNS query → response** to the address that lets a connection happen.
 
 ---
 
