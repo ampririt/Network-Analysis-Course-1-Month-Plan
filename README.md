@@ -30,14 +30,6 @@ This course introduces students to the fundamentals of network analysis — from
 - [Session 3 — Network Services: DHCP, DNS & ARP](/S3/README.md)
 - [Session 4 — Routing, Switching & VLANs](/S4/README.md)
 
-## Recommended Supplementary Tools
-
-| Tool | Purpose | When Introduced |
-|------|---------|-----------------|
-| **tcpdump / tshark** | CLI-based packet capture | Session 4 |
-| **Nmap** | Network scanning & discovery | Session 3 |
-| **NetworkMiner** | Network forensics & file extraction | Session 3 |
-| **Scapy (Python)** | Custom packet crafting | Optional / Advanced |
 
 ---
 

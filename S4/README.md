@@ -1,5 +1,7 @@
 ## Session 4 — Routing, Switching & VLANs
 
+> 🌐 **English** | [日本語](./README.ja.md)
+
 - [Session 4 — Routing, Switching \& VLANs](#session-4--routing-switching--vlans)
   - [Lecture](#lecture)
   - [Break (10 min)](#break-10-min)
@@ -11,8 +13,8 @@
   - [Deep Dive: Switching, Routing \& Useful `show` Commands](#deep-dive-switching-routing--useful-show-commands)
     - [MAC Table vs. Routing Table](#mac-table-vs-routing-table)
     - [Static vs. Dynamic Routing](#static-vs-dynamic-routing)
-    - [Administrative Distance](#administrative-distance-who-wins-when-sources-disagree)
-    - [Verify Commands](#verify-commands-packet-tracer--ios)
+    - [Administrative Distance (who wins when sources disagree)](#administrative-distance-who-wins-when-sources-disagree)
+    - [Verify Commands (Packet Tracer / IOS)](#verify-commands-packet-tracer--ios)
   - [Homework](#homework)
 
 
@@ -27,8 +29,7 @@
 - **Dynamic Routing Protocols**: Distance-vector (RIP) vs. link-state (OSPF) at a high level — how routers learn paths automatically
 - **Inter-VLAN Routing**: Router-on-a-Stick concept, sub-interfaces, vs. Layer 3 switch (SVI) approach
 - **Subnetting Refresher**: Network/host portions, subnet mask, CIDR notation, calculating usable hosts & subnet ranges
-- **First-Hop & Address Services**: Default gateway role, ARP at Layer 2, DHCP relay across subnets
-- **Packet Walk-through**: Trace a single packet PC → switch → router → switch → PC, watching MAC rewrites vs. IP preservation at each hop
+
 
 ### Break (10 min)
 - Step away, stretch, and grab a drink before diving into the hands-on labs.
@@ -40,7 +41,7 @@
 
 ---
 
-**Lab A — Cisco Packet Tracer: "Small Office Network" Mega-Lab (~55 min)**
+**Lab A — Cisco Packet Tracer: "Small Office Network" Mega-Lab**
 
 > [!IMPORTANT]
 > This is the core infrastructure lab of the course. Students build a realistic office network from scratch.
@@ -52,12 +53,18 @@ Build a 6-PC, 2-switch, 1-router office with **three VLANs** (Admin / Sales / IT
 
 ---
 
-**Lab B — Wireshark: VLAN & Routing Traffic Analysis (~25 min)**
+**Lab B — Cisco Packet Tracer: Routing Comparison — Static vs. RIP vs. OSPF**
 
-Read VLANs and routing straight out of a capture. You'll filter `vlan` to find VLAN IDs, expand the Ethernet header to inspect the **802.1Q tag** (TPID `0x8100`), filter `icmp` to watch **TTL decrement at each router hop**, and use **Statistics → Endpoints / Conversations** to map the active subnets and inter-VLAN flows.
+Build **one** 3-router topology (R1–R2–R3 in a line, each with a LAN behind it) and make PC1 ping PC3 **three different ways** — so you can feel the trade-offs between the routing methods first-hand on the *same* network.
+
+1. **Static** — hand-type `ip route` on every router for each remote LAN. It works, but notice how many lines you wrote and that nothing recovers if a link drops.
+2. **RIP** — wipe the static routes, enable `router rip` / `version 2` / `network …`. Watch routes appear automatically; check the **hop-count** metric and AD **120** in `show ip route`.
+3. **OSPF** — remove RIP, enable `router ospf 1` + `network … area 0`. Compare its **cost** metric (bandwidth-based) and AD **110**, then unplug the R1–R2 link and watch OSPF **reconverge** onto the backup path.
+
+Verify each stage with `show ip route`, `show ip protocols`, and `traceroute` from PC1 to PC3 — the routing table's source code (`S` / `R` / `O`) tells you which method is in charge.
 
 > 📖 **Full instructions, figures, and questions:**
-> 👉 **[Wireshark — Lab B: VLAN & Routing Traffic Analysis](./WIRESHARK_GUIDE.md)**
+> 👉 **[Packet Tracer — Lab B: Routing Comparison (Static / RIP / OSPF)](./PACKET_TRACER_GUIDE.md#lab-b--routing-comparison-static-vs-rip-vs-ospf)**
 
 ---
 
