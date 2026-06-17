@@ -30,6 +30,17 @@ This course introduces students to the fundamentals of network analysis — from
 - [Session 3 — Network Services: DHCP, DNS & ARP](/S3/README.md)
 - [Session 4 — Routing, Switching & VLANs](/S4/README.md)
 
+---
+
+## Bonus — Interactive Resources
+
+Standalone, browser-based extras to explore on your own — just open the HTML file, no install needed:
+
+| Resource | What it is |
+|----------|-----------|
+| **Network Fundamentals Simulator**<br>(network_simulation.html) | An interactive playground for the core concepts — **OSI encapsulation**, the **TCP 3-way handshake**, a packet's journey, **DNS/ARP** walkthroughs, and **IP/IPv6/subnet** calculators. *(Japanese UI)* |
+| **PacketLens — Packet Analyzer**<br>(wireshark_explain/index.html) | A Wireshark-style "signal analyzer" that teaches **how to read packets**: capture → analyze, **protocol dissection** (HTTP / TCP / DNS), packet stream, and **hex · ASCII** field views — all from safe simulated captures (no bytes on the wire). |
+| **Shell & Scripting for Network Engineers**<br>(shell_scripting_for_network_engineers.html) | A 53-slide interactive deck on automating the command line in **Bash & PowerShell** side by side — network commands (`ping`, `dig`, `netstat`, `curl`), pipes & filters (`grep`, `awk`, `tee`), writing your first script step by step, loops / conditionals / functions, a 5-script toolkit, and **cron / Task Scheduler**. Click any code to explain it; adjustable text size. |
 
 ---
 

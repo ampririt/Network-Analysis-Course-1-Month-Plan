@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PACKETLENS // signal analyzer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#060a0b;       --bg2:#0a1011;
+    --panel:#0a1112;    --panel2:#0d1718;   --cap:#091112;
+    --line:#15211f;     --line2:#21332f;
+    --text:#bdd2cb;     --dim:#62786f;      --faint:#3c4d48;
+    --phos:#5ef38c;     --phos-d:#39c873;
+    --amber:#ffb454;    --cyan:#52d6e6;     --rose:#f56b8c;
+    --violet:#9b8cf5;   --sel:rgba(94,243,140,.09);
+    --font-display:'Chakra Petch',sans-serif;
+    --font-mono:'IBM Plex Mono','SF Mono',Menlo,monospace;
+    --font-read:'Newsreader',Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:
+      radial-gradient(120% 80% at 50% -10%, #0c1718 0%, var(--bg) 55%, #04080a 100%);
+    color:var(--text); font-family:var(--font-mono); font-size:13px;
+    display:flex; flex-direction:column; height:100vh; overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---- atmosphere: scanlines + grain (non-interactive) ---- */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:9998; pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px);
+    mix-blend-mode:multiply; opacity:.5;
+  }
+  body::after{
+    content:""; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:.045;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ============ top device bar ============ */
+  .menubar{
+    display:flex; align-items:center; gap:22px; padding:9px 16px;
+    background:linear-gradient(180deg,#0c1516,#070d0e);
+    border-bottom:1px solid var(--line2); position:relative;
+  }
+  .brand{
+    font-family:var(--font-display); font-weight:700; font-size:16px; letter-spacing:2px;
+    color:var(--phos); text-shadow:0 0 12px rgba(94,243,140,.45); white-space:nowrap;
+  }
+  .brand .mk{color:var(--amber); margin-right:6px; text-shadow:0 0 12px rgba(255,180,84,.5)}
+  .brand .sub{
+    color:var(--dim); font-family:var(--font-mono); font-weight:500; font-size:10px;
+    letter-spacing:3px; margin-left:10px; text-shadow:none;
+  }
+  .menubar .nav{display:flex; gap:18px}
+  .menubar .nav span{
+    color:var(--faint); font-size:10.5px; letter-spacing:2px; text-transform:uppercase; cursor:default;
+    transition:color .15s;
+  }
+  .menubar .nav span:hover{color:var(--dim)}
+  .menubar .spacer{flex:1}
+  .rec{display:flex; align-items:center; gap:8px; color:var(--dim); font-size:10.5px; letter-spacing:2px}
+  .rec .led{width:8px;height:8px;border-radius:50%;background:var(--rose);box-shadow:0 0 8px var(--rose);animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+  #clock{color:var(--phos); text-shadow:0 0 8px rgba(94,243,140,.4)}
+  /* travelling scan line under the bar */
+  .menubar .scan{position:absolute; left:0; bottom:-1px; height:1px; width:100%; overflow:hidden}
+  .menubar .scan::after{content:""; position:absolute; top:0; left:-30%; width:30%; height:100%;
+    background:linear-gradient(90deg,transparent,var(--phos),transparent); animation:sweep 4.5s linear infinite; opacity:.7}
+  @keyframes sweep{to{left:130%}}
+
+  /* ============ filter / command line ============ */
+  .toolbar{
+    display:flex; gap:10px; align-items:center; padding:10px 16px;
+    background:var(--panel); border-bottom:1px solid var(--line);
+  }
+  .cmd{position:relative; flex:1}
+  .cmd .prompt{
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:var(--phos); font-weight:600; pointer-events:none; letter-spacing:1px; opacity:.8;
+  }
+  .filter-input{
+    width:100%; background:#040908; border:1px solid var(--line2); color:var(--phos);
+    padding:9px 12px 9px 34px; border-radius:3px; font-family:var(--font-mono); font-size:12.5px;
+    letter-spacing:.5px; transition:border-color .15s, box-shadow .15s;
+  }
+  .filter-input::placeholder{color:var(--faint); letter-spacing:.5px}
+  .filter-input:focus{outline:none; border-color:var(--phos-d); box-shadow:0 0 0 1px rgba(94,243,140,.25),0 0 18px rgba(94,243,140,.12)}
+  .filter-input.invalid{border-color:var(--rose); color:var(--rose)}
+  .qbtn{
+    background:transparent; border:1px solid var(--line2); color:var(--dim);
+    padding:7px 13px; border-radius:3px; cursor:pointer; font-family:var(--font-display);
+    font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; transition:all .15s;
+  }
+  .qbtn:hover{color:var(--text); border-color:var(--dim)}
+  .qbtn.active{
+    color:var(--bg); background:var(--phos); border-color:var(--phos);
+    box-shadow:0 0 16px rgba(94,243,140,.35);
+  }
+
+  /* ============ pane scaffolding ============ */
+  .panes{display:flex; flex-direction:column; flex:1; min-height:0}
+  .pane{display:flex; flex-direction:column; min-height:0; min-width:0}
+  .list-pane{flex:1 1 40%; border-bottom:2px solid var(--line2)}
+  .bottom{display:flex; flex:1 1 60%; min-height:150px}
+  .det{flex:1 1 56%; border-right:2px solid var(--line2)}
+  .byt{flex:1 1 44%; background:#050a0b}
+  .pane-cap{
+    display:flex; align-items:center; gap:10px; padding:6px 14px;
+    background:var(--cap); border-bottom:1px solid var(--line);
+    font-family:var(--font-display); font-size:10.5px; font-weight:600; letter-spacing:2.5px;
+    text-transform:uppercase; color:var(--phos-d); white-space:nowrap;
+  }
+  .pane-cap .ic{color:var(--amber)}
+  .pane-cap .cap-sub{color:var(--faint); font-family:var(--font-mono); font-weight:400; letter-spacing:1px; margin-left:auto}
+  .pane-body{flex:1; overflow:auto; min-height:0}
+
+  /* ============ packet list ============ */
+  table.plist{border-collapse:collapse; width:100%; font-size:12px}
+  table.plist thead th{
+    position:sticky; top:0; z-index:2; text-align:left; user-select:none;
+    background:#0a1213; color:var(--dim); font-family:var(--font-display);
+    font-weight:600; font-size:10px; letter-spacing:2px; text-transform:uppercase;
+    padding:7px 10px; border-bottom:1px solid var(--line2);
+  }
+  table.plist tbody tr{
+    cursor:pointer; border-left:3px solid var(--pc,transparent);
+    animation:rowin .4s both; transition:background .12s;
+  }
+  @keyframes rowin{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+  table.plist td{
+    padding:5px 10px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    border-bottom:1px solid rgba(255,255,255,.025);
+  }
+  table.plist tbody tr:hover{background:rgba(94,243,140,.045)}
+  table.plist tbody tr.selected{
+    background:var(--sel); border-left-width:3px;
+    box-shadow:inset 0 0 0 9999px rgba(94,243,140,.02);
+  }
+  table.plist tr.selected td{color:#e6fff0}
+  td.num,td.len{text-align:right; color:var(--dim); font-variant-numeric:tabular-nums}
+  tr.selected td.num,tr.selected td.len{color:var(--phos)}
+  td.info{max-width:0; width:100%; color:var(--dim)}
+  tr.selected td.info{color:var(--text)}
+  .col-no{width:50px} .col-time{width:100px} .col-src{width:148px}
+  .col-dst{width:148px} .col-proto{width:86px} .col-len{width:56px}
+  .pbadge{
+    display:inline-block; font-family:var(--font-display); font-weight:600; font-size:9.5px;
+    letter-spacing:1.5px; padding:2px 8px; border-radius:2px; color:var(--pc);
+    border:1px solid color-mix(in srgb, var(--pc) 55%, transparent);
+    background:color-mix(in srgb, var(--pc) 13%, transparent);
+  }
+
+  /* ============ protocol dissection tree ============ */
+  .layer{border-bottom:1px solid rgba(255,255,255,.03)}
+  .layer-head{
+    display:flex; align-items:center; gap:8px; padding:6px 12px; cursor:pointer; user-select:none;
+    font-family:var(--font-display); font-weight:600; font-size:11.5px; letter-spacing:.6px;
+    color:var(--amber); transition:background .12s;
+  }
+  .layer-head:hover{background:rgba(255,180,84,.05)}
+  .layer-head .tw{display:inline-block; width:9px; color:var(--phos-d); font-size:10px; transition:transform .14s}
+  .layer.collapsed .tw{transform:rotate(-90deg)}
+  .layer.collapsed .fields{display:none}
+  .fields{padding:2px 0 8px 0; margin-left:18px; border-left:1px dashed var(--line2)}
+  .field{
+    position:relative; padding:3px 10px 3px 18px; cursor:pointer; font-family:var(--font-mono);
+    font-size:12px; line-height:1.5; white-space:pre-wrap; border-left:2px solid transparent;
+  }
+  .field::before{content:""; position:absolute; left:0; top:13px; width:11px; height:1px; background:var(--line2)}
+  .field.sub{padding-left:34px; color:#9fb2ab}
+  .field.sub::before{left:16px; width:11px}
+  .field.sub2{padding-left:50px}
+  .field:hover{background:rgba(94,243,140,.05)}
+  .field.selected{background:var(--sel); border-left-color:var(--amber)}
+  .field .fname{color:var(--cyan)}
+  .field .fval{color:var(--amber)}
+  .field.meta{cursor:help}
+  .field.meta .fname{color:var(--dim)}
+
+  /* ============ hex / ascii ============ */
+  .pane-body.bytes-body{cursor:crosshair}
+  .hex{font-family:var(--font-mono); font-size:12px; padding:8px 12px; line-height:1.65}
+  .hexrow{white-space:pre; color:#9fb6af}
+  .hexrow .off{color:var(--phos-d); margin-right:12px; opacity:.8}
+  .hexrow .gap{display:inline-block; width:9px}
+  .hexrow .asc{color:var(--dim); margin-left:16px}
+  .ac{color:var(--dim)}
+  .hb.hl,.ac.hl{
+    color:#0a0705; background:var(--amber); border-radius:2px;
+    box-shadow:0 0 9px rgba(255,180,84,.7); text-shadow:none;
+  }
+
+  /* ============ field analysis (editorial) ============ */
+  .explain-wrap{display:flex; flex-direction:column; border-top:2px solid var(--line2); background:var(--panel)}
+  .explain{padding:11px 18px 14px; min-height:70px; max-height:168px; overflow:auto}
+  .explain h4{
+    margin:0 0 6px; font-family:var(--font-display); font-weight:600; font-size:14px;
+    letter-spacing:.4px; color:var(--phos); text-shadow:0 0 10px rgba(94,243,140,.25);
+  }
+  .explain .meta{color:var(--dim); font-family:var(--font-mono); font-size:11px; letter-spacing:.4px; margin-bottom:8px}
+  .explain .meta b{color:var(--amber); font-weight:600}
+  .explain p{
+    margin:0; font-family:var(--font-read); font-size:15.5px; line-height:1.55; color:#d6e6df;
+    max-width:74ch;
+  }
+  .explain .empty{color:var(--faint); font-family:var(--font-read); font-style:italic; font-size:15px}
+
+  /* ============ status bar ============ */
+  .status{
+    display:flex; align-items:center; gap:20px; padding:6px 16px;
+    background:linear-gradient(180deg,#0a1314,#060c0d); border-top:1px solid var(--line2);
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:1.5px; color:var(--dim);
+    text-transform:uppercase;
+  }
+  .status .dot{width:8px;height:8px;border-radius:50%;background:var(--phos);box-shadow:0 0 8px var(--phos);display:inline-block;margin-right:7px}
+  .status b{color:var(--phos-d); font-weight:500}
+  .status .spacer{flex:1}
+
+  /* ============ tooltip ============ */
+  #tip{
+    position:fixed; z-index:50; max-width:330px; display:none; pointer-events:none;
+    background:rgba(8,16,16,.96); border:1px solid var(--phos-d); border-radius:4px;
+    padding:9px 11px; box-shadow:0 10px 34px rgba(0,0,0,.6), 0 0 0 1px rgba(94,243,140,.08);
+    font-family:var(--font-mono); font-size:11.5px; line-height:1.5; color:var(--text); backdrop-filter:blur(3px);
+  }
+  #tip b{color:var(--phos); font-family:var(--font-display); letter-spacing:.5px; display:block; margin-bottom:3px}
+
+  /* ---- flow-graph toolbar button ---- */
+  .flow-btn{border-color:color-mix(in srgb,var(--amber) 55%,transparent); color:var(--amber)}
+  .flow-btn:hover{background:color-mix(in srgb,var(--amber) 14%,transparent); color:var(--amber); border-color:var(--amber)}
+
+  /* ---- JP/EN language toggle ---- */
+  .lang-btn{
+    background:transparent; border:1px solid var(--phos-d); color:var(--phos);
+    font-family:var(--font-display); font-weight:600; font-size:11px; letter-spacing:1.5px;
+    padding:5px 13px; border-radius:3px; cursor:pointer; transition:all .15s;
+  }
+  .lang-btn:hover{background:color-mix(in srgb,var(--phos) 15%,transparent); box-shadow:0 0 14px rgba(94,243,140,.3)}
+
+  /* ---- bytes-pane tabs ---- */
+  .byt-cap{gap:16px}
+  .byt-cap .tab{
+    font-family:var(--font-display); font-size:10.5px; font-weight:600; letter-spacing:2px;
+    text-transform:uppercase; color:var(--faint); cursor:pointer; padding:2px 0;
+    border-bottom:2px solid transparent; transition:color .12s;
+  }
+  .byt-cap .tab:hover{color:var(--dim)}
+  .byt-cap .tab.active{color:var(--phos); border-bottom-color:var(--phos)}
+
+  /* ---- encapsulation view ---- */
+  .encap{padding:14px 16px}
+  .encap .note{font-family:var(--font-read); font-style:italic; color:var(--dim); font-size:13.5px; margin:0 0 14px; line-height:1.5}
+  .frame-map{display:flex; width:100%; height:46px; border:1px solid var(--line2); border-radius:4px; overflow:hidden; margin-bottom:8px}
+  .frame-map .seg{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:0;
+    color:#08110c; font-family:var(--font-display); font-weight:700; font-size:10px; letter-spacing:.5px;
+    border-right:1px solid rgba(0,0,0,.4); overflow:hidden; white-space:nowrap; cursor:pointer; transition:filter .12s;
+    background:var(--c);
+  }
+  .frame-map .seg:last-child{border-right:0}
+  .frame-map .seg:hover{filter:brightness(1.18)}
+  .frame-map .seg small{font-family:var(--font-mono); font-weight:500; font-size:8.5px; opacity:.85}
+  .map-scale{display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:9.5px; color:var(--faint); margin-bottom:20px}
+  .onion{display:flex; flex-direction:column; gap:8px}
+  .obox{
+    border:1px solid var(--c); border-left:4px solid var(--c); border-radius:6px; padding:9px 10px;
+    background:color-mix(in srgb,var(--c) 8%, transparent); cursor:pointer; transition:background .12s, transform .12s;
+  }
+  .obox:hover{background:color-mix(in srgb,var(--c) 16%, transparent); transform:translateX(2px)}
+  .ohead{display:flex; align-items:center; gap:9px; font-family:var(--font-display); font-weight:600; font-size:12.5px; color:var(--c)}
+  .ohead .osi{font-family:var(--font-mono); font-size:9px; letter-spacing:1px; padding:1px 5px; border:1px solid var(--c); border-radius:2px}
+  .ohead .orange{margin-left:auto; font-family:var(--font-mono); font-weight:400; font-size:10px; color:var(--dim); letter-spacing:.3px}
+  .obox .payload{font-family:var(--font-mono); font-size:10.5px; color:var(--dim); margin-top:7px; padding-left:2px}
+  /* flash a tree layer when focused from the onion */
+  .layer.flash{animation:flash 1s ease-out}
+  @keyframes flash{0%{background:rgba(255,180,84,.3)}100%{background:transparent}}
+
+  /* ---- flow graph overlay ---- */
+  #flow-overlay{position:fixed; inset:0; z-index:200; display:none; background:rgba(3,7,8,.88); backdrop-filter:blur(5px)}
+  #flow-overlay.open{display:flex; flex-direction:column}
+  .flow-bar{display:flex; align-items:baseline; gap:16px; padding:15px 22px; border-bottom:1px solid var(--line2)}
+  .flow-bar h2{margin:0; font-family:var(--font-display); font-weight:700; font-size:17px; letter-spacing:1.5px; color:var(--phos); text-shadow:0 0 14px rgba(94,243,140,.4)}
+  .flow-bar .sub{font-family:var(--font-read); font-style:italic; color:var(--dim); font-size:13.5px}
+  .flow-bar .x{margin-left:auto; cursor:pointer; color:var(--dim); border:1px solid var(--line2); border-radius:4px; padding:7px 14px; font-family:var(--font-display); letter-spacing:1.5px; font-size:12px; align-self:center; background:transparent}
+  .flow-bar .x:hover{color:var(--rose); border-color:var(--rose)}
+  .flow-scroll{flex:1; overflow:auto; padding:6px 22px 36px}
+  .flow-scroll svg{display:block}
+  .flrow{cursor:pointer}
+  .flrow .flbg{fill:transparent}
+  .flrow:hover .flbg{fill:rgba(94,243,140,.06)}
+  .flrow text.lbl{font-family:var(--font-mono); font-size:11px; font-weight:500}
+  .flrow text.gut{font-family:var(--font-mono); font-size:10px; fill:var(--dim)}
+  .flrow text.gutn{font-family:var(--font-display); font-size:11px; font-weight:600; fill:var(--phos-d)}
+  .flcolname{font-family:var(--font-display); font-size:11px; font-weight:600; letter-spacing:.5px; fill:var(--text)}
+  .flcolip{font-family:var(--font-mono); font-size:9.5px; fill:var(--dim)}
+  .lifeline{stroke:var(--line2); stroke-width:1; stroke-dasharray:2 4}
+  .flow-legend{display:flex; flex-wrap:wrap; gap:14px; padding:0 22px 14px; font-family:var(--font-mono); font-size:10.5px; color:var(--dim)}
+  .flow-legend i{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:middle}
+
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-thumb{background:#1c2a28;border-radius:6px;border:3px solid transparent;background-clip:padding-box}
+  ::-webkit-scrollbar-thumb:hover{background:#28403a;background-clip:padding-box}
+  ::-webkit-scrollbar-track{background:transparent}
+</style>
+</head>
+<body>
+  <div class="menubar">
+    <span class="brand"><span class="mk">◈</span>PACKETLENS<span class="sub" data-en="SIGNAL ANALYZER" data-ja="シグナル アナライザ">SIGNAL ANALYZER</span></span>
+    <div class="nav">
+      <span data-en="File" data-ja="ファイル">File</span>
+      <span data-en="Capture" data-ja="キャプチャ">Capture</span>
+      <span data-en="Analyze" data-ja="解析">Analyze</span>
+      <span data-en="Statistics" data-ja="統計">Statistics</span>
+      <span data-en="Help" data-ja="ヘルプ">Help</span>
+    </div>
+    <span class="spacer"></span>
+    <button id="langBtn" class="lang-btn">日本語</button>
+    <span class="rec"><span class="led"></span><span data-en="CAPTURING" data-ja="キャプチャ中">CAPTURING</span></span>
+    <span class="rec">T+ <span id="clock">00:00:00</span></span>
+    <div class="scan"></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="cmd">
+      <span class="prompt">▸</span>
+      <input id="filter" class="filter-input" placeholder="apply display filter —  tcp · udp · http · dhcp · dns · arp · icmp" autocomplete="off" />
+    </div>
+    <button class="qbtn active" data-f="" data-en="All" data-ja="全て">All</button>
+    <button class="qbtn" data-f="tcp">TCP</button>
+    <button class="qbtn" data-f="udp">UDP</button>
+    <button class="qbtn" data-f="http">HTTP</button>
+    <button class="qbtn" data-f="dhcp">DHCP</button>
+    <button class="qbtn" data-f="dns">DNS</button>
+    <button class="qbtn" data-f="arp">ARP</button>
+    <button class="qbtn" data-f="icmp">ICMP</button>
+    <button class="qbtn flow-btn" id="flowBtn" title="Show the conversation as a time-sequence ladder" data-en="⇄ Flow Graph" data-ja="⇄ フローグラフ">⇄ Flow Graph</button>
+  </div>
+
+  <div class="panes">
+    <div class="pane list-pane">
+      <div class="pane-cap"><span class="ic">▤</span><span data-en="Packet Stream" data-ja="パケット一覧">Packet Stream</span><span class="cap-sub" data-en="click a frame to dissect" data-ja="フレームをクリックして解析">click a frame to dissect</span></div>
+      <div class="pane-body">
+        <table class="plist">
+          <thead><tr>
+            <th class="col-no">No.</th><th class="col-time">Time</th>
+            <th class="col-src">Source</th><th class="col-dst">Destination</th>
+            <th class="col-proto">Proto</th><th class="col-len">Len</th><th>Info</th>
+          </tr></thead>
+          <tbody id="plist-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="pane det">
+        <div class="pane-cap"><span class="ic">⌗</span><span data-en="Protocol Dissection" data-ja="プロトコル解析">Protocol Dissection</span><span class="cap-sub" data-en="click a field → highlight bytes" data-ja="フィールドをクリック → バイト強調">click a field → highlight bytes</span></div>
+        <div class="pane-body" id="details"></div>
+      </div>
+      <div class="pane byt">
+        <div class="pane-cap byt-cap">
+          <span class="ic">⬡</span>
+          <span class="tab active" data-tab="hex" data-en="Hex · ASCII" data-ja="Hex · ASCII">Hex · ASCII</span>
+          <span class="tab" data-tab="encap" data-en="Encapsulation" data-ja="カプセル化">Encapsulation</span>
+          <span class="cap-sub" id="byt-sub">hover bytes for source field</span>
+        </div>
+        <div class="pane-body bytes-body" id="hexwrap"><div class="hex" id="hex"></div></div>
+        <div class="pane-body" id="encapwrap" style="display:none"><div class="encap" id="encap"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="explain-wrap">
+    <div class="pane-cap"><span class="ic">✲</span><span data-en="Field Analysis" data-ja="フィールド解析">Field Analysis</span></div>
+    <div class="explain" id="explain">
+      <div class="empty">Select a field in the protocol dissection to read a full explanation of what it means and why it is there.</div>
+    </div>
+  </div>
+
+  <div class="status">
+    <span><span class="dot"></span><span data-en="READY" data-ja="準備完了">READY</span></span>
+    <span id="st-file">wireshark_demo.pcapng</span>
+    <span class="spacer"></span>
+    <span id="st-count"></span>
+    <span><span data-en="PROFILE" data-ja="プロファイル">PROFILE</span> <b>DEFAULT</b></span>
+  </div>
+
+  <div id="flow-overlay">
+    <div class="flow-bar">
+      <h2 data-en="⇄ FLOW GRAPH" data-ja="⇄ フローグラフ">⇄ FLOW GRAPH</h2>
+      <span class="sub" data-en="time runs downward · each arrow is one packet · click an arrow to inspect it" data-ja="時間は下方向へ · 矢印1本が1パケット · 矢印をクリックで詳細">time runs downward · each arrow is one packet · click an arrow to inspect it</span>
+      <button class="x" id="flowClose" data-en="✕ CLOSE (Esc)" data-ja="✕ 閉じる (Esc)">✕ CLOSE (Esc)</button>
+    </div>
+    <div class="flow-legend" id="flowLegend"></div>
+    <div class="flow-scroll" id="flowScroll"></div>
+  </div>
+
+  <div id="tip"></div>
+
+<script>
+/* ============================================================
+   PacketLens — a self-contained Wireshark-style explainer.
+   Each packet is built byte-by-byte so the hex pane, the
+   detail tree and the byte-offset highlighting stay in sync.
+   ============================================================ */
+
+const S = s => [...s].map(c => c.charCodeAt(0));   // string -> byte array
+const Z = n => new Array(n).fill(0);               // n zero bytes
+
+// Builder: keeps a running byte array and records each field's offset/length.
+class PB {
+  constructor(meta){ this.m = meta; this.bytes = []; this.layers = []; this.L = null; this.lastOff = 0; }
+  layer(name){ this.L = { name, fields: [] }; this.layers.push(this.L); return this; }
+  // field that contributes bytes
+  f(name, value, b, desc){
+    const off = this.bytes.length; this.lastOff = off;
+    for (const x of b) this.bytes.push(x & 0xff);
+    this.L.fields.push({ name, value, offset: off, length: b.length, desc });
+    return this;
+  }
+  // sub-field referencing bytes already added (defaults to the previous f() range)
+  sf(name, value, desc, off, len, lvl){
+    const o = (off == null ? this.lastOff : off);
+    const l = (len == null ? (this.bytes.length - o) : len);
+    this.L.fields.push({ name, value, offset: o, length: l, desc, sub: true, lvl: lvl || 1 });
+    return this;
+  }
+  // metadata field (no bytes, no highlight) — used by the Frame layer
+  meta(name, value, desc){
+    this.L.fields.push({ name, value, desc, metaField: true });
+    return this;
+  }
+  build(){ this.m.bytes = this.bytes; this.m.layers = this.layers; return this.m; }
+}
+
+// Common helper: add the Frame metadata layer.
+function frame(pb, no, ts, len, protos, color){
+  pb.layer(`Frame ${no}: ${len} bytes on wire (${len*8} bits), ${len} bytes captured`)
+    .meta("Frame Number", String(no), "Sequential index Wireshark assigns to each captured packet. It is local to the capture file and has nothing to do with the network — it just lets you reference 'packet 5'.")
+    .meta("Frame Length", `${len} bytes (${len*8} bits)`, "Total size of this frame as it appeared on the wire, including the Ethernet header but excluding the 4-byte Ethernet FCS (which the NIC usually strips before capture).")
+    .meta("Capture Length", `${len} bytes`, "How many bytes Wireshark actually stored. If a 'snap length' were set it could be smaller than the frame length; here the whole packet was captured.")
+    .meta("Arrival Time", ts, "Timestamp from the capturing host's clock when this frame was received. The 'Time' column in the list is usually shown relative to the first packet.")
+    .meta("Protocols in frame", protos, "The layered stack of dissectors that matched this packet, from lowest layer to highest. This is the 'protocol onion' you are peeling open below.")
+    .meta("Coloring Rule", color, "Wireshark colors each row using rules matched top-to-bottom. The color is a visual hint about the protocol or about problems (e.g. red = checksum/RST errors).");
+}
+
+// MAC / IP helpers (cosmetic only)
+const MAC = { client:[0x00,0x1c,0x42,0x00,0x00,0x08], router:[0x00,0x1a,0x2b,0x3c,0x4d,0x5e],
+              bcast:[0xff,0xff,0xff,0xff,0xff,0xff], mcastSSDP:[0x01,0x00,0x5e,0x7f,0xff,0xfa] };
+const IP  = { client:[192,168,1,100], router:[192,168,1,1], dns:[192,168,1,1],
+              web:[93,184,216,34], any:[0,0,0,0], bcast:[255,255,255,255],
+              ssdp:[239,255,255,250] };
+
+// ---- Ethernet layer helper -------------------------------------------------
+function eth(pb, dst, src, type, typeName){
+  pb.layer(`Ethernet II, Src: ${src.map(h=>h.toString(16).padStart(2,'0')).join(':')}, Dst: ${dst.map(h=>h.toString(16).padStart(2,'0')).join(':')}`)
+    .f("Destination", dst.map(h=>h.toString(16).padStart(2,'0')).join(':'), dst,
+       "Layer-2 (MAC) address of the next hop on this LAN segment. ff:ff:ff:ff:ff:ff is a broadcast to every host; 01:00:5e... is IPv4 multicast. This is rewritten at every router hop.")
+    .f("Source", src.map(h=>h.toString(16).padStart(2,'0')).join(':'), src,
+       "MAC address of the interface that put this frame on the wire. The first 3 bytes (OUI) identify the hardware vendor; the last 3 are assigned by that vendor.")
+    .f("Type", `0x${type.toString(16).padStart(4,'0')} (${typeName})`, [type>>8, type&0xff],
+       "EtherType tells the receiver which Layer-3 protocol is inside: 0x0800 = IPv4, 0x0806 = ARP, 0x86dd = IPv6. Wireshark uses it to pick the next dissector.");
+}
+
+// ---- IPv4 layer helper -----------------------------------------------------
+function ipv4(pb, opts){
+  const { totalLen, id, proto, protoName, src, dst, ttl=64, csum=[0xb1,0xe6], flags=0x40, frag=0 } = opts;
+  const fl = (flags<<8) | frag; // flags in top 3 bits of a 16-bit field
+  pb.layer(`Internet Protocol Version 4, Src: ${src.join('.')}, Dst: ${dst.join('.')}`)
+    .f("Version + Header Length", "0x45", [0x45],
+       "One byte split in two nibbles. High nibble 4 = IPv4. Low nibble 5 = header length in 32-bit words (5 × 4 = 20 bytes, the minimum with no options).")
+      .sf("0100 .... = Version: 4", "4", "IP protocol version. 4 means IPv4.")
+      .sf(".... 0101 = Header Length: 20 bytes (5)", "5", "Internet Header Length (IHL) in 32-bit words. Needed because IP options can make the header longer than 20 bytes.")
+    .f("Differentiated Services Field", "0x00 (DSCP: CS0, ECN: Not-ECT)", [0x00],
+       "QoS marking. The top 6 bits (DSCP) classify traffic for prioritization (e.g. voice vs bulk); the low 2 bits (ECN) allow routers to signal congestion instead of dropping packets.")
+    .f("Total Length", String(totalLen), [totalLen>>8, totalLen&0xff],
+       `Entire IP packet size in bytes — IP header + everything above it (here ${totalLen}). Lets the receiver know where the packet ends and detect truncation.`)
+    .f("Identification", `0x${id.toString(16).padStart(4,'0')} (${id})`, [id>>8, id&0xff],
+       "A per-packet ID used to reassemble fragments: all fragments of one original datagram share this value.")
+    .f("Flags + Fragment Offset", `0x${fl.toString(16).padStart(4,'0')}`, [fl>>8, fl&0xff],
+       "Top 3 bits are control flags; the remaining 13 bits are the fragment offset (in 8-byte units) for reassembly.")
+      .sf("0... .... = Reserved bit: Not set", "0", "Must be zero.")
+      .sf(".1.. .... = Don't fragment: Set", "1", "DF flag. The sender forbids routers from fragmenting this packet; if it is too big for a link, the router drops it and returns ICMP 'fragmentation needed' (this drives Path MTU Discovery).")
+      .sf("..0. .... = More fragments: Not set", "0", "MF flag. 0 means this is the last (or only) fragment.")
+    .f("Time to Live", String(ttl), [ttl],
+       `Hop limit. Each router decrements it by 1; at 0 the packet is discarded and ICMP 'Time Exceeded' is returned (this is how traceroute works). Common start values: 64 (Linux/macOS), 128 (Windows).`)
+    .f("Protocol", `${protoName} (${proto})`, [proto],
+       `Identifies the Layer-4 payload: 6 = TCP, 17 = UDP, 1 = ICMP. Here it is ${protoName}. Wireshark uses it to choose the next dissector.`)
+    .f("Header Checksum", `0x${csum.map(h=>h.toString(16).padStart(2,'0')).join('')}`, csum,
+       "Covers only the IP header (not the payload). Recomputed at every hop because the TTL changes. If it fails, the packet is dropped silently.")
+    .f("Source Address", src.join('.'), src,
+       "32-bit IPv4 address of the original sender. Unlike the MAC address, this stays the same end-to-end (barring NAT).")
+    .f("Destination Address", dst.join('.'), dst,
+       "32-bit IPv4 address of the final recipient. Routers forward based on this field.");
+}
+
+// ============================================================
+//  Build the packets
+// ============================================================
+const PACKETS = [];
+
+/* 1 — ARP request --------------------------------------------------------- */
+(function(){
+  const pb = new PB({ no:1, time:"0.000000", src:"192.168.1.100", dst:"Broadcast",
+    proto:"ARP", info:"Who has 192.168.1.1? Tell 192.168.1.100", color:"ARP" });
+  frame(pb,1,"Jun 16, 2026 19:30:01.000000","42","eth:ethertype:arp","ARP");
+  eth(pb, MAC.bcast, MAC.client, 0x0806, "ARP");
+  pb.layer("Address Resolution Protocol (request)")
+    .f("Hardware type","Ethernet (1)",[0x00,0x01],"The Layer-2 technology ARP is resolving on. 1 = Ethernet.")
+    .f("Protocol type","IPv4 (0x0800)",[0x08,0x00],"The Layer-3 address family being resolved. 0x0800 = IPv4.")
+    .f("Hardware size","6",[0x06],"Length in bytes of a hardware (MAC) address — 6 for Ethernet.")
+    .f("Protocol size","4",[0x04],"Length in bytes of a protocol (IP) address — 4 for IPv4.")
+    .f("Opcode","request (1)",[0x00,0x01],"1 = request ('who has this IP?'), 2 = reply ('I have it, here is my MAC'). ARP has no other transport — it rides directly on Ethernet.")
+    .f("Sender MAC address","00:1c:42:00:00:08",MAC.client,"MAC of the host asking the question. The receiver caches this mapping for free.")
+    .f("Sender IP address","192.168.1.100",IP.client,"IP of the host asking. Lets others learn this IP↔MAC pair.")
+    .f("Target MAC address","00:00:00:00:00:00",Z(6),"Unknown — that is exactly what we are trying to discover, so it is left all zeros.")
+    .f("Target IP address","192.168.1.1",IP.router,"The IP whose MAC we want. Only the host that owns this address should reply.");
+  PACKETS.push(pb.build());
+})();
+
+/* 2 — ARP reply ----------------------------------------------------------- */
+(function(){
+  const pb = new PB({ no:2, time:"0.000213", src:"192.168.1.1", dst:"192.168.1.100",
+    proto:"ARP", info:"192.168.1.1 is at 00:1a:2b:3c:4d:5e", color:"ARP" });
+  frame(pb,2,"Jun 16, 2026 19:30:01.000213","42","eth:ethertype:arp","ARP");
+  eth(pb, MAC.client, MAC.router, 0x0806, "ARP");
+  pb.layer("Address Resolution Protocol (reply)")
+    .f("Hardware type","Ethernet (1)",[0x00,0x01],"1 = Ethernet.")
+    .f("Protocol type","IPv4 (0x0800)",[0x08,0x00],"0x0800 = IPv4.")
+    .f("Hardware size","6",[0x06],"6-byte MAC addresses.")
+    .f("Protocol size","4",[0x04],"4-byte IPv4 addresses.")
+    .f("Opcode","reply (2)",[0x00,0x02],"2 = reply. The router answers directly (unicast) to whoever asked.")
+    .f("Sender MAC address","00:1a:2b:3c:4d:5e",MAC.router,"The answer to the question: this is the MAC owning 192.168.1.1.")
+    .f("Sender IP address","192.168.1.1",IP.router,"Confirms which IP the above MAC belongs to.")
+    .f("Target MAC address","00:1c:42:00:00:08",MAC.client,"MAC of the original asker (now known, copied from the request).")
+    .f("Target IP address","192.168.1.100",IP.client,"IP of the original asker.");
+  PACKETS.push(pb.build());
+})();
+
+/* 3 — DNS query ----------------------------------------------------------- */
+(function(){
+  const qname = [7,...S("example"),3,...S("com"),0];
+  const dnsLen = 12 + qname.length + 4;          // header + question
+  const udpLen = 8 + dnsLen;
+  const totalLen = 20 + udpLen;
+  const frameLen = 14 + totalLen;
+  const pb = new PB({ no:3, time:"0.001120", src:"192.168.1.100", dst:"192.168.1.1",
+    proto:"DNS", info:"Standard query 0x1a2b A example.com", color:"UDP" });
+  frame(pb,3,"Jun 16, 2026 19:30:01.001120",String(frameLen),"eth:ethertype:ip:udp:dns","UDP");
+  eth(pb, MAC.router, MAC.client, 0x0800, "IPv4");
+  ipv4(pb,{ totalLen, id:0x1a2b, proto:17, protoName:"UDP", src:IP.client, dst:IP.dns, csum:[0x39,0xa1] });
+  pb.layer(`User Datagram Protocol, Src Port: 50000, Dst Port: 53`)
+    .f("Source Port","50000",[0xc3,0x50],"Ephemeral port the OS picked for this query; the DNS reply will be sent back to it.")
+    .f("Destination Port","53",[0x00,0x35],"Well-known port 53 = DNS. This is how the kernel knows to hand the payload to a DNS dissector/server.")
+    .f("Length",String(udpLen),[udpLen>>8,udpLen&0xff],`UDP header (8) + data. UDP is connectionless: no handshake, no sequence numbers, no retransmission — speed over reliability.`)
+    .f("Checksum","0x0000",[0x00,0x00],"Optional in IPv4 UDP; 0x0000 means 'not computed'. Covers the UDP header, data and an IP pseudo-header.");
+  pb.layer("Domain Name System (query)")
+    .f("Transaction ID","0x1a2b",[0x1a,0x2b],"Random ID echoed in the response so the client can match replies to requests (and reject spoofed answers that guess wrong).")
+    .f("Flags","0x0100 Standard query",[0x01,0x00],"Bit-field describing the message.")
+      .sf("0... .... .... .... = Response: Message is a query","0","QR bit. 0 = query, 1 = response.")
+      .sf(".000 0... .... .... = Opcode: Standard query (0)","0","The kind of query; 0 is a normal lookup.")
+      .sf(".... .... 1... .... = Recursion desired: Set","1","RD bit. Asks the server to do the full lookup on our behalf and return the final answer.")
+    .f("Questions","1",[0x00,0x01],"Number of questions in this message — normally exactly 1.")
+    .f("Answer RRs","0",[0x00,0x00],"Resource records in the answer section. 0 in a query (the server fills these in).")
+    .f("Authority RRs","0",[0x00,0x00],"Authority records — 0 in a query.")
+    .f("Additional RRs","0",[0x00,0x00],"Additional records (e.g. EDNS) — 0 here.")
+    .f("Name: example.com","example.com",qname,"The domain being looked up, encoded as length-prefixed labels: 7'example' 3'com' 0. The trailing 0 is the root label.")
+    .f("Type","A (1)",[0x00,0x01],"Record type wanted. A = IPv4 address. (AAAA=IPv6, MX=mail, CNAME=alias, etc.)")
+    .f("Class","IN (1)",[0x00,0x01],"Namespace class. IN = Internet (essentially always).");
+  PACKETS.push(pb.build());
+})();
+
+/* 4 — DNS response -------------------------------------------------------- */
+(function(){
+  const qname = [7,...S("example"),3,...S("com"),0];
+  const answer = [0xc0,0x0c, 0x00,0x01, 0x00,0x01, 0x00,0x00,0x0e,0x10, 0x00,0x04, 93,184,216,34];
+  const dnsLen = 12 + qname.length + 4 + answer.length;
+  const udpLen = 8 + dnsLen;
+  const totalLen = 20 + udpLen;
+  const frameLen = 14 + totalLen;
+  const pb = new PB({ no:4, time:"0.025430", src:"192.168.1.1", dst:"192.168.1.100",
+    proto:"DNS", info:"Standard query response 0x1a2b A example.com A 93.184.216.34", color:"UDP" });
+  frame(pb,4,"Jun 16, 2026 19:30:01.025430",String(frameLen),"eth:ethertype:ip:udp:dns","UDP");
+  eth(pb, MAC.client, MAC.router, 0x0800, "IPv4");
+  ipv4(pb,{ totalLen, id:0x1a2c, proto:17, protoName:"UDP", src:IP.dns, dst:IP.client, csum:[0x39,0x80] });
+  pb.layer(`User Datagram Protocol, Src Port: 53, Dst Port: 50000`)
+    .f("Source Port","53",[0x00,0x35],"Comes from port 53 (the DNS server).")
+    .f("Destination Port","50000",[0xc3,0x50],"Sent back to the exact ephemeral port the client used.")
+    .f("Length",String(udpLen),[udpLen>>8,udpLen&0xff],"UDP header + DNS message length.")
+    .f("Checksum","0x0000",[0x00,0x00],"Not computed (optional in IPv4).");
+  pb.layer("Domain Name System (response)")
+    .f("Transaction ID","0x1a2b",[0x1a,0x2b],"Same ID as the query — this is how the client matches the answer to its question.")
+    .f("Flags","0x8180 Standard query response, No error",[0x81,0x80],"Now QR=1 (response) and RA=1 (recursion available); rcode=0 (no error).")
+      .sf("1... .... .... .... = Response: Message is a response","1","QR bit set — this is a reply.")
+      .sf(".... .... .... 0000 = Reply code: No error (0)","0","RCODE 0 = success. (3 = NXDOMAIN 'name does not exist'.)")
+    .f("Questions","1",[0x00,0x01],"The original question is echoed back.")
+    .f("Answer RRs","1",[0x00,0x01],"One answer record follows.")
+    .f("Authority RRs","0",[0x00,0x00],"None included.")
+    .f("Additional RRs","0",[0x00,0x00],"None included.")
+    .f("Queries: example.com A IN","example.com",[...qname,0x00,0x01,0x00,0x01],"The echoed question section (name + type A + class IN).")
+    .f("Answer: example.com A 93.184.216.34","93.184.216.34",answer,"The resource record. 0xc00c is a compression pointer back to the name at offset 12; then type A, class IN, a TTL of 3600s, 4-byte length and the IPv4 address.")
+      .sf("Name: example.com (pointer 0xc00c)","example.com","Name compression: instead of repeating 'example.com', it points to the name already present in the question.",pb.bytes.length-answer.length,2)
+      .sf("Type: A (1)","A","Answer is an IPv4 address record.",pb.bytes.length-answer.length+2,2)
+      .sf("Time to live: 3600 (1 hour)","3600","How long resolvers may cache this answer before asking again.",pb.bytes.length-answer.length+6,4)
+      .sf("Address: 93.184.216.34","93.184.216.34","The resolved IPv4 address the client will now connect to.",pb.bytes.length-4,4);
+  PACKETS.push(pb.build());
+})();
+
+/* TCP layer helper (used by SYN / SYN-ACK / ACK / HTTP) -------------------- */
+function tcp(pb, o){
+  const { sport, dport, seq, ack, dataOff, flags, win, csum, opts=[], flagText } = o;
+  const offByte = (dataOff<<4); // data offset in high nibble, reserved=0
+  pb.layer(`Transmission Control Protocol, Src Port: ${sport}, Dst Port: ${dport}, Seq: ${seq}, Ack: ${ack}`)
+    .f("Source Port",String(sport),[sport>>8,sport&0xff],"Sender's port. Combined with the 4 IP/port values it forms the 'socket pair' that uniquely identifies this connection.")
+    .f("Destination Port",String(dport),[dport>>8,dport&0xff],`Receiver's port. ${dport===80?'80 = HTTP.':dport===443?'443 = HTTPS.':'Identifies the service.'}`)
+    .f("Sequence Number (raw)",String(seq>>>0),[ (seq>>>24)&0xff,(seq>>>16)&0xff,(seq>>>8)&0xff,seq&0xff ],"Byte-offset of the first data byte in this segment within the stream. TCP numbers every byte so lost data can be detected and retransmitted.")
+    .f("Acknowledgment Number (raw)",String(ack>>>0),[ (ack>>>24)&0xff,(ack>>>16)&0xff,(ack>>>8)&0xff,ack&0xff ],"Next sequence number the sender expects to receive — i.e. everything up to here arrived OK. Only meaningful when the ACK flag is set.")
+    .f("Header Length + Flags",`0x${offByte.toString(16).padStart(2,'0')}${flags.toString(16).padStart(2,'0')}`,[offByte, flags],`Data offset nibble + 12 control-flag bits.`)
+      .sf(`${(dataOff).toString(2).padStart(4,'0')} .... = Header Length: ${dataOff*4} bytes (${dataOff})`,String(dataOff),"TCP header length in 32-bit words. 5 = 20 bytes (no options); 6 = 24 bytes (one option such as MSS).")
+      .sf("Flags: 0x"+flags.toString(16).padStart(3,'0')+" ("+flagText+")",flagText,"The control bits that drive the TCP state machine.")
+      .sf((flags&0x02?"...1":"...0")+" .... = SYN", flags&0x02?"Set":"Not set","SYN = synchronize. Set only on the first two packets to establish a connection and agree initial sequence numbers.")
+      .sf((flags&0x10?"1":"0")+"... = ACK", flags&0x10?"Set":"Not set","ACK = acknowledgment. Once set (on every packet after the first SYN) the Acknowledgment Number field is valid.")
+      .sf((flags&0x08?"...1":"...0")+" = PSH", flags&0x08?"Set":"Not set","PSH = push. Tells the receiver to deliver buffered data to the application immediately rather than waiting for more.")
+      .sf((flags&0x01?"1":"0")+" = FIN", flags&0x01?"Set":"Not set","FIN = finish. Begins the graceful close of one direction of the connection.")
+    .f("Window",String(win),[win>>8,win&0xff],"Flow control: how many more bytes the sender is currently willing to receive. A window of 0 tells the peer to stop sending.")
+    .f("Checksum",`0x${csum.map(h=>h.toString(16).padStart(2,'0')).join('')}`,csum,"Covers the TCP header, data and an IP pseudo-header — TCP's end-to-end integrity check.")
+    .f("Urgent Pointer","0",[0x00,0x00],"Only meaningful if the URG flag is set; points to 'urgent' data. Rarely used today.");
+  if (opts.length){
+    // MSS option 02 04 05 b4
+    pb.f("Options: Maximum Segment Size","MSS = 1460 bytes",opts,"TCP options appear only in SYN packets here. MSS announces the largest payload this host wants per segment (1460 = 1500-byte Ethernet MTU − 20 IP − 20 TCP), avoiding IP fragmentation.");
+  }
+}
+
+/* 5 — TCP SYN ------------------------------------------------------------- */
+(function(){
+  const opts=[0x02,0x04,0x05,0xb4];
+  const totalLen = 20 + 24;            // IP + TCP(24 with MSS)
+  const frameLen = 14 + totalLen;
+  const pb = new PB({ no:5, time:"0.026100", src:"192.168.1.100", dst:"93.184.216.34",
+    proto:"TCP", info:"50000 → 80 [SYN] Seq=0 Win=29200 Len=0 MSS=1460", color:"TCP" });
+  frame(pb,5,"Jun 16, 2026 19:30:01.026100",String(frameLen),"eth:ethertype:ip:tcp","TCP");
+  eth(pb, MAC.router, MAC.client, 0x0800, "IPv4");
+  ipv4(pb,{ totalLen, id:0x4a1c, proto:6, protoName:"TCP", src:IP.client, dst:IP.web, csum:[0x6f,0x21] });
+  tcp(pb,{ sport:50000, dport:80, seq:0x9a1c3f47, ack:0, dataOff:6, flags:0x02, win:29200, csum:[0x5a,0x1c], opts, flagText:"SYN" });
+  PACKETS.push(pb.build());
+})();
+
+/* 6 — TCP SYN, ACK -------------------------------------------------------- */
+(function(){
+  const opts=[0x02,0x04,0x05,0xb4];
+  const totalLen = 20 + 24;
+  const frameLen = 14 + totalLen;
+  const pb = new PB({ no:6, time:"0.041880", src:"93.184.216.34", dst:"192.168.1.100",
+    proto:"TCP", info:"80 → 50000 [SYN, ACK] Seq=0 Ack=1 Win=28960 Len=0 MSS=1460", color:"TCP" });
+  frame(pb,6,"Jun 16, 2026 19:30:01.041880",String(frameLen),"eth:ethertype:ip:tcp","TCP");
+  eth(pb, MAC.client, MAC.router, 0x0800, "IPv4");
+  ipv4(pb,{ totalLen, id:0x0000, proto:6, protoName:"TCP", src:IP.web, dst:IP.client, csum:[0x2a,0x55] });
+  tcp(pb,{ sport:80, dport:50000, seq:0x55aa10c0, ack:0x9a1c3f48, dataOff:6, flags:0x12, win:28960, csum:[0x9b,0x2d], opts, flagText:"SYN, ACK" });
+  PACKETS.push(pb.build());
+})();
+
+/* 7 — TCP ACK ------------------------------------------------------------- */
+(function(){
+  const totalLen = 20 + 20;
+  const frameLen = 14 + totalLen;
+  const pb = new PB({ no:7, time:"0.042050", src:"192.168.1.100", dst:"93.184.216.34",
+    proto:"TCP", info:"50000 → 80 [ACK] Seq=1 Ack=1 Win=29200 Len=0", color:"TCP" });
+  frame(pb,7,"Jun 16, 2026 19:30:01.042050",String(frameLen),"eth:ethertype:ip:tcp","TCP");
+  eth(pb, MAC.router, MAC.client, 0x0800, "IPv4");
+  ipv4(pb,{ totalLen, id:0x4a1d, proto:6, protoName:"TCP", src:IP.client, dst:IP.web, csum:[0x6f,0x39] });
+  tcp(pb,{ sport:50000, dport:80, seq:0x9a1c3f48, ack:0x55aa10c1, dataOff:5, flags:0x10, win:29200, csum:[0x4d,0x90], flagText:"ACK" });
+  PACKETS.push(pb.build());
+})();
+
+/* 8 — HTTP GET ------------------------------------------------------------ */
+(function(){
+  const lines = ["GET / HTTP/1.1\r\n","Host: example.com\r\n","User-Agent: curl/8.4.0\r\n","Accept: */*\r\n","\r\n"];
+  const payload = S(lines.join(""));
+  const totalLen = 20 + 20 + payload.length;
+  const frameLen = 14 + totalLen;
+  const pb = new PB({ no:8, time:"0.042500", src:"192.168.1.100", dst:"93.184.216.34",
+    proto:"HTTP", info:"GET / HTTP/1.1 ", color:"HTTP" });
+  frame(pb,8,"Jun 16, 2026 19:30:01.042500",String(frameLen),"eth:ethertype:ip:tcp:http","HTTP");
+  eth(pb, MAC.router, MAC.client, 0x0800, "IPv4");
+  ipv4(pb,{ totalLen, id:0x4a1e, proto:6, protoName:"TCP", src:IP.client, dst:IP.web, csum:[0x6e,0xc0] });
+  tcp(pb,{ sport:50000, dport:80, seq:0x9a1c3f48, ack:0x55aa10c1, dataOff:5, flags:0x18, win:29200, csum:[0x88,0x21], flagText:"PSH, ACK" });
+  // HTTP layer — each header line maps to its byte range
+  pb.layer("Hypertext Transfer Protocol");
+  let off = pb.bytes.length;
+  const addLine = (text, name, desc) => {
+    const b = S(text);
+    pb.f(name, text.replace(/\r\n/g,"\\r\\n"), b, desc);
+  };
+  addLine(lines[0], "Request Line: GET / HTTP/1.1",
+    "The request line: METHOD, request-target, HTTP version. GET = retrieve a resource without side effects. '/' is the path (the site root). HTTP/1.1 keeps the TCP connection open for reuse.");
+  addLine(lines[1], "Host: example.com",
+    "Mandatory in HTTP/1.1. Lets one server (one IP) host many sites (virtual hosting) by telling it which domain you want.");
+  addLine(lines[2], "User-Agent: curl/8.4.0",
+    "Identifies the client software. Servers use it for stats, compatibility shims, or blocking bots.");
+  addLine(lines[3], "Accept: */*",
+    "Content negotiation: which media types the client will accept. */* = anything.");
+  addLine(lines[4], "\\r\\n (end of headers)",
+    "A bare blank line (CRLF) marks the end of the header block. For a GET there is no body, so the message ends here.");
+  PACKETS.push(pb.build());
+})();
+
+/* 9 — SSDP (UDP multicast, like the screenshot) --------------------------- */
+(function(){
+  const lines = ["M-SEARCH * HTTP/1.1\r\n","HOST: 239.255.255.250:1900\r\n",'MAN: "ssdp:discover"\r\n',"MX: 1\r\n","ST: ssdp:all\r\n","\r\n"];
+  const payload = S(lines.join(""));
+  const udpLen = 8 + payload.length;
+  const totalLen = 20 + udpLen;
+  const frameLen = 14 + totalLen;
+  const pb = new PB({ no:9, time:"0.052000", src:"192.168.1.100", dst:"239.255.255.250",
+    proto:"SSDP", info:"M-SEARCH * HTTP/1.1 ", color:"UDP" });
+  frame(pb,9,"Jun 16, 2026 19:30:01.052000",String(frameLen),"eth:ethertype:ip:udp:ssdp","UDP");
+  eth(pb, MAC.mcastSSDP, MAC.client, 0x0800, "IPv4");
+  ipv4(pb,{ totalLen, id:0x7a01, proto:17, protoName:"UDP", src:IP.client, dst:IP.ssdp, ttl:1, flags:0x00, csum:[0x11,0x22] });
+  pb.layer("User Datagram Protocol, Src Port: 50000, Dst Port: 1900")
+    .f("Source Port","50000",[0xc3,0x50],"Ephemeral source port; replies from devices come back here (unicast).")
+    .f("Destination Port","1900",[0x07,0x6c],"Port 1900 = SSDP, the discovery part of UPnP used to find smart-home / media devices on the LAN.")
+    .f("Length",String(udpLen),[udpLen>>8,udpLen&0xff],"UDP is ideal for multicast discovery: one datagram reaches many devices with no connection setup.")
+    .f("Checksum","0x0000",[0x00,0x00],"Not computed.");
+  pb.layer("Simple Service Discovery Protocol");
+  pb.f(lines[0], "M-SEARCH * HTTP/1.1\\r\\n", S(lines[0]),"SSDP reuses HTTP syntax over UDP. M-SEARCH is a multicast search asking 'what devices are out there?'.");
+  pb.f(lines[1], "HOST: 239.255.255.250:1900\\r\\n", S(lines[1]),"The fixed SSDP multicast group address and port that every UPnP device listens on.");
+  pb.f(lines[2], 'MAN: "ssdp:discover"\\r\\n', S(lines[2]),"Mandatory extension declaring the intent of this request: a discovery probe.");
+  pb.f(lines[3], "MX: 1\\r\\n", S(lines[3]),"Maximum wait: devices must answer within a random delay up to MX seconds, spreading replies to avoid a flood.");
+  pb.f(lines[4], "ST: ssdp:all\\r\\n", S(lines[4]),"Search Target: which device/service types to match. ssdp:all = every device should respond.");
+  pb.f(lines[5], "\\r\\n", S(lines[5]),"Blank line ends the SSDP message.");
+  PACKETS.push(pb.build());
+})();
+
+/* 10 — DHCP Discover ------------------------------------------------------ */
+(function(){
+  const chaddr = [...MAC.client, ...Z(10)];   // 16 bytes
+  const options = [
+    0x35,0x01,0x01,                 // 53: DHCP Message Type = Discover
+    0x37,0x04,0x01,0x03,0x06,0x2a,  // 55: Parameter Request List
+    0x39,0x02,0x05,0xdc,            // 57: Max DHCP message size 1500
+    0x3d,0x07,0x01,...MAC.client,   // 61: Client identifier
+    0xff                            // 255: End
+  ];
+  const dhcpLen = 236 + 4 + options.length;   // bootp fixed + magic + options
+  const udpLen = 8 + dhcpLen;
+  const totalLen = 20 + udpLen;
+  const frameLen = 14 + totalLen;
+  const pb = new PB({ no:10, time:"0.060000", src:"0.0.0.0", dst:"255.255.255.255",
+    proto:"DHCP", info:"DHCP Discover - Transaction ID 0x1a2b3c4d", color:"DHCP" });
+  frame(pb,10,"Jun 16, 2026 19:30:01.060000",String(frameLen),"eth:ethertype:ip:udp:bootp:dhcp","DHCP");
+  eth(pb, MAC.bcast, MAC.client, 0x0800, "IPv4");
+  ipv4(pb,{ totalLen, id:0x0000, proto:17, protoName:"UDP", src:IP.any, dst:IP.bcast, flags:0x00, csum:[0x39,0x96] });
+  pb.layer("User Datagram Protocol, Src Port: 68, Dst Port: 67")
+    .f("Source Port","68 (bootpc)",[0x00,0x44],"DHCP client port. The client has no IP yet, so it sends from 0.0.0.0:68.")
+    .f("Destination Port","67 (bootps)",[0x00,0x43],"DHCP server port. Sent to the broadcast address because the client doesn't know the server's address yet.")
+    .f("Length",String(udpLen),[udpLen>>8,udpLen&0xff],"UDP carries DHCP because broadcast is needed before any IP exists.")
+    .f("Checksum","0x0000",[0x00,0x00],"Not computed.");
+  pb.layer("Dynamic Host Configuration Protocol (Discover)")
+    .f("Message type","Boot Request (1)",[0x01],"BOOTP op code. 1 = request from client to server.")
+    .f("Hardware type","Ethernet (0x01)",[0x01],"Network hardware family — Ethernet.")
+    .f("Hardware address length","6",[0x06],"MAC address length in bytes.")
+    .f("Hops","0",[0x00],"Used by relay agents; 0 means no relay between client and server.")
+    .f("Transaction ID","0x1a2b3c4d",[0x1a,0x2b,0x3c,0x4d],"Random ID tying the whole DHCP conversation (Discover→Offer→Request→Ack) together.")
+    .f("Seconds elapsed","0",[0x00,0x00],"Seconds since the client started trying to get an address.")
+    .f("Bootp flags","0x8000 (Broadcast)",[0x80,0x00],"Broadcast bit set: the client has no IP, so it asks the server to broadcast the reply rather than unicast it.")
+    .f("Client IP address","0.0.0.0",Z(4),"ciaddr — only filled in if the client already has a usable lease (renewing). Zero during initial Discover.")
+    .f("Your (client) IP address","0.0.0.0",Z(4),"yiaddr — the server writes the offered address here in its reply. Empty in the Discover.")
+    .f("Next server IP address","0.0.0.0",Z(4),"siaddr — used for network boot (TFTP). Not used here.")
+    .f("Relay agent IP address","0.0.0.0",Z(4),"giaddr — filled by a DHCP relay if the server is on another subnet.")
+    .f("Client MAC address","00:1c:42:00:00:08",chaddr,"chaddr — the client's hardware address. The server keys leases off this so the same device gets a stable address. (Padded to 16 bytes.)")
+    .f("Server host name","(not given)",Z(64),"Optional 64-byte server name field, unused here (all zeros).")
+    .f("Boot file name","(not given)",Z(128),"Optional 128-byte boot-file field for network boot, unused here (all zeros).")
+    .f("Magic cookie","DHCP (0x63825363)",[0x63,0x82,0x53,0x63],"The fixed value that marks the start of the DHCP options area and distinguishes DHCP from plain BOOTP.")
+    .f("Option 53: DHCP Message Type = Discover","Discover",[0x35,0x01,0x01],"The single most important option: it makes this a DHCP DISCOVER (type 1) — 'is there a DHCP server out there?'.")
+    .f("Option 55: Parameter Request List","Subnet Mask, Router, DNS, NTP",[0x37,0x04,0x01,0x03,0x06,0x2a],"The client lists which configuration values it wants the server to include (1=mask, 3=router/gateway, 6=DNS, 42=NTP).")
+    .f("Option 57: Maximum DHCP Message Size","1500",[0x39,0x02,0x05,0xdc],"Largest DHCP message the client can accept, so the server doesn't overflow its buffers.")
+    .f("Option 61: Client Identifier","01:00:1c:42:00:00:08",[0x3d,0x07,0x01,...MAC.client],"A unique client key (here type 1 = Ethernet MAC). Lets the server identify the client even across hardware quirks.")
+    .f("Option 255: End","End",[0xff],"Marks the end of the options. Anything after this is padding.");
+  PACKETS.push(pb.build());
+})();
+
+/* 11 — ICMP Echo request (ping) ------------------------------------------- */
+(function(){
+  const data = S("abcdefghijklmnopqrstuvwabcdefghi"); // 32 bytes
+  const icmpLen = 8 + data.length;
+  const totalLen = 20 + icmpLen;
+  const frameLen = 14 + totalLen;
+  const pb = new PB({ no:11, time:"0.061000", src:"192.168.1.100", dst:"93.184.216.34",
+    proto:"ICMP", info:"Echo (ping) request  id=0x0001, seq=1/256, ttl=64", color:"ICMP" });
+  frame(pb,11,"Jun 16, 2026 19:30:01.061000",String(frameLen),"eth:ethertype:ip:icmp","ICMP");
+  eth(pb, MAC.router, MAC.client, 0x0800, "IPv4");
+  ipv4(pb,{ totalLen, id:0x5b2a, proto:1, protoName:"ICMP", src:IP.client, dst:IP.web, csum:[0x3a,0x77] });
+  pb.layer("Internet Control Message Protocol")
+    .f("Type","8 (Echo (ping) request)",[0x08],"ICMP message type. 8 = echo request, 0 = echo reply, 3 = destination unreachable, 11 = time exceeded (traceroute).")
+    .f("Code","0",[0x00],"Sub-type. For echo it is always 0.")
+    .f("Checksum","0x4d3a",[0x4d,0x3a],"Covers the ICMP message. ICMP rides directly on IP (no ports) — it is the network's signalling/diagnostic protocol.")
+    .f("Identifier","0x0001 (1)",[0x00,0x01],"Lets the sender match replies to requests when several pings run at once (often the process ID).")
+    .f("Sequence Number","1",[0x00,0x01],"Increments per ping so you can spot lost/reordered replies and measure round-trip time.")
+    .f("Data (32 bytes)","abcdefghijklmnopqrstuvwabcdefghi",data,"Arbitrary payload echoed back unchanged by the target. ping uses it to verify the path delivers data intact and to pad to a chosen size.");
+  PACKETS.push(pb.build());
+})();
+
+// ============================================================
+//  Rendering
+// ============================================================
+// Refined console accent per protocol (used for badges + row edges).
+const PROTO_COLOR = {
+  ARP:"#e0a64a", DNS:"#52d6e6", UDP:"#52d6e6", SSDP:"#4ab8cc",
+  TCP:"#9b8cf5", HTTP:"#5ef38c", DHCP:"#f59e6b", ICMP:"#f56b8c"
+};
+
+// ============================================================
+//  i18n — EN / JA.  t() returns Japanese when lang==='ja',
+//  via an exact-match dictionary first, then phrase rules.
+//  Anything unmatched falls back to the original English.
+// ============================================================
+let lang = 'en';
+let currentTab = 'hex';
+
+const DICT_JA = {
+  // ---- field names ----
+  "Destination":"宛先 (Destination)","Source":"送信元 (Source)","Type":"タイプ (Type)",
+  "Version + Header Length":"バージョン + ヘッダ長","Differentiated Services Field":"DiffServ フィールド",
+  "Total Length":"全長 (Total Length)","Identification":"識別子 (Identification)",
+  "Flags + Fragment Offset":"フラグ + フラグメントオフセット","Time to Live":"TTL（生存時間）",
+  "Protocol":"プロトコル (Protocol)","Header Checksum":"ヘッダチェックサム",
+  "Source Address":"送信元アドレス","Destination Address":"宛先アドレス",
+  "Source Port":"送信元ポート","Destination Port":"宛先ポート",
+  "Sequence Number (raw)":"シーケンス番号（生値）","Acknowledgment Number (raw)":"確認応答番号（生値）",
+  "Header Length + Flags":"ヘッダ長 + フラグ","Window":"ウィンドウ (Window)","Checksum":"チェックサム (Checksum)",
+  "Urgent Pointer":"緊急ポインタ","Options: Maximum Segment Size":"オプション: 最大セグメントサイズ (MSS)",
+  "Hardware type":"ハードウェアタイプ","Protocol type":"プロトコルタイプ","Hardware size":"ハードウェアサイズ",
+  "Protocol size":"プロトコルサイズ","Opcode":"オペコード (Opcode)",
+  "Sender MAC address":"送信側 MAC アドレス","Sender IP address":"送信側 IP アドレス",
+  "Target MAC address":"ターゲット MAC アドレス","Target IP address":"ターゲット IP アドレス",
+  "Transaction ID":"トランザクション ID","Flags":"フラグ (Flags)","Questions":"質問数 (Questions)",
+  "Answer RRs":"回答 RR 数","Authority RRs":"権威 RR 数","Additional RRs":"追加 RR 数",
+  "Name: example.com":"名前: example.com","Class":"クラス (Class)",
+  "Queries: example.com A IN":"クエリ: example.com A IN",
+  "Answer: example.com A 93.184.216.34":"回答: example.com A 93.184.216.34",
+  "Length":"長さ (Length)","Message type":"メッセージタイプ","Hardware address length":"ハードウェアアドレス長",
+  "Hops":"ホップ数 (Hops)","Seconds elapsed":"経過秒数","Bootp flags":"BOOTP フラグ",
+  "Client IP address":"クライアント IP アドレス (ciaddr)","Your (client) IP address":"割当 IP アドレス (yiaddr)",
+  "Next server IP address":"次サーバ IP アドレス (siaddr)","Relay agent IP address":"リレーエージェント IP アドレス (giaddr)",
+  "Client MAC address":"クライアント MAC アドレス (chaddr)","Server host name":"サーバホスト名",
+  "Boot file name":"ブートファイル名","Magic cookie":"マジッククッキー",
+  "Option 53: DHCP Message Type = Discover":"オプション 53: DHCP メッセージタイプ = Discover",
+  "Option 55: Parameter Request List":"オプション 55: パラメータ要求リスト",
+  "Option 57: Maximum DHCP Message Size":"オプション 57: 最大 DHCP メッセージサイズ",
+  "Option 61: Client Identifier":"オプション 61: クライアント識別子",
+  "Option 255: End":"オプション 255: 終端 (End)",
+  "Code":"コード (Code)","Identifier":"識別子 (Identifier)","Sequence Number":"シーケンス番号",
+  "Data (32 bytes)":"データ (32 バイト)",
+  "Frame Number":"フレーム番号","Frame Length":"フレーム長","Capture Length":"キャプチャ長",
+  "Arrival Time":"到着時刻","Protocols in frame":"フレーム内のプロトコル","Coloring Rule":"配色ルール",
+  "Request Line: GET / HTTP/1.1":"リクエストライン: GET / HTTP/1.1","Host: example.com":"Host: example.com",
+  "User-Agent: curl/8.4.0":"User-Agent: curl/8.4.0","Accept: */*":"Accept: */*",
+  "\\r\\n (end of headers)":"\\r\\n（ヘッダ終端）",
+  // ---- IPv4 / DNS sub-field names ----
+  "0100 .... = Version: 4":"0100 .... = バージョン: 4",
+  ".... 0101 = Header Length: 20 bytes (5)":".... 0101 = ヘッダ長: 20 バイト (5)",
+  "0... .... = Reserved bit: Not set":"0... .... = 予約ビット: 未設定",
+  ".1.. .... = Don't fragment: Set":".1.. .... = フラグメント禁止(DF): 設定",
+  "..0. .... = More fragments: Not set":"..0. .... = フラグメント継続(MF): 未設定",
+  "0... .... .... .... = Response: Message is a query":"0... .... .... .... = 応答(QR): クエリ",
+  ".000 0... .... .... = Opcode: Standard query (0)":".000 0... .... .... = オペコード: 標準クエリ (0)",
+  ".... .... 1... .... = Recursion desired: Set":".... .... 1... .... = 再帰要求(RD): 設定",
+  "1... .... .... .... = Response: Message is a response":"1... .... .... .... = 応答(QR): 応答",
+  ".... .... .... 0000 = Reply code: No error (0)":".... .... .... 0000 = 応答コード: エラーなし (0)",
+  "Name: example.com (pointer 0xc00c)":"名前: example.com (ポインタ 0xc00c)",
+  "Type: A (1)":"タイプ: A (1)","Time to live: 3600 (1 hour)":"TTL: 3600 (1時間)",
+  "Address: 93.184.216.34":"アドレス: 93.184.216.34",
+  // ---- values ----
+  "request (1)":"要求 (1)","reply (2)":"応答 (2)","Ethernet (1)":"イーサネット (1)","IPv4 (0x0800)":"IPv4 (0x0800)",
+  "Boot Request (1)":"ブート要求 (1)","Ethernet (0x01)":"イーサネット (0x01)","(not given)":"（指定なし）",
+  "End":"終端 (End)","8 (Echo (ping) request)":"8（エコー(ping)要求）","0x8000 (Broadcast)":"0x8000（ブロードキャスト）",
+  "Subnet Mask, Router, DNS, NTP":"サブネットマスク, ルータ, DNS, NTP",
+  "0x0100 Standard query":"0x0100 標準クエリ","0x8180 Standard query response, No error":"0x8180 標準クエリ応答, エラーなし",
+  "MSS = 1460 bytes":"MSS = 1460 バイト","Set":"設定","Not set":"未設定",
+  // ---- info column ----
+  "Who has 192.168.1.1? Tell 192.168.1.100":"192.168.1.1 は誰? → 192.168.1.100 へ通知",
+  "192.168.1.1 is at 00:1a:2b:3c:4d:5e":"192.168.1.1 の MAC は 00:1a:2b:3c:4d:5e",
+  "Standard query 0x1a2b A example.com":"標準クエリ 0x1a2b A example.com",
+  "Standard query response 0x1a2b A example.com A 93.184.216.34":"標準クエリ応答 0x1a2b A example.com A 93.184.216.34",
+  "DHCP Discover - Transaction ID 0x1a2b3c4d":"DHCP Discover - トランザクション ID 0x1a2b3c4d",
+  "Echo (ping) request  id=0x0001, seq=1/256, ttl=64":"エコー(ping)要求  id=0x0001, seq=1/256, ttl=64",
+  // ---- flow-graph roles / labels ----
+  "Client":"クライアント","Gateway / DNS":"ゲートウェイ / DNS","Web server":"Web サーバ",
+  "Client (no IP)":"クライアント (IP なし)","Broadcast":"ブロードキャスト","SSDP Multicast":"SSDP マルチキャスト","Host":"ホスト",
+  "DNS query":"DNS クエリ","DNS response":"DNS 応答","ARP request":"ARP 要求","ARP reply":"ARP 応答",
+  "ICMP echo request":"ICMP エコー要求",
+  // ---- misc UI rendered from JS ----
+  "hover bytes for source field":"バイトにカーソルで対応フィールド表示",
+  "click a layer to highlight its bytes":"レイヤをクリックでバイトを強調",
+  // ---- variant descriptions (TCP destination port) ----
+  "Receiver's port. 80 = HTTP.":"受信側のポート。80 = HTTP。",
+  "Receiver's port. 443 = HTTPS.":"受信側のポート。443 = HTTPS。",
+  "Receiver's port. Identifies the service.":"受信側のポート。サービスを識別する。",
+  // ---- descriptions ----
+  "Layer-2 (MAC) address of the next hop on this LAN segment. ff:ff:ff:ff:ff:ff is a broadcast to every host; 01:00:5e... is IPv4 multicast. This is rewritten at every router hop.":"この LAN セグメントにおける次ホップの L2（MAC）アドレス。ff:ff:ff:ff:ff:ff は全ホスト宛のブロードキャスト、01:00:5e... は IPv4 マルチキャスト。ルータを通過するたびに書き換えられる。",
+  "MAC address of the interface that put this frame on the wire. The first 3 bytes (OUI) identify the hardware vendor; the last 3 are assigned by that vendor.":"このフレームを送出したインターフェースの MAC アドレス。先頭3バイト(OUI)がハードウェアベンダを示し、後半3バイトはそのベンダが割り当てる。",
+  "EtherType tells the receiver which Layer-3 protocol is inside: 0x0800 = IPv4, 0x0806 = ARP, 0x86dd = IPv6. Wireshark uses it to pick the next dissector.":"EtherType は中身の L3 プロトコルを示す: 0x0800=IPv4, 0x0806=ARP, 0x86dd=IPv6。Wireshark は次のディセクタ選択に使う。",
+  "One byte split in two nibbles. High nibble 4 = IPv4. Low nibble 5 = header length in 32-bit words (5 × 4 = 20 bytes, the minimum with no options).":"1バイトを上位・下位の2ニブルに分割。上位ニブル4=IPv4、下位ニブル5=ヘッダ長（32ビットワード単位、5×4=20バイト、オプションなしの最小値）。",
+  "IP protocol version. 4 means IPv4.":"IP プロトコルのバージョン。4 は IPv4。",
+  "Internet Header Length (IHL) in 32-bit words. Needed because IP options can make the header longer than 20 bytes.":"ヘッダ長(IHL)を32ビットワードで表す。IP オプションでヘッダが20バイトを超えうるため必要。",
+  "QoS marking. The top 6 bits (DSCP) classify traffic for prioritization (e.g. voice vs bulk); the low 2 bits (ECN) allow routers to signal congestion instead of dropping packets.":"QoS 用マーキング。上位6ビット(DSCP)が優先制御のためのトラフィック分類（例: 音声 vs 大容量）、下位2ビット(ECN)はパケット破棄の代わりに輻輳を通知できる。",
+  "A per-packet ID used to reassemble fragments: all fragments of one original datagram share this value.":"フラグメント再構成に使うパケットごとの ID。元の1データグラムの全フラグメントが同じ値を共有する。",
+  "Top 3 bits are control flags; the remaining 13 bits are the fragment offset (in 8-byte units) for reassembly.":"上位3ビットが制御フラグ、残り13ビットが再構成用のフラグメントオフセット（8バイト単位）。",
+  "Must be zero.":"ゼロでなければならない。",
+  "DF flag. The sender forbids routers from fragmenting this packet; if it is too big for a link, the router drops it and returns ICMP 'fragmentation needed' (this drives Path MTU Discovery).":"DF フラグ。送信側はルータによる分割を禁止する。リンクに対して大きすぎる場合ルータは破棄し ICMP「fragmentation needed」を返す（Path MTU Discovery の仕組み）。",
+  "MF flag. 0 means this is the last (or only) fragment.":"MF フラグ。0 は最後（または唯一）のフラグメントを意味する。",
+  "Hop limit. Each router decrements it by 1; at 0 the packet is discarded and ICMP 'Time Exceeded' is returned (this is how traceroute works). Common start values: 64 (Linux/macOS), 128 (Windows).":"ホップ数の上限。ルータごとに1減算され、0で破棄され ICMP「Time Exceeded」が返る（traceroute の原理）。一般的な初期値: 64 (Linux/macOS), 128 (Windows)。",
+  "Covers only the IP header (not the payload). Recomputed at every hop because the TTL changes. If it fails, the packet is dropped silently.":"IP ヘッダのみ（ペイロードは含まない）を対象とする。TTL が変わるため各ホップで再計算される。失敗するとパケットは黙って破棄される。",
+  "32-bit IPv4 address of the original sender. Unlike the MAC address, this stays the same end-to-end (barring NAT).":"元の送信者の 32 ビット IPv4 アドレス。MAC と違い、（NAT がなければ）端から端まで変わらない。",
+  "32-bit IPv4 address of the final recipient. Routers forward based on this field.":"最終受信者の 32 ビット IPv4 アドレス。ルータはこのフィールドを基に転送する。",
+  "Sender's port. Combined with the 4 IP/port values it forms the 'socket pair' that uniquely identifies this connection.":"送信側のポート。IP/ポートの4値と合わせて、この接続を一意に識別する「ソケットペア」を構成する。",
+  "Byte-offset of the first data byte in this segment within the stream. TCP numbers every byte so lost data can be detected and retransmitted.":"このセグメント先頭データバイトのストリーム内バイトオフセット。TCP は全バイトに番号を付け、損失を検出・再送できる。",
+  "Next sequence number the sender expects to receive — i.e. everything up to here arrived OK. Only meaningful when the ACK flag is set.":"送信側が次に受信を期待するシーケンス番号 — つまりここまで正常に届いたことを示す。ACK フラグが立っているときのみ有効。",
+  "Data offset nibble + 12 control-flag bits.":"データオフセットのニブル + 12 個の制御フラグビット。",
+  "The control bits that drive the TCP state machine.":"TCP の状態遷移を駆動する制御ビット。",
+  "SYN = synchronize. Set only on the first two packets to establish a connection and agree initial sequence numbers.":"SYN = 同期。接続確立と初期シーケンス番号の合意のため、最初の2パケットだけで立てられる。",
+  "ACK = acknowledgment. Once set (on every packet after the first SYN) the Acknowledgment Number field is valid.":"ACK = 確認応答。（最初の SYN 以降の全パケットで）立つと、確認応答番号フィールドが有効になる。",
+  "PSH = push. Tells the receiver to deliver buffered data to the application immediately rather than waiting for more.":"PSH = プッシュ。受信側にバッファ済みデータを待たずに即アプリへ渡すよう指示する。",
+  "FIN = finish. Begins the graceful close of one direction of the connection.":"FIN = 終了。接続の片方向の正常クローズを開始する。",
+  "Flow control: how many more bytes the sender is currently willing to receive. A window of 0 tells the peer to stop sending.":"フロー制御: 送信側があと何バイト受信できるか。ウィンドウ0は相手に送信停止を伝える。",
+  "Covers the TCP header, data and an IP pseudo-header — TCP's end-to-end integrity check.":"TCP ヘッダ・データ・IP 擬似ヘッダを対象とする — TCP の端到端の整合性チェック。",
+  "Only meaningful if the URG flag is set; points to 'urgent' data. Rarely used today.":"URG フラグが立つときのみ有効で「緊急」データを指す。今日ではほとんど使われない。",
+  "TCP options appear only in SYN packets here. MSS announces the largest payload this host wants per segment (1460 = 1500-byte Ethernet MTU − 20 IP − 20 TCP), avoiding IP fragmentation.":"ここでは TCP オプションは SYN パケットにのみ現れる。MSS は1セグメントあたり受け入れる最大ペイロードを通知（1460 = 1500 バイトのイーサ MTU − 20 IP − 20 TCP）し、IP フラグメント化を避ける。",
+  "Ephemeral port the OS picked for this query; the DNS reply will be sent back to it.":"OS がこのクエリ用に選んだエフェメラルポート。DNS 応答はここへ返される。",
+  "Well-known port 53 = DNS. This is how the kernel knows to hand the payload to a DNS dissector/server.":"ウェルノウンポート 53 = DNS。カーネルはこれでペイロードを DNS に渡すと判断する。",
+  "UDP header (8) + data. UDP is connectionless: no handshake, no sequence numbers, no retransmission — speed over reliability.":"UDP ヘッダ(8) + データ。UDP はコネクションレス: ハンドシェイク・シーケンス番号・再送なし — 信頼性より速度。",
+  "Optional in IPv4 UDP; 0x0000 means 'not computed'. Covers the UDP header, data and an IP pseudo-header.":"IPv4 の UDP では任意。0x0000 は「未計算」。UDP ヘッダ・データ・IP 擬似ヘッダを対象とする。",
+  "Comes from port 53 (the DNS server).":"ポート 53（DNS サーバ）から送られる。",
+  "Sent back to the exact ephemeral port the client used.":"クライアントが使ったエフェメラルポートへ正確に返送される。",
+  "UDP header + DNS message length.":"UDP ヘッダ + DNS メッセージ長。",
+  "Not computed (optional in IPv4).":"未計算（IPv4 では任意）。",
+  "Random ID echoed in the response so the client can match replies to requests (and reject spoofed answers that guess wrong).":"応答でそのまま返されるランダムな ID。クライアントは応答と要求を対応付けられる（誤った偽装応答を拒否できる）。",
+  "Bit-field describing the message.":"メッセージを記述するビットフィールド。",
+  "QR bit. 0 = query, 1 = response.":"QR ビット。0 = クエリ、1 = 応答。",
+  "The kind of query; 0 is a normal lookup.":"クエリの種類。0 は通常の検索。",
+  "RD bit. Asks the server to do the full lookup on our behalf and return the final answer.":"RD ビット。サーバに代理で完全な検索を行い最終回答を返すよう要求する。",
+  "Number of questions in this message — normally exactly 1.":"このメッセージ内の質問数 — 通常はちょうど1。",
+  "Resource records in the answer section. 0 in a query (the server fills these in).":"回答セクションのリソースレコード数。クエリでは0（サーバが埋める）。",
+  "Authority records — 0 in a query.":"権威レコード — クエリでは0。",
+  "Additional records (e.g. EDNS) — 0 here.":"追加レコード（例: EDNS）— ここでは0。",
+  "The domain being looked up, encoded as length-prefixed labels: 7'example' 3'com' 0. The trailing 0 is the root label.":"検索対象のドメイン。長さ接頭付きラベルで符号化: 7'example' 3'com' 0。末尾の0はルートラベル。",
+  "Record type wanted. A = IPv4 address. (AAAA=IPv6, MX=mail, CNAME=alias, etc.)":"要求するレコード種別。A = IPv4 アドレス。（AAAA=IPv6, MX=メール, CNAME=別名 等）",
+  "Namespace class. IN = Internet (essentially always).":"名前空間クラス。IN = インターネット（ほぼ常にこれ）。",
+  "Same ID as the query — this is how the client matches the answer to its question.":"クエリと同じ ID — クライアントはこれで回答を質問に対応付ける。",
+  "Now QR=1 (response) and RA=1 (recursion available); rcode=0 (no error).":"QR=1（応答）かつ RA=1（再帰利用可）、rcode=0（エラーなし）。",
+  "QR bit set — this is a reply.":"QR ビットが立つ — これは応答。",
+  "RCODE 0 = success. (3 = NXDOMAIN 'name does not exist'.)":"RCODE 0 = 成功。（3 = NXDOMAIN「名前が存在しない」）",
+  "The original question is echoed back.":"元の質問がそのまま返される。",
+  "One answer record follows.":"回答レコードが1件続く。",
+  "None included.":"含まれない。",
+  "The echoed question section (name + type A + class IN).":"返された質問セクション（名前 + タイプ A + クラス IN）。",
+  "The resource record. 0xc00c is a compression pointer back to the name at offset 12; then type A, class IN, a TTL of 3600s, 4-byte length and the IPv4 address.":"リソースレコード。0xc00c はオフセット12の名前を指す圧縮ポインタ。続いてタイプ A、クラス IN、TTL 3600 秒、長さ4バイト、IPv4 アドレス。",
+  "Name compression: instead of repeating 'example.com', it points to the name already present in the question.":"名前圧縮: 'example.com' を繰り返さず、質問内に既出の名前を指す。",
+  "Answer is an IPv4 address record.":"回答は IPv4 アドレスレコード。",
+  "How long resolvers may cache this answer before asking again.":"リゾルバが再問い合わせまでこの回答をキャッシュしてよい時間。",
+  "The resolved IPv4 address the client will now connect to.":"解決された IPv4 アドレス。クライアントはここへ接続する。",
+  "The request line: METHOD, request-target, HTTP version. GET = retrieve a resource without side effects. '/' is the path (the site root). HTTP/1.1 keeps the TCP connection open for reuse.":"リクエストライン: メソッド・リクエストターゲット・HTTP バージョン。GET = 副作用なしでリソースを取得。'/' はパス（サイトのルート）。HTTP/1.1 は再利用のため TCP 接続を維持する。",
+  "Mandatory in HTTP/1.1. Lets one server (one IP) host many sites (virtual hosting) by telling it which domain you want.":"HTTP/1.1 で必須。どのドメインが欲しいかを伝えることで、1台のサーバ（1 IP）が多数のサイトをホスト（バーチャルホスティング）できる。",
+  "Identifies the client software. Servers use it for stats, compatibility shims, or blocking bots.":"クライアントソフトを識別する。サーバは統計・互換対応・ボット遮断に利用する。",
+  "Content negotiation: which media types the client will accept. */* = anything.":"コンテンツネゴシエーション: クライアントが受け入れるメディアタイプ。*/* = 何でも可。",
+  "A bare blank line (CRLF) marks the end of the header block. For a GET there is no body, so the message ends here.":"空行(CRLF)がヘッダブロックの終端を示す。GET には本文がないため、メッセージはここで終わる。",
+  "SSDP reuses HTTP syntax over UDP. M-SEARCH is a multicast search asking 'what devices are out there?'.":"SSDP は UDP 上で HTTP 構文を再利用する。M-SEARCH は「どんな機器があるか?」を尋ねるマルチキャスト探索。",
+  "The fixed SSDP multicast group address and port that every UPnP device listens on.":"全 UPnP 機器が待ち受ける、固定の SSDP マルチキャストグループアドレスとポート。",
+  "Mandatory extension declaring the intent of this request: a discovery probe.":"この要求の意図（探索プローブ）を宣言する必須拡張。",
+  "Maximum wait: devices must answer within a random delay up to MX seconds, spreading replies to avoid a flood.":"最大待機: 機器は最大 MX 秒のランダム遅延内に応答する。応答を分散させて殺到を防ぐ。",
+  "Search Target: which device/service types to match. ssdp:all = every device should respond.":"検索ターゲット: 一致させる機器/サービス種別。ssdp:all = 全機器が応答すべき。",
+  "Blank line ends the SSDP message.":"空行が SSDP メッセージを終端する。",
+  "BOOTP op code. 1 = request from client to server.":"BOOTP オペコード。1 = クライアントからサーバへの要求。",
+  "Network hardware family — Ethernet.":"ネットワークハードウェアの種別 — イーサネット。",
+  "MAC address length in bytes.":"MAC アドレスのバイト長。",
+  "Used by relay agents; 0 means no relay between client and server.":"リレーエージェントが使用。0 はクライアント・サーバ間にリレーなしを意味する。",
+  "Random ID tying the whole DHCP conversation (Discover→Offer→Request→Ack) together.":"DHCP の一連のやり取り（Discover→Offer→Request→Ack）全体を結びつけるランダム ID。",
+  "Seconds since the client started trying to get an address.":"クライアントがアドレス取得を試み始めてからの秒数。",
+  "Broadcast bit set: the client has no IP, so it asks the server to broadcast the reply rather than unicast it.":"ブロードキャストビット設定: クライアントは IP を持たないため、応答をユニキャストでなくブロードキャストするようサーバに要求する。",
+  "ciaddr — only filled in if the client already has a usable lease (renewing). Zero during initial Discover.":"ciaddr — クライアントが既に使えるリースを持つ（更新時）場合のみ設定。初回 Discover では0。",
+  "yiaddr — the server writes the offered address here in its reply. Empty in the Discover.":"yiaddr — サーバが応答で提案アドレスをここに書く。Discover では空。",
+  "siaddr — used for network boot (TFTP). Not used here.":"siaddr — ネットワークブート(TFTP)で使用。ここでは未使用。",
+  "giaddr — filled by a DHCP relay if the server is on another subnet.":"giaddr — サーバが別サブネットにある場合、DHCP リレーが設定する。",
+  "chaddr — the client's hardware address. The server keys leases off this so the same device gets a stable address. (Padded to 16 bytes.)":"chaddr — クライアントのハードウェアアドレス。サーバはこれを鍵にリースを管理し、同一機器に安定したアドレスを割り当てる。（16バイトにパディング）",
+  "Optional 64-byte server name field, unused here (all zeros).":"任意の64バイトのサーバ名フィールド。ここでは未使用（すべてゼロ）。",
+  "Optional 128-byte boot-file field for network boot, unused here (all zeros).":"ネットワークブート用の任意の128バイトのブートファイルフィールド。ここでは未使用（すべてゼロ）。",
+  "The fixed value that marks the start of the DHCP options area and distinguishes DHCP from plain BOOTP.":"DHCP オプション領域の開始を示し、素の BOOTP と DHCP を区別する固定値。",
+  "The single most important option: it makes this a DHCP DISCOVER (type 1) — 'is there a DHCP server out there?'.":"最も重要なオプション: これを DHCP DISCOVER（タイプ1）にする — 「DHCP サーバはいますか?」。",
+  "The client lists which configuration values it wants the server to include (1=mask, 3=router/gateway, 6=DNS, 42=NTP).":"クライアントがサーバに含めてほしい設定値を列挙する（1=マスク, 3=ルータ/ゲートウェイ, 6=DNS, 42=NTP）。",
+  "Largest DHCP message the client can accept, so the server doesn't overflow its buffers.":"クライアントが受け入れられる最大の DHCP メッセージ。サーバがバッファを溢れさせないため。",
+  "A unique client key (here type 1 = Ethernet MAC). Lets the server identify the client even across hardware quirks.":"一意のクライアント鍵（ここではタイプ1=イーサネット MAC）。ハードウェアの差異を越えてクライアントを識別できる。",
+  "Marks the end of the options. Anything after this is padding.":"オプションの終端を示す。これ以降はすべてパディング。",
+  "ICMP message type. 8 = echo request, 0 = echo reply, 3 = destination unreachable, 11 = time exceeded (traceroute).":"ICMP メッセージタイプ。8 = エコー要求、0 = エコー応答、3 = 宛先到達不能、11 = 時間超過（traceroute）。",
+  "Sub-type. For echo it is always 0.":"サブタイプ。エコーでは常に0。",
+  "Covers the ICMP message. ICMP rides directly on IP (no ports) — it is the network's signalling/diagnostic protocol.":"ICMP メッセージを対象とする。ICMP はポートを持たず IP 上に直接乗る — ネットワークの通知/診断プロトコル。",
+  "Lets the sender match replies to requests when several pings run at once (often the process ID).":"複数の ping が同時に走るとき、送信側が応答と要求を対応付けられる（多くはプロセス ID）。",
+  "Increments per ping so you can spot lost/reordered replies and measure round-trip time.":"ping ごとに増加し、損失/順序入れ替わりの検出や往復時間の測定に使える。",
+  "Arbitrary payload echoed back unchanged by the target. ping uses it to verify the path delivers data intact and to pad to a chosen size.":"ターゲットがそのまま返す任意のペイロード。ping は経路がデータを無損で運ぶことの確認や、指定サイズへのパディングに使う。",
+  // ---- ARP descriptions ----
+  "The Layer-2 technology ARP is resolving on. 1 = Ethernet.":"ARP が解決対象とする L2 技術。1 = イーサネット。",
+  "The Layer-3 address family being resolved. 0x0800 = IPv4.":"解決対象の L3 アドレス種別。0x0800 = IPv4。",
+  "Length in bytes of a hardware (MAC) address — 6 for Ethernet.":"ハードウェア(MAC)アドレスのバイト長 — イーサネットでは 6。",
+  "Length in bytes of a protocol (IP) address — 4 for IPv4.":"プロトコル(IP)アドレスのバイト長 — IPv4 では 4。",
+  "1 = request ('who has this IP?'), 2 = reply ('I have it, here is my MAC'). ARP has no other transport — it rides directly on Ethernet.":"1 = 要求（このIPは誰?）、2 = 応答（私です、MACはこれ）。ARP は専用トランスポートを持たず、イーサネット上に直接乗る。",
+  "MAC of the host asking the question. The receiver caches this mapping for free.":"質問しているホストの MAC。受信側はこの対応表を無償でキャッシュできる。",
+  "IP of the host asking. Lets others learn this IP↔MAC pair.":"質問しているホストの IP。他ホストが IP↔MAC の対応を学習できる。",
+  "Unknown — that is exactly what we are trying to discover, so it is left all zeros.":"未知 — まさに調べたい対象なので、すべてゼロのまま。",
+  "The IP whose MAC we want. Only the host that owns this address should reply.":"MAC を知りたい対象の IP。このアドレスを持つホストだけが応答する。",
+  "1 = Ethernet.":"1 = イーサネット。","0x0800 = IPv4.":"0x0800 = IPv4。",
+  "6-byte MAC addresses.":"6 バイトの MAC アドレス。","4-byte IPv4 addresses.":"4 バイトの IPv4 アドレス。",
+  "2 = reply. The router answers directly (unicast) to whoever asked.":"2 = 応答。ルータは質問元へ直接（ユニキャストで）応答する。",
+  "The answer to the question: this is the MAC owning 192.168.1.1.":"質問への答え: これが 192.168.1.1 を持つ MAC。",
+  "Confirms which IP the above MAC belongs to.":"上記 MAC がどの IP のものかを確認する。",
+  "MAC of the original asker (now known, copied from the request).":"元の質問者の MAC（要求からコピーされ既知）。",
+  "IP of the original asker.":"元の質問者の IP。",
+  // ---- DHCP UDP descriptions ----
+  "DHCP client port. The client has no IP yet, so it sends from 0.0.0.0:68.":"DHCP クライアントポート。クライアントはまだ IP を持たないため 0.0.0.0:68 から送信する。",
+  "DHCP server port. Sent to the broadcast address because the client doesn't know the server's address yet.":"DHCP サーバポート。クライアントはサーバのアドレスを知らないためブロードキャスト宛に送る。",
+  "UDP carries DHCP because broadcast is needed before any IP exists.":"IP が存在する前にブロードキャストが必要なため、DHCP は UDP で運ばれる。",
+  "Not computed.":"未計算。",
+  "Ephemeral source port; replies from devices come back here (unicast).":"エフェメラルな送信元ポート。各デバイスからの応答はここへ（ユニキャストで）返る。",
+  "Port 1900 = SSDP, the discovery part of UPnP used to find smart-home / media devices on the LAN.":"ポート 1900 = SSDP。LAN 上のスマート家電/メディア機器を見つける UPnP の探索部分。",
+  "UDP is ideal for multicast discovery: one datagram reaches many devices with no connection setup.":"UDP はマルチキャスト探索に最適: 接続確立なしで1つのデータグラムが多数の機器に届く。",
+  // ---- frame meta descriptions ----
+  "Sequential index Wireshark assigns to each captured packet. It is local to the capture file and has nothing to do with the network — it just lets you reference 'packet 5'.":"Wireshark が各キャプチャパケットに付ける連番。キャプチャファイル内だけの番号でネットワークとは無関係、「5番目のパケット」と参照するためのもの。",
+  "Total size of this frame as it appeared on the wire, including the Ethernet header but excluding the 4-byte Ethernet FCS (which the NIC usually strips before capture).":"ワイヤ上に現れたフレームの総サイズ。イーサネットヘッダを含むが、4バイトの FCS（通常 NIC がキャプチャ前に除去）は含まない。",
+  "How many bytes Wireshark actually stored. If a 'snap length' were set it could be smaller than the frame length; here the whole packet was captured.":"Wireshark が実際に保存したバイト数。snap length 設定時はフレーム長より小さくなりうるが、ここでは全体を取得。",
+  "Timestamp from the capturing host's clock when this frame was received. The 'Time' column in the list is usually shown relative to the first packet.":"このフレーム受信時のキャプチャホストの時刻。一覧の Time 列は通常、最初のパケットからの相対時間で表示される。",
+  "The layered stack of dissectors that matched this packet, from lowest layer to highest. This is the 'protocol onion' you are peeling open below.":"このパケットに一致したディセクタの階層スタック（下位層から上位層へ）。下で剥いていく「プロトコルの玉ねぎ」。",
+  "Wireshark colors each row using rules matched top-to-bottom. The color is a visual hint about the protocol or about problems (e.g. red = checksum/RST errors).":"Wireshark は上から順に一致したルールで各行に配色する。色はプロトコルや問題（例: 赤 = チェックサム/RST エラー）の視覚的ヒント。"
+};
+
+// phrase rules for dynamic strings (layer names, frame line, info, bit-fields).
+// applied in order; longest / most specific first.
+const PHRASES_JA = [
+  // dynamic descriptions (embed a number / protocol name) — match the static halves
+  ["Entire IP packet size in bytes — IP header + everything above it (here ","IP パケット全体のサイズ（バイト）= IP ヘッダ + 上位すべて（ここでは "],
+  ["). Lets the receiver know where the packet ends and detect truncation.","）。受信側はパケットの終端を知り、切り詰めを検出できる。"],
+  ["Identifies the Layer-4 payload: 6 = TCP, 17 = UDP, 1 = ICMP. Here it is ","L4 ペイロードの種別: 6=TCP, 17=UDP, 1=ICMP。ここでは "],
+  [". Wireshark uses it to choose the next dissector.","。Wireshark は次のディセクタ選択に使う。"],
+  ["Internet Protocol Version 4","IPv4 (インターネットプロトコル v4)"],
+  ["Address Resolution Protocol","ARP (アドレス解決プロトコル)"],
+  ["Transmission Control Protocol","TCP (伝送制御プロトコル)"],
+  ["User Datagram Protocol","UDP (ユーザーデータグラムプロトコル)"],
+  ["Hypertext Transfer Protocol","HTTP (ハイパーテキスト転送プロトコル)"],
+  ["Simple Service Discovery Protocol","SSDP (シンプルサービスディスカバリプロトコル)"],
+  ["Dynamic Host Configuration Protocol","DHCP (動的ホスト構成プロトコル)"],
+  ["Internet Control Message Protocol","ICMP (インターネット制御メッセージプロトコル)"],
+  ["Domain Name System","DNS (ドメインネームシステム)"],
+  ["Ethernet II","イーサネット II"],
+  ["Src Port:","送信元ポート:"],["Dst Port:","宛先ポート:"],
+  ["Src:","送信元:"],["Dst:","宛先:"],
+  ["bytes on wire (","バイト（ワイヤ上, "],[" bits), "," ビット）、"],["bytes captured","バイト取得"],
+  ["Frame ","フレーム "],
+  ["(request)","（要求）"],["(reply)","（応答）"],["(query)","（クエリ）"],["(response)","（応答）"],
+  ["Header Length:","ヘッダ長:"],[" bytes ("," バイト ("],
+  ["Not set","未設定"],["Set","設定"],
+  ["Flags:","フラグ:"]
+];
+
+function t(s){
+  if(lang==='en' || s==null) return s;
+  if(Object.prototype.hasOwnProperty.call(DICT_JA, s)) return DICT_JA[s];
+  let r = String(s);
+  for(const [a,b] of PHRASES_JA) r = r.split(a).join(b);
+  return r;
+}
+
+// swap all static chrome + re-render dynamic views for the active language
+function applyUILang(){
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    el.textContent = (lang==='ja') ? el.dataset.ja : el.dataset.en;
+  });
+  filterEl.placeholder = (lang==='ja')
+    ? 'ディスプレイフィルタを入力 —  tcp · udp · http · dhcp · dns · arp · icmp'
+    : 'apply display filter —  tcp · udp · http · dhcp · dns · arp · icmp';
+  document.getElementById('langBtn').textContent = (lang==='ja') ? 'EN' : '日本語';
+  renderList();
+  if(current) selectPacket(current);
+  if(flowBuilt) buildFlow();
+  switchTab(currentTab);
+}
+
+const body = document.getElementById('plist-body');
+const details = document.getElementById('details');
+const hexEl = document.getElementById('hex');
+const explainEl = document.getElementById('explain');
+const tip = document.getElementById('tip');
+const filterEl = document.getElementById('filter');
+const stCount = document.getElementById('st-count');
+
+let current = null;       // current packet
+let filterText = "";
+
+function matchesFilter(p){
+  if(!filterText) return true;
+  const f = filterText.toLowerCase().trim();
+  const proto = p.proto.toLowerCase();
+  // simple protocol-name filtering + free text
+  if(["tcp","udp","http","dhcp","dns","arp","icmp","ssdp"].includes(f)){
+    if(f==="tcp") return p.protocolsHas("tcp");
+    if(f==="udp") return p.protocolsHas("udp");
+    return proto===f || p.protocolsHas(f);
+  }
+  return (p.proto+" "+p.src+" "+p.dst+" "+p.info).toLowerCase().includes(f);
+}
+
+// helper to check the 'Protocols in frame' chain
+PACKETS.forEach(p=>{
+  const chain = (p.layers[0].fields.find(f=>f.name==="Protocols in frame")||{}).value||"";
+  p._chain = chain.toLowerCase();
+  p.protocolsHas = (k)=> p._chain.includes(k) || p.proto.toLowerCase()===k;
+});
+
+function renderList(){
+  body.innerHTML="";
+  let shown=0, idx=0;
+  PACKETS.forEach(p=>{
+    if(!matchesFilter(p)) return;
+    shown++;
+    const pc = PROTO_COLOR[p.proto] || PROTO_COLOR[p.color] || "#8aa3a0";
+    const tr=document.createElement('tr');
+    tr.style.setProperty('--pc', pc);
+    tr.style.animationDelay=(idx++ * 30)+"ms";
+    tr.dataset.no=p.no;
+    tr.innerHTML =
+      `<td class="num">${p.no}</td>`+
+      `<td>${p.time}</td>`+
+      `<td>${p.src}</td>`+
+      `<td>${p.dst}</td>`+
+      `<td><span class="pbadge" style="--pc:${pc}">${p.proto}</span></td>`+
+      `<td class="len">${p.bytes.length}</td>`+
+      `<td class="info" title="${t(p.info).replace(/"/g,'&quot;')}">${escapeHtml(t(p.info))}</td>`;
+    if(current && current.no===p.no) tr.classList.add('selected');
+    tr.addEventListener('click',()=>selectPacket(p, tr));
+    body.appendChild(tr);
+  });
+  const pct = Math.round(shown/PACKETS.length*100);
+  stCount.textContent = (lang==='ja')
+    ? `フレーム ${PACKETS.length} · 表示 ${shown} (${pct}%)`
+    : `FRAMES ${PACKETS.length} · SHOWN ${shown} (${pct}%)`;
+}
+
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function selectPacket(p){
+  current=p;
+  [...body.children].forEach(tr=>tr.classList.toggle('selected', +tr.dataset.no===p.no));
+  renderDetails(p);
+  renderHex(p);
+  renderEncap(p);
+  setExplain(null);
+}
+
+function renderDetails(p){
+  details.innerHTML="";
+  p.layers.forEach((layer,li)=>{
+    const wrap=document.createElement('div');
+    wrap.className='layer';
+    const head=document.createElement('div');
+    head.className='layer-head';
+    head.innerHTML=`<span class="tw">▼</span><span>${escapeHtml(t(layer.name))}</span>`;
+    head.addEventListener('click',()=>wrap.classList.toggle('collapsed'));
+    wrap.appendChild(head);
+    const fwrap=document.createElement('div');
+    fwrap.className='fields';
+    layer.fields.forEach((fld,fi)=>{
+      const d=document.createElement('div');
+      d.className='field'+(fld.sub?' sub':'')+(fld.lvl===2?'2':'')+(fld.metaField?' meta':'');
+      const val = fld.value!=null && fld.value!=="" ? `: <span class="fval">${escapeHtml(t(String(fld.value)))}</span>` : "";
+      d.innerHTML=`<span class="fname">${escapeHtml(t(fld.name))}</span>${val}`;
+      d.addEventListener('mouseenter',e=>showTip(e,fld));
+      d.addEventListener('mousemove',moveTip);
+      d.addEventListener('mouseleave',hideTip);
+      d.addEventListener('click',()=>{
+        [...details.querySelectorAll('.field.selected')].forEach(x=>x.classList.remove('selected'));
+        d.classList.add('selected');
+        if(!fld.metaField) highlightBytes(fld.offset, fld.length);
+        else highlightBytes(-1,0);
+        setExplain(fld);
+      });
+      fwrap.appendChild(d);
+    });
+    wrap.appendChild(fwrap);
+    details.appendChild(wrap);
+  });
+}
+
+function renderHex(p){
+  hexEl.innerHTML="";
+  const b=p.bytes;
+  for(let i=0;i<b.length;i+=16){
+    const row=document.createElement('div');
+    row.className='hexrow';
+    let html=`<span class="off">${i.toString(16).padStart(4,'0')}</span>`;
+    let asc='';
+    for(let j=0;j<16;j++){
+      if(i+j<b.length){
+        const v=b[i+j];
+        html+=`<span class="hb" data-off="${i+j}">${v.toString(16).padStart(2,'0')}</span> `;
+        const c=(v>=32&&v<127)?String.fromCharCode(v):'.';
+        asc+=`<span class="ac" data-off="${i+j}">${c==='&'?'&amp;':c==='<'?'&lt;':c==='>'?'&gt;':c}</span>`;
+      } else { html+='   '; asc+=' '; }
+      if(j===7) html+='<span class="gap"></span>';
+    }
+    html+=`<span class="asc">${asc}</span>`;
+    row.innerHTML=html;
+    hexEl.appendChild(row);
+  }
+}
+
+function highlightBytes(off,len){
+  hexEl.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'));
+  if(off<0) return;
+  for(let k=off;k<off+len;k++){
+    hexEl.querySelectorAll(`[data-off="${k}"]`).forEach(e=>e.classList.add('hl'));
+  }
+  const first=hexEl.querySelector(`.hb[data-off="${off}"]`);
+  if(first) first.scrollIntoView({block:'nearest'});
+}
+
+function setExplain(fld){
+  const ja = lang==='ja';
+  if(!fld){
+    explainEl.innerHTML = `<div class="empty">${ja
+      ? 'プロトコル解析でフィールドを選ぶと、その意味と存在理由の詳しい説明が表示されます。'
+      : 'Select a field in the protocol dissection to read a full explanation of what it means and why it is there.'}</div>`;
+    return;
+  }
+  const range = fld.metaField
+    ? (ja ? '<i>キャプチャのメタ情報 — ワイヤ上にバイトなし</i>' : '<i>capture metadata — no bytes on the wire</i>')
+    : (ja ? `バイト <b>${fld.offset}</b>–<b>${fld.offset+fld.length-1}</b>（オフセット 0x${fld.offset.toString(16)}, ${fld.length} バイト）`
+          : `bytes <b>${fld.offset}</b>–<b>${fld.offset+fld.length-1}</b> (offset 0x${fld.offset.toString(16)}, ${fld.length} byte${fld.length>1?'s':''})`);
+  explainEl.innerHTML =
+    `<h4>${escapeHtml(t(fld.name))}</h4>`+
+    `<div class="meta">${ja?'値':'VALUE'} <b>${escapeHtml(t(String(fld.value??'—')))}</b> &nbsp;·&nbsp; ${range}</div>`+
+    `<p>${escapeHtml(t(fld.desc||''))}</p>`;
+}
+
+function showTip(e,fld){
+  tip.innerHTML=`<b>${escapeHtml(t(fld.name))}</b>${escapeHtml(t(fld.desc||''))}`;
+  tip.style.display='block';
+  moveTip(e);
+}
+function moveTip(e){
+  const pad=14; let x=e.clientX+pad, y=e.clientY+pad;
+  const r=tip.getBoundingClientRect();
+  if(x+r.width>window.innerWidth) x=e.clientX-r.width-pad;
+  if(y+r.height>window.innerHeight) y=e.clientY-r.height-pad;
+  tip.style.left=x+'px'; tip.style.top=y+'px';
+}
+function hideTip(){ tip.style.display='none'; }
+
+// hover hex -> tooltip telling which field (optional nicety)
+hexEl.addEventListener('mouseover',e=>{
+  const t=e.target.closest('[data-off]'); if(!t||!current) return;
+  const off=+t.dataset.off;
+  const fld=findFieldAt(current,off);
+  if(fld){ showTip(e,fld); }
+});
+hexEl.addEventListener('mousemove',e=>{ if(tip.style.display==='block') moveTip(e); });
+hexEl.addEventListener('mouseout',hideTip);
+
+function findFieldAt(p,off){
+  for(const L of p.layers) for(const f of L.fields)
+    if(!f.metaField && off>=f.offset && off<f.offset+f.length && !f.sub) return f;
+  // fall back to sub-fields
+  for(const L of p.layers) for(const f of L.fields)
+    if(!f.metaField && off>=f.offset && off<f.offset+f.length) return f;
+  return null;
+}
+
+// filter wiring
+filterEl.addEventListener('input',()=>{
+  filterText=filterEl.value;
+  const f=filterText.toLowerCase().trim();
+  filterEl.classList.remove('invalid');
+  document.querySelectorAll('.qbtn').forEach(b=>b.classList.toggle('active', b.dataset.f===f));
+  renderList();
+});
+document.querySelectorAll('.qbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.qbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    filterEl.value=btn.dataset.f; filterText=btn.dataset.f;
+    renderList();
+  });
+});
+
+// live capture clock in the device bar
+(function(){
+  const clk=document.getElementById('clock');
+  const t=()=>{ const d=new Date(); clk.textContent=d.toTimeString().slice(0,8); };
+  t(); setInterval(t,1000);
+})();
+
+// ============================================================
+//  Layer helpers (shared by encapsulation view + flow graph)
+// ============================================================
+// Map a layer name to a short label, OSI tier and a colour.
+// Colour is keyed by OSI layer so "same layer = same colour".
+const LAYER_INFO = [
+  { re:/Ethernet/,            ab:"ETH",  osi:"L2", c:"#e0a64a" },
+  { re:/Address Resolution/,  ab:"ARP",  osi:"L2", c:"#e0a64a" },
+  { re:/Internet Protocol/,   ab:"IPv4", osi:"L3", c:"#52d6e6" },
+  { re:/Internet Control/,    ab:"ICMP", osi:"L3", c:"#52d6e6" },
+  { re:/Transmission Control/,ab:"TCP",  osi:"L4", c:"#9b8cf5" },
+  { re:/User Datagram/,       ab:"UDP",  osi:"L4", c:"#9b8cf5" },
+  { re:/Hypertext/,           ab:"HTTP", osi:"L7", c:"#5ef38c" },
+  { re:/Domain Name/,         ab:"DNS",  osi:"L7", c:"#5ef38c" },
+  { re:/Simple Service/,      ab:"SSDP", osi:"L7", c:"#5ef38c" },
+  { re:/Dynamic Host/,        ab:"DHCP", osi:"L7", c:"#5ef38c" }
+];
+function layerInfo(name){ for(const x of LAYER_INFO) if(x.re.test(name)) return x; return {ab:"?",osi:"",c:"#8aa3a0"}; }
+function shortName(name){ return name.split(",")[0].trim(); }
+// byte span covered by a layer's real (non-meta) fields
+function layerSpan(L){
+  let a=Infinity,b=0,has=false;
+  for(const f of L.fields){ if(f.metaField) continue; has=true; a=Math.min(a,f.offset); b=Math.max(b,f.offset+f.length); }
+  return has ? { off:a, len:b-a } : null;
+}
+
+// ============================================================
+//  Encapsulation view (per packet)
+// ============================================================
+const encapEl   = document.getElementById('encap');
+const hexWrap   = document.getElementById('hexwrap');
+const encapWrap = document.getElementById('encapwrap');
+const bytSub    = document.getElementById('byt-sub');
+
+function renderEncap(p){
+  const layers = p.layers.map((L,i)=>({L,i})).filter(o=>o.i>0 && layerSpan(o.L)); // skip Frame meta
+  const total = p.bytes.length;
+  const ja = lang==='ja';
+  const TX = {
+    note: ja ? '各ボックスは下のレイヤを<b>包む</b>ヘッダ — このネストが<b>カプセル化</b>。バーは各レイヤがフレームに占める割合を示す。レイヤをクリックでバイトを強調。'
+             : 'Each box is a header that <b>wraps</b> the layer beneath it — that nesting is <b>encapsulation</b>. The bar shows how much of the frame each layer actually occupies. Click any layer to highlight its bytes.',
+    byte0:  ja ? 'バイト 0' : 'byte 0',
+    onwire: ja ? `${total} バイト（ワイヤ上）` : `${total} bytes on the wire`,
+    inner:  ja ? '▸ 最内層 — 実際に運ばれているアプリケーションデータ' : '▸ innermost layer — this is the actual application data being carried',
+    wrap:   ja ? '▸ ペイロード: これ以下はこのヘッダに包まれる' : '▸ payload: everything below is wrapped inside this header',
+    bytes:  (a,b,l)=> ja ? `バイト ${a}–${b} · ${l} B` : `bytes ${a}–${b} · ${l} B`,
+    segT:   (ab,l,pc)=> ja ? `${ab} — ${total} 中 ${l} バイト (${pc}%)` : `${ab} — ${l} of ${total} bytes (${pc}%)`
+  };
+
+  // 1) proportional frame map (shows header overhead vs payload, to scale)
+  let map = '<div class="frame-map">';
+  layers.forEach(({L})=>{
+    const sp = layerSpan(L), info = layerInfo(L.name);
+    const pct = (sp.len/total*100).toFixed(2);
+    map += `<div class="seg" style="--c:${info.c}; flex:0 0 ${pct}%" data-off="${sp.off}" data-len="${sp.len}" data-li="${p.layers.indexOf(L)}" title="${TX.segT(info.ab,sp.len,pct)}">${info.ab}<small>${sp.len} B</small></div>`;
+  });
+  map += '</div>';
+  map += `<div class="map-scale"><span>${TX.byte0}</span><span>${TX.onwire}</span></div>`;
+
+  // 2) nested "onion" — each outer box wraps the layer inside it
+  let onion = '';
+  layers.forEach(({L},idx)=>{
+    const sp = layerSpan(L), info = layerInfo(L.name);
+    const last = idx===layers.length-1;
+    const payloadNote = `<div class="payload">${last?TX.inner:TX.wrap}</div>`;
+    onion += `<div class="obox" style="--c:${info.c}" data-li="${p.layers.indexOf(L)}">
+        <div class="ohead"><span class="osi">${info.osi}</span>${escapeHtml(t(shortName(L.name)))}
+          <span class="orange">${TX.bytes(sp.off, sp.off+sp.len-1, sp.len)}</span></div>
+        ${payloadNote}
+      </div>`;
+  });
+
+  encapEl.innerHTML =
+    `<p class="note">${TX.note}</p>`+
+    map +
+    `<div class="onion">${onion}</div>`;
+
+  // click → focus that layer (highlight bytes + flash the tree row)
+  encapEl.querySelectorAll('[data-li]').forEach(node=>{
+    node.addEventListener('click',()=>focusLayer(+node.dataset.li));
+  });
+}
+
+function focusLayer(realIdx){
+  switchTab('hex');
+  const L = current.layers[realIdx];
+  const sp = layerSpan(L);
+  if(sp) highlightBytes(sp.off, sp.len);
+  const lw = details.querySelectorAll('.layer')[realIdx];
+  if(lw){ lw.classList.remove('flash'); void lw.offsetWidth; lw.classList.add('flash'); lw.scrollIntoView({block:'nearest'}); }
+}
+
+// bytes-pane tab switching
+function switchTab(name){
+  currentTab = name;
+  document.querySelectorAll('.byt-cap .tab').forEach(el=>el.classList.toggle('active', el.dataset.tab===name));
+  const hex = name==='hex';
+  hexWrap.style.display   = hex ? '' : 'none';
+  encapWrap.style.display = hex ? 'none' : '';
+  bytSub.textContent = t(hex ? 'hover bytes for source field' : 'click a layer to highlight its bytes');
+}
+document.querySelectorAll('.byt-cap .tab').forEach(t=>{
+  t.addEventListener('click',()=>switchTab(t.dataset.tab));
+});
+
+// ============================================================
+//  Flow graph (whole capture, time-sequence ladder)
+// ============================================================
+const ROLE = {
+  "192.168.1.100":"Client", "192.168.1.1":"Gateway / DNS", "93.184.216.34":"Web server",
+  "0.0.0.0":"Client (no IP)", "255.255.255.255":"Broadcast", "Broadcast":"Broadcast",
+  "239.255.255.250":"SSDP Multicast"
+};
+function flowLabel(p){
+  const m = p.info.match(/\[(.*?)\]/);
+  if(m) return p.proto+" ["+m[1]+"]";
+  if(p.proto==="HTTP") return "HTTP GET /";
+  if(p.proto==="DNS")  return p.info.includes("response") ? "DNS response" : "DNS query";
+  if(p.proto==="ARP")  return p.info.startsWith("Who") ? "ARP request" : "ARP reply";
+  if(p.proto==="DHCP") return "DHCP Discover";
+  if(p.proto==="SSDP") return "SSDP M-SEARCH";
+  if(p.proto==="ICMP") return "ICMP echo request";
+  return p.proto;
+}
+
+let flowBuilt = false;
+function buildFlow(){
+  // columns = unique hosts in order of first appearance
+  const cols=[], idx={};
+  PACKETS.forEach(p=>[p.src,p.dst].forEach(h=>{ if(!(h in idx)){ idx[h]=cols.length; cols.push(h); } }));
+
+  const leftGut=70, colW=190, topH=78, rowH=50;
+  const W = leftGut + cols.length*colW + 40;
+  const H = topH + PACKETS.length*rowH + 20;
+  const colX = i => leftGut + colW*i + colW/2;
+
+  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  // lifelines + column headers
+  cols.forEach((h,i)=>{
+    const x = colX(i);
+    svg += `<line class="lifeline" x1="${x}" y1="${topH-10}" x2="${x}" y2="${H-10}"/>`;
+    svg += `<text class="flcolname" x="${x}" y="34" text-anchor="middle">${escapeHtml(t(ROLE[h]||"Host"))}</text>`;
+    svg += `<text class="flcolip" x="${x}" y="50" text-anchor="middle">${escapeHtml(h)}</text>`;
+  });
+  // packet arrows
+  PACKETS.forEach((p,i)=>{
+    const y  = topH + i*rowH + rowH/2;
+    const x1 = colX(idx[p.src]);
+    const x2 = colX(idx[p.dst]);
+    const c  = PROTO_COLOR[p.proto] || PROTO_COLOR[p.color] || "#8aa3a0";
+    const dir = x2>x1 ? 1 : -1;
+    const head = `${x2},${y} ${x2-9*dir},${y-4} ${x2-9*dir},${y+4}`;
+    const mid = (x1+x2)/2;
+    svg += `<g class="flrow" data-no="${p.no}">`+
+      `<rect class="flbg" x="0" y="${topH+i*rowH}" width="${W}" height="${rowH}"/>`+
+      `<text class="gutn" x="10" y="${y-2}">${p.no}</text>`+
+      `<text class="gut"  x="10" y="${y+11}">${p.time}s</text>`+
+      `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${c}" stroke-width="2"/>`+
+      `<circle cx="${x1}" cy="${y}" r="3" fill="${c}"/>`+
+      `<polygon points="${head}" fill="${c}"/>`+
+      `<text class="lbl" x="${mid}" y="${y-7}" text-anchor="middle" fill="${c}">${escapeHtml(t(flowLabel(p)))}</text>`+
+      `<title>${escapeHtml(t(p.info))}</title>`+
+    `</g>`;
+  });
+  svg += `</svg>`;
+  document.getElementById('flowScroll').innerHTML = svg;
+
+  // legend (colour per protocol present)
+  const seen=[]; PACKETS.forEach(p=>{ if(!seen.includes(p.proto)) seen.push(p.proto); });
+  document.getElementById('flowLegend').innerHTML =
+    seen.map(pr=>`<span><i style="background:${PROTO_COLOR[pr]||'#8aa3a0'}"></i>${pr}</span>`).join('');
+
+  // click an arrow → inspect that packet
+  document.querySelectorAll('#flowScroll .flrow').forEach(g=>{
+    g.addEventListener('click',()=>{
+      const no=+g.dataset.no;
+      closeFlow();
+      selectPacket(PACKETS.find(p=>p.no===no));
+    });
+  });
+  flowBuilt = true;
+}
+const flowOverlay = document.getElementById('flow-overlay');
+function openFlow(){ if(!flowBuilt) buildFlow(); flowOverlay.classList.add('open'); }
+function closeFlow(){ flowOverlay.classList.remove('open'); }
+document.getElementById('flowBtn').addEventListener('click',openFlow);
+document.getElementById('flowClose').addEventListener('click',closeFlow);
+flowOverlay.addEventListener('click',e=>{ if(e.target===flowOverlay) closeFlow(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeFlow(); });
+
+// language toggle
+document.getElementById('langBtn').addEventListener('click',()=>{
+  lang = (lang==='ja') ? 'en' : 'ja';
+  applyUILang();
+});
+
+// init
+renderList();
+selectPacket(PACKETS[0]);
+applyUILang();
+</script>
+</body>
+</html>

@@ -1,0 +1,2579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shell &amp; Scripting for Network Engineers</title>
+
+<!-- ===========================================================
+     FONTS  (Dual Shell style)
+     Display : Clash Display (Fontshare)
+     Body    : Hanken Grotesk (Google)
+     Mono    : JetBrains Mono (Google)
+     =========================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+/* ===========================================================
+   THEME TOKENS — edit these to restyle the whole deck
+   =========================================================== */
+:root{
+  --bg:#14161d;            /* slate canvas            */
+  --bg-2:#191c25;          /* raised surface          */
+  --panel:#1e2230;         /* cards / terminals       */
+  --panel-2:#232838;
+  --line:#2a2f3e;          /* hairlines / borders     */
+  --line-soft:#21263300;
+  --text:#e7ebf3;          /* primary text            */
+  --muted:#8a93a8;         /* secondary text          */
+  --faint:#5b6377;
+  --win:#48b0ff;           /* Windows / PowerShell accent (cool)  */
+  --mac:#ff8a5b;           /* macOS / Bash accent (warm)          */
+  --mint:#43e0a0;          /* prompts / success                   */
+  --gold:#ffcf5b;          /* highlight / warning                 */
+  --stage-bg:#0c0d12;      /* letterbox color         */
+  --slide-bg:var(--bg);
+
+  --display:'Clash Display',sans-serif;
+  --body:'Hanken Grotesk',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+
+/* ===========================================================
+   FIXED 16:9 STAGE — viewport-base.css (verbatim, mandatory)
+   =========================================================== */
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--stage-bg,#000);}
+.deck-viewport{position:fixed;inset:0;overflow:hidden;background:var(--stage-bg,#000);}
+.deck-stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;transform-origin:0 0;background:var(--slide-bg,#fff);}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;display:block;visibility:hidden;opacity:0;pointer-events:none;background:var(--slide-bg,#fff);}
+.slide.active,.slide.visible{visibility:visible;opacity:1;pointer-events:auto;z-index:1;}
+img,video,canvas,svg{max-width:100%;max-height:100%;}
+.deck-controls{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:1000;}
+@media print{
+  html,body{width:1920px;height:auto;overflow:visible;background:#fff;}
+  .deck-viewport{position:static;overflow:visible;background:#fff;}
+  .deck-stage{position:static;width:auto;height:auto;transform:none!important;background:none;}
+  .slide{position:relative;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;width:1920px;height:1080px;break-after:page;page-break-after:always;}
+  .slide:last-child{break-after:auto;page-break-after:auto;}
+  .deck-controls{display:none!important;}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.2s!important;}}
+
+/* ===========================================================
+   GLOBAL SLIDE LOOK
+   =========================================================== */
+.slide{
+  font-family:var(--body);color:var(--text);
+  background:
+   radial-gradient(1100px 760px at 90% 6%, rgba(72,176,255,.10), transparent 60%),
+   radial-gradient(1000px 740px at 2% 98%, rgba(255,138,91,.09), transparent 58%),
+   var(--bg);
+}
+/* persistent chrome bar (brand + section) on every content slide */
+.chrome{position:absolute;top:46px;left:84px;right:84px;display:flex;justify-content:space-between;align-items:center;z-index:5;
+  font-family:var(--mono);font-size:18px;letter-spacing:.05em;color:var(--muted);}
+.chrome .brand{display:flex;align-items:center;gap:13px;color:var(--text);font-weight:600;}
+.chrome .brand .dot{width:13px;height:13px;border-radius:3px;background:linear-gradient(135deg,var(--win),var(--mac));box-shadow:0 0 14px rgba(72,176,255,.5);}
+.chrome .sec{color:var(--faint);}
+.chrome .sec b{color:var(--win);font-weight:500;}
+
+/* content padding region */
+.pad{position:absolute;inset:0;padding:118px 84px 88px;display:flex;flex-direction:column;}
+
+/* slide header */
+.kicker{font-family:var(--mono);font-size:20px;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);margin-bottom:16px;}
+h2{font-family:var(--display);font-weight:600;font-size:68px;line-height:1.02;letter-spacing:-.015em;color:var(--text);}
+h2 .g{background:linear-gradient(100deg,var(--win),var(--mac));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.lead{font-size:27px;line-height:1.45;color:#c3cbdb;max-width:1500px;margin-top:18px;}
+.lead b{color:var(--text);font-weight:600;}
+
+.body{flex:1;margin-top:38px;min-height:0;}
+
+/* OS tags */
+.os{font-family:var(--mono);font-size:19px;font-weight:500;padding:4px 13px;border-radius:7px;display:inline-block;vertical-align:middle;}
+.os.win{color:var(--win);background:rgba(72,176,255,.12);border:1px solid rgba(72,176,255,.3);}
+.os.mac{color:var(--mac);background:rgba(255,138,91,.12);border:1px solid rgba(255,138,91,.3);}
+code{font-family:var(--mono);font-size:.92em;color:var(--gold);background:rgba(255,207,91,.08);padding:2px 8px;border-radius:6px;}
+
+/* ---------- TABLES ---------- */
+table{width:100%;border-collapse:collapse;font-size:24px;}
+thead th{font-family:var(--mono);font-size:19px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  text-align:left;padding:0 22px 16px;border-bottom:1.5px solid var(--line);font-weight:500;}
+tbody td{padding:17px 22px;border-bottom:1px solid var(--line);vertical-align:top;color:#d4dae6;}
+tbody tr:last-child td{border-bottom:none;}
+td .cmd{font-family:var(--mono);color:var(--text);font-weight:500;}
+td .winc{font-family:var(--mono);color:var(--win);}
+td .macc{font-family:var(--mono);color:var(--mac);}
+.col-win,.col-mac{font-family:var(--mono);}
+thead th.h-win{color:var(--win);}
+thead th.h-mac{color:var(--mac);}
+
+/* ---------- TERMINAL / CODE CARD ---------- */
+.term{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.45);display:flex;flex-direction:column;}
+.term-head{display:flex;align-items:center;gap:9px;padding:15px 20px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015);}
+.term-head i{width:12px;height:12px;border-radius:50%;}
+.term-head .r{background:#ff5f56;}.term-head .y{background:#ffbd2e;}.term-head .g{background:#27c93f;}
+.term-head .label{margin-left:10px;font-family:var(--mono);font-size:19px;color:var(--muted);}
+.term-head .badge{margin-left:auto;}
+.term-body{padding:24px 28px;font-family:var(--mono);font-size:22px;line-height:1.72;flex:1;}
+.term-body.sm{font-size:20px;line-height:1.62;}
+.term-body .ln{white-space:pre-wrap;}
+/* syntax roles */
+.c{color:var(--faint);}        /* comment  */
+.p{color:var(--mint);}         /* prompt   */
+.kw{color:var(--win);}         /* keyword  */
+.st{color:var(--mac);}         /* string   */
+.vr{color:var(--gold);}        /* variable */
+.fn{color:#c792ea;}            /* function */
+.op{color:var(--muted);}       /* output / dim */
+.ok{color:var(--mint);}        /* success  */
+
+/* ---------- CARDS ---------- */
+.cards{display:grid;gap:24px;height:100%;}
+.card{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;padding:30px 30px;position:relative;overflow:hidden;}
+.card .num{font-family:var(--mono);font-size:18px;color:var(--faint);}
+.card h3{font-family:var(--display);font-weight:600;font-size:31px;margin:8px 0 12px;color:var(--text);letter-spacing:-.01em;}
+.card p{font-size:22px;line-height:1.42;color:#aab2c4;}
+.card .top-accent{position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--win),var(--mac));}
+.card.win .top-accent{background:var(--win);}
+.card.mac .top-accent{background:var(--mac);}
+.card.mint .top-accent{background:var(--mint);}
+
+/* ---------- 2-COLUMN GRID ---------- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:30px;height:100%;}
+.two.tight{gap:24px;}
+
+/* ---------- ANNOTATED COMMAND ---------- */
+.anno{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:0;}
+.anno .line{font-family:var(--mono);font-size:54px;font-weight:500;display:flex;gap:26px;align-items:flex-start;}
+.anno .tok{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.anno .tok .label{font-family:var(--body);font-size:20px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;
+  border-top:2px solid var(--line);padding-top:10px;width:max-content;max-width:280px;text-align:center;font-weight:600;}
+.anno .tok .label b{display:block;font-weight:400;text-transform:none;letter-spacing:0;font-size:18px;color:var(--faint);margin-top:6px;}
+
+/* ---------- PIPE FLOW ---------- */
+.flow{display:flex;align-items:center;gap:18px;justify-content:center;flex-wrap:wrap;}
+.flow .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 26px;font-family:var(--mono);font-size:24px;color:var(--text);}
+.flow .pipe{font-family:var(--mono);font-size:34px;color:var(--mint);font-weight:700;}
+.flow .box .t{display:block;font-family:var(--body);font-size:18px;color:var(--muted);margin-top:6px;letter-spacing:.04em;}
+
+/* ---------- CHECKLIST ---------- */
+.check{display:grid;grid-template-columns:1fr 1fr;gap:18px 44px;}
+.check li{list-style:none;display:flex;gap:16px;align-items:flex-start;font-size:24px;line-height:1.4;color:#cfd6e4;}
+.check li .mk{flex:none;width:32px;height:32px;border-radius:8px;background:rgba(67,224,160,.14);border:1px solid rgba(67,224,160,.4);
+  color:var(--mint);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;margin-top:2px;}
+.check li b{color:var(--text);font-weight:600;}
+
+/* ---------- EXPLAIN PANEL (field → meaning) ---------- */
+.explain{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:6px 22px;}
+.explain .er{display:flex;gap:16px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line);}
+.explain .er:last-child{border-bottom:none;}
+.explain .tok{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--gold);flex:none;min-width:118px;}
+.explain .tok.win{color:var(--win);}.explain .tok.mac{color:var(--mac);}.explain .tok.ok{color:var(--mint);}
+.explain .def{font-size:21px;line-height:1.34;color:#c3cbdb;}
+.explain .def b{color:var(--text);font-weight:600;}
+
+/* ---------- PURPOSE callout ("what it's for") ---------- */
+.purpose{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(100deg,rgba(72,176,255,.10),rgba(255,138,91,.08));
+  border:1px solid var(--line);border-left:4px solid var(--mac);border-radius:12px;padding:18px 22px;}
+.purpose .ic{font-size:26px;line-height:1;flex:none;margin-top:2px;}
+.purpose .tx{font-size:22px;line-height:1.4;color:#d4dae6;}
+.purpose .tx b{color:var(--text);font-weight:600;}
+
+/* "▶ sample run" badge inside a terminal head */
+.run-badge{margin-left:auto;font-family:var(--mono);font-size:14px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--mint);background:rgba(67,224,160,.12);border:1px solid rgba(67,224,160,.35);border-radius:999px;padding:4px 12px;}
+
+/* a right-hand stack for script slides: sample-run terminal + reading panel */
+.stack{display:flex;flex-direction:column;gap:18px;min-height:0;}
+.stack .term{flex:none;}
+
+/* ---------- CLICK-TO-EXPLAIN ---------- */
+/* any token tagged .x becomes clickable; it fills the slide's .xbody */
+.x{cursor:pointer;border-radius:4px;padding:0 2px;
+  border-bottom:1px dashed rgba(255,207,91,.5);transition:background .15s ease,color .15s ease;}
+.x:hover{background:rgba(255,207,91,.16);}
+.x.active{background:var(--gold);border-bottom-color:transparent;}
+.x.active,.x.active *{color:#14161d !important;}
+
+.xpanel{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;
+  display:flex;flex-direction:column;min-height:0;}
+.xpanel .xhead{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:14px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--mint);margin-bottom:16px;}
+.xpanel .xhead .pulse{width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 0 rgba(67,224,160,.6);
+  animation:xpulse 1.8s ease-out infinite;}
+@keyframes xpulse{0%{box-shadow:0 0 0 0 rgba(67,224,160,.5);}70%{box-shadow:0 0 0 12px rgba(67,224,160,0);}100%{box-shadow:0 0 0 0 rgba(67,224,160,0);}}
+.xtitle{font-family:var(--mono);font-size:23px;color:var(--gold);font-weight:500;margin-bottom:12px;}
+.xbody{font-size:22px;line-height:1.5;color:#cdd5e3;}
+.xbody code{font-size:.9em;}
+.xbody.hint{color:var(--muted);font-style:italic;}
+
+/* ---------- STEP-BY-STEP build (beginner) ---------- */
+/* highlight the line we just added / changed in a growing script */
+.ln.add{background:rgba(67,224,160,.13);border-left:3px solid var(--mint);padding-left:10px;margin-left:-13px;border-radius:0 5px 5px 0;}
+.ln.chg{background:rgba(255,207,91,.13);border-left:3px solid var(--gold);padding-left:10px;margin-left:-13px;border-radius:0 5px 5px 0;}
+.ln.dim{opacity:.5;}
+/* friendly "in plain words" explanation panel */
+.eplain{display:flex;flex-direction:column;gap:20px;justify-content:center;height:100%;}
+.eplain .eh{font-family:var(--mono);font-size:18px;letter-spacing:.14em;text-transform:uppercase;color:var(--mint);}
+.eplain ul{list-style:none;display:flex;flex-direction:column;gap:18px;}
+.eplain li{font-size:26px;line-height:1.42;color:#d6dce8;display:flex;gap:16px;align-items:flex-start;}
+.eplain li .b{flex:none;width:34px;height:34px;border-radius:9px;background:rgba(72,176,255,.15);border:1px solid rgba(72,176,255,.42);
+  color:var(--win);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;margin-top:3px;}
+.eplain li b{color:#fff;font-weight:600;}
+.eplain code{font-size:.9em;}
+.step-tip{display:flex;gap:14px;align-items:flex-start;background:rgba(255,207,91,.08);border:1px solid rgba(255,207,91,.3);
+  border-left:4px solid var(--gold);border-radius:12px;padding:16px 20px;font-size:21px;line-height:1.4;color:#d6dce8;}
+.step-tip b{color:#fff;}
+/* full-width explanation under a side-by-side code pair */
+.eplain.row{height:auto;justify-content:flex-start;gap:14px;}
+.eplain.row ul{display:grid;grid-template-columns:1fr 1fr;gap:14px 44px;}
+.eplain.row li{font-size:23px;}
+
+/* ---------- mini section heading (used on "how it works" slides) ---------- */
+.mini-h{font-family:var(--mono);font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:var(--mint);margin-bottom:14px;display:flex;align-items:center;gap:9px;}
+.mini-h .os{margin-left:auto;}
+
+/* ---------- ANATOMY breakdown box ---------- */
+.anatomy{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:18px 22px;}
+.anatomy .acode{font-family:var(--mono);font-size:25px;color:var(--text);margin-bottom:14px;letter-spacing:.02em;}
+.anatomy .alabels{display:flex;flex-direction:column;gap:7px;font-size:18px;line-height:1.3;color:#c3cbdb;}
+.anatomy .alabels b{color:var(--gold);font-family:var(--mono);font-weight:500;}
+
+/* ---------- TITLE SLIDE ---------- */
+.title-slide .seam{position:absolute;top:0;bottom:0;left:62%;width:1px;background:linear-gradient(to bottom,transparent,var(--line),transparent);z-index:1;}
+.title-wrap{position:absolute;inset:0;display:grid;grid-template-columns:1fr 560px;align-items:center;gap:60px;padding:0 96px;z-index:2;}
+.title-wrap h1{font-family:var(--display);font-weight:700;font-size:128px;line-height:.94;letter-spacing:-.02em;}
+.title-wrap h1 .g{background:linear-gradient(100deg,var(--win),var(--mac));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.title-wrap .sub{margin-top:34px;font-size:31px;line-height:1.45;color:#c3cbdb;max-width:840px;}
+.title-wrap .sub b{color:var(--win);font-weight:600;}.title-wrap .sub i{color:var(--mac);font-style:normal;font-weight:600;}
+.title-wrap .tags{margin-top:42px;display:flex;gap:14px;flex-wrap:wrap;}
+.title-wrap .tag{font-family:var(--mono);font-size:18px;padding:11px 20px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--muted);}
+.title-wrap .tag b{color:var(--text);font-weight:500;}
+.os-toggle{display:flex;gap:10px;}
+.os-toggle span{padding:7px 16px;border:1px solid var(--line);border-radius:999px;font-size:19px;font-family:var(--mono);}
+.os-toggle .w{color:var(--win);border-color:rgba(72,176,255,.45);}
+.os-toggle .m{color:var(--mac);border-color:rgba(255,138,91,.45);}
+.cur{display:inline-block;width:11px;height:21px;background:var(--mint);vertical-align:-3px;animation:bl 1.1s steps(1) infinite;}
+@keyframes bl{50%{opacity:0;}}
+
+/* ---------- SECTION / CLOSING accents ---------- */
+.big-num{position:absolute;right:90px;bottom:40px;font-family:var(--display);font-weight:700;font-size:360px;line-height:1;
+  color:transparent;-webkit-text-stroke:2px rgba(138,147,168,.14);z-index:0;user-select:none;}
+
+/* ===========================================================
+   REVEAL ANIMATIONS
+   =========================================================== */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .65s var(--ease),transform .65s var(--ease);}
+.slide.visible .reveal{opacity:1;transform:none;}
+.slide.visible .reveal.d1{transition-delay:.08s;}
+.slide.visible .reveal.d2{transition-delay:.18s;}
+.slide.visible .reveal.d3{transition-delay:.28s;}
+.slide.visible .reveal.d4{transition-delay:.38s;}
+.slide.visible .reveal.d5{transition-delay:.48s;}
+.slide.visible .reveal.d6{transition-delay:.58s;}
+.slide.visible .reveal.d7{transition-delay:.68s;}
+.slide.visible .reveal.d8{transition-delay:.78s;}
+
+/* ===========================================================
+   DECK CHROME — progress bar + counter + edit button
+   (lives outside the stage; not part of the slide design)
+   =========================================================== */
+.deck-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--win),var(--mac));z-index:1000;width:0;transition:width .3s var(--ease);}
+.deck-counter{position:fixed;right:26px;bottom:20px;z-index:1000;font-family:var(--mono);font-size:18px;color:var(--muted);
+  background:rgba(20,22,29,.7);border:1px solid var(--line);border-radius:999px;padding:7px 15px;backdrop-filter:blur(6px);}
+.deck-counter b{color:var(--text);}
+.deck-hint{position:fixed;left:26px;bottom:20px;z-index:1000;font-family:var(--mono);font-size:14px;color:var(--faint);}
+.deck-textsize{position:fixed;top:50%;right:12px;transform:translateY(-50%);z-index:1000;display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:rgba(20,22,29,.82);border:1px solid var(--line);border-radius:16px;padding:7px 6px;backdrop-filter:blur(6px);}
+.deck-textsize button{font-family:var(--body);font-weight:600;color:var(--text);background:transparent;border:none;cursor:pointer;
+  width:38px;height:32px;border-radius:11px;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .15s;}
+.deck-textsize button:hover{background:rgba(255,255,255,.09);}
+.deck-textsize #txtDown{font-size:15px;}
+.deck-textsize #txtUp{font-size:23px;}
+.deck-textsize #txtReset{height:auto;width:40px;padding:3px 0;font-family:var(--mono);font-size:11px;color:var(--muted);}
+.deck-textsize #txtReset:hover{color:var(--text);}
+@media print{.deck-textsize{display:none!important;}}
+.edit-hotzone{position:fixed;top:0;left:0;width:80px;height:80px;z-index:10000;cursor:pointer;}
+.edit-toggle{position:fixed;top:18px;left:18px;z-index:10001;opacity:0;pointer-events:none;transition:opacity .3s ease;
+  width:48px;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);
+  font-size:20px;cursor:pointer;}
+.edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto;}
+.edit-toggle.active{background:var(--win);color:#0c0d12;border-color:var(--win);}
+.edit-banner{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:10001;display:none;
+  font-family:var(--mono);font-size:14px;color:var(--win);background:rgba(20,22,29,.92);border:1px solid var(--win);
+  border-radius:999px;padding:8px 18px;}
+.edit-banner.show{display:block;}
+[contenteditable="true"]{outline:2px dashed rgba(72,176,255,.5);outline-offset:4px;border-radius:4px;cursor:text;}
+</style>
+</head>
+<body>
+<div class="deck-progress" id="progress"></div>
+<div class="deck-viewport">
+  <main class="deck-stage" id="deckStage">
+
+  <!-- ========================= SLIDE 1 — TITLE ========================= -->
+  <section class="slide title-slide active">
+    <span class="seam"></span>
+    <div class="chrome">
+      <span class="brand"><span class="dot"></span>net-eng / scripting</span>
+      <span class="os-toggle"><span class="w">⊞ Windows</span><span class="m"> macOS</span></span>
+    </div>
+    <div class="title-wrap">
+      <div class="col">
+        <div class="kicker reveal d1">Teaching Module · 01</div>
+        <h1 class="reveal d2">Shell <span class="g">&amp;</span><br>Scripting</h1>
+        <p class="sub reveal d3">The same network workflows, two worlds: <b>PowerShell on Windows</b> and <i>Bash / Zsh on macOS</i> — learned side by side.</p>
+        <div class="tags reveal d4">
+          <span class="tag"><b>diagnose</b> networks</span>
+          <span class="tag"><b>automate</b> tasks</span>
+          <span class="tag"><b>script</b> once</span>
+        </div>
+      </div>
+      <div class="term reveal d5">
+        <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">ping-sweep · .sh / .ps1</span></div>
+        <div class="term-body">
+          <div class="ln"><span class="c"># macOS · zsh</span></div>
+          <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ping -c 4 10.1.1.1</div>
+          <div class="ln"><span class="c"># Windows · PowerShell</span></div>
+          <div class="ln"><span class="kw">PS&gt;</span> Test-Connection 10.1.1.1</div>
+          <div class="ln"><span class="ok">✓ reachable</span> <span class="op">· 4/4 replies</span><span class="cur"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 2 — WHY ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Why the shell</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Motivation</div>
+        <h2 class="reveal d1">Why a network engineer<br>lives in the <span class="g">terminal</span></h2>
+        <p class="lead reveal d2">GUIs do one thing at a time. The shell lets you query, test, and configure <b>dozens of devices in seconds</b> — and a script turns a good debugging session into something you can repeat, share, and schedule.</p>
+      </div>
+      <div class="body">
+        <div class="cards reveal d3" style="grid-template-columns:repeat(4,1fr);">
+          <div class="card win"><span class="top-accent"></span><div class="num">01</div><h3>Speed</h3><p>One command checks 254 hosts. Tab-completion and history beat clicking through menus.</p></div>
+          <div class="card mac"><span class="top-accent"></span><div class="num">02</div><h3>Repeatable</h3><p>A script runs the exact same steps every time — no missed checks at 3&nbsp;a.m.</p></div>
+          <div class="card mint"><span class="top-accent"></span><div class="num">03</div><h3>Remote</h3><p>SSH into anything. Most servers and switches have no GUI at all.</p></div>
+          <div class="card"><span class="top-accent"></span><div class="num">04</div><h3>Composable</h3><p>Pipe small tools together to build exactly the report you need.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 3 — SHELL LANDSCAPE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Foundations</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Know your shell</div>
+        <h2 class="reveal d1">Which shell am I in?</h2>
+        <p class="lead reveal d2">A <b>terminal</b> is the window; the <b>shell</b> is the program inside it that reads your commands. Different OSes ship different shells — same idea, different syntax.</p>
+      </div>
+      <div class="body reveal d3">
+        <table>
+          <thead><tr><th>Platform</th><th>Default shell</th><th>Terminal app</th><th>Prompt looks like</th></tr></thead>
+          <tbody>
+            <tr><td><span class="os mac">macOS</span></td><td><span class="cmd">zsh</span> (since 2019)</td><td>Terminal.app · iTerm2</td><td><code>user@mac ~ %</code></td></tr>
+            <tr><td><span class="os mac">Linux / macOS</span></td><td><span class="cmd">bash</span></td><td>any terminal</td><td><code>user@host:~$</code></td></tr>
+            <tr><td><span class="os win">Windows</span></td><td><span class="cmd">PowerShell</span></td><td>Windows Terminal</td><td><code>PS C:\Users\you&gt;</code></td></tr>
+            <tr><td><span class="os win">Windows</span></td><td><span class="cmd">cmd.exe</span> (legacy)</td><td>Command Prompt</td><td><code>C:\Users\you&gt;</code></td></tr>
+          </tbody>
+        </table>
+        <p class="lead reveal d4" style="margin-top:26px;font-size:24px;">💡 <b>This deck focuses on PowerShell</b> (Windows) and <b>Bash/Zsh</b> (macOS) — bash and zsh are close enough that the same commands work in both. Check your shell with <code>echo $SHELL</code> (mac) or <code>$PSVersionTable</code> (Windows).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 4 — ANATOMY ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Foundations</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Read any command</div>
+        <h2 class="reveal d1">Anatomy of a command</h2>
+        <p class="lead reveal d2">Almost every command — on any shell — is the same four parts. Learn to spot them and you can read documentation for tools you've never used.</p>
+      </div>
+      <div class="body">
+        <div class="anno reveal d3" style="height:auto;margin:48px 0 12px;">
+          <div class="line">
+            <div class="tok"><span class="p">ping</span><span class="label">Command<b>the program to run</b></span></div>
+            <div class="tok"><span class="kw">-c&nbsp;4</span><span class="label">Option / flag<b>changes behaviour</b></span></div>
+            <div class="tok"><span class="st">10.1.1.1</span><span class="label">Argument<b>what to act on</b></span></div>
+          </div>
+        </div>
+        <p class="lead reveal d4" style="text-align:center;max-width:1400px;margin:30px auto 0;font-size:24px;">
+          Short flags use one dash (<code>-c</code>); long flags use two (<code>--count</code>). PowerShell prefers named parameters (<code>-Count 4</code>). When stuck, ask the tool itself:
+          <span class="os mac">man ping</span> · <span class="os mac">ping --help</span> · <span class="os win">Get-Help Test-Connection</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 5 — FILESYSTEM NAV ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Getting around</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Navigation</div>
+        <h2 class="reveal d1">Moving around the filesystem</h2>
+        <p class="lead reveal d2">Before automating anything you need to move, look, and find. PowerShell aliases many Unix names, so <code>ls</code> and <code>cd</code> often work on Windows too.</p>
+      </div>
+      <div class="body reveal d3">
+        <table>
+          <thead><tr><th>Task</th><th class="h-mac">macOS · Bash / Zsh</th><th class="h-win">Windows · PowerShell</th></tr></thead>
+          <tbody>
+            <tr><td>Where am I?</td><td><span class="macc">pwd</span></td><td><span class="winc">Get-Location</span> · <span class="winc">pwd</span></td></tr>
+            <tr><td>List files</td><td><span class="macc">ls -la</span></td><td><span class="winc">Get-ChildItem</span> · <span class="winc">ls</span></td></tr>
+            <tr><td>Change directory</td><td><span class="macc">cd /etc</span></td><td><span class="winc">Set-Location C:\</span> · <span class="winc">cd</span></td></tr>
+            <tr><td>Make a folder</td><td><span class="macc">mkdir logs</span></td><td><span class="winc">New-Item -ItemType Directory logs</span></td></tr>
+            <tr><td>Show a file</td><td><span class="macc">cat hosts.txt</span></td><td><span class="winc">Get-Content hosts.txt</span> · <span class="winc">cat</span></td></tr>
+            <tr><td>Find a file</td><td><span class="macc">find . -name "*.log"</span></td><td><span class="winc">Get-ChildItem -Recurse -Filter *.log</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 6 — NET CMDS I: REACHABILITY ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Network toolkit</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Toolkit · 1 of 3 — Reachability</div>
+        <h2 class="reveal d1">Is it up? How do I get there?</h2>
+      </div>
+      <div class="body">
+        <div class="two tight">
+          <div class="reveal d2" style="display:flex;flex-direction:column;justify-content:center;">
+            <table style="font-size:23px;">
+              <thead><tr><th>Goal</th><th class="h-mac">macOS</th><th class="h-win">Windows</th></tr></thead>
+              <tbody>
+                <tr><td>Ping a host</td><td><span class="macc">ping host</span></td><td><span class="winc">ping</span> · <span class="winc">Test-Connection</span></td></tr>
+                <tr><td>Trace the path</td><td><span class="macc">traceroute host</span></td><td><span class="winc">tracert host</span></td></tr>
+                <tr><td>Test a TCP port</td><td><span class="macc">nc -vz host 443</span></td><td><span class="winc">Test-NetConnection host -Port 443</span></td></tr>
+              </tbody>
+            </table>
+            <p class="lead" style="font-size:22px;margin-top:24px;">⚠️ On macOS <code>ping</code> runs <b>forever</b> — stop it with <b>Ctrl-C</b>, or cap it with <code>-c 4</code>. Windows <code>ping</code> sends 4 by default.</p>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">reachability checks</span></div>
+            <div class="term-body sm">
+              <div class="ln"><span class="c"># macOS — 4 pings then stop</span></div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ping -c 4 10.1.1.1</div>
+              <div class="ln"><span class="op">64 bytes from 10.1.1.1: ttl=64 time=1.2ms</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># Windows — port + ping in one</span></div>
+              <div class="ln"><span class="kw">PS&gt;</span> Test-NetConnection 10.1.1.1 <span class="kw">-Port</span> 443</div>
+              <div class="ln"><span class="op">TcpTestSucceeded :</span> <span class="ok">True</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 7 — NET CMDS II: ADDRESSING + DNS ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Network toolkit</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Toolkit · 2 of 3 — Addressing &amp; DNS</div>
+        <h2 class="reveal d1">My address &amp; name resolution</h2>
+      </div>
+      <div class="body reveal d2">
+        <table>
+          <thead><tr><th>Goal</th><th class="h-mac">macOS · Bash / Zsh</th><th class="h-win">Windows · PowerShell</th></tr></thead>
+          <tbody>
+            <tr><td>Show my IP / interfaces</td><td><span class="macc">ifconfig</span> · <span class="macc">ipconfig getifaddr en0</span></td><td><span class="winc">ipconfig</span> · <span class="winc">Get-NetIPAddress</span></td></tr>
+            <tr><td>Routing table</td><td><span class="macc">netstat -rn</span> · <span class="macc">route -n get default</span></td><td><span class="winc">Get-NetRoute</span> · <span class="winc">route print</span></td></tr>
+            <tr><td>Resolve a name (DNS)</td><td><span class="macc">dig example.com</span> · <span class="macc">nslookup</span></td><td><span class="winc">Resolve-DnsName example.com</span></td></tr>
+            <tr><td>Flush DNS cache</td><td><span class="macc">sudo dscacheutil -flushcache</span></td><td><span class="winc">Clear-DnsClientCache</span></td></tr>
+            <tr><td>ARP / neighbour table</td><td><span class="macc">arp -a</span></td><td><span class="winc">Get-NetNeighbor</span> · <span class="winc">arp -a</span></td></tr>
+          </tbody>
+        </table>
+        <p class="lead reveal d3" style="font-size:23px;margin-top:24px;">🔎 <code>dig</code> is the network engineer's favourite — it shows the exact records and which server answered. Add <code>+short</code> for just the IP: <code>dig +short example.com</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 8 — NET CMDS III: SOCKETS + REMOTE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Network toolkit</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Toolkit · 3 of 3 — Sockets, remote &amp; transfer</div>
+        <h2 class="reveal d1">Connections, sessions &amp; data</h2>
+      </div>
+      <div class="body reveal d2">
+        <table>
+          <thead><tr><th>Goal</th><th class="h-mac">macOS · Bash / Zsh</th><th class="h-win">Windows · PowerShell</th></tr></thead>
+          <tbody>
+            <tr><td>Open ports / sockets</td><td><span class="macc">netstat -an</span> · <span class="macc">lsof -i</span></td><td><span class="winc">Get-NetTCPConnection</span> · <span class="winc">netstat -an</span></td></tr>
+            <tr><td>Remote shell (SSH)</td><td><span class="macc">ssh admin@10.1.1.1</span></td><td><span class="winc">ssh admin@10.1.1.1</span> (built-in)</td></tr>
+            <tr><td>Fetch a URL / API</td><td><span class="macc">curl -s https://api/health</span></td><td><span class="winc">Invoke-RestMethod https://api/health</span></td></tr>
+            <tr><td>Download a file</td><td><span class="macc">curl -O https://.../fw.bin</span></td><td><span class="winc">Invoke-WebRequest -OutFile fw.bin …</span></td></tr>
+            <tr><td>Copy over the network</td><td><span class="macc">scp file admin@host:/tmp</span></td><td><span class="winc">scp</span> · <span class="winc">Copy-Item -ToSession</span></td></tr>
+          </tbody>
+        </table>
+        <p class="lead reveal d3" style="font-size:23px;margin-top:24px;">🌐 <code>curl</code> + <code>Invoke-RestMethod</code> are how you talk to device REST APIs and webhooks — the bridge between the shell and modern network automation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= READING RESULTS 1 — PING & TRACEROUTE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Reading results</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">What's the result? · 1 of 3</div>
+        <h2 class="reveal d1">ping &amp; traceroute — line by line</h2>
+        <p class="lead reveal d2">Two reachability tools. <b>Click any command, option, or output value</b> to see what it does.</p>
+      </div>
+      <div class="body">
+        <div class="two tight" style="height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">connectivity test</span></div>
+            <div class="term-body sm" style="font-size:18px;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> <span class="fn x" data-t="ping" data-exp="Sends ICMP echo-request packets to a host and times the replies — the first test for <b>is it alive, how far, how fast?</b>">ping</span> <span class="kw x" data-t="-c 4  (count)" data-exp="<b>Count</b>: send exactly 4 packets, then stop. Without it, macOS/Linux ping runs forever (Ctrl-C to quit); Windows sends 4 by default.">-c 4</span> <span class="st x" data-t="target" data-exp="The <b>target</b> — an IP or hostname. <code>8.8.8.8</code> is Google public DNS, a handy always-on reachability check.">8.8.8.8</span></div>
+              <div class="ln"><span class="op">PING 8.8.8.8: 56 data bytes</span></div>
+              <div class="ln"><span class="op">64 bytes from 8.8.8.8: </span><span class="kw x" data-t="ttl=116" data-exp="<b>Time-To-Live</b> left on the reply. It drops by 1 at each router, so it hints how many <b>hops</b> away the host is.">ttl=116</span> <span class="mac x" style="color:var(--mac)" data-t="time=12.3 ms" data-exp="<b>Round-trip latency</b> for this packet — out and back. Lower is better; spikes mean congestion.">time=12.3 ms</span></div>
+              <div class="ln"><span class="op">64 bytes from 8.8.8.8: ttl=116 time=11.8 ms</span></div>
+              <div class="ln"><span class="op">--- 8.8.8.8 ping statistics ---</span></div>
+              <div class="ln"><span class="op">4 transmitted, 4 received, </span><span class="ok x" data-t="0.0% loss" data-exp="Share of probes with <b>no reply</b>. 0% = healthy link; anything above 0% means packets are being dropped.">0.0% loss</span></div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">path discovery</span></div>
+            <div class="term-body sm" style="font-size:18px;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> <span class="fn x" data-t="traceroute" data-exp="Maps the <b>path</b> to a host, listing every router (hop) along the way and the latency to each. Windows: <code>tracert</code>.">traceroute</span> <span class="st x" data-t="target" data-exp="The destination. traceroute resolves the name, then sends probes with increasing TTL to reveal each hop in turn.">google.com</span></div>
+              <div class="ln"><span class="op">traceroute to google.com, 64 hops max</span></div>
+              <div class="ln"><span class="kw x" data-t="a hop" data-exp="Each numbered line is one <b>router</b> on the path. Hop 1 is always your local gateway; each next line is one router closer."> 1</span><span class="op">  router.lan (192.168.1.1)  1.2 ms</span></div>
+              <div class="ln"><span class="kw"> 2</span><span class="op">  10.0.0.1                  8.4 ms</span></div>
+              <div class="ln"><span class="kw"> 3</span><span class="op">  isp-gw (203.0.113.1)     11.0 ms</span></div>
+              <div class="ln"><span class="x" data-t="* * *" data-exp="That hop <b>did not reply</b> within the timeout — often a router/firewall that ignores probes. Usually harmless, not a failure."><span class="c"> 5  * * *   (no reply / filtered)</span></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="xpanel reveal d4" style="margin-top:20px;">
+          <div class="xhead"><span class="pulse"></span>Click a command, option, or value above →</div>
+          <div class="xtitle">ping &amp; traceroute</div>
+          <div class="xbody hint"><b>ping</b> asks one host <em>are you there, and how fast?</em>; <b>traceroute</b> shows <em>which routers I cross to get there.</em> Tap any highlighted part for the detail.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= READING RESULTS 2 — DNS & INTERFACE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Reading results</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">What's the result? · 2 of 3</div>
+        <h2 class="reveal d1">DNS &amp; interface — what to look at</h2>
+        <p class="lead reveal d2">Resolve names and read your own addressing. <b>Click any command, option, or value</b> to see what it does.</p>
+      </div>
+      <div class="body">
+        <div class="two tight" style="height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">name resolution</span></div>
+            <div class="term-body sm" style="font-size:18px;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> <span class="fn x" data-t="dig" data-exp="<b>Domain Information Groper</b> — queries DNS servers and prints the records returned. The go-to tool for DNS debugging.">dig</span> <span class="kw x" data-t="+short" data-exp="Trim the output to <b>just the answer</b> (the IP). Perfect for capturing inside a script.">+short</span> <span class="st x" data-t="name" data-exp="The <b>name to resolve</b> into an IP address.">example.com</span></div>
+              <div class="ln"><span class="ok">93.184.216.34</span>   <span class="c"># just the IP</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> dig example.com</div>
+              <div class="ln"><span class="c">;; ANSWER SECTION:</span></div>
+              <div class="ln">example.com. <span class="kw x" data-t="TTL 3600" data-exp="<b>TTL</b> in seconds — how long this answer may be cached before a fresh lookup is needed.">3600</span> IN <span class="kw x" data-t="A record" data-exp="<b>Address record</b> — maps a name to an IPv4 address. <code>AAAA</code> is the IPv6 version.">A</span> <span class="ok">93.184.216.34</span></div>
+              <div class="ln"><span class="op">;; Query time: 24 msec</span></div>
+              <div class="ln"><span class="op">;; </span><span class="x" data-t="SERVER #53" data-exp="<b>Which resolver answered</b>, and on which port (53 = DNS)."><span class="op">SERVER: 1.1.1.1#53</span></span></div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">my address</span></div>
+            <div class="term-body sm" style="font-size:18px;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> <span class="fn x" data-t="ipconfig getifaddr" data-exp="macOS shortcut that prints <b>just the IPv4 address</b> of one interface — handy in scripts.">ipconfig getifaddr</span> <span class="st x" data-t="en0" data-exp="The <b>interface name</b>. On a Mac en0 is usually Wi-Fi; Ethernet is often en1/en4.">en0</span></div>
+              <div class="ln"><span class="ok">192.168.1.42</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> <span class="fn x" data-t="ifconfig" data-exp="Shows and configures network interfaces and their addresses. Modern Linux equivalent: <code>ip addr</code>.">ifconfig</span> en0 | <span class="x" data-t="grep filter" data-exp="Filters the long ifconfig output down to just the <b>line containing the IP</b>."><span class="kw">grep</span> <span class="st">&quot;inet &quot;</span></span></div>
+              <div class="ln"><span class="x" data-t="inet" data-exp="The interface&#39;s <b>IPv4 address</b> on the local network."><span class="kw">inet</span></span> <span class="ok">192.168.1.42</span> netmask <span class="kw x" data-t="netmask 0xffffff00" data-exp="The <b>subnet mask</b> in hex: 0xffffff00 = 255.255.255.0 = <b>/24</b> — the first 24 bits are the network.">0xffffff00</span></div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;broadcast 192.168.1.255</div>
+              <div class="ln"><span class="c"># 0xffffff00 = 255.255.255.0 = /24</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="xpanel reveal d4" style="margin-top:20px;">
+          <div class="xhead"><span class="pulse"></span>Click a command, option, or value above →</div>
+          <div class="xtitle">DNS &amp; interface</div>
+          <div class="xbody hint"><b>dig</b> turns a name into an address; <b>ifconfig</b> / <b>ipconfig getifaddr</b> show your own. Tap any highlighted part for the detail.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= READING RESULTS 3 — SOCKETS & HTTP ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Reading results</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">What's the result? · 3 of 3</div>
+        <h2 class="reveal d1">sockets &amp; HTTP — reading the reply</h2>
+        <p class="lead reveal d2">Inspect open sockets and test an HTTP endpoint. <b>Click any command, option, or value</b> to see what it does.</p>
+      </div>
+      <div class="body">
+        <div class="two tight" style="height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">open ports</span></div>
+            <div class="term-body sm" style="font-size:18px;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> <span class="fn x" data-t="netstat -an" data-exp="Lists network <b>connections &amp; listening sockets</b>. <code>-a</code> = all, <code>-n</code> = numeric (skip name lookups — faster).">netstat -an</span> | <span class="x" data-t="grep LISTEN" data-exp="Keep only the lines containing LISTEN — i.e. sockets <b>waiting for connections</b>."><span class="kw">grep</span> LISTEN</span></div>
+              <div class="ln"><span class="op">tcp4  </span><span class="ok x" data-t="*.22" data-exp="Bound on <b>all interfaces</b> (<code>*</code>) on port 22 — that is SSH.">*.22</span><span class="op">    *.*   </span><span class="kw x" data-t="LISTEN" data-exp="The socket state: a service is <b>accepting new connections</b> on that port.">LISTEN</span></div>
+              <div class="ln"><span class="op">tcp4  *.</span><span class="ok">443</span><span class="op">   *.*   LISTEN</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> <span class="fn x" data-t="lsof -i :443" data-exp="<b>List open files</b> of type network; <code>-i :443</code> filters to port 443 to reveal the owning process.">lsof -i :443</span></div>
+              <div class="ln"><span class="op">COMMAND  PID  USER ...</span></div>
+              <div class="ln"><span class="x" data-t="owning process" data-exp="The owning <b>program (nginx)</b> and its <b>PID</b> 812 — confirms the web server is the listener."><span class="op">nginx  812  root</span></span><span class="op">  TCP *:</span><span class="ok">https</span><span class="op"> (LISTEN)</span></div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">HTTP check</span></div>
+            <div class="term-body sm" style="font-size:18px;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> <span class="fn x" data-t="curl" data-exp="Transfers data to/from a URL — the everyday tool to <b>test HTTP endpoints and APIs</b>.">curl</span> <span class="kw x" data-t="-s  (silent)" data-exp="<b>Silent</b>: hide curl&#39;s progress meter and error spinner.">-s</span> <span class="kw x" data-t="-o /dev/null" data-exp="Send the <b>response body to nowhere</b> — we only want the metrics, not the HTML.">-o /dev/null</span> \</div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw x" data-t='-w &quot;...&quot;' data-exp="<b>Write-out</b>: print chosen variables after the request — here the status code and total time.">-w <span class="st">"%{http_code} %{time_total}s"</span></span> \</div>
+              <div class="ln">&nbsp;&nbsp;https://example.com</div>
+              <div class="ln"><span class="ok x" data-t="HTTP status" data-exp="HTTP <b>OK</b>. 3xx = redirect, 4xx = client error, 5xx = server error, 000 = no response at all.">200</span> <span class="op x" data-t="time_total" data-exp="<b>Total time</b> for the whole request, in seconds — your real user-facing latency.">0.184s</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> curl -s https://api.github.com/zen</div>
+              <div class="ln"><span class="st">Keep it logically awesome.</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="xpanel reveal d4" style="margin-top:20px;">
+          <div class="xhead"><span class="pulse"></span>Click a command, option, or value above →</div>
+          <div class="xtitle">sockets &amp; HTTP</div>
+          <div class="xbody hint"><b>netstat</b> / <b>lsof</b> show what's listening locally; <b>curl</b> checks a remote endpoint and its status code. Tap any highlighted part for the detail.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= NETSTAT DEEP DIVE · 1 — OPTIONS & OUTPUT ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Deep dive · netstat</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Deep dive · netstat · 1 of 2</div>
+        <h2 class="reveal d1">netstat — <span class="g">see every connection</span></h2>
+        <p class="lead reveal d2">Lists every network socket on the machine: what's <b>listening</b>, and who's <b>connected</b> to whom.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:0.92fr 1.08fr;gap:30px;height:auto;">
+          <div class="reveal d3">
+            <div class="mini-h">Common options</div>
+            <div class="explain">
+              <div class="er"><span class="tok ok">-a</span><span class="def">Show <b>all</b> sockets — both listening and active connections.</span></div>
+              <div class="er"><span class="tok ok">-n</span><span class="def"><b>Numeric</b>: don't resolve host/port names — faster and clearer.</span></div>
+              <div class="er"><span class="tok">-t / -u</span><span class="def"><b>TCP</b> only / <b>UDP</b> only (Linux).</span></div>
+              <div class="er"><span class="tok">-l</span><span class="def">Only <b>listening</b> sockets (Linux).</span></div>
+              <div class="er"><span class="tok">-p</span><span class="def">Show the owning <b>program + PID</b> (Linux; needs <code>sudo</code>).</span></div>
+              <div class="er"><span class="tok">-r</span><span class="def">Show the <b>routing table</b> instead of sockets.</span></div>
+            </div>
+          </div>
+          <div class="reveal d4">
+            <div class="mini-h">The everyday combo: <span class="os mac">netstat -an</span></div>
+            <div class="term">
+              <div class="term-body" style="font-size:17px;line-height:1.55;">
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> netstat -an   <span class="c"># all sockets, numeric</span></div>
+                <div class="ln"><span class="op">Proto  Local Address      Foreign Address      (state)</span></div>
+                <div class="ln">tcp4   192.168.1.42.<span class="ok">22</span>   203.0.113.7.51324    <span class="kw">ESTABLISHED</span></div>
+                <div class="ln">tcp4   <span class="ok">*.443</span>             *.*                  <span class="kw">LISTEN</span></div>
+              </div>
+            </div>
+            <div class="explain" style="margin-top:16px;">
+              <div class="er"><span class="tok">Proto</span><span class="def"><code>tcp4</code> / <code>tcp6</code> / <code>udp</code> — protocol &amp; IP version.</span></div>
+              <div class="er"><span class="tok">Local Address</span><span class="def"><b>Your</b> side as <code>ip.port</code>. <code>*</code> = any interface.</span></div>
+              <div class="er"><span class="tok">Foreign Address</span><span class="def">The <b>other</b> side. <code>*.*</code> = waiting for anyone to connect.</span></div>
+            </div>
+            <div class="step-tip" style="margin-top:14px;">💡&nbsp; <span>macOS netstat has no <code>-p</code> — use <code>lsof -i</code> to see the process. Modern Linux: <code>ss -tlnp</code>.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= NETSTAT DEEP DIVE · 2 — STATES & ANALYZE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Deep dive · netstat</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Deep dive · netstat · 2 of 2</div>
+        <h2 class="reveal d1">netstat — <span class="g">states &amp; how to analyze</span></h2>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:0.96fr 1.04fr;gap:30px;height:auto;">
+          <div class="reveal d3">
+            <div class="mini-h">What the State column means</div>
+            <div class="explain">
+              <div class="er"><span class="tok kw">LISTEN</span><span class="def">A service is <b>waiting</b> for connections on that port.</span></div>
+              <div class="er"><span class="tok ok">ESTABLISHED</span><span class="def">An <b>active, open</b> connection — data can flow.</span></div>
+              <div class="er"><span class="tok">TIME_WAIT</span><span class="def">Recently closed; the OS holds it briefly — <b>normal</b>, common under load.</span></div>
+              <div class="er"><span class="tok st">CLOSE_WAIT</span><span class="def">The other side closed but <b>your app hasn't</b> — a leak if it piles up.</span></div>
+              <div class="er"><span class="tok st">SYN_SENT</span><span class="def">Trying to connect, <b>no reply yet</b> — firewall, or host is down.</span></div>
+            </div>
+          </div>
+          <div class="reveal d4">
+            <div class="mini-h">How to analyze it</div>
+            <div class="term">
+              <div class="term-body" style="font-size:16px;line-height:1.6;">
+                <div class="ln"><span class="c"># is my web server listening on 443?</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> netstat -an | grep <span class="st">'.443 '</span> | grep <span class="kw">LISTEN</span></div>
+                <div class="ln">&nbsp;</div>
+                <div class="ln"><span class="c"># how many clients connected right now?</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> netstat -an | grep <span class="st">.443</span> | grep -c <span class="kw">ESTABLISHED</span></div>
+                <div class="ln"><span class="ok">37</span></div>
+                <div class="ln">&nbsp;</div>
+                <div class="ln"><span class="c"># which remote IPs are connected?</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> netstat -an | grep ESTAB | awk <span class="st">'{print $5}'</span></div>
+              </div>
+            </div>
+            <div class="step-tip" style="margin-top:14px;">🔎&nbsp; <span><b>Analyze:</b> growing <code>CLOSE_WAIT</code> = an app isn't closing sockets (a bug); piles of <code>SYN_SENT</code> = you can't reach the server; lots of <code>TIME_WAIT</code> = just busy, usually fine.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= CURL DEEP DIVE · 1 — OPTIONS & WRITE-OUT ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Deep dive · curl</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Deep dive · curl · 1 of 2</div>
+        <h2 class="reveal d1">curl — <span class="g">talk to any URL</span></h2>
+        <p class="lead reveal d2">Fetch pages and APIs — and measure exactly what happens on the way.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1fr 1fr;gap:30px;height:auto;">
+          <div class="reveal d3">
+            <div class="mini-h">Common options</div>
+            <div class="explain">
+              <div class="er"><span class="tok ok">-s</span><span class="def"><b>Silent</b> — hide the progress meter.</span></div>
+              <div class="er"><span class="tok">-o file / -O</span><span class="def">Save the body to a file / to its remote name.</span></div>
+              <div class="er"><span class="tok">-L</span><span class="def"><b>Follow redirects</b> (3xx) to the final page.</span></div>
+              <div class="er"><span class="tok">-I</span><span class="def">Fetch <b>headers only</b> (a HEAD request).</span></div>
+              <div class="er"><span class="tok">-H "K: V"</span><span class="def">Add a request <b>header</b> (e.g. an API token).</span></div>
+              <div class="er"><span class="tok">-X POST / -d</span><span class="def">Set the <b>method</b> / send body data.</span></div>
+              <div class="er"><span class="tok">-u / -k</span><span class="def">HTTP <b>auth</b> (<code>user:pass</code>) / <b>skip</b> the TLS certificate check.</span></div>
+              <div class="er"><span class="tok ok">--max-time N</span><span class="def">Give up if the <b>whole request</b> takes longer than N seconds (<code>--connect-timeout</code> limits just the connect phase).</span></div>
+            </div>
+          </div>
+          <div class="reveal d4">
+            <div class="mini-h"><code>-w</code> write-out variables</div>
+            <div class="explain">
+              <div class="er"><span class="tok ok">%{http_code}</span><span class="def">The status code — <code>200</code>, <code>404</code>, <code>500</code>…</span></div>
+              <div class="er"><span class="tok">%{time_total}</span><span class="def">Whole request time, in seconds.</span></div>
+              <div class="er"><span class="tok">%{time_namelookup}</span><span class="def">Time spent on <b>DNS</b>.</span></div>
+              <div class="er"><span class="tok">%{time_connect}</span><span class="def">Time to open the <b>TCP</b> connection.</span></div>
+              <div class="er"><span class="tok">%{time_starttransfer}</span><span class="def">Time to the <b>first byte</b> (server think-time).</span></div>
+            </div>
+            <div class="term" style="margin-top:14px;">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">discard the body · or save it</span></div>
+              <div class="term-body" style="font-size:14px;line-height:1.5;">
+                <div class="ln"><span class="c"># discard the body → just the metrics</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> curl -s <span class="kw">-o /dev/null</span> \</div>
+                <div class="ln">&nbsp;&nbsp;-w <span class="st">"%{http_code} %{time_total}s\n"</span> https://api/health</div>
+                <div class="ln"><span class="ok">200</span> <span class="op">0.184s</span></div>
+                <div class="ln">&nbsp;</div>
+                <div class="ln"><span class="c"># OR save the body to a file</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> curl -s <span class="kw">-o health.json</span> https://api/health</div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> cat health.json</div>
+                <div class="ln"><span class="st">{"status":"ok","db":"up"}</span></div>
+                <div class="ln"><span class="c"># -O keeps the URL's own filename · -L follows redirects</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= CURL DEEP DIVE · 2 — RESULTS & ANALYZE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Deep dive · curl</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Deep dive · curl · 2 of 2</div>
+        <h2 class="reveal d1">curl — <span class="g">read &amp; analyze the result</span></h2>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:0.92fr 1.08fr;gap:30px;height:auto;">
+          <div class="reveal d3">
+            <div class="mini-h">What the status code means</div>
+            <div class="explain">
+              <div class="er"><span class="tok ok">2xx</span><span class="def"><b>Success</b> — 200 OK, 201 Created, 204 No Content.</span></div>
+              <div class="er"><span class="tok">3xx</span><span class="def"><b>Redirect</b> — 301/302 → add <code>-L</code> to follow it.</span></div>
+              <div class="er"><span class="tok st">4xx</span><span class="def"><b>Your</b> request — 401 auth, 403 forbidden, 404 missing, 429 rate-limited.</span></div>
+              <div class="er"><span class="tok st">5xx</span><span class="def"><b>Server</b>'s fault — 500 error, 502/503 down or overloaded.</span></div>
+              <div class="er"><span class="tok">000</span><span class="def"><b>No HTTP at all</b> — DNS fail, timeout, refused, or TLS error.</span></div>
+            </div>
+          </div>
+          <div class="reveal d4">
+            <div class="mini-h">Analyze: where is the slowness?</div>
+            <div class="term">
+              <div class="term-body" style="font-size:15px;line-height:1.55;">
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> curl -s -o /dev/null -w <span class="st">"dns:%{time_namelookup} \</span></div>
+                <div class="ln"><span class="st">&nbsp;&nbsp;conn:%{time_connect} ttfb:%{time_starttransfer} \</span></div>
+                <div class="ln"><span class="st">&nbsp;&nbsp;total:%{time_total}\n"</span> https://api.example.com</div>
+                <div class="ln"><span class="op">dns:</span><span class="ok">0.02</span> <span class="op">conn:</span><span class="ok">0.05</span> <span class="op">ttfb:</span><span class="st">0.17</span> <span class="op">total:0.18</span></div>
+                <div class="ln">&nbsp;</div>
+                <div class="ln"><span class="c"># inspect the response headers:</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> curl -sI https://api.example.com | head</div>
+              </div>
+            </div>
+            <div class="step-tip" style="margin-top:14px;">🔎&nbsp; <span><b>Read the timings:</b> big <code>dns</code> = DNS problem · big <code>conn</code> = network/TLS · big <code>ttfb</code> = <b>slow server</b>. <code>-sI</code> shows headers like <code>Server</code>, <code>Content-Type</code>, <code>Location</code>.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 9 — PIPES / REDIRECTION ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Composing commands</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">The superpower</div>
+        <h2 class="reveal d1">Pipes, redirection &amp; filtering</h2>
+        <p class="lead reveal d2">The shell's real power is gluing small tools together. The <b>pipe</b> <code>|</code> feeds one command's output into the next; <b>redirection</b> sends it to a file.</p>
+      </div>
+      <div class="body">
+        <div class="flow reveal d3" style="margin:6px 0 30px;">
+          <span class="box">netstat -an<span class="t">all connections</span></span>
+          <span class="pipe">|</span>
+          <span class="box">grep 443<span class="t">keep matches</span></span>
+          <span class="pipe">|</span>
+          <span class="box">wc -l<span class="t">count lines</span></span>
+          <span class="pipe" style="color:var(--mac)">&gt;</span>
+          <span class="box">report.txt<span class="t">save to file</span></span>
+        </div>
+        <div class="reveal d4">
+          <table style="font-size:23px;">
+            <thead><tr><th>Operator</th><th>Meaning</th><th class="h-mac">Filter (macOS)</th><th class="h-win">Filter (Windows)</th></tr></thead>
+            <tbody>
+              <tr><td><code>|</code></td><td>Pipe output → next command</td><td><span class="macc">… | grep "fail"</span></td><td><span class="winc">… | Select-String "fail"</span></td></tr>
+              <tr><td><code>&gt;</code> / <code>&gt;&gt;</code></td><td>Write / append to a file</td><td><span class="macc">cmd &gt; out.txt</span></td><td><span class="winc">cmd &gt; out.txt</span></td></tr>
+              <tr><td>count / first</td><td>Summarise results</td><td><span class="macc">wc -l</span> · <span class="macc">head</span></td><td><span class="winc">Measure-Object</span> · <span class="winc">Select -First</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= PIPES — FOLLOW-ALONG EXAMPLE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Composing commands</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Pipes in practice · type it yourself</div>
+        <h2 class="reveal d1">Follow along: <span class="g">build a pipeline</span></h2>
+        <p class="lead reveal d2">Goal: <b>"how many services am I listening on?"</b> Start with the raw firehose, then add one stage at a time and watch the output shrink to a single answer.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.12fr 0.88fr;gap:26px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">terminal</span><span class="run-badge">▶ follow along</span></div>
+            <div class="term-body" style="font-size:19px;line-height:1.5;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> netstat -an                  <span class="c"># ① raw</span></div>
+              <div class="ln"><span class="op">… 312 lines — far too much to read …</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> netstat -an | grep <span class="kw">LISTEN</span>    <span class="c"># ②</span></div>
+              <div class="ln"><span class="op">tcp4  *.</span><span class="ok">22</span><span class="op">     LISTEN</span></div>
+              <div class="ln"><span class="op">tcp4  *.</span><span class="ok">80</span><span class="op">     LISTEN</span></div>
+              <div class="ln"><span class="op">tcp4  *.</span><span class="ok">443</span><span class="op">    LISTEN</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> … | grep LISTEN | awk <span class="st">'{print $4}'</span>  <span class="c"># ③</span></div>
+              <div class="ln"><span class="op">*.22   *.80   *.443</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> … | grep LISTEN | wc -l      <span class="c"># ④</span></div>
+              <div class="ln"><span class="ok">3</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> … | grep LISTEN <span class="mac" style="color:var(--mac)">&gt;</span> listening.txt  <span class="c"># ⑤</span></div>
+            </div>
+          </div>
+          <div class="stack reveal d4">
+            <div class="explain">
+              <div class="er"><span class="tok mac">netstat -an</span><span class="def"><b>①</b> The raw firehose — every socket on the box, too much to eyeball.</span></div>
+              <div class="er"><span class="tok">| grep LISTEN</span><span class="def"><b>②</b> The pipe feeds that text to <code>grep</code>, which <b>keeps only</b> lines with "LISTEN".</span></div>
+              <div class="er"><span class="tok">| awk '{print $4}'</span><span class="def"><b>③</b> <code>awk</code> prints just the <b>4th column</b> (the address.port), dropping the rest.</span></div>
+              <div class="er"><span class="tok ok">| wc -l</span><span class="def"><b>④</b> <code>wc -l</code> counts the lines → <b>one number</b>: your answer.</span></div>
+              <div class="er"><span class="tok mac">&gt; listening.txt</span><span class="def"><b>⑤</b> Redirect the result <b>into a file</b> instead of the screen (<code>&gt;&gt;</code> appends).</span></div>
+            </div>
+            <div class="purpose">
+              <span class="ic">🧪</span>
+              <span class="tx"><b>Try it:</b> run each line, check the result, <em>then</em> add the next <code>|</code>. Windows: <code>Get-NetTCPConnection | ? State -eq Listen | Measure-Object</code>.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= DEEP DIVE · tee ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Deep dive · tee</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Deep dive · tee</div>
+        <h2 class="reveal d1">tee — <span class="g">see it AND save it</span></h2>
+        <p class="lead reveal d2">A pipe sends output to <b>one</b> place. <code>tee</code> copies it — to the <b>screen and a file</b> at the same time.</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:28px;justify-content:center;">
+        <div class="flow reveal d3" style="gap:12px;">
+          <span class="box">a command<span class="t">makes output</span></span>
+          <span class="pipe">|</span>
+          <span class="box">tee file<span class="t">makes a copy</span></span>
+          <span class="pipe">→</span>
+          <span class="box">🖥 screen<span class="t">you see it</span></span>
+          <span class="pipe" style="color:var(--mac)">+</span>
+          <span class="box">📄 file<span class="t">it's saved</span></span>
+        </div>
+        <div class="two" style="grid-template-columns:1fr 1.05fr;gap:30px;height:auto;">
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span>Normally a pipe <code>|</code> hands output to just <b>one</b> next command.</span></li>
+              <li><span class="b">2</span><span><code>tee</code> shows the output on screen <b>and</b> writes a copy to a file.</span></li>
+              <li><span class="b">3</span><span>Add <code>-a</code> to <b>append</b> (add to the end) instead of overwriting.</span></li>
+            </ul>
+          </div>
+          <div class="reveal d4">
+            <div class="mini-h">Easy examples</div>
+            <div class="term">
+              <div class="term-body" style="font-size:17px;line-height:1.6;">
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ls | tee files.txt   <span class="c"># see it + save it</span></div>
+                <div class="ln"><span class="op">file1  file2  file3</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> cat files.txt        <span class="c"># it's in the file too</span></div>
+                <div class="ln"><span class="op">file1  file2  file3</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> date | tee -a log.txt <span class="c"># append a line</span></div>
+              </div>
+            </div>
+            <div class="step-tip" style="margin-top:14px;">🔐&nbsp; <span>To write to a <b>root-owned</b> file, <code>&gt;</code> fails with sudo — use <code>echo "…" | sudo tee /etc/hosts</code> instead.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= DEEP DIVE · awk (basics) ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Deep dive · awk</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Deep dive · awk · 1 of 2</div>
+        <h2 class="reveal d1">awk — <span class="g">grab a column</span></h2>
+        <p class="lead reveal d2">awk reads text <b>line by line</b> and splits each line into <b>fields</b> (columns) you can print.</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:26px;justify-content:center;">
+        <div class="anatomy reveal d3">
+          <div class="acode"><span class="st">alice</span>&nbsp;&nbsp;&nbsp;<span class="st">25</span>&nbsp;&nbsp;&nbsp;<span class="st">NYC</span></div>
+          <div class="alabels">
+            <span><b>$1</b> = alice &nbsp;&nbsp; <b>$2</b> = 25 &nbsp;&nbsp; <b>$3</b> = NYC &nbsp;&nbsp; <b>$0</b> = the whole line</span>
+          </div>
+        </div>
+        <div class="two" style="grid-template-columns:1fr 1.05fr;gap:30px;height:auto;">
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span>awk cuts each line into <b>columns</b> at the spaces.</span></li>
+              <li><span class="b">2</span><span><code>$1</code> is the 1st column, <code>$2</code> the 2nd … <code>$0</code> is the whole line.</span></li>
+              <li><span class="b">3</span><span><code>{print $2}</code> prints just that column for every line.</span></li>
+              <li><span class="b">4</span><span><code>-F','</code> splits on a comma instead of spaces — for CSV files.</span></li>
+            </ul>
+          </div>
+          <div class="reveal d4">
+            <div class="mini-h">Easy examples</div>
+            <div class="term">
+              <div class="term-body" style="font-size:16px;line-height:1.65;">
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> echo <span class="st">"alice 25 NYC"</span> | awk <span class="st">'{print $1}'</span></div>
+                <div class="ln"><span class="ok">alice</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> echo <span class="st">"alice 25 NYC"</span> | awk <span class="st">'{print $3}'</span></div>
+                <div class="ln"><span class="ok">NYC</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> echo <span class="st">"a,b,c"</span> | awk -F<span class="st">','</span> <span class="st">'{print $2}'</span></div>
+                <div class="ln"><span class="ok">b</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= DEEP DIVE · awk (patterns) ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Deep dive · awk</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Deep dive · awk · 2 of 2</div>
+        <h2 class="reveal d1">awk — <span class="g">pick lines &amp; do a little math</span></h2>
+        <p class="lead reveal d2">Put a <b>pattern</b> before the <code>{ }</code> and awk acts <b>only on matching lines</b> — exactly how our scripts pull out what they need.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:0.95fr 1.05fr;gap:30px;height:auto;">
+          <div class="reveal d3">
+            <div class="mini-h">In plain words</div>
+            <div class="explain">
+              <div class="er"><span class="tok">/word/{print $2}</span><span class="def">Only on lines that contain “word”, print column 2.</span></div>
+              <div class="er"><span class="tok">$2+0</span><span class="def">Turns text like “11.8 ms” into the <b>number</b> 11.8.</span></div>
+              <div class="er"><span class="tok">END{ … }</span><span class="def">Runs <b>once at the end</b> — perfect for a total or a count.</span></div>
+              <div class="er"><span class="tok">NR&gt;1</span><span class="def">“Skip line 1” — handy to ignore a CSV <b>header</b> row.</span></div>
+            </div>
+          </div>
+          <div class="reveal d4">
+            <div class="mini-h">Straight from our scripts</div>
+            <div class="term">
+              <div class="term-body" style="font-size:15px;line-height:1.6;">
+                <div class="ln"><span class="c"># netreport: the router's IP</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> route -n get default | awk <span class="st">'/gateway/{print $2}'</span></div>
+                <div class="ln"><span class="ok">192.168.1.1</span></div>
+                <div class="ln">&nbsp;</div>
+                <div class="ln"><span class="c"># latency-log: just the ping time, as a number</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ping -c1 8.8.8.8 | awk -F<span class="st">'time='</span> <span class="st">'/time=/{print $2+0}'</span></div>
+                <div class="ln"><span class="ok">11.8</span></div>
+                <div class="ln">&nbsp;</div>
+                <div class="ln"><span class="c"># count established connections</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> netstat -an | awk <span class="st">'/ESTAB/{n++} END{print n}'</span></div>
+                <div class="ln"><span class="ok">42</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= BUILD A SCRIPT · STEP 1 — COMMANDS IN A FILE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Write your first script</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Write your first script · Step 1 of 6</div>
+        <h2 class="reveal d1">A script is just <span class="g">commands in a file</span></h2>
+        <p class="lead reveal d2">We'll build one small script, <b>one line at a time</b>. Start with commands you already know.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.05fr 0.95fr;gap:28px;height:auto;">
+          <div class="stack reveal d3">
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">check.sh</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln add">echo <span class="st">"Checking the network..."</span></div>
+                <div class="ln add">ping -c 3 google.com</div>
+              </div>
+            </div>
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">check.ps1</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln add"><span class="fn">Write-Output</span> <span class="st">"Checking the network..."</span></div>
+                <div class="ln add"><span class="fn">Test-Connection</span> google.com -Count 3</div>
+              </div>
+            </div>
+          </div>
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span>A script is just <b>commands saved in a file</b> — the same ones you'd type by hand.</span></li>
+              <li><span class="b">2</span><span>Run the file once and every line runs in order, <b>top to bottom</b>.</span></li>
+              <li><span class="b">3</span><span><b>macOS</b> uses Bash, <b>Windows</b> uses PowerShell — same idea, different command names.</span></li>
+            </ul>
+            <div class="step-tip">💾&nbsp; <span>Save as <b>check.sh</b> (macOS) or <b>check.ps1</b> (Windows). Green = the line we just added.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= BUILD A SCRIPT · STEP 2 — SHEBANG ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Write your first script</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Write your first script · Step 2 of 6</div>
+        <h2 class="reveal d1">Add the <span class="g">first line</span>: the shebang</h2>
+        <p class="lead reveal d2">One special line at the very top tells the computer how to run your file.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.05fr 0.95fr;gap:28px;height:auto;">
+          <div class="stack reveal d3">
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">check.sh</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln add"><span class="kw">#!/usr/bin/env bash</span></div>
+                <div class="ln dim">echo <span class="st">"Checking the network..."</span></div>
+                <div class="ln dim">ping -c 3 google.com</div>
+              </div>
+            </div>
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">check.ps1</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln add"><span class="c"># no shebang — the .ps1 name says PowerShell</span></div>
+                <div class="ln dim"><span class="fn">Write-Output</span> <span class="st">"Checking the network..."</span></div>
+                <div class="ln dim"><span class="fn">Test-Connection</span> google.com -Count 3</div>
+              </div>
+            </div>
+          </div>
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span><b>Bash:</b> the first line <code>#!</code> (the <b>“shebang”</b>) picks the language — here <code>bash</code>.</span></li>
+              <li><span class="b">2</span><span><b>Windows:</b> no shebang needed — the <code>.ps1</code> file name already tells Windows it's PowerShell.</span></li>
+              <li><span class="b">3</span><span>Either way, something has to say <b>“run this as a script.”</b></span></li>
+            </ul>
+            <div class="step-tip">⬆️&nbsp; <span>In Bash the shebang must be the <b>very first line</b> — no blank space above it.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= BUILD A SCRIPT · STEP 3 — COMMENTS ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Write your first script</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Write your first script · Step 3 of 6</div>
+        <h2 class="reveal d1">Leave <span class="g">notes</span>: comments</h2>
+        <p class="lead reveal d2">Explain what your script does — for other people, and for future-you.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.05fr 0.95fr;gap:28px;height:auto;">
+          <div class="stack reveal d3">
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">check.sh</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln dim"><span class="kw">#!/usr/bin/env bash</span></div>
+                <div class="ln add"><span class="c"># check.sh - is the internet working?</span></div>
+                <div class="ln dim">echo <span class="st">"Checking the network..."</span></div>
+                <div class="ln dim">ping -c 3 google.com</div>
+              </div>
+            </div>
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">check.ps1</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln add"><span class="c"># check.ps1 - is the internet working?</span></div>
+                <div class="ln dim"><span class="fn">Write-Output</span> <span class="st">"Checking the network..."</span></div>
+                <div class="ln dim"><span class="fn">Test-Connection</span> google.com -Count 3</div>
+              </div>
+            </div>
+          </div>
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span>Any line starting with <b>#</b> is a <b>comment</b> — the computer skips it.</span></li>
+              <li><span class="b">2</span><span>Good news: <b>both</b> Bash and PowerShell use <code>#</code> for comments.</span></li>
+              <li><span class="b">3</span><span>Comments are notes for humans: what it does, how to use it.</span></li>
+            </ul>
+            <div class="step-tip">💡&nbsp; <span>(Bash's <code>#!</code> on line 1 is the one special case — every other <code>#</code> is just a note.)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= BUILD A SCRIPT · STEP 4 — VARIABLE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Write your first script</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Write your first script · Step 4 of 6</div>
+        <h2 class="reveal d1">Remember a value: a <span class="g">variable</span></h2>
+        <p class="lead reveal d2">Store the host name once, then reuse it — so you only change it in one place.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.05fr 0.95fr;gap:28px;height:auto;">
+          <div class="stack reveal d3">
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">check.sh</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln dim"><span class="kw">#!/usr/bin/env bash</span></div>
+                <div class="ln add"><span class="vr">TARGET</span>=<span class="st">"google.com"</span></div>
+                <div class="ln chg">echo <span class="st">"Checking <span class="vr">$TARGET</span>..."</span></div>
+                <div class="ln chg">ping -c 3 <span class="st">"<span class="vr">$TARGET</span>"</span></div>
+              </div>
+            </div>
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">check.ps1</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln dim"><span class="c"># check.ps1</span></div>
+                <div class="ln add"><span class="vr">$Target</span> = <span class="st">"google.com"</span></div>
+                <div class="ln chg"><span class="fn">Write-Output</span> <span class="st">"Checking <span class="vr">$Target</span>..."</span></div>
+                <div class="ln chg"><span class="fn">Test-Connection</span> <span class="vr">$Target</span> -Count 3</div>
+              </div>
+            </div>
+          </div>
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span>A <b>variable</b> is a labelled box that stores a value you reuse.</span></li>
+              <li><span class="b">2</span><span><b>Bash:</b> <code>TARGET="google.com"</code> &nbsp;·&nbsp; <b>PowerShell:</b> <code>$Target = "google.com"</code>.</span></li>
+              <li><span class="b">3</span><span>Read it back with a <code>$</code>. Change it once → it updates everywhere.</span></li>
+            </ul>
+            <div class="step-tip">⚠️&nbsp; <span>Bash: <b>no spaces</b> around <code>=</code>. PowerShell: spaces are fine, and the name keeps its <code>$</code>.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= BUILD A SCRIPT · STEP 5 — ARGUMENT ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Write your first script</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Write your first script · Step 5 of 6</div>
+        <h2 class="reveal d1">Let the user <span class="g">choose</span>: an argument</h2>
+        <p class="lead reveal d2">Make the script work for <b>any</b> host the user types — with a sensible default.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.05fr 0.95fr;gap:28px;height:auto;">
+          <div class="stack reveal d3">
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">check.sh</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln dim"><span class="kw">#!/usr/bin/env bash</span></div>
+                <div class="ln chg"><span class="vr">TARGET</span>=<span class="st">"${1:-google.com}"</span></div>
+                <div class="ln dim">echo <span class="st">"Checking <span class="vr">$TARGET</span>..."</span></div>
+                <div class="ln dim">ping -c 3 <span class="st">"<span class="vr">$TARGET</span>"</span></div>
+              </div>
+            </div>
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">check.ps1</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln chg"><span class="kw">param</span>(<span class="vr">$Target</span> = <span class="st">"google.com"</span>)</div>
+                <div class="ln dim"><span class="fn">Write-Output</span> <span class="st">"Checking <span class="vr">$Target</span>..."</span></div>
+                <div class="ln dim"><span class="fn">Test-Connection</span> <span class="vr">$Target</span> -Count 3</div>
+              </div>
+            </div>
+          </div>
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span>An <b>argument</b> is a value the user types after the script's name.</span></li>
+              <li><span class="b">2</span><span><b>Bash:</b> <code>${1:-google.com}</code> = use the 1st argument, or google.com if none.</span></li>
+              <li><span class="b">3</span><span><b>PowerShell:</b> <code>param($Target = "google.com")</code> does the same — an arg with a default.</span></li>
+            </ul>
+            <div class="step-tip">⌨️&nbsp; <span><code>./check.sh github.com</code> (macOS) &nbsp;·&nbsp; <code>.\check.ps1 github.com</code> (Windows).</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= BUILD A SCRIPT · STEP 6 — RUN IT ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Write your first script</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Write your first script · Step 6 of 6</div>
+        <h2 class="reveal d1">Save it &amp; <span class="g">run it</span></h2>
+        <p class="lead reveal d2">Two commands turn your file into a tool you can run any time.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.05fr 0.95fr;gap:28px;height:auto;">
+          <div class="stack reveal d3">
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">macOS · Terminal</span></span><span class="run-badge">▶ try it</span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> chmod +x check.sh     <span class="c"># make runnable (once)</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ./check.sh            <span class="c"># run with default</span></div>
+                <div class="ln"><span class="op">Checking google.com... </span><span class="ok">0% loss</span></div>
+                <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ./check.sh github.com</div>
+              </div>
+            </div>
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">Windows · PowerShell</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.55;">
+                <div class="ln"><span class="kw">PS&gt;</span> .\check.ps1            <span class="c"># run with default</span></div>
+                <div class="ln"><span class="op">Checking google.com... </span><span class="ok">0% loss</span></div>
+                <div class="ln"><span class="kw">PS&gt;</span> .\check.ps1 github.com</div>
+              </div>
+            </div>
+          </div>
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span><b>macOS:</b> <code>chmod +x check.sh</code> makes it runnable (once), then <code>./check.sh</code>.</span></li>
+              <li><span class="b">2</span><span><b>Windows:</b> just <code>.\check.ps1</code>. First time only, allow scripts: <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>.</span></li>
+              <li><span class="b">3</span><span>Add a host to check a different one — the default kicks in when you don't.</span></li>
+            </ul>
+            <div class="step-tip">🎉&nbsp; <span>A real, reusable script on <b>both</b> systems — built one line at a time. Next: decisions, loops &amp; functions.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 10 — VARIABLES ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Scripting blocks</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Building block 1 · click to explain</div>
+        <h2 class="reveal d1">Variables &amp; substitution</h2>
+        <p class="lead reveal d2">Store a value once, reuse it everywhere. <b>Click any part</b> of the code to see how you define, read, and capture into a variable.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.12fr 0.88fr;gap:24px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">Bash / Zsh</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.6;">
+              <div class="ln"><span class="c"># define — NO spaces around =</span></div>
+              <div class="ln"><span class="x" data-t="VAR=value (assign)" data-exp="<b>Define a variable:</b> <code>NAME=value</code> with <b>no spaces</b> around <code>=</code> (<code>HOST = x</code> is an error). Quote any value that contains spaces."><span class="vr">HOST</span>=<span class="st">"10.1.1.1"</span></span></div>
+              <div class="ln"><span class="vr">PORT</span>=8080</div>
+              <div class="ln"><span class="c"># read it back — always quote!</span></div>
+              <div class="ln">ping -c1 <span class="x" data-t="&quot;$HOST&quot; (read + quote)" data-exp="<b>Read a variable</b> with a <code>$</code>. Always wrap it in double quotes — <code>&quot;$HOST&quot;</code> — so an empty or spaced value can't break the command."><span class="st">"$HOST"</span></span></div>
+              <div class="ln">echo <span class="st">"<span class="x" data-t="${HOST} (braces)" data-exp="<b>Braces</b> mark where the name ends: <code>${HOST}:${PORT}</code> is unambiguous where <code>$HOST:$PORT</code> could confuse the parser. Braces are also required for the <code>${1:-…}</code> default syntax.">${HOST}:${PORT}</span>"</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># capture a command's output</span></div>
+              <div class="ln"><span class="vr">IP</span>=<span class="x" data-t="$( ) command substitution" data-exp="<b>Command substitution:</b> <code>$( )</code> runs the command inside and replaces it with the command's <b>output</b> — here storing the resolved IP into <code>IP</code>."><span class="fn">$(</span>dig +short example.com<span class="fn">)</span></span></div>
+              <div class="ln">echo <span class="st">"resolved $IP"</span></div>
+            </div>
+          </div>
+          <div class="stack reveal d4">
+            <div class="term">
+              <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">PowerShell</span></span></div>
+              <div class="term-body" style="font-size:18px;line-height:1.6;">
+                <div class="ln"><span class="x" data-t="$var = value" data-exp="PowerShell variables start with <code>$</code> and <b>spaces around <code>=</code> are fine</b> (unlike Bash)."><span class="vr">$Target</span> = <span class="st">"10.1.1.1"</span></span></div>
+                <div class="ln"><span class="x" data-t="$( ) capture" data-exp="Wrap an expression in <code>( )</code> and assign it — PowerShell captures the result as an <b>object</b>, not just text."><span class="vr">$IP</span> = (Resolve-DnsName ex.com).IPAddress</span></div>
+                <div class="ln"><span class="x" data-t="$env: variables" data-exp="Environment variables live under <code>$env:</code> in PowerShell — e.g. <code>$env:PATH</code>. Bash uses <code>$PATH</code> / <code>$HOME</code>."><span class="vr">$env:PATH</span></span></div>
+              </div>
+            </div>
+            <div class="xpanel">
+              <div class="xhead"><span class="pulse"></span>Click any part of the code →</div>
+              <div class="xtitle">Defining &amp; using variables</div>
+              <div class="xbody hint">Tap a token to learn how to <b>assign</b> (<code>NAME=value</code>), <b>read</b> (<code>"$NAME"</code>), and <b>capture</b> command output (<code>$( )</code>). Next page: giving them <b>defaults</b>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= ARGUMENTS, DEFAULTS & OUTPUT (interactive) ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Scripting blocks</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Building block 1b · click to explain</div>
+        <h2 class="reveal d1">Arguments, <span class="g">${defaults}</span> &amp; saving output</h2>
+        <p class="lead reveal d2">How a script reads its arguments, falls back to a <b>default</b> when one is missing, and writes results to a file. <b>Click any part</b> to see how it works.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.12fr 0.88fr;gap:24px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">args-and-defaults.sh</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.6;">
+              <div class="ln"><span class="c"># run as:  ./deploy.sh web01 8080</span></div>
+              <div class="ln">echo <span class="st">"host=<span class="x" data-t="$1, $2 …  positional args" data-exp="<b>Positional arguments.</b> For <code>./deploy.sh web01 8080</code>: <code>$1</code>=web01, <code>$2</code>=8080, and <code>$0</code>=the script's own name.">$1</span> port=<span class="x" data-t="$2" data-exp="The <b>second</b> argument. They keep going: <code>$3</code>, <code>$4</code>, … and <code>${10}</code> once you pass ten.">$2</span> n=<span class="x" data-t="$#  arg count" data-exp="<b>How many</b> arguments were passed — check it to make sure the caller gave enough.">$#</span> all=<span class="x" data-t="$@  all args" data-exp="<b>All</b> the arguments as a list — loop over them, or forward them to another command.">$@</span>"</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># default if the arg is missing/empty</span></div>
+              <div class="ln"><span class="vr">URL</span>=<span class="st">"<span class="x" data-t="${1:-default}" data-exp="<b>Default value.</b> <code>${1:-X}</code> means: use <code>$1</code>, but if it is <b>unset or empty</b>, use <code>X</code> instead. That's why the script runs with or without an argument.">${1:-https://example.com}</span>"</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># require it, else abort with a message</span></div>
+              <div class="ln"><span class="vr">TARGET</span>=<span class="st">"<span class="x" data-t="${1:?message}" data-exp="<b>Required value.</b> <code>${1:?msg}</code> uses <code>$1</code> if present, otherwise prints <code>msg</code> to stderr and <b>exits the script</b> — a one-line guard against missing input.">${1:?need an IP}</span>"</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># the default trick works for ANY var</span></div>
+              <div class="ln"><span class="vr">RETRIES</span>=<span class="st">"<span class="x" data-t="${VAR:-default}" data-exp="The same pattern isn't just for arguments: <code>${VAR:-X}</code> means 'use <code>$RETRIES</code>, or <code>3</code> if it was never set.'">${RETRIES:-3}</span>"</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># save output to a file</span></div>
+              <div class="ln">echo <span class="st">"$URL"</span> <span class="x" data-t="&gt;&gt;  append" data-exp="<b>Append redirect.</b> <code>&gt;&gt;</code> adds to the end of a file (a single <code>&gt;</code> would overwrite it). The file is created if it doesn't exist."><span class="mac" style="color:var(--mac)">&gt;&gt;</span> urls.log</span></div>
+              <div class="ln">echo <span class="st">"done"</span> <span class="x" data-t="| tee -a" data-exp="<b>tee</b> splits the stream two ways — it prints to the <b>screen</b> AND writes to the file at the same time. <code>-a</code> appends instead of overwriting; great for live logs you also want to watch."><span class="op">|</span> <span class="fn">tee</span> -a run.log</span></div>
+            </div>
+          </div>
+          <div class="stack reveal d4">
+            <div class="anatomy">
+              <div class="acode">${ <span class="vr">1</span> <span class="ok">:-</span> <span class="st">https://example.com</span> }</div>
+              <div class="alabels">
+                <span><b>${ }</b> &nbsp;parameter expansion</span>
+                <span><b>1</b> &nbsp;&nbsp;&nbsp;the value to use — here arg <code>$1</code></span>
+                <span><b>:-</b> &nbsp;&nbsp;“if it's empty, use the fallback”</span>
+                <span><b>https://…</b> &nbsp;the fallback value</span>
+              </div>
+            </div>
+            <div class="xpanel">
+              <div class="xhead"><span class="pulse"></span>Click any part of the code →</div>
+              <div class="xtitle">Arguments &amp; defaults</div>
+              <div class="xbody hint">Read <code>${1:-default}</code> as: <em>“give me <code>$1</code> — but if it's empty, use the default instead.”</em> Tap any token to explore args, defaults, and saving output.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 11 — CONTROL FLOW ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Scripting blocks</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Building block 2</div>
+        <h2 class="reveal d1">Conditionals &amp; loops</h2>
+        <p class="lead reveal d2">Make decisions with <b>if</b>, and repeat work with <b>loops</b> — the moment a one-liner becomes a script.</p>
+      </div>
+      <div class="body">
+        <div class="two reveal d3">
+          <div class="term">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">macOS · Bash</span></span></div>
+            <div class="term-body sm">
+              <div class="ln"><span class="c"># loop over a list, test each</span></div>
+              <div class="ln"><span class="kw">for</span> n <span class="kw">in</span> 1 2 3; <span class="kw">do</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="vr">IP</span>=<span class="st">"10.1.1.$n"</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">if</span> ping -c1 -W1 <span class="vr">$IP</span> &gt;/dev/null; <span class="kw">then</span></div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;echo <span class="st">"<span class="vr">$IP</span> UP"</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">else</span></div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;echo <span class="st">"<span class="vr">$IP</span> down"</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">fi</span></div>
+              <div class="ln"><span class="kw">done</span></div>
+            </div>
+          </div>
+          <div class="term">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">Windows · PowerShell</span></span></div>
+            <div class="term-body sm">
+              <div class="ln"><span class="c"># loop over a range, test each</span></div>
+              <div class="ln"><span class="kw">foreach</span> (<span class="vr">$n</span> <span class="kw">in</span> 1..3) {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="vr">$IP</span> = <span class="st">"10.1.1.$n"</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">if</span> (Test-Connection <span class="vr">$IP</span> -Count 1 -Quiet) {</div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">"$IP UP"</span></div>
+              <div class="ln">&nbsp;&nbsp;} <span class="kw">else</span> {</div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">"$IP down"</span></div>
+              <div class="ln">&nbsp;&nbsp;}</div>
+              <div class="ln">}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= CONDITIONALS (interactive) ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Scripting blocks</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Scripting basics · making a decision</div>
+        <h2 class="reveal d1">Making a decision: <span class="g">if / else</span></h2>
+        <p class="lead reveal d2">Run different commands depending on whether something worked — on macOS <b>and</b> Windows.</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="two" style="grid-template-columns:1fr 1fr;gap:26px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">decide.sh</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.7;">
+              <div class="ln"><span class="c"># is the internet working?</span></div>
+              <div class="ln"><span class="kw">if</span> ping -c1 google.com; <span class="kw">then</span></div>
+              <div class="ln">&nbsp;&nbsp;echo <span class="st">"✅ we are online"</span></div>
+              <div class="ln"><span class="kw">else</span></div>
+              <div class="ln">&nbsp;&nbsp;echo <span class="st">"❌ no connection"</span></div>
+              <div class="ln"><span class="kw">fi</span></div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">decide.ps1</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.7;">
+              <div class="ln"><span class="c"># is the internet working?</span></div>
+              <div class="ln"><span class="kw">if</span> (<span class="fn">Test-Connection</span> google.com -Quiet) {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="st">"✅ we are online"</span></div>
+              <div class="ln">} <span class="kw">else</span> {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="st">"❌ no connection"</span></div>
+              <div class="ln">}</div>
+            </div>
+          </div>
+        </div>
+        <div class="eplain row reveal d4">
+          <div class="eh">In plain words</div>
+          <ul>
+            <li><span class="b">1</span><span><code>if</code> runs a command/test. If it <b>works</b>, the first block runs.</span></li>
+            <li><span class="b">2</span><span><code>else</code> is the backup — it runs only when the <code>if</code> <b>failed</b>.</span></li>
+            <li><span class="b">3</span><span><b>Bash</b> closes the block with <code>then … fi</code>; <b>PowerShell</b> wraps it in <code>{ … }</code>.</span></li>
+            <li><span class="b">4</span><span>Compare values: Bash <code>[ "$n" -gt 3 ]</code> &nbsp;·&nbsp; PowerShell <code>$n -gt 3</code>.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= LOOPS (interactive) ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Scripting blocks</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Scripting basics · repeating work</div>
+        <h2 class="reveal d1">Repeat something: <span class="g">loops</span></h2>
+        <p class="lead reveal d2">Run the same lines many times — without copy-pasting them.</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="two" style="grid-template-columns:1fr 1fr;gap:26px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">loops.sh</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.6;">
+              <div class="ln"><span class="c"># FOR: once for each item in a list</span></div>
+              <div class="ln"><span class="kw">for</span> site <span class="kw">in</span> google.com github.com; <span class="kw">do</span></div>
+              <div class="ln">&nbsp;&nbsp;ping -c1 <span class="st">"$site"</span></div>
+              <div class="ln"><span class="kw">done</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># WHILE: keep going while true</span></div>
+              <div class="ln">n=1</div>
+              <div class="ln"><span class="kw">while</span> [ <span class="st">"$n"</span> -le 3 ]; <span class="kw">do</span></div>
+              <div class="ln">&nbsp;&nbsp;echo <span class="st">"try $n"</span>; n=$((n + 1))</div>
+              <div class="ln"><span class="kw">done</span></div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">loops.ps1</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.6;">
+              <div class="ln"><span class="c"># FOR: once for each item in a list</span></div>
+              <div class="ln"><span class="kw">foreach</span> (<span class="vr">$site</span> <span class="kw">in</span> <span class="st">"google.com"</span>,<span class="st">"github.com"</span>) {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="fn">Test-Connection</span> <span class="vr">$site</span> -Count 1</div>
+              <div class="ln">}</div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># WHILE: keep going while true</span></div>
+              <div class="ln"><span class="vr">$n</span> = 1</div>
+              <div class="ln"><span class="kw">while</span> (<span class="vr">$n</span> -le 3) {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="st">"try $n"</span>; <span class="vr">$n</span>++</div>
+              <div class="ln">}</div>
+            </div>
+          </div>
+        </div>
+        <div class="eplain row reveal d4">
+          <div class="eh">In plain words</div>
+          <ul>
+            <li><span class="b">1</span><span>A <b>for</b> loop repeats once for <b>each item</b> in a list (here, two sites).</span></li>
+            <li><span class="b">2</span><span>A <b>while</b> loop repeats <b>as long as</b> a test stays true.</span></li>
+            <li><span class="b">3</span><span>Bash wraps the repeated lines in <code>do … done</code>; PowerShell uses <code>{ … }</code>.</span></li>
+            <li><span class="b">4</span><span>Same idea on both systems — only the punctuation changes.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= FUNCTIONS (interactive) ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Scripting blocks</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Scripting basics · reuse</div>
+        <h2 class="reveal d1">Reuse code: <span class="g">functions</span></h2>
+        <p class="lead reveal d2">Give a block of commands a name, then call it as many times as you like.</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="two" style="grid-template-columns:1fr 1fr;gap:26px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">functions.sh</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.7;">
+              <div class="ln"><span class="c"># define a function (a named block)</span></div>
+              <div class="ln"><span class="fn">check</span>() <span class="op">{</span></div>
+              <div class="ln">&nbsp;&nbsp;ping -c1 <span class="st">"$1"</span></div>
+              <div class="ln"><span class="op">}</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># call it by name, as often as you want</span></div>
+              <div class="ln"><span class="fn">check</span> google.com</div>
+              <div class="ln"><span class="fn">check</span> github.com</div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">functions.ps1</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.7;">
+              <div class="ln"><span class="c"># define a function (a named block)</span></div>
+              <div class="ln"><span class="kw">function</span> <span class="fn">Check</span>(<span class="vr">$h</span>) <span class="op">{</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="fn">Test-Connection</span> <span class="vr">$h</span> -Count 1</div>
+              <div class="ln"><span class="op">}</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># call it by name, as often as you want</span></div>
+              <div class="ln"><span class="fn">Check</span> google.com</div>
+              <div class="ln"><span class="fn">Check</span> github.com</div>
+            </div>
+          </div>
+        </div>
+        <div class="eplain row reveal d4">
+          <div class="eh">In plain words</div>
+          <ul>
+            <li><span class="b">1</span><span>A <b>function</b> is a named block of commands you can reuse.</span></li>
+            <li><span class="b">2</span><span>Define it once (<code>check() { }</code> or <code>function Check { }</code>), then <b>call it by name</b>.</span></li>
+            <li><span class="b">3</span><span>The value you pass arrives inside as <code>$1</code> (Bash) or your <code>$h</code> parameter (PowerShell).</span></li>
+            <li><span class="b">4</span><span>Write it once, call it everywhere — no copy-pasting the same lines.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 12 — FIRST SCRIPT ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>From command to script</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Save it for next time</div>
+        <h2 class="reveal d1">Your first script file</h2>
+        <p class="lead reveal d2">A script is just commands in a file. Each platform has one setup quirk: a <b>shebang + execute bit</b> on macOS, and the <b>execution policy</b> on Windows.</p>
+      </div>
+      <div class="body">
+        <div class="two reveal d3">
+          <div class="term">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">check.sh — macOS</span></span></div>
+            <div class="term-body sm">
+              <div class="ln"><span class="kw">#!/usr/bin/env bash</span>  <span class="c"># shebang</span></div>
+              <div class="ln">ping -c 2 <span class="st">"$1"</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># make it runnable, then run:</span></div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> chmod +x check.sh</div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ./check.sh 10.1.1.1</div>
+            </div>
+          </div>
+          <div class="term">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">check.ps1 — Windows</span></span></div>
+            <div class="term-body sm">
+              <div class="ln"><span class="kw">param</span>(<span class="vr">$Target</span>)   <span class="c"># named input</span></div>
+              <div class="ln">Test-Connection <span class="vr">$Target</span> -Count 2</div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># allow local scripts once:</span></div>
+              <div class="ln"><span class="kw">PS&gt;</span> Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</div>
+              <div class="ln"><span class="kw">PS&gt;</span> .\check.ps1 10.1.1.1</div>
+            </div>
+          </div>
+        </div>
+        <p class="lead reveal d4" style="font-size:22px;margin-top:22px;"><code>$1</code> (bash) and <code>param()</code> (PowerShell) let a caller pass in the target — the same script works for any host.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 13 — REAL SCRIPT ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Putting it together</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Capstone example</div>
+        <h2 class="reveal d1">A subnet <span class="g">ping-sweep</span></h2>
+        <p class="lead reveal d2">Everything so far — variables, a loop, a conditional, output — in one reusable tool that reports which hosts on a /24 are alive.</p>
+      </div>
+      <div class="body">
+        <div class="two reveal d3">
+          <div class="term">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">sweep.sh</span></span></div>
+            <div class="term-body sm" style="font-size:19px;">
+              <div class="ln"><span class="kw">#!/usr/bin/env bash</span></div>
+              <div class="ln"><span class="vr">NET</span>=<span class="st">"${1:-10.1.1}"</span>   <span class="c"># default subnet</span></div>
+              <div class="ln"><span class="kw">for</span> i <span class="kw">in</span> $(seq 1 254); <span class="kw">do</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">if</span> ping -c1 -W1 <span class="vr">$NET</span>.$i &gt;/dev/null 2&gt;&amp;1; <span class="kw">then</span></div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;echo <span class="st">"<span class="ok">UP</span>   <span class="vr">$NET</span>.$i"</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">fi</span></div>
+              <div class="ln"><span class="kw">done</span></div>
+            </div>
+          </div>
+          <div class="term">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">sweep.ps1</span></span></div>
+            <div class="term-body sm" style="font-size:19px;">
+              <div class="ln"><span class="kw">param</span>(<span class="vr">$Net</span> = <span class="st">"10.1.1"</span>)</div>
+              <div class="ln">1..254 | <span class="kw">ForEach-Object</span> {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="vr">$ip</span> = <span class="st">"$Net.$_"</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">if</span> (Test-Connection <span class="vr">$ip</span> -Count 1 -Quiet) {</div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="st">"<span class="ok">UP</span>   $ip"</span></div>
+              <div class="ln">&nbsp;&nbsp;}</div>
+              <div class="ln">}</div>
+            </div>
+          </div>
+        </div>
+        <p class="lead reveal d4" style="font-size:22px;margin-top:20px;">Run it &amp; save the result: <code>./sweep.sh 192.168.1 &gt; alive.txt</code> &nbsp;·&nbsp; <code>.\sweep.ps1 192.168.1 &gt; alive.txt</code></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT LIBRARY — DIVIDER ========================= -->
+  <section class="slide">
+    <span class="big-num">.sh</span>
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head" style="margin-top:120px;">
+        <div class="kicker reveal d1">5 scripts you'll actually reuse</div>
+        <h2 class="reveal d1" style="font-size:84px;">A network engineer's<br><span class="g">shell toolkit</span></h2>
+        <p class="lead reveal d2">Five practical tools — each shown in <b>both</b> <span class="os mac">Bash (.sh)</span> for macOS/Linux and <span class="os win">PowerShell (.ps1)</span> for Windows, with a sample run so you know exactly what to expect.</p>
+      </div>
+      <div class="body reveal d3" style="display:flex;align-items:flex-end;">
+        <div class="flow" style="justify-content:flex-start;gap:14px;">
+          <span class="box" style="font-size:20px;">1 · health-check<span class="t">is the site up?</span></span>
+          <span class="box" style="font-size:20px;">2 · portscan<span class="t">which ports open?</span></span>
+          <span class="box" style="font-size:20px;">3 · latency-log<span class="t">RTT → CSV</span></span>
+          <span class="box" style="font-size:20px;">4 · netreport<span class="t">machine snapshot</span></span>
+          <span class="box" style="font-size:20px;">5 · fleet<span class="t">SSH many hosts</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT 1 — HEALTH CHECK ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Script 1 of 5 · Bash + PowerShell</div>
+        <h2 class="reveal d1">Service health monitor</h2>
+        <p class="lead reveal d2">Hit a URL, check the HTTP status, log a line whenever it's <b>down</b> — an uptime watchdog for <span class="os mac">cron</span> or <span class="os win">Task Scheduler</span>.</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="two" style="grid-template-columns:1fr 1fr;gap:24px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">health-check.sh</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.5;">
+              <div class="ln"><span class="kw">#!/usr/bin/env bash</span></div>
+              <div class="ln"><span class="vr">URL</span>=<span class="st">"${1:-https://google.com}"</span></div>
+              <div class="ln"><span class="vr">code</span>=$(curl -sL -o /dev/null -w <span class="st">"%{http_code}"</span> --max-time 5 <span class="st">"$URL"</span>)</div>
+              <div class="ln"><span class="vr">ts</span>=$(date <span class="st">'+%F %T'</span>)</div>
+              <div class="ln"><span class="kw">if</span> [ <span class="st">"$code"</span> -ge 200 ] &amp;&amp; [ <span class="st">"$code"</span> -lt 400 ]; <span class="kw">then</span></div>
+              <div class="ln">&nbsp;&nbsp;echo <span class="st">"$ts <span class="ok">OK</span>   $URL ($code)"</span></div>
+              <div class="ln"><span class="kw">else</span> echo <span class="st">"$ts DOWN $URL ($code)"</span> | tee -a outage.log; <span class="kw">fi</span></div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">health-check.ps1</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.5;">
+              <div class="ln"><span class="kw">param</span>([string]<span class="vr">$Url</span> = <span class="st">"https://google.com"</span>)</div>
+              <div class="ln"><span class="vr">$ts</span> = <span class="fn">Get-Date</span> -Format <span class="st">"yyyy-MM-dd HH:mm:ss"</span></div>
+              <div class="ln"><span class="kw">try</span> {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="vr">$r</span> = <span class="fn">Invoke-WebRequest</span> <span class="vr">$Url</span> -TimeoutSec 5 -UseBasicParsing</div>
+              <div class="ln">&nbsp;&nbsp;<span class="st">"$ts <span class="ok">OK</span>   $Url ($($r.StatusCode))"</span></div>
+              <div class="ln"><span class="kw">} catch</span> {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="st">"$ts DOWN $Url"</span> | <span class="fn">Tee-Object</span> outage.log -Append</div>
+              <div class="ln">}</div>
+            </div>
+          </div>
+        </div>
+        <div class="two" style="grid-template-columns:1.3fr 0.7fr;gap:24px;height:auto;">
+          <div class="term reveal d4">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">terminal</span><span class="run-badge">▶ sample run</span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.55;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ./health-check.sh https://google.com</div>
+              <div class="ln"><span class="op">2026-06-17 09:48:53 </span><span class="ok">OK</span><span class="op">   https://google.com (200)</span> <span class="c"># 301→200</span></div>
+              <div class="ln"><span class="kw">PS&gt;</span> .\health-check.ps1 https://down.test</div>
+              <div class="ln"><span class="op">2026-06-17 09:49:10 </span><span class="st">DOWN</span><span class="op"> https://down.test (000)</span></div>
+            </div>
+          </div>
+          <div class="purpose reveal d4">
+            <span class="ic">🎯</span>
+            <span class="tx"><b>Use it for</b> uptime monitoring. <code>-L</code> follows redirects, so any <code>2xx–3xx</code> = healthy; <code>4xx/5xx</code> or <code>000</code> → <code>outage.log</code>.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT 1 · HOW IT WORKS ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Script 1 of 5 · how it works</div>
+        <h2 class="reveal d1">Service health monitor — <span class="g">step by step</span></h2>
+        <p class="lead reveal d2">What actually happens, in order, each time the script runs:</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:30px;justify-content:center;">
+        <div class="flow reveal d3" style="gap:12px;">
+          <span class="box">① the URL<span class="t">what to check</span></span>
+          <span class="pipe">→</span>
+          <span class="box">② curl -sL visits it<span class="t">follows redirects</span></span>
+          <span class="pipe">→</span>
+          <span class="box">③ status code<span class="t">2xx · 3xx · 4xx · 000</span></span>
+          <span class="pipe">→</span>
+          <span class="box">④ decide<span class="t">OK · or log DOWN</span></span>
+        </div>
+        <div class="eplain row reveal d4">
+          <div class="eh">In plain words</div>
+          <ul>
+            <li><span class="b">1</span><span>You hand the script a website address (or it uses a default).</span></li>
+            <li><span class="b">2</span><span><b>curl -sL</b> quietly visits it, <b>following redirects</b>, and brings back the <b>status number</b>.</span></li>
+            <li><span class="b">3</span><span>Any <b>2xx or 3xx</b> = the site is healthy; <b>4xx / 5xx</b> or <b>000</b> (no answer) = trouble.</span></li>
+            <li><span class="b">4</span><span>Healthy → prints “OK”. Trouble → writes a timestamped line to <code>outage.log</code>.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT 2 — PORT SCANNER ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Script 2 of 5 · Bash + PowerShell</div>
+        <h2 class="reveal d1">TCP port scanner</h2>
+        <p class="lead reveal d2">Loop a list of ports and report which are open — a quick "what's listening?" check (<span class="os mac">nc</span> on macOS, <span class="os win">Test-NetConnection</span> on Windows).</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="two" style="grid-template-columns:1fr 1fr;gap:24px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">portscan.sh</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.5;">
+              <div class="ln"><span class="kw">#!/usr/bin/env bash</span></div>
+              <div class="ln"><span class="vr">HOST</span>=<span class="st">"${1:-127.0.0.1}"</span></div>
+              <div class="ln"><span class="vr">PORTS</span>=<span class="st">"${2:-22 80 443 3306}"</span></div>
+              <div class="ln"><span class="kw">for</span> p <span class="kw">in</span> <span class="vr">$PORTS</span>; <span class="kw">do</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">if</span> nc -z -G1 <span class="st">"$HOST"</span> <span class="st">"$p"</span> 2&gt;/dev/null</div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">then</span> echo <span class="st">"<span class="ok">OPEN</span>    $HOST:$p"</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">else</span> echo <span class="st">"closed  $HOST:$p"</span>; <span class="kw">fi</span></div>
+              <div class="ln"><span class="kw">done</span></div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">portscan.ps1</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.5;">
+              <div class="ln"><span class="kw">param</span>([string]<span class="vr">$Target</span> = <span class="st">"127.0.0.1"</span>,</div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[int[]]<span class="vr">$Ports</span> = 22,80,443,3306)</div>
+              <div class="ln"><span class="kw">foreach</span> (<span class="vr">$p</span> <span class="kw">in</span> <span class="vr">$Ports</span>) {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="vr">$ok</span> = (<span class="fn">Test-NetConnection</span> <span class="vr">$Target</span> -Port <span class="vr">$p</span> `</div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-WarningAction SilentlyContinue).TcpTestSucceeded</div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">if</span> (<span class="vr">$ok</span>) { <span class="st">"<span class="ok">OPEN</span>    ${Target}:$p"</span> }</div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">else</span> { <span class="st">"closed  ${Target}:$p"</span> }</div>
+              <div class="ln">}</div>
+            </div>
+          </div>
+        </div>
+        <div class="two" style="grid-template-columns:1.3fr 0.7fr;gap:24px;height:auto;">
+          <div class="term reveal d4">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">terminal</span><span class="run-badge">▶ sample run</span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.55;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ./portscan.sh scanme.local <span class="st">"22 80 443"</span></div>
+              <div class="ln"><span class="ok">OPEN</span><span class="op">    scanme.local:22</span></div>
+              <div class="ln"><span class="kw">PS&gt;</span> .\portscan.ps1 scanme.local 22,80,443</div>
+              <div class="ln"><span class="op">closed  scanme.local:443</span></div>
+            </div>
+          </div>
+          <div class="purpose reveal d4">
+            <span class="ic">🎯</span>
+            <span class="tx"><b>Use it for</b> a "what's exposed?" check after a firewall change. <code>OPEN</code> = the port accepted a connection; <code>closed</code> = refused or silent.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT 2 · HOW IT WORKS ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Script 2 of 5 · how it works</div>
+        <h2 class="reveal d1">TCP port scanner — <span class="g">step by step</span></h2>
+        <p class="lead reveal d2">What actually happens, in order, each time the script runs:</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:30px;justify-content:center;">
+        <div class="flow reveal d3" style="gap:12px;">
+          <span class="box">① host + ports<span class="t">what to scan</span></span>
+          <span class="pipe">→</span>
+          <span class="box">② try each port<span class="t">loop the list</span></span>
+          <span class="pipe">→</span>
+          <span class="box">③ knock with nc<span class="t">1-second test</span></span>
+          <span class="pipe">→</span>
+          <span class="box">④ OPEN / closed<span class="t">one per port</span></span>
+        </div>
+        <div class="eplain row reveal d4">
+          <div class="eh">In plain words</div>
+          <ul>
+            <li><span class="b">1</span><span>You give it a host and a list of ports to check.</span></li>
+            <li><span class="b">2</span><span>It goes through the ports <b>one at a time</b>.</span></li>
+            <li><span class="b">3</span><span>For each, <b>netcat</b> knocks for up to a second to see if anything answers.</span></li>
+            <li><span class="b">4</span><span>Answer → <b>OPEN</b> (a service is there); silence → <b>closed</b>. A quick map of what's exposed.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT 3 — LATENCY LOGGER ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Script 3 of 5 · Bash + PowerShell</div>
+        <h2 class="reveal d1">Latency logger → CSV</h2>
+        <p class="lead reveal d2">Ping a target on a timer and append the round-trip time to a CSV — catch <b>intermittent</b> drops you'd never see live, then graph the file.</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="two" style="grid-template-columns:1fr 1fr;gap:24px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">latency-log.sh</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.5;">
+              <div class="ln"><span class="kw">#!/usr/bin/env bash</span></div>
+              <div class="ln"><span class="vr">TARGET</span>=<span class="st">"${1:-8.8.8.8}"</span>; <span class="vr">OUT</span>=<span class="st">"latency.csv"</span></div>
+              <div class="ln">echo <span class="st">"timestamp,target,rtt_ms"</span> &gt;&gt; <span class="st">"$OUT"</span></div>
+              <div class="ln"><span class="kw">while</span> true; <span class="kw">do</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="vr">rtt</span>=$(ping -c1 <span class="st">"$TARGET"</span> | awk -F<span class="st">'time='</span> <span class="st">'/time=/{print $2+0}'</span>)</div>
+              <div class="ln">&nbsp;&nbsp;echo <span class="st">"$(date +%FT%T),$TARGET,${rtt:-timeout}"</span> &gt;&gt; <span class="st">"$OUT"</span></div>
+              <div class="ln">&nbsp;&nbsp;sleep 5</div>
+              <div class="ln"><span class="kw">done</span></div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">latency-log.ps1</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.5;">
+              <div class="ln"><span class="kw">param</span>([string]<span class="vr">$Target</span> = <span class="st">"8.8.8.8"</span>)</div>
+              <div class="ln"><span class="vr">$out</span> = <span class="st">"latency.csv"</span></div>
+              <div class="ln"><span class="st">"timestamp,target,rtt_ms"</span> | <span class="fn">Add-Content</span> <span class="vr">$out</span></div>
+              <div class="ln"><span class="kw">while</span> (<span class="vr">$true</span>) {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="vr">$r</span> = <span class="fn">Test-Connection</span> <span class="vr">$Target</span> -Count 1 -EA SilentlyContinue</div>
+              <div class="ln">&nbsp;&nbsp;<span class="vr">$rtt</span> = <span class="kw">if</span> (<span class="vr">$r</span>) { <span class="vr">$r</span>.Latency } <span class="kw">else</span> { <span class="st">"timeout"</span> }</div>
+              <div class="ln">&nbsp;&nbsp;<span class="st">"$(Get-Date -Format s),$Target,$rtt"</span> | <span class="fn">Add-Content</span> <span class="vr">$out</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="fn">Start-Sleep</span> 5</div>
+              <div class="ln">}</div>
+            </div>
+          </div>
+        </div>
+        <div class="two" style="grid-template-columns:1.3fr 0.7fr;gap:24px;height:auto;">
+          <div class="term reveal d4">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">latency.csv — after a few samples</span><span class="run-badge">▶ sample run</span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.55;">
+              <div class="ln"><span class="op">timestamp,target,rtt_ms</span></div>
+              <div class="ln"><span class="op">2026-06-16T09:14:02,1.1.1.1,</span><span class="ok">11.8</span></div>
+              <div class="ln"><span class="op">2026-06-16T09:14:07,1.1.1.1,</span><span class="st">timeout</span></div>
+              <div class="ln"><span class="op">2026-06-16T09:14:12,1.1.1.1,</span><span class="ok">12.1</span></div>
+            </div>
+          </div>
+          <div class="purpose reveal d4">
+            <span class="ic">🎯</span>
+            <span class="tx"><b>Use it for</b> proving intermittent loss. Chart <code>latency.csv</code> later — each <code>timeout</code> row marks the exact second a packet dropped.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT 3 · HOW IT WORKS ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Script 3 of 5 · how it works</div>
+        <h2 class="reveal d1">Latency logger — <span class="g">step by step</span></h2>
+        <p class="lead reveal d2">What actually happens, in order, each time the script runs:</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:30px;justify-content:center;">
+        <div class="flow reveal d3" style="gap:12px;">
+          <span class="box">① ping once<span class="t">every 5 seconds</span></span>
+          <span class="pipe">→</span>
+          <span class="box">② grab the time<span class="t">awk extracts ms</span></span>
+          <span class="pipe">→</span>
+          <span class="box">③ add a CSV row<span class="t">time + value</span></span>
+          <span class="pipe">→</span>
+          <span class="box">④ repeat<span class="t">forever (Ctrl-C)</span></span>
+        </div>
+        <div class="eplain row reveal d4">
+          <div class="eh">In plain words</div>
+          <ul>
+            <li><span class="b">1</span><span>Every few seconds it sends <b>one ping</b> to your target.</span></li>
+            <li><span class="b">2</span><span>It pulls out just the <b>round-trip time</b> from the reply.</span></li>
+            <li><span class="b">3</span><span>It adds a row to <code>latency.csv</code>: timestamp, target, and the time in ms.</span></li>
+            <li><span class="b">4</span><span>No reply → it writes <b>timeout</b>. Open the CSV to <b>graph</b> the drops over time.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT 4 — NETWORK REPORT ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Script 4 of 5 · Bash + PowerShell</div>
+        <h2 class="reveal d1">One-shot network report</h2>
+        <p class="lead reveal d2">A snapshot of this machine's networking — host, IP, gateway, DNS, public IP — in one command. Capture it <b>before and after</b> a change to see what moved.</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="two" style="grid-template-columns:1fr 1fr;gap:24px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">netreport.sh</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.55;">
+              <div class="ln"><span class="kw">#!/usr/bin/env bash</span></div>
+              <div class="ln">echo <span class="st">"=== Host ==="</span>;    hostname</div>
+              <div class="ln">echo <span class="st">"=== IP ==="</span>;      ipconfig getifaddr en0</div>
+              <div class="ln">echo <span class="st">"=== Gateway ==="</span>; route -n get default \</div>
+              <div class="ln">&nbsp;&nbsp;| awk <span class="st">'/gateway/{print $2}'</span></div>
+              <div class="ln">echo <span class="st">"=== DNS ==="</span>;     scutil --dns \</div>
+              <div class="ln">&nbsp;&nbsp;| awk <span class="st">'/nameserver/{print $3}'</span> | sort -u</div>
+              <div class="ln">echo <span class="st">"=== Public ==="</span>;  curl -s ifconfig.me</div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">netreport.ps1</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.55;">
+              <div class="ln"><span class="st">"=== Host ==="</span>   ; hostname</div>
+              <div class="ln"><span class="st">"=== IP ==="</span>     ; (<span class="fn">Get-NetIPAddress</span> -AddressFamily IPv4).IPAddress</div>
+              <div class="ln"><span class="st">"=== Gateway ==="</span>; (<span class="fn">Get-NetRoute</span> <span class="st">'0.0.0.0/0'</span>).NextHop</div>
+              <div class="ln"><span class="st">"=== DNS ==="</span>    ; (<span class="fn">Get-DnsClientServerAddress</span> `</div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;-AddressFamily IPv4).ServerAddresses</div>
+              <div class="ln"><span class="st">"=== Public ==="</span> ; <span class="fn">Invoke-RestMethod</span> ifconfig.me/ip</div>
+            </div>
+          </div>
+        </div>
+        <div class="two" style="grid-template-columns:1.3fr 0.7fr;gap:24px;height:auto;">
+          <div class="term reveal d4">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">terminal</span><span class="run-badge">▶ sample run</span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.5;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ./netreport.sh   <span class="op">(or  </span><span class="kw">PS&gt;</span><span class="op"> .\netreport.ps1)</span></div>
+              <div class="ln"><span class="c">=== Host ===</span>     <span class="op">macbook.local</span></div>
+              <div class="ln"><span class="c">=== IP ===</span>       <span class="ok">192.168.1.42</span></div>
+              <div class="ln"><span class="c">=== Gateway ===</span>  <span class="ok">192.168.1.1</span></div>
+              <div class="ln"><span class="c">=== Public ===</span>   <span class="ok">203.0.113.55</span></div>
+            </div>
+          </div>
+          <div class="purpose reveal d4">
+            <span class="ic">🎯</span>
+            <span class="tx"><b>Use it for</b> ticket snapshots and before/after <code>diff</code>s — local IP, gateway, DNS, and the <b>public IP</b> you exit from (NAT).</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT 4 · HOW IT WORKS ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Script 4 of 5 · how it works</div>
+        <h2 class="reveal d1">One-shot network report — <span class="g">step by step</span></h2>
+        <p class="lead reveal d2">What actually happens, in order, each time the script runs:</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:30px;justify-content:center;">
+        <div class="flow reveal d3" style="gap:12px;">
+          <span class="box">① ask the system<span class="t">built-in commands</span></span>
+          <span class="pipe">→</span>
+          <span class="box">② name + local IP<span class="t">who am I?</span></span>
+          <span class="pipe">→</span>
+          <span class="box">③ gateway + DNS<span class="t">how I get out</span></span>
+          <span class="pipe">→</span>
+          <span class="box">④ public IP<span class="t">curl ifconfig.me</span></span>
+        </div>
+        <div class="eplain row reveal d4">
+          <div class="eh">In plain words</div>
+          <ul>
+            <li><span class="b">1</span><span>It runs a few built-in commands and prints each answer with a label.</span></li>
+            <li><span class="b">2</span><span>You see this machine's <b>name</b> and its <b>private IP</b> on the network.</span></li>
+            <li><span class="b">3</span><span>Then the <b>gateway</b> (your router) and the <b>DNS servers</b> it uses.</span></li>
+            <li><span class="b">4</span><span>Finally your <b>public IP</b> — what the internet sees. Private ≠ public = <b>NAT</b>.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT 5 — SSH FLEET RUNNER ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Script 5 of 5 · Bash + PowerShell</div>
+        <h2 class="reveal d1">Run a command across a fleet</h2>
+        <p class="lead reveal d2">Read a list of hosts and run the <b>same command</b> on each — over <span class="os mac">SSH</span> on macOS, <span class="os win">WinRM (Invoke-Command)</span> on Windows.</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="two" style="grid-template-columns:1fr 1fr;gap:24px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">fleet.sh</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.5;">
+              <div class="ln"><span class="kw">#!/usr/bin/env bash</span></div>
+              <div class="ln"><span class="vr">CMD</span>=<span class="st">"${*:-uptime}"</span>          <span class="c"># all args = command</span></div>
+              <div class="ln"><span class="kw">while</span> read -r host; <span class="kw">do</span></div>
+              <div class="ln">&nbsp;&nbsp;[ -z <span class="st">"$host"</span> ] &amp;&amp; <span class="kw">continue</span></div>
+              <div class="ln">&nbsp;&nbsp;echo <span class="st">"===== $host ====="</span></div>
+              <div class="ln">&nbsp;&nbsp;ssh -o ConnectTimeout=5 <span class="st">"$host"</span> <span class="st">"$CMD"</span> \</div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;|| echo <span class="st">"  (unreachable)"</span></div>
+              <div class="ln"><span class="kw">done</span> &lt; hosts.txt</div>
+            </div>
+          </div>
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">fleet.ps1</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.5;">
+              <div class="ln"><span class="kw">param</span>([string]<span class="vr">$Cmd</span> = <span class="st">"Get-Uptime"</span>)</div>
+              <div class="ln"><span class="kw">foreach</span> (<span class="vr">$h</span> <span class="kw">in</span> <span class="fn">Get-Content</span> hosts.txt) {</div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">if</span> (-<span class="kw">not</span> <span class="vr">$h</span>) { <span class="kw">continue</span> }</div>
+              <div class="ln">&nbsp;&nbsp;<span class="st">"===== $h ====="</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">try</span> { <span class="fn">Invoke-Command</span> -ComputerName <span class="vr">$h</span> `</div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;-ScriptBlock ([scriptblock]::Create(<span class="vr">$Cmd</span>)) }</div>
+              <div class="ln">&nbsp;&nbsp;<span class="kw">catch</span> { <span class="st">"  (unreachable)"</span> }</div>
+              <div class="ln">}</div>
+            </div>
+          </div>
+        </div>
+        <div class="two" style="grid-template-columns:1.3fr 0.7fr;gap:24px;height:auto;">
+          <div class="term reveal d4">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">terminal</span><span class="run-badge">▶ sample run</span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.5;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> ./fleet.sh <span class="st">"df -h /"</span></div>
+              <div class="ln"><span class="kw">===== web01 =====</span><span class="op">  /dev/sda1 40G 18G 48% /</span></div>
+              <div class="ln"><span class="kw">PS&gt;</span> .\fleet.ps1 <span class="st">"Get-Volume C"</span></div>
+              <div class="ln"><span class="kw">===== db01  =====</span><span class="st">  (unreachable)</span></div>
+            </div>
+          </div>
+          <div class="purpose reveal d4">
+            <span class="ic">🎯</span>
+            <span class="tx"><b>Use it for</b> one-pass audits across many hosts (disk, uptime, configs). A 5-second timeout flags a dead box as <code>(unreachable)</code> instead of stalling.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCRIPT 5 · HOW IT WORKS ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Script library</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Script 5 of 5 · how it works</div>
+        <h2 class="reveal d1">Run a command across a fleet — <span class="g">step by step</span></h2>
+        <p class="lead reveal d2">What actually happens, in order, each time the script runs:</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:30px;justify-content:center;">
+        <div class="flow reveal d3" style="gap:12px;">
+          <span class="box">① read hosts.txt<span class="t">one per line</span></span>
+          <span class="pipe">→</span>
+          <span class="box">② for each host<span class="t">loop the list</span></span>
+          <span class="pipe">→</span>
+          <span class="box">③ SSH + run cmd<span class="t">5-second timeout</span></span>
+          <span class="pipe">→</span>
+          <span class="box">④ print its reply<span class="t">or “unreachable”</span></span>
+        </div>
+        <div class="eplain row reveal d4">
+          <div class="eh">In plain words</div>
+          <ul>
+            <li><span class="b">1</span><span>It reads your server list from <code>hosts.txt</code>, one per line.</span></li>
+            <li><span class="b">2</span><span>For <b>each</b> one, it opens an SSH connection (giving up after 5 seconds).</span></li>
+            <li><span class="b">3</span><span>It runs the <b>same command</b> on that server and prints the answer under a header.</span></li>
+            <li><span class="b">4</span><span>No response → marked <b>(unreachable)</b>, and it moves on. One command, whole fleet.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCHEDULING · 1 — READ THE CRON SCHEDULE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Automation</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Automation · understand the timing</div>
+        <h2 class="reveal d1">When should it run? <span class="g">The cron schedule</span></h2>
+        <p class="lead reveal d2">macOS &amp; Linux use <b>cron</b> — just <b>five numbers</b> that say when to run a command. Learn to read them and scheduling is easy.</p>
+      </div>
+      <div class="body" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="two" style="grid-template-columns:1.05fr 0.95fr;gap:26px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">the five time fields</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.65;">
+              <div class="ln"><span class="vr">*</span> <span class="vr">*</span> <span class="vr">*</span> <span class="vr">*</span> <span class="vr">*</span>&nbsp;&nbsp;<span class="fn">command-to-run</span></div>
+              <div class="ln"><span class="op">│ │ │ │ │</span></div>
+              <div class="ln"><span class="op">│ │ │ │ └─</span> day of week <span class="c">(0–6, Sun=0)</span></div>
+              <div class="ln"><span class="op">│ │ │ └───</span> month <span class="c">(1–12)</span></div>
+              <div class="ln"><span class="op">│ │ └─────</span> day of month <span class="c">(1–31)</span></div>
+              <div class="ln"><span class="op">│ └───────</span> hour <span class="c">(0–23)</span></div>
+              <div class="ln"><span class="op">└─────────</span> minute <span class="c">(0–59)</span></div>
+            </div>
+          </div>
+          <div class="explain reveal d4">
+            <div class="er"><span class="tok ok">0 8 * * *</span><span class="def">every day at <b>08:00</b></span></div>
+            <div class="er"><span class="tok ok">*/5 * * * *</span><span class="def">every <b>5 minutes</b></span></div>
+            <div class="er"><span class="tok ok">0 * * * *</span><span class="def">every hour, <b>on the hour</b></span></div>
+            <div class="er"><span class="tok ok">0 9 * * 1</span><span class="def">every <b>Monday</b> at 09:00</span></div>
+            <div class="er"><span class="tok ok">30 2 1 * *</span><span class="def">02:30 on the <b>1st</b> of each month</span></div>
+          </div>
+        </div>
+        <div class="step-tip reveal d4">🕐&nbsp; <span><b>Read left → right:</b> minute, hour, day, month, weekday. A <code>*</code> means “every”, a <b>number</b> pins it to one value, and <code>*/5</code> means “every 5th”.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCHEDULE TUTORIAL · STEP 1 — PICK THE SCHEDULE ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Schedule it · tutorial</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Schedule it · tutorial · Step 1 of 4</div>
+        <h2 class="reveal d1">Pick <span class="g">when</span> it runs</h2>
+        <p class="lead reveal d2">Let's schedule <code>check.sh</code> to run automatically <b>every day at 8:00 AM</b>.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1fr 1fr;gap:30px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">plan the schedule</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.8;">
+              <div class="ln"><span class="c"># GOAL: every day at 8:00 AM</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># min hr day mon weekday</span></div>
+              <div class="ln">&nbsp;&nbsp;<span class="vr">0</span>&nbsp;&nbsp;<span class="vr">8</span>&nbsp;&nbsp;<span class="vr">*</span>&nbsp;&nbsp;&nbsp;<span class="vr">*</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="vr">*</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># → schedule = </span><span class="ok">0 8 * * *</span></div>
+            </div>
+          </div>
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span>First decide <b>when</b>. Here: every day at <b>8:00 AM</b>.</span></li>
+              <li><span class="b">2</span><span>Fill the five fields: minute <code>0</code>, hour <code>8</code>, the rest <code>*</code> (means “every”).</span></li>
+              <li><span class="b">3</span><span>That gives the schedule <code>0 8 * * *</code> — we'll use it next.</span></li>
+            </ul>
+            <div class="step-tip">🪟&nbsp; <span><b>Windows:</b> you'll choose the same time later with <code>-Daily -At 8am</code> (Step 4).</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCHEDULE TUTORIAL · STEP 2 — ADD IT TO CRON ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Schedule it · tutorial</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Schedule it · tutorial · Step 2 of 4</div>
+        <h2 class="reveal d1">Add it to your <span class="g">crontab</span></h2>
+        <p class="lead reveal d2">Open your personal schedule and add one line: the time, then the script.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.05fr 0.95fr;gap:30px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">Terminal</span></span></div>
+            <div class="term-body" style="font-size:19px;line-height:1.75;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> crontab -e       <span class="c"># opens an editor</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># type this one line, then save:</span></div>
+              <div class="ln"><span class="ok">0 8 * * *</span> ~/check.sh <span class="vr">&gt;&gt;</span> ~/check.log <span class="vr">2&gt;&amp;1</span></div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="c"># nano: Ctrl+O = save · Ctrl+X = exit</span></div>
+            </div>
+          </div>
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span><code>crontab -e</code> = <b>edit</b> your list of scheduled jobs (one line each).</span></li>
+              <li><span class="b">2</span><span>Use the <b>full path</b> <code>~/check.sh</code> — cron doesn't know where your files are.</span></li>
+              <li><span class="b">3</span><span><code>&gt;&gt; ~/check.log 2&gt;&amp;1</code> saves all output to a log so you can read it later.</span></li>
+            </ul>
+            <div class="step-tip">🪟&nbsp; <span><b>Windows:</b> open the <b>Task Scheduler</b> app, or use PowerShell — see Step 4.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCHEDULE TUTORIAL · STEP 3 — VERIFY ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Schedule it · tutorial</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Schedule it · tutorial · Step 3 of 4</div>
+        <h2 class="reveal d1">Confirm it &amp; <span class="g">read the log</span></h2>
+        <p class="lead reveal d2">cron now runs silently in the background. Check it's registered, then read what it did.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.05fr 0.95fr;gap:30px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os mac">Terminal</span></span><span class="run-badge">▶ check it</span></div>
+            <div class="term-body" style="font-size:19px;line-height:1.75;">
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> crontab -l       <span class="c"># list my jobs</span></div>
+              <div class="ln"><span class="ok">0 8 * * *</span> ~/check.sh &gt;&gt; ~/check.log 2&gt;&amp;1</div>
+              <div class="ln">&nbsp;</div>
+              <div class="ln"><span class="mac" style="color:var(--mac)">$</span> cat ~/check.log  <span class="c"># after 8am</span></div>
+              <div class="ln"><span class="op">Checking google.com... </span><span class="ok">0% loss</span></div>
+            </div>
+          </div>
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span><code>crontab -l</code> <b>lists</b> your jobs — make sure your line is there.</span></li>
+              <li><span class="b">2</span><span>You won't see anything at 8am — cron is silent. The <b>log file</b> is your proof it ran.</span></li>
+              <li><span class="b">3</span><span><b>Test now:</b> set the time a minute ahead, wait, then <code>cat</code> the log.</span></li>
+            </ul>
+            <div class="step-tip">🪟&nbsp; <span><b>Windows:</b> open the task's <b>History</b> tab, or run <code>Get-ScheduledTask</code>.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SCHEDULE TUTORIAL · STEP 4 — WINDOWS ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Schedule it · tutorial</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Schedule it · tutorial · Step 4 of 4</div>
+        <h2 class="reveal d1">The <span class="g">Windows</span> way: Task Scheduler</h2>
+        <p class="lead reveal d2">Same job, same 8 AM — Windows uses <b>Task Scheduler</b> instead of cron. Set it up once from PowerShell.</p>
+      </div>
+      <div class="body">
+        <div class="two" style="grid-template-columns:1.05fr 0.95fr;gap:30px;height:auto;">
+          <div class="term reveal d3">
+            <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label badge"><span class="os win">PowerShell (run once)</span></span></div>
+            <div class="term-body" style="font-size:18px;line-height:1.7;">
+              <div class="ln"><span class="c"># 1) WHEN it runs</span></div>
+              <div class="ln"><span class="vr">$t</span> = <span class="fn">New-ScheduledTaskTrigger</span> -Daily -At 8am</div>
+              <div class="ln"><span class="c"># 2) WHAT it runs</span></div>
+              <div class="ln"><span class="vr">$a</span> = <span class="fn">New-ScheduledTaskAction</span> -Execute pwsh `</div>
+              <div class="ln">&nbsp;&nbsp;&nbsp;&nbsp;-Argument <span class="st">"C:\check.ps1"</span></div>
+              <div class="ln"><span class="c"># 3) save it</span></div>
+              <div class="ln"><span class="fn">Register-ScheduledTask</span> <span class="st">"Check"</span> -Trigger <span class="vr">$t</span> -Action <span class="vr">$a</span></div>
+            </div>
+          </div>
+          <div class="eplain reveal d4">
+            <div class="eh">In plain words</div>
+            <ul>
+              <li><span class="b">1</span><span>A task has two parts: a <b>trigger</b> (when) and an <b>action</b> (what to run).</span></li>
+              <li><span class="b">2</span><span><code>-Daily -At 8am</code> is the same idea as cron's <code>0 8 * * *</code>.</span></li>
+              <li><span class="b">3</span><span><code>Register-ScheduledTask</code> saves it — Windows now runs it for you.</span></li>
+              <li><span class="b">4</span><span>Manage it later in the <b>Task Scheduler</b> app: history, disable, delete.</span></li>
+            </ul>
+            <div class="step-tip">🍎&nbsp; <span><b>macOS / Linux:</b> the cron line from Steps 1–3 does exactly the same job.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 15 — BEST PRACTICES ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Do it safely</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Habits that save you</div>
+        <h2 class="reveal d1">Scripting best practices</h2>
+        <p class="lead reveal d2">A script runs faster than you can think — which means it makes mistakes faster too. These habits keep automation safe in production.</p>
+      </div>
+      <div class="body reveal d3" style="display:flex;align-items:center;">
+        <ul class="check">
+          <li><span class="mk">✓</span><span><b>Fail loudly.</b> Start bash scripts with <code>set -euo pipefail</code>; check exit codes (<code>$?</code> / <code>$LASTEXITCODE</code>).</span></li>
+          <li><span class="mk">✓</span><span><b>Quote your variables.</b> <code>"$HOST"</code> avoids breakage when values contain spaces or are empty.</span></li>
+          <li><span class="mk">✓</span><span><b>Dry-run first.</b> Echo what <em>would</em> happen before running destructive commands for real.</span></li>
+          <li><span class="mk">✓</span><span><b>Never hard-code secrets.</b> Read passwords/keys from env vars or a vault, not the script body.</span></li>
+          <li><span class="mk">✓</span><span><b>Be idempotent.</b> Running twice should be safe — check state before you change it.</span></li>
+          <li><span class="mk">✓</span><span><b>Comment &amp; log.</b> Future-you needs to know <em>why</em>; write timestamps to a log file.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 16 — CHEAT SHEET ========================= -->
+  <section class="slide">
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Reference</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Keep this open</div>
+        <h2 class="reveal d1">Cross-platform cheat sheet</h2>
+      </div>
+      <div class="body reveal d2">
+        <table style="font-size:22px;">
+          <thead><tr><th>I want to…</th><th class="h-mac">macOS · Bash / Zsh</th><th class="h-win">Windows · PowerShell</th></tr></thead>
+          <tbody>
+            <tr><td>Check a host is up</td><td><span class="macc">ping -c 4 host</span></td><td><span class="winc">Test-Connection host</span></td></tr>
+            <tr><td>Trace a route</td><td><span class="macc">traceroute host</span></td><td><span class="winc">tracert host</span></td></tr>
+            <tr><td>Show my IP</td><td><span class="macc">ifconfig</span></td><td><span class="winc">Get-NetIPAddress</span></td></tr>
+            <tr><td>Resolve a name</td><td><span class="macc">dig +short host</span></td><td><span class="winc">Resolve-DnsName host</span></td></tr>
+            <tr><td>Open ports</td><td><span class="macc">lsof -i</span> · <span class="macc">netstat -an</span></td><td><span class="winc">Get-NetTCPConnection</span></td></tr>
+            <tr><td>Hit a REST API</td><td><span class="macc">curl -s url</span></td><td><span class="winc">Invoke-RestMethod url</span></td></tr>
+            <tr><td>Filter output</td><td><span class="macc">… | grep pattern</span></td><td><span class="winc">… | Select-String pattern</span></td></tr>
+            <tr><td>Save to file</td><td><span class="macc">cmd &gt; out.txt</span></td><td><span class="winc">cmd &gt; out.txt</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= SLIDE 17 — RECAP / EXERCISE / CLOSE ========================= -->
+  <section class="slide">
+    <span class="big-num">{ }</span>
+    <div class="chrome"><span class="brand"><span class="dot"></span>net-eng / scripting</span><span class="sec"><b>Wrap-up</b></span></div>
+    <div class="pad">
+      <div class="head">
+        <div class="kicker reveal d1">Recap &amp; practice</div>
+        <h2 class="reveal d1">You can now <span class="g">automate the line</span></h2>
+        <p class="lead reveal d2">Identify your shell → read any command → run the network toolkit → compose with pipes → store logic in a script → schedule it. The syntax differs across <span class="os win">PowerShell</span> and <span class="os mac">Bash/Zsh</span>, but the thinking is identical.</p>
+      </div>
+      <div class="body reveal d3" style="display:flex;align-items:center;">
+        <div class="term" style="width:100%;">
+          <div class="term-head"><i class="r"></i><i class="y"></i><i class="g"></i><span class="label">practice.md — try these on your own machine</span></div>
+          <div class="term-body" style="font-size:23px;">
+            <div class="ln"><span class="c"># 1 · Identify your shell &amp; default gateway</span></div>
+            <div class="ln"><span class="p">›</span> echo $SHELL  <span class="op">/</span>  $PSVersionTable   <span class="op">·</span>   netstat -rn <span class="op">/</span> Get-NetRoute</div>
+            <div class="ln">&nbsp;</div>
+            <div class="ln"><span class="c"># 2 · Resolve a domain, then ping the IP you got back</span></div>
+            <div class="ln"><span class="p">›</span> <span class="vr">IP</span>=$(dig +short example.com | head -1); ping -c2 <span class="vr">$IP</span></div>
+            <div class="ln">&nbsp;</div>
+            <div class="ln"><span class="c"># 3 · Turn the ping-sweep into a script that logs UP hosts with a timestamp</span></div>
+            <div class="ln"><span class="p">›</span> ./sweep.sh 192.168.1 | tee <span class="st">"sweep-$(date +%F).log"</span><span class="cur"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+</div>
+
+<!-- deck chrome -->
+<div class="deck-counter"><b id="cur">1</b> / <span id="tot">17</span></div>
+<div class="deck-hint">← → / Space · E to edit · ± text size</div>
+<div class="deck-textsize" title="Text size">
+  <button id="txtUp" title="Bigger text (+)" aria-label="Bigger text">A</button>
+  <button id="txtReset" title="Reset text size (0)"><span id="txtLabel">100%</span></button>
+  <button id="txtDown" title="Smaller text (−)" aria-label="Smaller text">A</button>
+</div>
+
+<!-- inline editing controls -->
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️</button>
+<div class="edit-banner" id="editBanner">EDIT MODE · click any text · Ctrl+S to save a copy · E to exit</div>
+
+<script>
+/* ===========================================================
+   SLIDE CONTROLLER — keyboard, wheel, touch, progress, count
+   =========================================================== */
+class Deck{
+  constructor(){
+    this.slides=[...document.querySelectorAll('.slide')];
+    this.i=0;
+    this.stage=document.getElementById('deckStage');
+    this.progress=document.getElementById('progress');
+    this.curEl=document.getElementById('cur');
+    document.getElementById('tot').textContent=this.slides.length;
+    /* text-size state: scales the fonts inside the slides (not the whole canvas) */
+    this.tscale=1;
+    this.tlabel=document.getElementById('txtLabel');
+    this.captureFontBases();
+    document.getElementById('txtUp').onclick=()=>this.textBigger();
+    document.getElementById('txtDown').onclick=()=>this.textSmaller();
+    document.getElementById('txtReset').onclick=()=>this.textReset();
+    this.scale();addEventListener('resize',()=>this.scale());
+    this.keys();this.wheel();this.touch();
+    this.show(0);
+  }
+  /* fit the 1920×1080 stage to the window (unchanged) */
+  scale(){
+    const f=Math.min(innerWidth/1920,innerHeight/1080);
+    const x=(innerWidth-1920*f)/2, y=(innerHeight-1080*f)/2;
+    this.stage.style.transform=`translate(${x}px,${y}px) scale(${f})`;
+  }
+  /* record each element's original font-size once, so scaling never compounds */
+  captureFontBases(){
+    this.tels=[...this.stage.querySelectorAll('*')];
+    this.tels.forEach(el=>{ el.dataset.fs=parseFloat(getComputedStyle(el).fontSize)||0; });
+  }
+  setTextScale(s){
+    this.tscale=Math.max(0.7,Math.min(1.8,Math.round(s*100)/100));
+    this.tels.forEach(el=>{ const b=parseFloat(el.dataset.fs); if(b) el.style.fontSize=(b*this.tscale)+'px'; });
+    if(this.tlabel)this.tlabel.textContent=Math.round(this.tscale*100)+'%';
+  }
+  textBigger(){this.setTextScale(this.tscale+0.1);}
+  textSmaller(){this.setTextScale(this.tscale-0.1);}
+  textReset(){this.setTextScale(1);}
+  show(n){
+    this.i=Math.max(0,Math.min(n,this.slides.length-1));
+    this.slides.forEach((s,k)=>{s.classList.toggle('active',k===this.i);s.classList.toggle('visible',k===this.i);});
+    this.progress.style.width=((this.i+1)/this.slides.length*100)+'%';
+    this.curEl.textContent=this.i+1;
+  }
+  next(){this.show(this.i+1);} prev(){this.show(this.i-1);}
+  keys(){
+    addEventListener('keydown',e=>{
+      if(e.target.getAttribute&&e.target.getAttribute('contenteditable')==='true')return;
+      if(e.key==='+'||e.key==='='){e.preventDefault();this.textBigger();}
+      else if(e.key==='-'||e.key==='_'){e.preventDefault();this.textSmaller();}
+      else if(e.key==='0'){e.preventDefault();this.textReset();}
+      else if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();this.next();}
+      else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();this.prev();}
+      else if(e.key==='Home'){this.show(0);} else if(e.key==='End'){this.show(this.slides.length-1);}
+    });
+  }
+  wheel(){
+    let lock=false;
+    addEventListener('wheel',e=>{
+      if(e.ctrlKey||e.metaKey){e.preventDefault(); e.deltaY<0?this.textBigger():this.textSmaller(); return;}
+      if(lock)return; if(Math.abs(e.deltaY)<24)return;
+      lock=true; e.deltaY>0?this.next():this.prev();
+      setTimeout(()=>lock=false,500);
+    },{passive:false});
+  }
+  touch(){
+    let x0=null;
+    addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
+    addEventListener('touchend',e=>{
+      if(x0===null)return; const dx=e.changedTouches[0].clientX-x0;
+      if(Math.abs(dx)>60){dx<0?this.next():this.prev();} x0=null;
+    },{passive:true});
+  }
+}
+const deck=new Deck();
+
+/* ===========================================================
+   CLICK-TO-EXPLAIN — click any .x token to fill the slide's panel
+   A token carries data-t (title) and data-exp (HTML explanation).
+   =========================================================== */
+document.addEventListener('click',(e)=>{
+  const tok=e.target.closest('.x');
+  if(!tok) return;
+  // don't hijack clicks while editing text
+  if(tok.getAttribute('contenteditable')==='true') return;
+  const slide=tok.closest('.slide');
+  const body=slide&&slide.querySelector('.xbody');
+  if(!body) return;
+  slide.querySelectorAll('.x.active').forEach(el=>el.classList.remove('active'));
+  tok.classList.add('active');
+  const titleEl=slide.querySelector('.xtitle');
+  if(titleEl) titleEl.textContent=tok.getAttribute('data-t')||tok.textContent.trim();
+  body.classList.remove('hint');
+  body.innerHTML=tok.getAttribute('data-exp')||'';
+});
+
+/* ===========================================================
+   INLINE EDITING — hover hotzone / E key, save a copy (Ctrl+S)
+   =========================================================== */
+const editor={
+  isActive:false,
+  toggle(){
+    this.isActive=!this.isActive;
+    document.querySelectorAll('.slide [class]:not(.cur)').forEach(()=>{});
+    // make text containers editable
+    const sel='h1,h2,h3,p,td,th,.ln,.kicker,.label,.tag,.num,li,.t';
+    document.querySelectorAll('.deck-stage '+sel).forEach(el=>{
+      el.setAttribute('contenteditable',this.isActive?'true':'false');
+    });
+    document.getElementById('editToggle').classList.toggle('active',this.isActive);
+    document.getElementById('editBanner').classList.toggle('show',this.isActive);
+  },
+  saveCopy(){
+    const clone=document.documentElement.cloneNode(true);
+    clone.querySelectorAll('[contenteditable]').forEach(el=>el.removeAttribute('contenteditable'));
+    const blob=new Blob(['<!DOCTYPE html>\n'+clone.outerHTML],{type:'text/html'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='shell_scripting_for_network_engineers.edited.html';
+    a.click();
+  }
+};
+const editToggle=document.getElementById('editToggle');
+const hotzone=document.getElementById('editHotzone');
+let hideT=null;
+editToggle.addEventListener('click',()=>editor.toggle());
+hotzone.addEventListener('click',()=>editor.toggle());
+hotzone.addEventListener('mouseenter',()=>{clearTimeout(hideT);editToggle.classList.add('show');});
+hotzone.addEventListener('mouseleave',()=>{hideT=setTimeout(()=>{if(!editor.isActive)editToggle.classList.remove('show');},400);});
+editToggle.addEventListener('mouseenter',()=>clearTimeout(hideT));
+editToggle.addEventListener('mouseleave',()=>{hideT=setTimeout(()=>{if(!editor.isActive)editToggle.classList.remove('show');},400);});
+addEventListener('keydown',e=>{
+  if((e.key==='e'||e.key==='E')&&!(e.target.getAttribute&&e.target.getAttribute('contenteditable')==='true')){editor.toggle();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();editor.saveCopy();}
+});
+</script>
+</body>
+</html>

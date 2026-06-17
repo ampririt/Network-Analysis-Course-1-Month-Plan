@@ -24,6 +24,7 @@
     - [Step 6 — Verify the addressing](#step-6--verify-the-addressing)
     - [Step 7 — Test connectivity with `ping`](#step-7--test-connectivity-with-ping)
   - [Lab 2 Questions](#lab-2-questions)
+  - [Practice Exercise — Add a Third Subnet](#practice-exercise--add-a-third-subnet)
 
 ---
 
@@ -298,6 +299,64 @@ By default a router's interfaces are **administratively down** (shut down). **`n
 <summary>💡 Show answer</summary>
 
 At the router the packet comes **in** and is processed **up** to **Layer 3 (IP)** — the router reads the destination IP to decide where to send it — then it's re-built going **out** back down to Layer 2. The **Layer-3 source/destination IP addresses stay the same** end-to-end (PC0 → PC1) because they identify the *original sender and final receiver*. But the **Layer-2 MAC addresses are rewritten at every hop**: on the way out, the source MAC becomes the router's **g0/1** MAC and the destination MAC becomes **PC1's** MAC, because MAC addresses only identify devices on the *current* physical link. This "IP stays, MAC changes per hop" behaviour is the heart of how routing works.
+</details>
+
+---
+
+### Practice Exercise — Add a Third Subnet
+
+Now do it **on your own**, with no step-by-step CLI to copy. Extend the network you just built by hanging a **third subnet** off the same router — this time using a **switch** so that subnet can hold *several* PCs. Building it yourself is the only way to find out whether the Lab 2 ideas actually stuck.
+
+**Goal topology:** keep PC0 and PC1 exactly as they are, then add a **third interface** (`g0/2`) on Router0 leading to a **switch**, with **two** PCs (`PC2` and `PC3`) hanging off that switch — all on a brand-new `172.16.0.0/24` network.
+
+<p align="center">
+  <img src="./img/cisco_package_tracer/netwrok_structure.png" alt="Reference: the Lab 2 two-subnet topology you are extending" width="480"><br>
+  <em>Start from your finished Lab 2 network (above) and add the third subnet described below.</em>
+</p>
+
+| Device | Interface | IP Address | Subnet Mask | Default Gateway |
+| :--- | :--- | :--- | :--- | :--- |
+| **PC0** | FastEthernet0 | `192.168.1.100` | `255.255.255.0` | `192.168.1.1` |
+| **PC1** | FastEthernet0 | `10.1.1.100` | `255.255.255.0` | `10.1.1.1` |
+| **PC2** | FastEthernet0 | `172.16.0.100` | `255.255.255.0` | `172.16.0.1` |
+| **PC3** | FastEthernet0 | `172.16.0.101` | `255.255.255.0` | `172.16.0.1` |
+| **Router0** | g0/2 | `172.16.0.1` | `255.255.255.0` | — |
+
+**Your tasks:**
+
+1. Drag in a **Switch** (the `2960` is fine) and **two more PCs** (`PC2`, `PC3`).
+2. Cable **PC2** and **PC3** to the switch (`FastEthernet0` → any switch port like `FastEthernet0/1`, `FastEthernet0/2`), and cable the **switch** to **Router0's `g0/2`**.
+3. Give **PC2** and **PC3** the addresses in the table (note they **share** the gateway `172.16.0.1` because they're on the *same* subnet).
+4. Configure **`g0/2`** on the router with `172.16.0.1 255.255.255.0` and bring it up — *you write the CLI this time* (look back at Step 5 if you need the command shape).
+5. From **PC2**, `ping` all of: **PC3** (`172.16.0.101`), **PC0** (`192.168.1.100`), and **PC1** (`10.1.1.100`). All three should succeed.
+
+**Stretch goals (optional):**
+
+* From PC2, run `tracert 192.168.1.100`. How many hops does it report, and why?
+* On the router, run `show ip route` (in privileged EXEC). Find your three `C` (connected) networks. What does each line mean?
+
+**Q1.** When you ping **PC3 from PC2**, the packet does **not** pass through the router at all — but pinging **PC0 from PC2 does**. What's the difference, and how does PC2 decide?
+
+<details>
+<summary>💡 Show answer</summary>
+
+PC2 (`172.16.0.100`) and PC3 (`172.16.0.101`) are on the **same** `172.16.0.0/24` subnet, so PC2 sees the destination as **local** and delivers the frame **directly through the switch** — no routing needed (the switch is a Layer-2 device). PC0 (`192.168.1.100`) is on a **different** subnet, so PC2 sees it as **remote**, sends the packet to its **default gateway** (`172.16.0.1`, the router's g0/2), and the router forwards it. The host compares the destination IP against its own IP + subnet mask: same network part → deliver locally; different → send to the gateway.
+</details>
+
+**Q2.** Why do **PC2 and PC3 share the same default gateway** (`172.16.0.1`), while PC0 and PC1 each had a *different* one?
+
+<details>
+<summary>💡 Show answer</summary>
+
+A host's default gateway is **the router interface on its own subnet**. PC2 and PC3 are on the **same** subnet (`172.16.0.0/24`), so they share the **same** exit door — the router's `g0/2` (`172.16.0.1`). PC0 and PC1 were on **different** subnets, so each used the router interface facing *its* network (`192.168.1.1` and `10.1.1.1` respectively).
+</details>
+
+**Q3.** Why is it fine to put a **switch** (not another router) between the router and PC2/PC3, even though we needed a *router* between PC0 and PC1 back in Lab 2?
+
+<details>
+<summary>💡 Show answer</summary>
+
+PC2 and PC3 are on the **same** network, and a **switch** is exactly the right device to connect hosts **within** one subnet — it forwards frames by MAC address at Layer 2. A **router** is only needed to move traffic **between different** networks (as with PC0↔PC1). So: switch for *intra*-subnet, router for *inter*-subnet. The single router interface `g0/2` is enough to give the whole `172.16.0.0/24` switch segment its gateway to the rest of the network.
 </details>
 
 ---
