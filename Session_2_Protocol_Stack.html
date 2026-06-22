@@ -7091,6 +7091,7 @@
             </div>
             <div class="btns">
               <button class="sim-btn primary" id="simStart">▶ Start</button>
+              <button class="sim-btn" id="simStep">▸ Step</button>
               <button class="sim-btn pause" id="simPause" disabled>
                 ❚❚ Pause
               </button>
@@ -7866,6 +7867,7 @@
             </div>
             <div class="btns">
               <button class="sim-btn primary" id="hsStart">▶ Start</button>
+              <button class="sim-btn" id="hsStep">▸ Step</button>
               <button class="sim-btn pause" id="hsPause" disabled>
                 ❚❚ Pause
               </button>
@@ -8314,6 +8316,7 @@
             </div>
             <div class="btns">
               <button class="sim-btn primary" id="wsStart">▶ Start</button>
+              <button class="sim-btn" id="wsStep">▸ Step</button>
               <button class="sim-btn pause" id="wsPause" disabled>
                 ❚❚ Pause
               </button>
@@ -8416,6 +8419,7 @@
             </div>
             <div class="btns">
               <button class="sim-btn primary" id="udpStart">▶ Start</button>
+              <button class="sim-btn" id="udpStep">▸ Step</button>
               <button class="sim-btn pause" id="udpPause" disabled>
                 ❚❚ Pause
               </button>
@@ -8684,6 +8688,252 @@
         </section>
 
         <!-- =========================================================
+             NETWORK SOCKET — meaning + how it works
+             A socket = IP + port (+ protocol) = one connection endpoint.
+             Connection identified by the 4-tuple; client/server lifecycle.
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Sockets</span
+              ><span>Endpoints · IP + port</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0"
+            >where the address meets the application</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            A socket is one <em class="display">endpoint</em> of a connection.
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 20px; max-width: 1540px">
+            A socket bundles an <strong>IP address</strong> + a
+            <strong>port number</strong> (over TCP or UDP) into a single
+            addressable point — the handle a program reads from and writes to.
+            The <strong>IP</strong> finds the <em>host</em>; the
+            <strong>port</strong> finds the <em>program</em> running on it.
+          </p>
+
+          <!-- connection diagram: client endpoint ↔ server endpoint -->
+          <div
+            class="reveal"
+            style="--i: 3; display: flex; align-items: center; gap: 24px; margin-top: 26px; max-width: 1640px"
+          >
+            <div class="sock-ep" style="--ec: var(--cobalt); --ecs: var(--cobalt-soft)">
+              <div class="who">CLIENT · browser</div>
+              <div class="addr">192.168.1.10<span>:49152</span></div>
+              <div class="note">OS-assigned ephemeral port</div>
+            </div>
+            <div style="flex: 1; text-align: center; position: relative">
+              <div
+                style="height: 3px; background: var(--ink); border-radius: 2px; margin: 0 6px"
+              ></div>
+              <div
+                style="
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  background: var(--paper);
+                  padding: 4px 14px;
+                  font-family: var(--font-mono);
+                  font-size: 15px;
+                  font-weight: 700;
+                  color: var(--ink-soft);
+                  border: 1.5px solid var(--ink);
+                  border-radius: 999px;
+                  white-space: nowrap;
+                "
+              >
+                TCP connection
+              </div>
+            </div>
+            <div class="sock-ep" style="--ec: var(--moss); --ecs: var(--moss-soft)">
+              <div class="who">SERVER · https</div>
+              <div class="addr">200.12.34.56<span>:443</span></div>
+              <div class="note">well-known listening port</div>
+            </div>
+          </div>
+
+          <!-- the 4-tuple that uniquely names the connection -->
+          <div
+            class="reveal"
+            style="--i: 4; margin-top: 16px; display: flex; align-items: center; gap: 14px; font-family: var(--font-mono); font-size: 16px; max-width: 1640px"
+          >
+            <span style="font-weight: 700; color: var(--plum)">4-tuple</span>
+            <span style="color: var(--muted)">=</span>
+            <span class="pill" style="margin: 0">src IP 192.168.1.10</span>
+            <span class="pill" style="margin: 0">src port 49152</span>
+            <span class="pill" style="margin: 0">dst IP 200.12.34.56</span>
+            <span class="pill" style="margin: 0">dst port 443</span>
+            <span style="color: var(--ink-soft)">— uniquely names this connection</span>
+          </div>
+
+          <!-- how it works: server + client lifecycles -->
+          <div class="grid-2" style="margin-top: 26px; gap: 48px">
+            <div class="card moss reveal" style="--i: 5">
+              <div class="label">How it works · server</div>
+              <p style="font-family: var(--font-mono); font-size: 18px; line-height: 1.7; margin-top: 4px">
+                <strong>socket()</strong> → <strong>bind(</strong>IP:443<strong>)</strong>
+                → <strong>listen()</strong> → <strong>accept()</strong>
+              </p>
+              <p style="margin-top: 8px; font-size: 17px">
+                Waits on a fixed, well-known port. One listening socket can
+                hand off <strong>thousands</strong> of connections — each kept
+                apart by its 4-tuple.
+              </p>
+            </div>
+            <div class="card reveal" style="--i: 6">
+              <div class="label" style="color: var(--cobalt)">How it works · client</div>
+              <p style="font-family: var(--font-mono); font-size: 18px; line-height: 1.7; margin-top: 4px">
+                <strong>socket()</strong> →
+                <strong>connect(</strong>200.12.34.56:443<strong>)</strong> →
+                <strong>send()</strong> / <strong>recv()</strong>
+              </p>
+              <p style="margin-top: 8px; font-size: 17px">
+                The OS picks a free <em>ephemeral</em> port for the source, then
+                streams bytes through the socket like a file.
+              </p>
+            </div>
+          </div>
+          <style>
+            .sock-ep {
+              width: 320px;
+              border: 1.5px solid var(--ec);
+              border-left: 7px solid var(--ec);
+              background: var(--ecs);
+              border-radius: 10px;
+              padding: 16px 20px;
+            }
+            .sock-ep .who {
+              font-family: var(--font-mono);
+              font-size: 13px;
+              font-weight: 700;
+              letter-spacing: 0.08em;
+              text-transform: uppercase;
+              color: var(--ec);
+            }
+            .sock-ep .addr {
+              font-family: var(--font-mono);
+              font-size: 26px;
+              font-weight: 700;
+              color: var(--ink);
+              margin-top: 6px;
+            }
+            .sock-ep .addr span {
+              color: var(--ec);
+            }
+            .sock-ep .note {
+              font-size: 13px;
+              color: var(--ink-soft);
+              margin-top: 6px;
+            }
+          </style>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             NETWORK SOCKET (2) — what it is used for, types & ports
+             Stream (TCP) vs datagram (UDP) sockets, port ranges, and the
+             real services each well-known port maps to.
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Sockets</span
+              ><span>What they're for · types · ports</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow reveal" style="--i: 0"
+            >every networked program speaks through a socket</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            What sockets are <em class="display">used for.</em>
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 19px; max-width: 1560px">
+            Open a web page, send mail, join a video call, query a database —
+            each opens a socket. The OS hands the program a socket like a file
+            descriptor, then <strong>demultiplexes</strong> every arriving
+            packet to the right socket by its destination port + 4-tuple. That's
+            how one machine runs <strong>many</strong> services at once.
+          </p>
+
+          <!-- two socket types -->
+          <div class="grid-2" style="margin-top: 24px; gap: 44px">
+            <div class="card reveal" style="--i: 3">
+              <div class="label" style="color: var(--cobalt)">
+                Stream socket · TCP · SOCK_STREAM
+              </div>
+              <p style="font-size: 18px; margin-top: 4px">
+                Connection-oriented, <strong>reliable</strong>, ordered byte
+                stream — a handshake first, then guaranteed delivery.
+              </p>
+              <p style="font-size: 17px; margin-top: 8px; color: var(--ink-soft)">
+                <strong>Used for:</strong> web (HTTP/HTTPS), email, SSH, file
+                transfer, databases — anything that must arrive intact and in
+                order.
+              </p>
+            </div>
+            <div class="card amber reveal" style="--i: 4">
+              <div class="label">Datagram socket · UDP · SOCK_DGRAM</div>
+              <p style="font-size: 18px; margin-top: 4px">
+                Connectionless, no handshake, <strong>no guarantee</strong> —
+                fire and forget, just fast.
+              </p>
+              <p style="font-size: 17px; margin-top: 8px; color: var(--ink-soft)">
+                <strong>Used for:</strong> DNS, DHCP, VoIP, live video, online
+                games — anything that prefers speed over perfect delivery.
+              </p>
+            </div>
+          </div>
+
+          <!-- port ranges -->
+          <div class="reveal" style="--i: 5; margin-top: 24px">
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1023fr 1fr 1fr;
+                gap: 6px;
+                font-family: var(--font-mono);
+                font-size: 14px;
+                font-weight: 700;
+                text-align: center;
+              "
+            >
+              <div style="padding: 9px; background: var(--cobalt-soft); color: var(--cobalt-deep); border: 1.5px solid var(--cobalt); border-radius: 6px">
+                WELL-KNOWN · 0–1023 (HTTP 80 · HTTPS 443 · SSH 22 · DNS 53)
+              </div>
+              <div style="padding: 9px; background: var(--moss-soft); color: var(--moss); border: 1.5px solid var(--moss); border-radius: 6px; white-space: nowrap">
+                REGISTERED · 1024–49151
+              </div>
+              <div style="padding: 9px; background: var(--amber-soft); color: var(--amber); border: 1.5px solid var(--amber); border-radius: 6px; white-space: nowrap">
+                EPHEMERAL · 49152–65535
+              </div>
+            </div>
+            <div style="margin-top: 6px; font-size: 14px; color: var(--muted); font-family: var(--font-mono)">
+              servers listen on fixed well-known ports · clients are given a temporary ephemeral port per connection
+            </div>
+          </div>
+
+          <!-- well-known services -->
+          <div
+            class="reveal"
+            style="--i: 6; margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center"
+          >
+            <span style="font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--ink-soft)">COMMON PORTS:</span>
+            <span class="pill" style="margin: 0">22 · SSH</span>
+            <span class="pill" style="margin: 0">25 · SMTP</span>
+            <span class="pill" style="margin: 0">53 · DNS</span>
+            <span class="pill" style="margin: 0">80 · HTTP</span>
+            <span class="pill" style="margin: 0">443 · HTTPS</span>
+            <span class="pill" style="margin: 0">3306 · MySQL</span>
+            <span class="pill" style="margin: 0">3389 · RDP</span>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
              PART 2 DIVIDER — IP DESIGN & SUBNETTING
              ========================================================= -->
         <section class="slide divider-slide">
@@ -8699,6 +8949,301 @@
             decide what those addresses <em>are</em> — structure, masks, CIDR,
             and the arithmetic of subnetting.
           </p>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             BINARY ↔ DECIMAL — reading one octet of an IP address
+             Foundation slide: powers-of-2 reference, 32-bit address
+             split into four octets (172.20.1.1), and a worked
+             expansion of the first octet 10101100 → 172.
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">IP Design</span
+              ><span>Binary &harr; decimal · reading an octet</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0"
+            >32 bits · 8 bits per octet · base-2 place values</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            Inside, every address is just
+            <em class="display">binary.</em>
+          </h2>
+
+          <!-- intro (left) + powers-of-two reference table (right) -->
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 320px;
+              gap: 56px;
+              margin-top: 20px;
+              align-items: start;
+            "
+          >
+            <p class="reveal" style="--i: 2; font-size: 20px; max-width: 1100px">
+              A computer stores an IP address as one
+              <strong>32-bit</strong> binary number. That's unreadable to
+              people, so we split it into <strong>four 8-bit octets</strong>,
+              separate them with dots, and write each octet in
+              <strong>decimal</strong> — <span class="mono">172.20.1.1</span>.
+              Converting back is just adding the place values where a bit is
+              <span class="mono">1</span>.
+            </p>
+
+            <!-- powers of two — memorise these eight place values -->
+            <div class="reveal" style="--i: 3">
+              <table
+                style="
+                  border-collapse: collapse;
+                  font-family: var(--font-mono);
+                  font-weight: 700;
+                  font-size: 16px;
+                  width: 100%;
+                "
+              >
+                <tr>
+                  <td
+                    colspan="2"
+                    style="
+                      padding: 7px;
+                      text-align: center;
+                      background: var(--moss);
+                      color: var(--paper);
+                      letter-spacing: 0.08em;
+                      text-transform: uppercase;
+                      font-size: 13px;
+                    "
+                  >
+                    Memorise these eight
+                  </td>
+                </tr>
+                <!-- 2^n  →  value -->
+                <tbody id="powTable">
+                  <tr>
+                    <td class="pw-k">2⁷</td><td class="pw-v">128</td>
+                  </tr>
+                  <tr><td class="pw-k">2⁶</td><td class="pw-v">64</td></tr>
+                  <tr><td class="pw-k">2⁵</td><td class="pw-v">32</td></tr>
+                  <tr><td class="pw-k">2⁴</td><td class="pw-v">16</td></tr>
+                  <tr><td class="pw-k">2³</td><td class="pw-v">8</td></tr>
+                  <tr><td class="pw-k">2²</td><td class="pw-v">4</td></tr>
+                  <tr><td class="pw-k">2¹</td><td class="pw-v">2</td></tr>
+                  <tr><td class="pw-k">2⁰</td><td class="pw-v">1</td></tr>
+                  <tr>
+                    <td
+                      style="
+                        padding: 6px 12px;
+                        text-align: center;
+                        background: var(--plum);
+                        color: var(--paper);
+                      "
+                    >
+                      all 1s
+                    </td>
+                    <td
+                      style="
+                        padding: 6px 12px;
+                        text-align: center;
+                        background: var(--plum);
+                        color: var(--paper);
+                      "
+                    >
+                      255
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <style>
+                #powTable .pw-k {
+                  padding: 6px 12px;
+                  text-align: center;
+                  background: var(--moss-soft);
+                  color: var(--ink);
+                  border: 1px solid var(--moss);
+                }
+                #powTable .pw-v {
+                  padding: 6px 12px;
+                  text-align: center;
+                  background: var(--amber-soft);
+                  color: var(--ink);
+                  border: 1px solid var(--amber);
+                }
+              </style>
+            </div>
+          </div>
+
+          <!-- 32-bit address split into four coloured octets -->
+          <div class="reveal" style="--i: 4; margin-top: 26px">
+            <!-- place-value labels sit above the first (worked) octet only -->
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(8, 1fr);
+                width: 392px;
+                gap: 3px;
+                font-family: var(--font-mono);
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--moss);
+                text-align: center;
+                margin-bottom: 4px;
+              "
+            >
+              <span>2⁷</span><span>2⁶</span><span>2⁵</span><span>2⁴</span
+              ><span>2³</span><span>2²</span><span>2¹</span><span>2⁰</span>
+            </div>
+
+            <div style="display: flex; gap: 18px; align-items: flex-start">
+              <!-- OCTET 1 · cobalt · 10101100 = 172 -->
+              <div class="oct-wrap" style="--oc: var(--cobalt); --ocs: var(--cobalt-soft)">
+                <div class="oct-bits">
+                  <span class="ob">1</span><span class="ob">0</span
+                  ><span class="ob">1</span><span class="ob">0</span
+                  ><span class="ob">1</span><span class="ob">1</span
+                  ><span class="ob">0</span><span class="ob">0</span>
+                </div>
+                <div class="oct-dec">172</div>
+              </div>
+              <span class="oct-dot">.</span>
+              <!-- OCTET 2 · amber · 00010100 = 20 -->
+              <div class="oct-wrap" style="--oc: var(--amber); --ocs: var(--amber-soft)">
+                <div class="oct-bits">
+                  <span class="ob">0</span><span class="ob">0</span
+                  ><span class="ob">0</span><span class="ob">1</span
+                  ><span class="ob">0</span><span class="ob">1</span
+                  ><span class="ob">0</span><span class="ob">0</span>
+                </div>
+                <div class="oct-dec">20</div>
+              </div>
+              <span class="oct-dot">.</span>
+              <!-- OCTET 3 · moss · 00000001 = 1 -->
+              <div class="oct-wrap" style="--oc: var(--moss); --ocs: var(--moss-soft)">
+                <div class="oct-bits">
+                  <span class="ob">0</span><span class="ob">0</span
+                  ><span class="ob">0</span><span class="ob">0</span
+                  ><span class="ob">0</span><span class="ob">0</span
+                  ><span class="ob">0</span><span class="ob">1</span>
+                </div>
+                <div class="oct-dec">1</div>
+              </div>
+              <span class="oct-dot">.</span>
+              <!-- OCTET 4 · plum · 00000001 = 1 -->
+              <div class="oct-wrap" style="--oc: var(--plum); --ocs: var(--plum-soft)">
+                <div class="oct-bits">
+                  <span class="ob">0</span><span class="ob">0</span
+                  ><span class="ob">0</span><span class="ob">0</span
+                  ><span class="ob">0</span><span class="ob">0</span
+                  ><span class="ob">0</span><span class="ob">1</span>
+                </div>
+                <div class="oct-dec">1</div>
+              </div>
+              <span
+                style="
+                  align-self: center;
+                  margin-left: 8px;
+                  font-family: var(--font-mono);
+                  font-size: 15px;
+                  color: var(--ink-soft);
+                "
+                >binary&nbsp;·&nbsp;decimal</span
+              >
+            </div>
+            <style>
+              .oct-wrap {
+                display: inline-block;
+              }
+              .oct-bits {
+                display: grid;
+                grid-template-columns: repeat(8, 1fr);
+                gap: 3px;
+                width: 392px;
+              }
+              .oct-bits .ob {
+                background: var(--ocs);
+                border: 1.5px solid var(--oc);
+                color: var(--ink);
+                text-align: center;
+                font-family: var(--font-mono);
+                font-weight: 700;
+                font-size: 17px;
+                padding: 9px 0;
+              }
+              .oct-dec {
+                margin-top: 6px;
+                text-align: center;
+                font-family: var(--font-display);
+                font-weight: 600;
+                font-size: 30px;
+                color: var(--oc);
+              }
+              .oct-dot {
+                align-self: flex-start;
+                margin-top: 4px;
+                font-family: var(--font-display);
+                font-weight: 700;
+                font-size: 30px;
+                color: var(--ink);
+              }
+            </style>
+          </div>
+
+          <!-- worked expansion of the first octet -->
+          <div
+            class="reveal"
+            style="
+              --i: 5;
+              margin-top: 24px;
+              display: flex;
+              gap: 28px;
+              align-items: center;
+            "
+          >
+            <div
+              style="
+                font-family: var(--font-display);
+                font-size: 64px;
+                font-weight: 600;
+                color: var(--cobalt);
+                line-height: 1;
+              "
+            >
+              10101100
+            </div>
+            <div
+              style="
+                font-family: var(--font-mono);
+                font-size: 19px;
+                line-height: 1.9;
+                color: var(--ink);
+              "
+            >
+              <div>
+                = (2⁷×1)+(2⁶×0)+(2⁵×1)+(2⁴×0)+(2³×1)+(2²×1)+(2¹×0)+(2⁰×0)
+              </div>
+              <div>
+                = 128 + 0 + 32 + 0 + 8 + 4 + 0 + 0
+              </div>
+              <div style="margin-top: 6px">
+                =
+                <span
+                  style="
+                    display: inline-block;
+                    padding: 4px 18px;
+                    border: 2px solid var(--moss);
+                    border-radius: 8px;
+                    background: var(--moss-soft);
+                    color: var(--ink);
+                    font-weight: 700;
+                  "
+                  >172</span
+                >
+              </div>
+            </div>
+          </div>
           <div class="page-num"></div>
         </section>
 
@@ -9043,11 +9588,261 @@
             </div>
             <div class="btns">
               <button class="sim-btn primary" id="ipcStart">▶ Start</button>
+              <button class="sim-btn" id="ipcStep">▸ Step</button>
               <button class="sim-btn pause" id="ipcPause" disabled>
                 ❚❚ Pause
               </button>
               <button class="sim-btn" id="ipcStop" disabled>■ Stop</button>
             </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             BROADCAST ADDRESS — host bits all 1, reserved
+             One packet to every host on the link. Shows 172.16.255.255/16
+             in binary (host half all 1s), a broadcast diagram, and the
+             classful broadcast examples.
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">IP Design</span
+              ><span>Reserved address · broadcast</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow plum reveal" style="--i: 0"
+            >host bits all 1 · one packet, every host</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 46px">
+            The <em class="display">broadcast</em> address — every host at
+            once.
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 20px; max-width: 1500px">
+            Like the network address, it's <strong>reserved</strong> — you
+            can't assign it to a device. Set
+            <strong>every host bit to 1</strong> and you get the
+            <strong>last (highest) address</strong> in the network. A packet
+            sent there is delivered to <em>every</em> host on the same link.
+          </p>
+
+          <!-- 32-bit view of 172.16.255.255 /16 — host half is all 1s -->
+          <div class="reveal" style="--i: 3; margin-top: 22px">
+            <div class="ip-bits" style="max-width: 1360px">
+              <!-- network · 16 bits · 172.16 -->
+              <div class="bit net">1</div><div class="bit net">0</div
+              ><div class="bit net">1</div><div class="bit net">0</div
+              ><div class="bit net">1</div><div class="bit net">1</div
+              ><div class="bit net">0</div><div class="bit net">0</div
+              ><div class="bit net">0</div><div class="bit net">0</div
+              ><div class="bit net">0</div><div class="bit net">1</div
+              ><div class="bit net">0</div><div class="bit net">0</div
+              ><div class="bit net">0</div><div class="bit net">0</div>
+              <!-- host · 16 bits · all 1 → 255.255 (broadcast) -->
+              <div class="bit bcast">1</div><div class="bit bcast">1</div
+              ><div class="bit bcast">1</div><div class="bit bcast">1</div
+              ><div class="bit bcast">1</div><div class="bit bcast">1</div
+              ><div class="bit bcast">1</div><div class="bit bcast">1</div
+              ><div class="bit bcast">1</div><div class="bit bcast">1</div
+              ><div class="bit bcast">1</div><div class="bit bcast">1</div
+              ><div class="bit bcast">1</div><div class="bit bcast">1</div
+              ><div class="bit bcast">1</div><div class="bit bcast">1</div>
+            </div>
+            <div class="ip-octet-labels" style="max-width: 1360px">
+              <span>172</span><span>16</span
+              ><span style="background: var(--plum-soft); border-color: var(--plum); color: var(--plum)">255</span
+              ><span style="background: var(--plum-soft); border-color: var(--plum); color: var(--plum)">255</span>
+            </div>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                max-width: 1360px;
+                gap: 6px;
+                margin-top: 8px;
+                font-family: var(--font-mono);
+                font-size: 14px;
+                font-weight: 700;
+                text-align: center;
+              "
+            >
+              <div style="padding: 7px; background: var(--cobalt-soft); color: var(--cobalt-deep); border: 1.5px solid var(--cobalt); border-radius: 6px">
+                ◀ NETWORK · /16 ▶
+              </div>
+              <div style="padding: 7px; background: var(--plum-soft); color: var(--plum); border: 1.5px solid var(--plum); border-radius: 6px">
+                ◀ HOST PORTION = ALL 1s → 172.16.255.255 ▶
+              </div>
+            </div>
+          </div>
+          <style>
+            .ip-bits .bit.bcast {
+              background: var(--plum-soft);
+              border-color: var(--plum);
+              color: var(--plum);
+            }
+          </style>
+
+          <!-- classful examples (left) + broadcast diagram (right) -->
+          <div class="grid-2" style="margin-top: 26px; gap: 48px; align-items: center">
+            <div class="reveal" style="--i: 4">
+              <table class="data" style="font-size: 18px">
+                <tr>
+                  <th style="text-align: left">Classful network</th>
+                  <th style="text-align: left">Broadcast address</th>
+                  <th style="text-align: left">Host octets</th>
+                </tr>
+                <tr>
+                  <td class="mono">10.0.0.0 /8</td>
+                  <td class="mono" style="color: var(--plum); font-weight: 700">10.255.255.255</td>
+                  <td>2nd–4th</td>
+                </tr>
+                <tr>
+                  <td class="mono">172.16.0.0 /16</td>
+                  <td class="mono" style="color: var(--plum); font-weight: 700">172.16.255.255</td>
+                  <td>3rd–4th</td>
+                </tr>
+                <tr>
+                  <td class="mono">192.168.65.0 /24</td>
+                  <td class="mono" style="color: var(--plum); font-weight: 700">192.168.65.255</td>
+                  <td>4th only</td>
+                </tr>
+              </table>
+              <p style="margin-top: 12px; font-size: 17px; color: var(--ink-soft)">
+                Whatever the mask, fill the host octets with
+                <span class="mono">255</span> (all 1s) and you have the
+                block's broadcast address.
+              </p>
+            </div>
+
+            <!-- broadcast communication: one source → every node -->
+            <div class="reveal" style="--i: 5">
+              <div
+                style="
+                  font-family: var(--font-mono);
+                  font-size: 14px;
+                  font-weight: 700;
+                  letter-spacing: 0.08em;
+                  text-transform: uppercase;
+                  color: var(--plum);
+                  text-align: center;
+                  margin-bottom: 14px;
+                "
+              >
+                ■ Broadcast communication
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; padding: 0 12px">
+                <!-- five receiving nodes, each with an up arrow from the bus -->
+                <!-- repeated node unit -->
+                <div class="bc-node"><div class="bc-dot">host</div><div class="bc-arrow">↑</div></div>
+                <div class="bc-node"><div class="bc-dot">host</div><div class="bc-arrow">↑</div></div>
+                <div class="bc-node"><div class="bc-dot">host</div><div class="bc-arrow">↑</div></div>
+                <div class="bc-node"><div class="bc-dot">host</div><div class="bc-arrow">↑</div></div>
+                <div class="bc-node"><div class="bc-dot">host</div><div class="bc-arrow">↑</div></div>
+              </div>
+              <div style="height: 4px; background: var(--ink); border-radius: 2px; margin: 0 4px"></div>
+              <div style="text-align: center; margin-top: 10px; font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink)">
+                one frame → the whole link
+              </div>
+            </div>
+          </div>
+          <style>
+            .bc-node { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+            .bc-dot {
+              width: 64px; height: 44px; border-radius: 8px;
+              background: var(--paper-warm); border: 1.5px solid var(--ink);
+              display: flex; align-items: center; justify-content: center;
+              font-family: var(--font-mono); font-size: 13px; color: var(--ink);
+            }
+            .bc-arrow { color: var(--plum); font-size: 26px; font-weight: 700; line-height: 1; }
+          </style>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             RECAP — concluding the IP-address calculation before subnetting
+             Two reserved addresses (network = host bits 0, broadcast =
+             host bits 1) and the usable-host formula 2ⁿ − 2.
+             ========================================================= -->
+        <section class="slide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">IP Design</span
+              ><span>Recap · before we subnet</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >caution · two addresses you can <em>not</em> assign</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 48px">
+            Every block reserves <em class="display">two</em> addresses.
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 20px; max-width: 1500px">
+            Before subnetting, lock in these three facts. In any IPv4 network,
+            the first and last addresses are taken — so the devices you can
+            actually use are everything in between.
+          </p>
+
+          <div class="grid-3" style="margin-top: 34px">
+            <!-- network address -->
+            <div class="card reveal" style="--i: 3">
+              <div class="label">Network address</div>
+              <h3 style="color: var(--cobalt-deep)">Host bits = all 0</h3>
+              <p style="margin-top: 8px">
+                Names the network itself, not a device. Example
+                <span class="mono">172.16.0.0</span> (Class B). It's what
+                routing tables point at.
+              </p>
+              <div style="margin-top: 14px">
+                <span class="pill" style="border-color: var(--cobalt); color: var(--cobalt-deep)">…0000 0000</span>
+              </div>
+            </div>
+            <!-- broadcast address -->
+            <div class="card plum reveal" style="--i: 4">
+              <div class="label">Broadcast address</div>
+              <h3 style="color: var(--plum)">Host bits = all 1</h3>
+              <p style="margin-top: 8px">
+                Reaches every host on the link at once. Example
+                <span class="mono">192.168.1.255</span> (Class C). The highest
+                address in the block.
+              </p>
+              <div style="margin-top: 14px">
+                <span class="pill" style="border-color: var(--plum); color: var(--plum)">…1111 1111</span>
+              </div>
+            </div>
+            <!-- usable hosts -->
+            <div class="card moss reveal" style="--i: 5">
+              <div class="label">Usable hosts</div>
+              <h3 style="color: var(--moss); font-family: var(--font-mono)">2ⁿ − 2</h3>
+              <p style="margin-top: 8px">
+                <span class="mono">n</span> = number of host bits. Subtract
+                <strong>2</strong> — the network and broadcast addresses are
+                already spoken for.
+              </p>
+              <div style="margin-top: 14px">
+                <span class="pill" style="border-color: var(--moss); color: var(--moss)">/24 → 2⁸ − 2 = 254</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- bridge into subnetting -->
+          <div
+            class="reveal"
+            style="
+              --i: 6;
+              margin-top: 30px;
+              padding: 18px 26px;
+              border: 1.5px solid var(--ink);
+              background: var(--paper-warm);
+              font-size: 19px;
+              line-height: 1.5;
+            "
+          >
+            <strong>That's why a /24 hosts 254, not 256.</strong> Hold onto the
+            network-and-broadcast rule — subnetting is just choosing where the
+            host/network boundary falls, then re-deriving these same two edges
+            for every new, smaller block.
           </div>
           <div class="page-num"></div>
         </section>
@@ -10093,6 +10888,354 @@
         </section>
 
         <!-- =========================================================
+             SIM SLIDE — DESIGN THE OPTIMAL SUBNET (borrow host bits)
+             Interactive: 192.168.10.178, Class C /24 → borrow 3 host
+             bits → 2³ = 8 subnets (000–111). This address lives in
+             subnet 101 = subnet #5 (★). Mirrors the reference handout.
+             ========================================================= -->
+        <section class="slide" id="subnetBorrowSlide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Interactive</span
+              ><span>Design the subnet · borrow host bits</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >Live simulation · Press START</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            Borrow host bits to <em class="display">create subnets.</em>
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 19px; max-width: 1520px">
+            Take <span class="mono">192.168.10.178</span> — a Class C address,
+            natural mask <span class="mono">/24</span>. Steal the top
+            <strong>3 host bits</strong> for a <strong>subnet field</strong>:
+            <span class="mono">n</span> borrowed bits create
+            <span class="mono">2ⁿ</span> subnets. Watch which subnet this
+            address falls into.
+          </p>
+
+          <!-- ── 32-bit strip with decimal octet labels ── -->
+          <div class="reveal" style="--i: 3; margin-top: 18px">
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+                max-width: 1180px;
+                font-family: var(--font-mono);
+                font-weight: 700;
+                font-size: 20px;
+                text-align: center;
+                color: var(--ink);
+                margin-bottom: 6px;
+              "
+            >
+              <span>192</span><span>168</span><span>10</span><span>178</span>
+            </div>
+            <div
+              id="sb-bits"
+              style="
+                display: grid;
+                grid-template-columns: repeat(32, 1fr);
+                gap: 3px;
+                max-width: 1180px;
+              "
+            ></div>
+            <!-- boundary labels appear once bits are borrowed -->
+            <div
+              id="sb-bound"
+              style="
+                display: grid;
+                grid-template-columns: 24fr 3fr 5fr;
+                gap: 4px;
+                max-width: 1180px;
+                margin-top: 6px;
+                font-family: var(--font-mono);
+                font-size: 13px;
+                font-weight: 700;
+                text-align: center;
+                opacity: 0;
+                transition: opacity 0.45s;
+              "
+            >
+              <div style="padding: 6px; background: var(--cobalt-soft); color: var(--cobalt-deep); border: 1.5px solid var(--cobalt); border-radius: 5px">
+                NETWORK · Class C /24
+              </div>
+              <div style="padding: 6px; background: var(--plum-soft); color: var(--plum); border: 1.5px solid var(--plum); border-radius: 5px">
+                SUBNET · 3
+              </div>
+              <div style="padding: 6px; background: var(--amber-soft); color: var(--amber); border: 1.5px solid var(--amber); border-radius: 5px">
+                HOST · 5
+              </div>
+            </div>
+          </div>
+
+          <!-- ── 8 possible subnets + result, side by side ── -->
+          <div
+            class="reveal"
+            style="--i: 4; display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; margin-top: 20px; align-items: start"
+          >
+            <!-- the eight subnets (3 bits → 2³ = 8) -->
+            <div id="sb-grid-wrap" style="opacity: 0; transition: opacity 0.5s">
+              <div
+                style="
+                  text-align: center;
+                  font-family: var(--font-display);
+                  font-weight: 600;
+                  font-size: 18px;
+                  color: var(--ink);
+                  margin-bottom: 10px;
+                "
+              >
+                Class C : 192.168.10.0 — <strong>8</strong> possible subnets
+              </div>
+              <div id="sb-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px">
+                <div class="sb-cell" data-sn="0"><div class="bn">000</div><div class="nm">subnet 0</div></div>
+                <div class="sb-cell" data-sn="1"><div class="bn">001</div><div class="nm">subnet 1</div></div>
+                <div class="sb-cell" data-sn="2"><div class="bn">010</div><div class="nm">subnet 2</div></div>
+                <div class="sb-cell" data-sn="3"><div class="bn">011</div><div class="nm">subnet 3</div></div>
+                <div class="sb-cell" data-sn="4"><div class="bn">100</div><div class="nm">subnet 4</div></div>
+                <div class="sb-cell" data-sn="5"><div class="bn">101</div><div class="nm">subnet 5</div></div>
+                <div class="sb-cell" data-sn="6"><div class="bn">110</div><div class="nm">subnet 6</div></div>
+                <div class="sb-cell" data-sn="7"><div class="bn">111</div><div class="nm">subnet 7</div></div>
+              </div>
+            </div>
+
+            <!-- result panel -->
+            <div id="sb-result" style="opacity: 0; transition: opacity 0.5s">
+              <div class="card plum" style="padding: 20px 24px">
+                <div class="label">This address lives in</div>
+                <h3 style="color: var(--plum); font-size: 30px">
+                  Subnet <span class="mono">101</span> = #5 <span style="color: var(--plum)">★</span>
+                </h3>
+                <table class="data" style="font-size: 18px; margin-top: 14px">
+                  <tr><td>New mask</td><td class="mono" style="font-weight: 700">/27 · 255.255.255.224</td></tr>
+                  <tr><td>Subnets</td><td class="mono" style="font-weight: 700">2³ = 8</td></tr>
+                  <tr><td>Hosts / subnet</td><td class="mono" style="font-weight: 700">2⁵ − 2 = 30</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <style>
+            #subnetBorrowSlide .sb-cell {
+              border: 1.5px solid var(--rule);
+              background: rgba(255, 252, 244, 0.6);
+              border-radius: 8px;
+              padding: 12px 8px;
+              text-align: center;
+              transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+            }
+            #subnetBorrowSlide .sb-cell .bn {
+              font-family: var(--font-mono);
+              font-size: 22px;
+              font-weight: 700;
+              color: var(--ink-soft);
+            }
+            #subnetBorrowSlide .sb-cell .nm {
+              font-family: var(--font-mono);
+              font-size: 12px;
+              color: var(--muted);
+              margin-top: 4px;
+            }
+            #subnetBorrowSlide .sb-cell.hit {
+              background: var(--plum-soft);
+              border-color: var(--plum);
+              box-shadow: 5px 5px 0 var(--plum);
+            }
+            #subnetBorrowSlide .sb-cell.hit .bn {
+              color: var(--plum);
+            }
+            #subnetBorrowSlide .sb-cell.hit .nm::after {
+              content: " ★";
+              color: var(--plum);
+            }
+          </style>
+
+          <!-- sim controls (same pattern as the other simulators) -->
+          <div class="sim-controls">
+            <div class="sim-status">
+              <span id="sbBadgeWrap"
+                >STATUS<span class="badge" id="sbBadge">IDLE</span></span
+              >
+              <span class="narration" id="sbNarration"
+                >Click START — watch 192.168.10.178 borrow 3 host bits and land
+                in one of 8 subnets.</span
+              >
+            </div>
+            <div class="btns">
+              <button class="sim-btn primary" id="sbStart">▶ Start</button>
+              <button class="sim-btn" id="sbStep">▸ Step</button>
+              <button class="sim-btn pause" id="sbPause" disabled>
+                ❚❚ Pause
+              </button>
+              <button class="sim-btn" id="sbStop" disabled>■ Stop</button>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             SIM SLIDE — HOST CALCULATION (inside subnet 101)
+             Interactive: 5 host bits → 2⁵ = 32 addresses. Network
+             (00000) and broadcast (11111) are unusable (X) → 30 left.
+             This device is host 10010 (#18) = 192.168.10.178.
+             ========================================================= -->
+        <section class="slide" id="hostCalcSlide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Interactive</span
+              ><span>Host calculation · inside subnet 101</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow plum reveal" style="--i: 0"
+            >Live simulation · Press START</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 44px">
+            Inside subnet 101 —
+            <em class="display">32 addresses, 30 usable.</em>
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 19px; max-width: 1520px">
+            The 5 remaining host bits give
+            <span class="mono">2⁵ = 32</span> addresses,
+            <span class="mono">00000</span> through
+            <span class="mono">11111</span>. But the first (network) and the
+            last (broadcast) are reserved — so each subnet actually holds
+            <strong>30</strong> assignable hosts.
+          </p>
+
+          <!-- 32 host addresses of subnet 101 (built by JS) -->
+          <div class="reveal" style="--i: 3; margin-top: 18px">
+            <div
+              style="
+                font-family: var(--font-display);
+                font-weight: 600;
+                font-size: 18px;
+                color: var(--ink);
+                margin-bottom: 10px;
+              "
+            >
+              Subnet <span class="mono" style="color: var(--plum); font-weight: 700">101</span> · 192.168.10.0/24 → hosts
+            </div>
+            <div
+              id="hc-grid"
+              style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 9px; max-width: 1640px"
+            ></div>
+          </div>
+
+          <!-- usable-count result (left) + this-device callout (right) -->
+          <div
+            class="reveal"
+            style="--i: 4; display: grid; grid-template-columns: 1fr 1fr; gap: 44px; margin-top: 22px; align-items: center"
+          >
+            <div id="hc-result" style="opacity: 0; transition: opacity 0.5s; display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+              <span class="pill" style="border-color: var(--ink); font-size: 18px">2⁵ = 32 total</span>
+              <span style="font-size: 22px; color: var(--muted)">−</span>
+              <span class="pill" style="border-color: #c0392b; color: #c0392b; font-size: 18px">2 reserved</span>
+              <span style="font-size: 22px; color: var(--muted)">=</span>
+              <span class="pill" style="border-color: var(--moss); color: var(--moss); font-size: 18px; font-weight: 700">30 usable</span>
+            </div>
+
+            <div id="hc-callout" style="opacity: 0; transition: opacity 0.5s">
+              <div class="card plum" style="padding: 18px 24px">
+                <div class="label">This device</div>
+                <div style="font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--ink)">
+                  192.168.10.<span style="color: var(--plum)">101</span><span style="color: var(--amber)">10010</span>
+                </div>
+                <p style="margin-top: 8px; font-size: 18px">
+                  = the <span class="mono" style="color: var(--amber); font-weight: 700">10010</span>
+                  host (#18) of subnet
+                  <span class="mono" style="color: var(--plum); font-weight: 700">101</span>
+                  → <span class="mono">192.168.10.178</span>.
+                </p>
+              </div>
+            </div>
+          </div>
+          <style>
+            #hostCalcSlide .hc-cell {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 8px 12px;
+              border: 1.4px solid var(--rule);
+              border-radius: 7px;
+              background: rgba(255, 252, 244, 0.6);
+              font-family: var(--font-mono);
+              font-weight: 700;
+              font-size: 17px;
+              transition: background 0.3s, border-color 0.3s, box-shadow 0.3s,
+                opacity 0.3s;
+            }
+            #hostCalcSlide .hc-cell .ic {
+              font-size: 16px;
+              filter: grayscale(1);
+            }
+            #hostCalcSlide .hc-cell .bn {
+              color: var(--ink);
+            }
+            #hostCalcSlide .hc-cell.net,
+            #hostCalcSlide .hc-cell.bcast {
+              background: var(--paper-warm);
+              border-style: dashed;
+              border-color: #c0392b;
+              opacity: 0.6;
+            }
+            #hostCalcSlide .hc-cell.net .bn,
+            #hostCalcSlide .hc-cell.bcast .bn {
+              text-decoration: line-through;
+              color: #c0392b;
+            }
+            #hostCalcSlide .hc-cell.net::after,
+            #hostCalcSlide .hc-cell.bcast::after {
+              content: "✕";
+              color: #c0392b;
+              font-weight: 800;
+              margin-left: auto;
+            }
+            #hostCalcSlide .hc-cell.me {
+              background: var(--plum-soft);
+              border-color: var(--plum);
+              box-shadow: 4px 4px 0 var(--plum);
+            }
+            #hostCalcSlide .hc-cell.me .bn {
+              color: var(--plum);
+            }
+            #hostCalcSlide .hc-cell.me .ic {
+              filter: none;
+            }
+            #hostCalcSlide .hc-cell.me::after {
+              content: "★";
+              color: var(--plum);
+              margin-left: auto;
+            }
+          </style>
+
+          <!-- sim controls -->
+          <div class="sim-controls">
+            <div class="sim-status">
+              <span id="hcBadgeWrap"
+                >STATUS<span class="badge" id="hcBadge">IDLE</span></span
+              >
+              <span class="narration" id="hcNarration"
+                >Click START — count the 32 addresses in subnet 101, drop the
+                two reserved ones, and find this device.</span
+              >
+            </div>
+            <div class="btns">
+              <button class="sim-btn primary" id="hcStart">▶ Start</button>
+              <button class="sim-btn" id="hcStep">▸ Step</button>
+              <button class="sim-btn pause" id="hcPause" disabled>
+                ❚❚ Pause
+              </button>
+              <button class="sim-btn" id="hcStop" disabled>■ Stop</button>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
              SIM SLIDE — SUBNETTING CALCULATOR
              Interactive: 192.168.32.89/27 → network, broadcast, range
              Walks through bit manipulation step by step.
@@ -10321,6 +11464,7 @@
             </div>
             <div class="btns">
               <button class="sim-btn primary" id="scStart">▶ Start</button>
+              <button class="sim-btn" id="scStep">▸ Step</button>
               <button class="sim-btn pause" id="scPause" disabled>
                 ❚❚ Pause
               </button>
@@ -10690,6 +11834,304 @@
               <span class="bn-net">11111111.11111111.11111</span
               ><span class="bn-host">000.00000000</span> =
               <strong>255.255.248.0</strong>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             DESIGN PROBLEM — Class B for 30+ departments (subnet box)
+             Interactive: 172.16.0.0/16, ≥30 depts → 2⁵ = 32 subnets,
+             borrow 5 bits → /21. 30 departments used, 2 spare.
+             ========================================================= -->
+        <section class="slide" id="designSubnetSlide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Interactive</span
+              ><span>Design problem · one Class B → 30 departments</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow moss reveal" style="--i: 0"
+            >Live simulation · Press START</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 42px">
+            Split <em class="display">172.16.0.0/16</em> for 30+ departments.
+          </h2>
+
+          <div
+            class="reveal"
+            style="--i: 2; display: grid; grid-template-columns: 0.95fr 1.6fr; gap: 44px; margin-top: 22px; align-items: start"
+          >
+            <!-- the brief -->
+            <div class="card moss" style="padding: 22px 26px">
+              <div class="label">The problem</div>
+              <ul style="list-style: none; margin: 6px 0 0; padding: 0; font-size: 19px; line-height: 1.3">
+                <li style="padding: 8px 0; border-bottom: 1px solid var(--rule)">
+                  One Class B — <span class="mono" style="font-weight: 700">172.16.0.0/16</span>
+                </li>
+                <li style="padding: 8px 0; border-bottom: 1px solid var(--rule)">
+                  At least <strong>30 departments</strong>
+                </li>
+                <li style="padding: 8px 0; border-bottom: 1px solid var(--rule)">
+                  One network <strong>per department</strong>
+                </li>
+                <li style="padding: 8px 0">
+                  ≤ <strong>1023</strong> computers per department
+                </li>
+              </ul>
+            </div>
+
+            <!-- subnet box animation -->
+            <div>
+              <div
+                id="dp-hint"
+                style="
+                  font-family: var(--font-mono);
+                  font-size: 16px;
+                  font-weight: 700;
+                  color: var(--ink-soft);
+                  margin-bottom: 12px;
+                  opacity: 0;
+                  transition: opacity 0.4s;
+                "
+              >
+                16 host bits · need ≥ 30 nets · 2⁴ = 16 ✗ · <span style="color: var(--moss)">2⁵ = 32 ✓ → borrow 5 bits</span>
+              </div>
+              <div id="dp-grid-wrap" style="opacity: 0; transition: opacity 0.5s">
+                <div id="dp-grid" style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px"></div>
+              </div>
+              <div
+                id="dp-result"
+                style="
+                  opacity: 0;
+                  transition: opacity 0.5s;
+                  margin-top: 16px;
+                  padding: 14px 20px;
+                  border: 1.5px solid var(--moss);
+                  background: var(--moss-soft);
+                  border-radius: 8px;
+                  font-size: 19px;
+                "
+              >
+                <strong>Borrow 5 bits → mask grows /16 → /21.</strong>
+                32 subnets: <span class="mono" style="font-weight: 700">30 used + 2 spare</span> for growth.
+              </div>
+            </div>
+          </div>
+          <style>
+            #designSubnetSlide .dp-cell {
+              border: 1.4px solid var(--rule);
+              border-radius: 7px;
+              padding: 7px 4px;
+              text-align: center;
+              background: rgba(255, 252, 244, 0.6);
+              transition: background 0.3s, border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+            }
+            #designSubnetSlide .dp-cell .bn {
+              font-family: var(--font-mono);
+              font-size: 14px;
+              font-weight: 700;
+              color: var(--ink-soft);
+            }
+            #designSubnetSlide .dp-cell .nm {
+              font-family: var(--font-mono);
+              font-size: 11px;
+              color: var(--muted);
+              margin-top: 3px;
+              min-height: 13px;
+            }
+            #designSubnetSlide .dp-cell.dept {
+              background: var(--moss-soft);
+              border-color: var(--moss);
+            }
+            #designSubnetSlide .dp-cell.dept .bn { color: var(--moss); }
+            #designSubnetSlide .dp-cell.dept .nm { color: var(--moss); }
+            #designSubnetSlide .dp-cell.spare {
+              background: var(--paper-warm);
+              border-style: dashed;
+              opacity: 0.65;
+            }
+          </style>
+
+          <div class="sim-controls">
+            <div class="sim-status">
+              <span id="dpBadgeWrap"
+                >STATUS<span class="badge" id="dpBadge">IDLE</span></span
+              >
+              <span class="narration" id="dpNarration"
+                >Click START — borrow host bits until 172.16.0.0/16 has enough
+                subnets for 30 departments.</span
+              >
+            </div>
+            <div class="btns">
+              <button class="sim-btn primary" id="dpStart">▶ Start</button>
+              <button class="sim-btn" id="dpStep">▸ Step</button>
+              <button class="sim-btn pause" id="dpPause" disabled>
+                ❚❚ Pause
+              </button>
+              <button class="sim-btn" id="dpStop" disabled>■ Stop</button>
+            </div>
+          </div>
+          <div class="page-num"></div>
+        </section>
+
+        <!-- =========================================================
+             DESIGN PROBLEM — hosts per /21 department (host box)
+             Interactive: 11 host bits → 2¹¹ = 2048; drop network +
+             broadcast → 2046 usable ≥ 1023 required. Mask /21.
+             ========================================================= -->
+        <section class="slide" id="designHostSlide">
+          <div class="masthead">
+            <div class="left">
+              <span class="tag">Interactive</span
+              ><span>Design problem · hosts per department</span>
+            </div>
+            <div class="right"></div>
+          </div>
+          <span class="eyebrow amber reveal" style="--i: 0"
+            >Live simulation · Press START</span
+          >
+          <h2 class="reveal" style="--i: 1; font-size: 42px">
+            Does each <em class="display">/21</em> subnet hold 1023 computers?
+          </h2>
+          <p class="reveal" style="--i: 2; font-size: 19px; max-width: 1520px">
+            Borrowing 5 subnet bits leaves <span class="mono">16 − 5 = 11</span>
+            host bits per subnet. That's <span class="mono">2¹¹ = 2048</span>
+            addresses — drop the network and broadcast and you have the usable
+            pool for each department's computers.
+          </p>
+
+          <!-- host capacity box -->
+          <div class="reveal" style="--i: 3; margin-top: 30px; max-width: 1640px">
+            <div
+              id="dh-track"
+              style="
+                position: relative;
+                height: 86px;
+                border: 1.5px solid var(--ink);
+                border-radius: 12px;
+                background: var(--paper-warm);
+                overflow: hidden;
+              "
+            >
+              <div
+                id="dh-fill"
+                style="position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--moss-soft); transition: width 1.1s ease"
+              ></div>
+              <div
+                id="dh-cap-net"
+                class="dh-cap"
+                style="left: 0; opacity: 0"
+              >
+                network<br />✕
+              </div>
+              <div
+                id="dh-cap-bc"
+                class="dh-cap"
+                style="right: 0; opacity: 0"
+              >
+                broadcast<br />✕
+              </div>
+              <div
+                id="dh-num"
+                style="
+                  position: absolute;
+                  inset: 0;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-family: var(--font-display);
+                  font-size: 36px;
+                  font-weight: 600;
+                  color: var(--ink);
+                "
+              >
+                2¹¹ addresses
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                margin-top: 8px;
+                font-family: var(--font-mono);
+                font-size: 14px;
+                color: var(--muted);
+              "
+            >
+              <span>00000000000 · network</span>
+              <span>2048 total addresses</span>
+              <span>broadcast · 11111111111</span>
+            </div>
+          </div>
+
+          <!-- comparison (left) + final answer (right) -->
+          <div
+            class="reveal"
+            style="--i: 4; display: grid; grid-template-columns: 1fr 1fr; gap: 44px; margin-top: 28px; align-items: center"
+          >
+            <div id="dh-compare" style="opacity: 0; transition: opacity 0.5s; display: flex; gap: 14px; align-items: center; flex-wrap: wrap">
+              <span class="pill" style="border-color: var(--ink); font-size: 18px">required ≤ 1023</span>
+              <span style="font-size: 22px; color: var(--moss); font-weight: 700">≤</span>
+              <span class="pill" style="border-color: var(--moss); color: var(--moss); font-size: 18px; font-weight: 700">2046 usable</span>
+              <span style="font-size: 18px; color: var(--ink-soft)">— fits, with room to grow</span>
+            </div>
+            <div id="dh-result" style="opacity: 0; transition: opacity 0.5s">
+              <div class="card moss" style="padding: 18px 24px">
+                <div class="label">Final design</div>
+                <h3 style="color: var(--moss); font-family: var(--font-mono)">/21 · 255.255.248.0</h3>
+                <p style="margin-top: 6px; font-size: 18px">
+                  <strong>32</strong> subnets (30 depts + 2 spare) ×
+                  <strong>2046</strong> hosts each.
+                </p>
+              </div>
+            </div>
+          </div>
+          <style>
+            #designHostSlide .dh-cap {
+              position: absolute;
+              top: 0;
+              bottom: 0;
+              width: 96px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              gap: 2px;
+              background: var(--paper);
+              border-right: 2px dashed #c0392b;
+              font-family: var(--font-mono);
+              font-size: 13px;
+              font-weight: 700;
+              color: #c0392b;
+              text-align: center;
+              line-height: 1.1;
+              transition: opacity 0.4s;
+            }
+            #designHostSlide #dh-cap-bc {
+              border-right: none;
+              border-left: 2px dashed #c0392b;
+            }
+          </style>
+
+          <div class="sim-controls">
+            <div class="sim-status">
+              <span id="dhBadgeWrap"
+                >STATUS<span class="badge" id="dhBadge">IDLE</span></span
+              >
+              <span class="narration" id="dhNarration"
+                >Click START — count the addresses in one /21 subnet and check
+                it covers 1023 computers.</span
+              >
+            </div>
+            <div class="btns">
+              <button class="sim-btn primary" id="dhStart">▶ Start</button>
+              <button class="sim-btn" id="dhStep">▸ Step</button>
+              <button class="sim-btn pause" id="dhPause" disabled>
+                ❚❚ Pause
+              </button>
+              <button class="sim-btn" id="dhStop" disabled>■ Stop</button>
             </div>
           </div>
           <div class="page-num"></div>
@@ -11779,6 +13221,9 @@
           this.startBtn.addEventListener("click", () => this.start());
           this.pauseBtn.addEventListener("click", () => this.pause());
           this.stopBtn.addEventListener("click", () => this.stop());
+          this.stepBtn = document.getElementById("simStep");
+          if (this.stepBtn)
+            this.stepBtn.addEventListener("click", () => this.step());
 
           this.reset();
         }
@@ -11867,6 +13312,18 @@
           // Run first step immediately, then on interval.
           this.runStep();
           this.timer = setInterval(() => this.runStep(), this.stepMs);
+        }
+
+        // advance exactly one step on demand (manual stepping)
+        step() {
+          clearInterval(this.timer);
+          this.timer = null;
+          if (this.idx >= this.steps.length - 1) this.reset();
+          this.startBtn.disabled = false;
+          this.startBtn.textContent = "▶ Start";
+          this.pauseBtn.disabled = true;
+          this.stopBtn.disabled = false;
+          this.runStep();
         }
 
         pause() {
@@ -12844,8 +14301,735 @@
           stopSim();
           resetVisual();
         });
+        function manualStep() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx >= STEPS.length) {
+            stepIdx = 0;
+            resetVisual();
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = false;
+          setBadge(
+            stepIdx >= STEPS.length ? "DONE" : "STEP " + stepIdx,
+            stepIdx >= STEPS.length ? "var(--moss)" : "var(--cobalt)"
+          );
+        }
+        const ipcStepBtn = document.getElementById("ipcStep");
+        if (ipcStepBtn) ipcStepBtn.addEventListener("click", manualStep);
 
         buildBitStrip();
+        setBadge("IDLE", "var(--ink)");
+      })();
+
+      /* ===========================================================
+         DESIGN-THE-SUBNET SIMULATOR (borrow host bits)
+         192.168.10.178 · Class C /24 → borrow 3 bits → 8 subnets.
+         This address's subnet bits = 101 → subnet #5 (★).
+         =========================================================== */
+      (function () {
+        const slide = document.getElementById("subnetBorrowSlide");
+        if (!slide) return;
+
+        const IP = [192, 168, 10, 178];
+        const toBin8 = (n) => n.toString(2).padStart(8, "0");
+        const allBits = () => IP.map(toBin8).join("").split("");
+
+        const bitsDiv = document.getElementById("sb-bits");
+        const bound = document.getElementById("sb-bound");
+        const gridWrap = document.getElementById("sb-grid-wrap");
+        const grid = document.getElementById("sb-grid");
+        const result = document.getElementById("sb-result");
+        const badge = document.getElementById("sbBadge");
+        const narration = document.getElementById("sbNarration");
+        const startBtn = document.getElementById("sbStart");
+        const pauseBtn = document.getElementById("sbPause");
+        const stopBtn = document.getElementById("sbStop");
+
+        let timer = null,
+          stepIdx = 0,
+          paused = false;
+
+        function setBadge(t, c) {
+          badge.textContent = t;
+          badge.style.background = c || "var(--cobalt)";
+        }
+        function buildStrip() {
+          bitsDiv.innerHTML = "";
+          allBits().forEach((b, i) => {
+            const d = document.createElement("div");
+            d.className = "sc-bit" + (i < 24 ? " net" : " host");
+            d.textContent = b;
+            bitsDiv.appendChild(d);
+          });
+        }
+        function clearGrid() {
+          [...grid.children].forEach((c) => c.classList.remove("hit"));
+        }
+
+        const STEPS = [
+          {
+            narr: "Step 1 — 192.168.10.178 with its natural Class C mask /24: the first 24 bits are the network, the last 8 are the host.",
+            fn() {
+              buildStrip();
+              bound.style.opacity = "0";
+              gridWrap.style.opacity = "0";
+              result.style.opacity = "0";
+              clearGrid();
+            },
+          },
+          {
+            narr: "Step 2 — Borrow the top 3 host bits as a SUBNET field. The mask becomes /27: network 24 + subnet 3 + host 5.",
+            fn() {
+              [...bitsDiv.children].forEach((d, i) => {
+                if (i >= 24 && i < 27) {
+                  d.classList.remove("host");
+                  d.classList.add("subnet");
+                }
+              });
+              bound.style.opacity = "1";
+            },
+          },
+          {
+            narr: "Step 3 — Three subnet bits count from 000 to 111 → 2³ = 8 possible subnets.",
+            fn() {
+              gridWrap.style.opacity = "1";
+            },
+          },
+          {
+            narr: "Step 4 — This address's three subnet bits are 101 → it belongs to subnet number 5.",
+            fn() {
+              clearGrid();
+              grid.querySelector('[data-sn="5"]').classList.add("hit");
+            },
+          },
+          {
+            narr: "Done — /27 (255.255.255.224): 8 subnets, each keeping 5 host bits → 2⁵ − 2 = 30 usable hosts.",
+            fn() {
+              result.style.opacity = "1";
+              setBadge("DONE", "var(--moss)");
+            },
+          },
+        ];
+
+        function runStep() {
+          if (stepIdx >= STEPS.length) {
+            stopSim();
+            return;
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          if (stepIdx < STEPS.length) timer = setTimeout(runStep, 2200);
+          else timer = setTimeout(stopSim, 1800);
+        }
+        function resetVisual() {
+          buildStrip();
+          bound.style.opacity = "0";
+          gridWrap.style.opacity = "0";
+          result.style.opacity = "0";
+          clearGrid();
+          narration.textContent =
+            "Click START — watch 192.168.10.178 borrow 3 host bits and land in one of 8 subnets.";
+          setBadge("IDLE", "var(--ink)");
+        }
+        function stopSim() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx >= STEPS.length) setBadge("DONE", "var(--moss)");
+          else {
+            setBadge("IDLE");
+            resetVisual();
+          }
+        }
+
+        startBtn.addEventListener("click", () => {
+          if (paused) {
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            setBadge("RUNNING");
+            timer = setTimeout(runStep, 500);
+            return;
+          }
+          stepIdx = 0;
+          resetVisual();
+          startBtn.disabled = true;
+          pauseBtn.disabled = false;
+          stopBtn.disabled = false;
+          setBadge("RUNNING");
+          timer = setTimeout(runStep, 600);
+        });
+        pauseBtn.addEventListener("click", () => {
+          if (paused) return;
+          paused = true;
+          clearTimeout(timer);
+          timer = null;
+          pauseBtn.textContent = "▶ Resume";
+          setBadge("PAUSED", "var(--amber)");
+          startBtn.disabled = false;
+        });
+        stopBtn.addEventListener("click", () => {
+          stepIdx = STEPS.length;
+          stopSim();
+          resetVisual();
+        });
+        function manualStep() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx >= STEPS.length) {
+            stepIdx = 0;
+            resetVisual();
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = false;
+          setBadge(
+            stepIdx >= STEPS.length ? "DONE" : "STEP " + stepIdx,
+            stepIdx >= STEPS.length ? "var(--moss)" : "var(--cobalt)"
+          );
+        }
+        const sbStepBtn = document.getElementById("sbStep");
+        if (sbStepBtn) sbStepBtn.addEventListener("click", manualStep);
+
+        buildStrip();
+        setBadge("IDLE", "var(--ink)");
+      })();
+
+      /* ===========================================================
+         HOST-CALCULATION SIMULATOR (inside subnet 101)
+         5 host bits → 2⁵ = 32 addresses (00000–11111).
+         00000 = network, 11111 = broadcast → unusable (X).
+         30 usable. This device = host 10010 (192.168.10.178).
+         =========================================================== */
+      (function () {
+        const slide = document.getElementById("hostCalcSlide");
+        if (!slide) return;
+
+        const grid = document.getElementById("hc-grid");
+        const result = document.getElementById("hc-result");
+        const callout = document.getElementById("hc-callout");
+        const badge = document.getElementById("hcBadge");
+        const narration = document.getElementById("hcNarration");
+        const startBtn = document.getElementById("hcStart");
+        const pauseBtn = document.getElementById("hcPause");
+        const stopBtn = document.getElementById("hcStop");
+
+        let timer = null,
+          stepIdx = 0,
+          paused = false;
+
+        const cell = (i) => grid.querySelector('[data-h="' + i + '"]');
+
+        function setBadge(t, c) {
+          badge.textContent = t;
+          badge.style.background = c || "var(--cobalt)";
+        }
+        function buildGrid() {
+          grid.innerHTML = "";
+          for (let i = 0; i < 32; i++) {
+            const d = document.createElement("div");
+            d.className = "hc-cell";
+            d.dataset.h = i;
+            d.innerHTML =
+              '<span class="ic">🖥</span><span class="bn">' +
+              i.toString(2).padStart(5, "0") +
+              "</span>";
+            grid.appendChild(d);
+          }
+        }
+        function clearMarks() {
+          [...grid.children].forEach((c) =>
+            c.classList.remove("net", "bcast", "me", "dim")
+          );
+        }
+
+        const STEPS = [
+          {
+            narr: "Step 1 — Inside subnet 101 there are 5 host bits, so 2⁵ = 32 possible addresses: 00000 through 11111.",
+            fn() {
+              clearMarks();
+              result.style.opacity = "0";
+              callout.style.opacity = "0";
+            },
+          },
+          {
+            narr: "Step 2 — The first one, 00000 (all host bits 0), is the subnet's NETWORK address — it can't be assigned.",
+            fn() {
+              cell(0).classList.add("net");
+            },
+          },
+          {
+            narr: "Step 3 — The last one, 11111 (all host bits 1), is the BROADCAST address — also reserved.",
+            fn() {
+              cell(31).classList.add("bcast");
+            },
+          },
+          {
+            narr: "Step 4 — Two addresses removed → 32 − 2 = 30 usable host addresses in this subnet.",
+            fn() {
+              result.style.opacity = "1";
+            },
+          },
+          {
+            narr: "Done — 192.168.10.178 = 192.168.10.101·10010: the 10010 host (#18) of subnet 101.",
+            fn() {
+              cell(18).classList.add("me");
+              callout.style.opacity = "1";
+              setBadge("DONE", "var(--moss)");
+            },
+          },
+        ];
+
+        function runStep() {
+          if (stepIdx >= STEPS.length) {
+            stopSim();
+            return;
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          if (stepIdx < STEPS.length) timer = setTimeout(runStep, 2200);
+          else timer = setTimeout(stopSim, 1800);
+        }
+        function resetVisual() {
+          clearMarks();
+          result.style.opacity = "0";
+          callout.style.opacity = "0";
+          narration.textContent =
+            "Click START — count the 32 addresses in subnet 101, drop the two reserved ones, and find this device.";
+          setBadge("IDLE", "var(--ink)");
+        }
+        function stopSim() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx >= STEPS.length) setBadge("DONE", "var(--moss)");
+          else {
+            setBadge("IDLE");
+            resetVisual();
+          }
+        }
+
+        startBtn.addEventListener("click", () => {
+          if (paused) {
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            setBadge("RUNNING");
+            timer = setTimeout(runStep, 500);
+            return;
+          }
+          stepIdx = 0;
+          resetVisual();
+          startBtn.disabled = true;
+          pauseBtn.disabled = false;
+          stopBtn.disabled = false;
+          setBadge("RUNNING");
+          timer = setTimeout(runStep, 600);
+        });
+        pauseBtn.addEventListener("click", () => {
+          if (paused) return;
+          paused = true;
+          clearTimeout(timer);
+          timer = null;
+          pauseBtn.textContent = "▶ Resume";
+          setBadge("PAUSED", "var(--amber)");
+          startBtn.disabled = false;
+        });
+        stopBtn.addEventListener("click", () => {
+          stepIdx = STEPS.length;
+          stopSim();
+          resetVisual();
+        });
+        function manualStep() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx >= STEPS.length) {
+            stepIdx = 0;
+            resetVisual();
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = false;
+          setBadge(
+            stepIdx >= STEPS.length ? "DONE" : "STEP " + stepIdx,
+            stepIdx >= STEPS.length ? "var(--moss)" : "var(--cobalt)"
+          );
+        }
+        const hcStepBtn = document.getElementById("hcStep");
+        if (hcStepBtn) hcStepBtn.addEventListener("click", manualStep);
+
+        buildGrid();
+        setBadge("IDLE", "var(--ink)");
+      })();
+
+      /* ===========================================================
+         DESIGN-PROBLEM SIMULATOR — subnet box
+         172.16.0.0/16 · ≥30 depts → 2⁵ = 32 subnets → borrow 5 → /21.
+         =========================================================== */
+      (function () {
+        const slide = document.getElementById("designSubnetSlide");
+        if (!slide) return;
+
+        const grid = document.getElementById("dp-grid");
+        const gridWrap = document.getElementById("dp-grid-wrap");
+        const hint = document.getElementById("dp-hint");
+        const result = document.getElementById("dp-result");
+        const badge = document.getElementById("dpBadge");
+        const narration = document.getElementById("dpNarration");
+        const startBtn = document.getElementById("dpStart");
+        const pauseBtn = document.getElementById("dpPause");
+        const stopBtn = document.getElementById("dpStop");
+        const stepBtn = document.getElementById("dpStep");
+
+        let timer = null,
+          stepIdx = 0,
+          paused = false;
+
+        function setBadge(t, c) {
+          badge.textContent = t;
+          badge.style.background = c || "var(--cobalt)";
+        }
+        function buildGrid() {
+          grid.innerHTML = "";
+          for (let i = 0; i < 32; i++) {
+            const d = document.createElement("div");
+            d.className = "dp-cell";
+            d.dataset.sn = i;
+            d.innerHTML =
+              '<div class="bn">' +
+              i.toString(2).padStart(5, "0") +
+              '</div><div class="nm"></div>';
+            grid.appendChild(d);
+          }
+        }
+        function clearMarks() {
+          [...grid.children].forEach((c) => {
+            c.classList.remove("dept", "spare");
+            c.querySelector(".nm").textContent = "";
+          });
+        }
+
+        const STEPS = [
+          {
+            narr: "Step 1 — Class B 172.16.0.0/16 leaves 16 host bits to divide between a subnet field and a host field.",
+            fn() {
+              clearMarks();
+              hint.style.opacity = "0";
+              gridWrap.style.opacity = "0";
+              result.style.opacity = "0";
+            },
+          },
+          {
+            narr: "Step 2 — We need ≥ 30 networks. 2⁴ = 16 is too few; 2⁵ = 32 ≥ 30, so borrow 5 bits. That makes 32 subnets.",
+            fn() {
+              hint.style.opacity = "1";
+              gridWrap.style.opacity = "1";
+            },
+          },
+          {
+            narr: "Step 3 — Assign one subnet per department: 30 are used, 2 stay spare for future growth.",
+            fn() {
+              [...grid.children].forEach((c, i) => {
+                const nm = c.querySelector(".nm");
+                if (i < 30) {
+                  c.classList.add("dept");
+                  c.classList.remove("spare");
+                  nm.textContent = "Dept " + (i + 1);
+                } else {
+                  c.classList.add("spare");
+                  c.classList.remove("dept");
+                  nm.textContent = "spare";
+                }
+              });
+            },
+          },
+          {
+            narr: "Done — borrowing 5 bits grows the mask /16 → /21. 32 subnets, 30 for departments and 2 spare.",
+            fn() {
+              result.style.opacity = "1";
+              setBadge("DONE", "var(--moss)");
+            },
+          },
+        ];
+
+        function runStep() {
+          if (stepIdx >= STEPS.length) {
+            stopSim();
+            return;
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          if (stepIdx < STEPS.length) timer = setTimeout(runStep, 2200);
+          else timer = setTimeout(stopSim, 1800);
+        }
+        function resetVisual() {
+          clearMarks();
+          hint.style.opacity = "0";
+          gridWrap.style.opacity = "0";
+          result.style.opacity = "0";
+          narration.textContent =
+            "Click START — borrow host bits until 172.16.0.0/16 has enough subnets for 30 departments.";
+          setBadge("IDLE", "var(--ink)");
+        }
+        function stopSim() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx >= STEPS.length) setBadge("DONE", "var(--moss)");
+          else {
+            setBadge("IDLE");
+            resetVisual();
+          }
+        }
+        function manualStep() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx >= STEPS.length) {
+            stepIdx = 0;
+            resetVisual();
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = false;
+          setBadge(
+            stepIdx >= STEPS.length ? "DONE" : "STEP " + stepIdx,
+            stepIdx >= STEPS.length ? "var(--moss)" : "var(--cobalt)"
+          );
+        }
+
+        startBtn.addEventListener("click", () => {
+          if (paused) {
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            setBadge("RUNNING");
+            timer = setTimeout(runStep, 500);
+            return;
+          }
+          stepIdx = 0;
+          resetVisual();
+          startBtn.disabled = true;
+          pauseBtn.disabled = false;
+          stopBtn.disabled = false;
+          setBadge("RUNNING");
+          timer = setTimeout(runStep, 600);
+        });
+        pauseBtn.addEventListener("click", () => {
+          if (paused) return;
+          paused = true;
+          clearTimeout(timer);
+          timer = null;
+          pauseBtn.textContent = "▶ Resume";
+          setBadge("PAUSED", "var(--amber)");
+          startBtn.disabled = false;
+        });
+        stopBtn.addEventListener("click", () => {
+          stepIdx = STEPS.length;
+          stopSim();
+          resetVisual();
+        });
+        if (stepBtn) stepBtn.addEventListener("click", manualStep);
+
+        buildGrid();
+        setBadge("IDLE", "var(--ink)");
+      })();
+
+      /* ===========================================================
+         DESIGN-PROBLEM SIMULATOR — host box
+         /21 subnet · 11 host bits → 2¹¹ = 2048; −2 reserved → 2046
+         usable ≥ 1023 required.
+         =========================================================== */
+      (function () {
+        const slide = document.getElementById("designHostSlide");
+        if (!slide) return;
+
+        const fill = document.getElementById("dh-fill");
+        const num = document.getElementById("dh-num");
+        const capNet = document.getElementById("dh-cap-net");
+        const capBc = document.getElementById("dh-cap-bc");
+        const compare = document.getElementById("dh-compare");
+        const result = document.getElementById("dh-result");
+        const badge = document.getElementById("dhBadge");
+        const narration = document.getElementById("dhNarration");
+        const startBtn = document.getElementById("dhStart");
+        const pauseBtn = document.getElementById("dhPause");
+        const stopBtn = document.getElementById("dhStop");
+        const stepBtn = document.getElementById("dhStep");
+
+        let timer = null,
+          stepIdx = 0,
+          paused = false;
+
+        function setBadge(t, c) {
+          badge.textContent = t;
+          badge.style.background = c || "var(--cobalt)";
+        }
+
+        const STEPS = [
+          {
+            narr: "Step 1 — Borrowing 5 subnet bits leaves 16 − 5 = 11 host bits in every /21 subnet.",
+            fn() {
+              fill.style.width = "0";
+              num.textContent = "2¹¹ host bits";
+              capNet.style.opacity = "0";
+              capBc.style.opacity = "0";
+              compare.style.opacity = "0";
+              result.style.opacity = "0";
+            },
+          },
+          {
+            narr: "Step 2 — 11 host bits address 2¹¹ = 2048 values, 00000000000 through 11111111111.",
+            fn() {
+              fill.style.width = "100%";
+              num.textContent = "2048 addresses";
+            },
+          },
+          {
+            narr: "Step 3 — The first address (all host bits 0) is the subnet's network address — reserved.",
+            fn() {
+              capNet.style.opacity = "1";
+            },
+          },
+          {
+            narr: "Step 4 — The last address (all host bits 1) is the broadcast address — reserved.",
+            fn() {
+              capBc.style.opacity = "1";
+            },
+          },
+          {
+            narr: "Done — 2048 − 2 = 2046 usable hosts ≥ 1023 required ✓. Final mask: /21 = 255.255.248.0.",
+            fn() {
+              num.textContent = "2046 usable";
+              compare.style.opacity = "1";
+              result.style.opacity = "1";
+              setBadge("DONE", "var(--moss)");
+            },
+          },
+        ];
+
+        function runStep() {
+          if (stepIdx >= STEPS.length) {
+            stopSim();
+            return;
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          if (stepIdx < STEPS.length) timer = setTimeout(runStep, 2300);
+          else timer = setTimeout(stopSim, 1800);
+        }
+        function resetVisual() {
+          fill.style.width = "0";
+          num.textContent = "2¹¹ addresses";
+          capNet.style.opacity = "0";
+          capBc.style.opacity = "0";
+          compare.style.opacity = "0";
+          result.style.opacity = "0";
+          narration.textContent =
+            "Click START — count the addresses in one /21 subnet and check it covers 1023 computers.";
+          setBadge("IDLE", "var(--ink)");
+        }
+        function stopSim() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = true;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx >= STEPS.length) setBadge("DONE", "var(--moss)");
+          else {
+            setBadge("IDLE");
+            resetVisual();
+          }
+        }
+        function manualStep() {
+          clearTimeout(timer);
+          timer = null;
+          paused = false;
+          pauseBtn.textContent = "❚❚ Pause";
+          if (stepIdx >= STEPS.length) {
+            stepIdx = 0;
+            resetVisual();
+          }
+          const s = STEPS[stepIdx++];
+          narration.textContent = s.narr;
+          s.fn();
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          stopBtn.disabled = false;
+          setBadge(
+            stepIdx >= STEPS.length ? "DONE" : "STEP " + stepIdx,
+            stepIdx >= STEPS.length ? "var(--moss)" : "var(--cobalt)"
+          );
+        }
+
+        startBtn.addEventListener("click", () => {
+          if (paused) {
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            setBadge("RUNNING");
+            timer = setTimeout(runStep, 500);
+            return;
+          }
+          stepIdx = 0;
+          resetVisual();
+          startBtn.disabled = true;
+          pauseBtn.disabled = false;
+          stopBtn.disabled = false;
+          setBadge("RUNNING");
+          timer = setTimeout(runStep, 600);
+        });
+        pauseBtn.addEventListener("click", () => {
+          if (paused) return;
+          paused = true;
+          clearTimeout(timer);
+          timer = null;
+          pauseBtn.textContent = "▶ Resume";
+          setBadge("PAUSED", "var(--amber)");
+          startBtn.disabled = false;
+        });
+        stopBtn.addEventListener("click", () => {
+          stepIdx = STEPS.length;
+          stopSim();
+          resetVisual();
+        });
+        if (stepBtn) stepBtn.addEventListener("click", manualStep);
+
         setBadge("IDLE", "var(--ink)");
       })();
 
@@ -12888,6 +15072,28 @@
         const startBtn = document.getElementById("scStart");
         const pauseBtn = document.getElementById("scPause");
         const stopBtn = document.getElementById("scStop");
+        const scStepBtn = document.getElementById("scStep");
+        if (scStepBtn)
+          scStepBtn.addEventListener("click", function () {
+            clearTimeout(timer);
+            timer = null;
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            if (stepIdx >= STEPS.length) {
+              stepIdx = 0;
+              resetVisual();
+            }
+            const s = STEPS[stepIdx++];
+            narration.textContent = s.narr;
+            s.fn();
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = false;
+            setBadge(
+              stepIdx >= STEPS.length ? "DONE" : "STEP " + stepIdx,
+              stepIdx >= STEPS.length ? "var(--moss)" : "var(--cobalt)"
+            );
+          });
 
         const maskBin = document.getElementById("sc-mask-bin");
         const ipBin = document.getElementById("sc-ip-bin");
@@ -13245,7 +15451,28 @@
         const startBtn = document.getElementById("wsStart");
         const pauseBtn = document.getElementById("wsPause");
         const stopBtn = document.getElementById("wsStop");
+        const wsStepBtn = document.getElementById("wsStep");
         const boxes = [...stream.querySelectorAll(".sw-box")];
+        if (wsStepBtn)
+          wsStepBtn.addEventListener("click", function () {
+            stopLoop();
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            if (idx >= EV.length) {
+              idx = 0;
+              resetVisual();
+            }
+            const e = EV[idx++];
+            paintState(e); // applies the event's end state + sets narration
+            phase = "idle";
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = false;
+            setBadge(
+              idx >= EV.length ? "DONE" : "STEP " + idx,
+              idx >= EV.length ? "var(--moss)" : "var(--cobalt)"
+            );
+          });
 
         // Authored event timeline, faithful to the classic ladder diagram.
         // Each event carries the resulting state: base (lowest unacked seq),
@@ -13602,9 +15829,31 @@
         const startBtn = document.getElementById("hsStart");
         const pauseBtn = document.getElementById("hsPause");
         const stopBtn = document.getElementById("hsStop");
+        const hsStepBtn = document.getElementById("hsStep");
         let timer = null,
           idx = 0,
           paused = false;
+        if (hsStepBtn)
+          hsStepBtn.addEventListener("click", function () {
+            clearTimeout(timer);
+            timer = null;
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            if (idx >= STEPS.length) {
+              idx = 0;
+              resetVisual();
+            }
+            const s = STEPS[idx++];
+            narration.textContent = s.n;
+            s.f();
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = false;
+            setBadge(
+              idx >= STEPS.length ? "DONE" : "STEP " + idx,
+              idx >= STEPS.length ? "var(--moss)" : "var(--cobalt)"
+            );
+          });
 
         const setBadge = (t, c) => {
           badge.textContent = t;
@@ -13733,12 +15982,35 @@
         const startBtn = document.getElementById("udpStart");
         const pauseBtn = document.getElementById("udpPause");
         const stopBtn = document.getElementById("udpStop");
+        const udpStepBtn = document.getElementById("udpStep");
         let timer = null,
           idx = 0,
           paused = false,
           sent = 0,
           deliv = 0,
           lost = 0;
+        if (udpStepBtn)
+          udpStepBtn.addEventListener("click", function () {
+            clearTimeout(timer);
+            timer = null;
+            clearPending();
+            paused = false;
+            pauseBtn.textContent = "❚❚ Pause";
+            if (idx >= STEPS.length) {
+              idx = 0;
+              resetVisual();
+            }
+            const s = STEPS[idx++];
+            narration.textContent = s.n;
+            s.f();
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = false;
+            setBadge(
+              idx >= STEPS.length ? "DONE" : "STEP " + idx,
+              idx >= STEPS.length ? "var(--moss)" : "var(--cobalt)"
+            );
+          });
         const pending = [];
         const later = (fn, ms) => {
           const id = setTimeout(fn, ms);

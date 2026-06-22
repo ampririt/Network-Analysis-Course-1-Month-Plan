@@ -10,6 +10,7 @@
 
 - [Cisco Packet Tracer — Lab B: Multi-Subnet IP Design Build](#cisco-packet-tracer--lab-b-multi-subnet-ip-design-build)
 - [Lab B — Multi-Subnet IP Design Build](#lab-b--multi-subnet-ip-design-build)
+  - [Group Work — build Lab B in teams](#group-work--build-lab-b-in-teams)
   - [Step B1 — Subnet on paper (do this first!)](#step-b1--subnet-on-paper-do-this-first)
   - [Step B2 — Build the topology](#step-b2--build-the-topology)
   - [Step B3 — Configure the router](#step-b3--configure-the-router)
@@ -17,6 +18,7 @@
   - [Step B5 — Verify connectivity](#step-b5--verify-connectivity)
   - [Step B6 — Break it on purpose](#step-b6--break-it-on-purpose)
   - [Lab B Questions](#lab-b-questions)
+- [Group Project — Design & Build a New Network (in teams)](#group-project--design--build-a-new-network-in-teams)
 - [Practice Exercises](#practice-exercises)
 - [Next Steps](#next-steps)
 
@@ -244,6 +246,62 @@ It lists every router interface with its **IP address** and two state columns. A
 
 Because the addressing plan drives **everything** — gateway IPs, masks, and which PC belongs where. Designing it first prevents overlapping subnets and mid-build rework; in Packet Tracer (and real life) fixing an address scheme *after* you've configured 10 devices is far more painful than getting the table right up front. It's the same discipline real network engineers use (IPAM).
 </details>
+
+---
+
+## Group Project — Design & Build a New Network (in teams)
+
+Now that you've finished Lab B individually, do it again as a **team — on a brand-new problem**. Lab B walked you through one solved company network; here your group designs the IP scheme **from scratch**, builds it in Packet Tracer, and proves it works. No answer table is given — that's the point.
+
+### Teams
+
+**Class composition:** 25 students total — 20 Thai (TH) + 5 Japanese (JP).
+
+**Grouping rule:** each group has **4 TH + 1 JP = 5 students**, giving **5 groups** total. The single JP member in each group acts as the **liaison/note-taker**, so the JP students are spread evenly across all teams rather than clustered.
+
+| Group | Thai (TH) | Japanese (JP) | Size |
+|:---|:---|:---|:---:|
+| Group 1 | TH-01, TH-02, TH-03, TH-04 | JP-01 | 5 |
+| Group 2 | TH-05, TH-06, TH-07, TH-08 | JP-02 | 5 |
+| Group 3 | TH-09, TH-10, TH-11, TH-12 | JP-03 | 5 |
+| Group 4 | TH-13, TH-14, TH-15, TH-16 | JP-04 | 5 |
+| Group 5 | TH-17, TH-18, TH-19, TH-20 | JP-05 | 5 |
+| **Total** | **20** | **5** | **25** |
+
+### The new problem — "Campus" network
+
+> A small school campus uses the base network **`172.16.10.0/24`**. It has **four** areas that must each be their own subnet:
+>
+> | Area | Hosts needed |
+> |:---|:---:|
+> | **Library** | 60 |
+> | **Classrooms** | 28 |
+> | **Staff Office** | 12 |
+> | **Server Room** | 6 |
+>
+> Design an addressing plan that fits all four areas inside `172.16.10.0/24` with **no overlap and no wasted blocks**, build it in Packet Tracer, and verify a host in **every** area can reach a host in every other area.
+
+> [!NOTE]
+> This is a **different base network, different department count, and different host counts** from Lab B — so you can't copy the Lab B table. Use the same *method* (largest area first, next-power-of-two ≥ hosts + 2, lay each block immediately after the previous one).
+
+### What the team must do
+
+1. **Design together (on paper first).** Produce the subnet table — for each area: CIDR, mask, network, usable range, broadcast, and gateway. *(Hint: 60 hosts → `/26`; 28 → `/27`; 12 → `/28`; 6 → `/29`.)*
+2. **Split the build.** Assign one area per member (the 5th member takes the **router config** + overall wiring). Use one **`2911`**-class router (it has 3 on-board ports — add an extra NIC module, e.g. an `HWIC`/`NIM` Gig port, for the 4th area), one `2960` switch per area, and at least one PC per area.
+3. **Configure.** Give each router interface its area's gateway IP + matching mask and `no shutdown` it; give each PC a static IP, the right mask, and the correct gateway.
+4. **Verify as a team.** From a Library PC, `ping` a host in **each** other area, and run `show ip interface brief` to confirm every interface is `up/up`.
+5. **Diagnose.** Deliberately break **one** area with a wrong mask, observe the cross-subnet failure, explain it in one sentence, then fix it.
+
+### Deliverable
+
+The **JP liaison** collects and submits, on behalf of the group:
+- the completed subnet **design table** (all four areas),
+- a screenshot of `show ip interface brief` with all interfaces **up/up**,
+- a screenshot of a successful **cross-area ping**, and
+- the saved **`.pkt`** file.
+
+> [!TIP]
+> Everyone in the group should be able to *explain* the whole design, not just the part they built — the instructor may ask any member why a particular mask or gateway was chosen.
 
 ---
 

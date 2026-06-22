@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction to Bash Scripting — A Crash Course</title>
+
+<!-- ===========================================
+     FONTS
+     Inter  = display / headline / body (BlockFrame display voice)
+     Space Grotesk = label / chrome ("system readout" voice)
+     JetBrains Mono = code blocks only (justified for a coding deck)
+     =========================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Material Symbols (Material UI icon set) -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@40,600,1,0&display=swap" rel="stylesheet">
+
+<style>
+/* ===========================================
+   THEME TOKENS  (BlockFrame neobrutalist system)
+   Change these to retune the whole deck.
+   =========================================== */
+:root{
+  --black:#000000;
+  --white:#FFFFFF;
+  --offwhite:#FFFDF5;
+  --pink:#FE90E8;
+  --blue:#C0F7FE;
+  --green:#99E885;
+  --yellow:#F7CB46;
+  --cream:#FFDC8B;
+
+  --border:4px solid var(--black);
+  --border-thin:3px solid var(--black);
+  --shadow:8px 8px 0 var(--black);
+  --shadow-sm:4px 4px 0 var(--black);
+  --shadow-hover:6px 6px 0 var(--black);
+
+  --font-display:'Inter',sans-serif;
+  --font-label:'Space Grotesk',monospace;
+  --font-code:'JetBrains Mono',monospace;
+
+  --stage-bg:#111;          /* letterbox bars */
+}
+
+/* ===========================================
+   FIXED 16:9 STAGE — MANDATORY BASE STYLES
+   (full contents of viewport-base.css)
+   =========================================== */
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--stage-bg,#000)}
+.deck-viewport{position:fixed;inset:0;overflow:hidden;background:var(--stage-bg,#000)}
+.deck-stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;transform-origin:0 0;background:var(--slide-bg,#fff)}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;display:block;visibility:hidden;opacity:0;pointer-events:none;background:var(--slide-bg,#fff)}
+.slide.active,.slide.visible{visibility:visible;opacity:1;pointer-events:auto;z-index:1}
+img,video,canvas,svg{max-width:100%;max-height:100%}
+.deck-controls{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:1000}
+@media print{
+  html,body{width:1920px;height:auto;overflow:visible;background:#fff}
+  .deck-viewport{position:static;overflow:visible;background:#fff}
+  .deck-stage{position:static;width:auto;height:auto;transform:none!important;background:none}
+  .slide{position:relative;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;width:1920px;height:1080px;break-after:page;page-break-after:always}
+  .slide:last-child{break-after:auto;page-break-after:auto}
+  .deck-controls{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.2s!important}
+}
+
+/* ===========================================
+   GLOBAL RESET
+   =========================================== */
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ===========================================
+   SLIDE GROUNDS — pastel cycling is the rhythm
+   =========================================== */
+.bg-offwhite{--slide-bg:var(--offwhite)}
+.bg-cream{--slide-bg:var(--cream)}
+.bg-blue{--slide-bg:var(--blue)}
+.bg-pink{--slide-bg:var(--pink)}
+.bg-green{--slide-bg:var(--green)}
+.bg-yellow{--slide-bg:var(--yellow)}
+.bg-black{--slide-bg:var(--black)}
+
+.slide-inner{position:absolute;inset:0;padding:52px 72px 86px;display:flex;flex-direction:column;justify-content:center}
+/* Top-level content sizes to itself (no vertical over-stretch); the larger type + padding
+   fills most of the slide, and the whole stack is centered so margins stay small and balanced. */
+.slide-inner>.fill{flex:0 1 auto;min-height:0}
+
+/* faint dot-grid overlay used decoratively on light grounds */
+.dotgrid{position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(circle,var(--black) 1.2px,transparent 1.2px);background-size:26px 26px}
+
+/* ===========================================
+   TYPOGRAPHY
+   =========================================== */
+.pill{display:inline-flex;align-items:center;gap:10px;align-self:flex-start;
+  font-family:var(--font-label);font-weight:600;font-size:19px;letter-spacing:.09em;text-transform:uppercase;
+  border:var(--border-thin);box-shadow:var(--shadow-sm);background:var(--white);color:var(--black);
+  padding:11px 22px}
+.pill.pink{background:var(--pink)}.pill.blue{background:var(--blue)}.pill.green{background:var(--green)}
+.pill.yellow{background:var(--yellow)}.pill.cream{background:var(--cream)}
+
+.h-xl{font-family:var(--font-display);font-weight:900;font-size:118px;line-height:.92;letter-spacing:-.03em;text-transform:uppercase;color:var(--black)}
+.h-lg{font-family:var(--font-display);font-weight:800;font-size:68px;line-height:1;letter-spacing:-.02em;text-transform:uppercase;color:var(--black)}
+.h-md{font-family:var(--font-display);font-weight:800;font-size:38px;line-height:1.05;letter-spacing:-.01em;text-transform:uppercase;color:var(--black)}
+.body{font-family:var(--font-display);font-weight:500;font-size:34px;line-height:1.5;color:var(--black)}
+.body.sm{font-size:28px;line-height:1.45}
+.hl{background:var(--yellow);border:var(--border);box-shadow:6px 6px 0 var(--black);padding:0 14px;display:inline-block}
+.hl.pink{background:var(--pink)}.hl.green{background:var(--green)}.hl.blue{background:var(--blue)}
+
+/* ===========================================
+   CARDS
+   =========================================== */
+.card{border:var(--border);background:var(--white);box-shadow:var(--shadow);padding:36px 40px;display:flex;flex-direction:column;justify-content:center}
+.card-sm{border:var(--border-thin);background:var(--white);box-shadow:var(--shadow-sm);padding:28px 32px;display:flex;flex-direction:column;justify-content:center}
+.card-flat{border:var(--border);background:var(--white);padding:28px 32px}
+.card .ct{font-family:var(--font-display);font-weight:700;font-size:25px;text-transform:uppercase;letter-spacing:-.01em;margin-bottom:12px}
+.card-sm .ct{font-family:var(--font-display);font-weight:700;font-size:22px;text-transform:uppercase;margin-bottom:10px}
+.cb{font-family:var(--font-display);font-weight:500;font-size:26px;line-height:1.45;color:#161616}
+.card-sm .cb{font-size:23px;line-height:1.4}
+
+.icon-sq{width:54px;height:54px;border:var(--border-thin);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:900;font-size:26px;color:var(--black);flex:0 0 auto}
+.icon-sq.pink{background:var(--pink)}.icon-sq.blue{background:var(--blue)}.icon-sq.green{background:var(--green)}
+.icon-sq.yellow{background:var(--yellow)}.icon-sq.cream{background:var(--cream)}
+
+/* numbered list squares */
+.lnum{width:44px;height:44px;border:var(--border-thin);background:var(--yellow);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-label);font-weight:700;font-size:18px;flex:0 0 auto}
+
+/* ===========================================
+   MATERIAL ICONS  (Material UI / Material Symbols set)
+   - .mi : inline icon that sits with text
+   - .ic : bordered pastel icon-chip used as a card lead icon
+   =========================================== */
+.mi{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;
+  vertical-align:-0.16em;font-size:1.05em;font-variation-settings:'FILL' 1,'wght' 600,'opsz' 40}
+.ic{width:60px;height:60px;border:var(--border-thin);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;
+  margin-bottom:16px;flex:0 0 auto;background:var(--white)}
+.ic .mi{font-size:34px;vertical-align:0}
+.ic.pink{background:var(--pink)}.ic.blue{background:var(--blue)}.ic.green{background:var(--green)}
+.ic.yellow{background:var(--yellow)}.ic.cream{background:var(--cream)}
+
+/* ===========================================
+   CODE BLOCKS  (JetBrains Mono on bordered card)
+   =========================================== */
+.code{border:var(--border);background:var(--white);box-shadow:var(--shadow);overflow:hidden}
+.code-bar{display:flex;align-items:center;gap:9px;padding:11px 18px;background:var(--black)}
+.code-bar .d{width:13px;height:13px;border-radius:50%}
+.code-bar .d.r{background:#ff5f56}.code-bar .d.y{background:#ffbd2e}.code-bar .d.g{background:#27c93f}
+.code-bar .tag{margin-left:8px;font-family:var(--font-label);font-weight:600;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#cfcfcf}
+.code pre{font-family:var(--font-code);font-weight:500;font-size:27px;line-height:1.55;color:#161616;padding:26px 30px;white-space:pre;overflow:hidden}
+.code pre.sm{font-size:23px;line-height:1.5}
+.code pre.xs{font-size:19px;line-height:1.45}
+.c{color:#7d8a7d}              /* comment */
+.s{color:#1f7a4d}              /* string */
+.k{color:#c0299b}              /* keyword / builtin */
+.v{color:#1668c4}              /* variable / flag */
+.out{color:#6b6b6b}            /* sample output */
+
+/* ===========================================
+   LAYOUT HELPERS
+   =========================================== */
+.header{display:flex;flex-direction:column;gap:18px;margin-bottom:34px}
+.grid{display:grid;gap:28px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.row{display:flex;gap:28px}
+.col{display:flex;flex-direction:column}
+.fill{flex:1}
+.gap16{gap:18px}.gap20{gap:26px}
+.center-v{justify-content:center}
+.mt-auto{margin-top:auto}
+.list-item{display:flex;align-items:center;gap:16px}
+
+/* tilted decorative rectangle / badge */
+.tilt{position:absolute;border:var(--border-thin);box-shadow:var(--shadow-sm)}
+.badge{position:absolute;border:var(--border-thin);box-shadow:var(--shadow-sm);
+  font-family:var(--font-label);font-weight:700;font-size:18px;letter-spacing:.06em;text-transform:uppercase;
+  padding:12px 20px;background:var(--white)}
+.star{position:absolute;width:118px;height:118px;border:var(--border-thin);
+  clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  display:flex;align-items:center;justify-content:center}
+
+/* ===========================================
+   COVER + SECTION DIVIDER + CLOSE
+   =========================================== */
+.cover-kicker{font-family:var(--font-label);font-weight:600;font-size:22px;letter-spacing:.1em;text-transform:uppercase}
+.close-frame{border:4px solid var(--white);background:var(--black);box-shadow:12px 12px 0 var(--yellow);padding:64px 70px}
+.divider-num{font-family:var(--font-display);font-weight:900;font-size:230px;line-height:.8;color:var(--black);opacity:.92;letter-spacing:-.04em}
+
+/* ===========================================
+   PERSISTENT CHROME (counter + nav) — fixed, unscaled
+   =========================================== */
+.counter{position:fixed;left:24px;bottom:22px;z-index:1200;border:var(--border-thin);background:var(--white);box-shadow:var(--shadow-sm);
+  font-family:var(--font-label);font-weight:700;font-size:15px;letter-spacing:.1em;text-transform:uppercase;padding:10px 16px}
+.nav{position:fixed;right:24px;bottom:22px;z-index:1200;display:flex;gap:12px}
+.nav button{width:48px;height:48px;border:var(--border-thin);background:var(--white);box-shadow:var(--shadow-sm);cursor:pointer;
+  font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:transform .08s,box-shadow .08s}
+.nav button:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-hover)}
+.nav button:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--black)}
+.progress{position:fixed;left:0;top:0;height:6px;background:var(--black);z-index:1200;transition:width .3s}
+
+/* ===========================================
+   ANIMATIONS — staggered reveal on active slide
+   =========================================== */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
+.slide.visible .reveal{opacity:1;transform:translateY(0)}
+.slide.visible .reveal:nth-child(1){transition-delay:.06s}
+.slide.visible .reveal:nth-child(2){transition-delay:.14s}
+.slide.visible .reveal:nth-child(3){transition-delay:.22s}
+.slide.visible .reveal:nth-child(4){transition-delay:.30s}
+.slide.visible .reveal:nth-child(5){transition-delay:.38s}
+.slide.visible .reveal:nth-child(6){transition-delay:.46s}
+.slide.visible .d1{transition-delay:.1s}.slide.visible .d2{transition-delay:.2s}
+.slide.visible .d3{transition-delay:.3s}.slide.visible .d4{transition-delay:.4s}
+.slide.visible .d5{transition-delay:.5s}.slide.visible .d6{transition-delay:.6s}
+
+/* edit affordance */
+.edit-hotzone{position:fixed;top:0;left:0;width:80px;height:80px;z-index:10000;cursor:pointer}
+.edit-toggle{position:fixed;top:18px;left:18px;z-index:10001;width:50px;height:50px;border:var(--border-thin);background:var(--yellow);
+  box-shadow:var(--shadow-sm);cursor:pointer;font-size:22px;opacity:0;pointer-events:none;transition:opacity .3s}
+.edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto}
+.edit-toggle.active{background:var(--green)}
+[contenteditable="true"]{outline:3px dashed rgba(0,0,0,.4);outline-offset:3px;cursor:text}
+
+/* ===========================================
+   LANGUAGE TOGGLE (JP / EN) — fixed, unscaled chrome
+   =========================================== */
+.lang-toggle{position:fixed;right:24px;top:18px;z-index:1300;border:var(--border-thin);background:var(--pink);
+  box-shadow:var(--shadow-sm);cursor:pointer;font-family:var(--font-label);font-weight:700;font-size:15px;
+  letter-spacing:.08em;text-transform:uppercase;padding:11px 18px;color:var(--black);
+  display:flex;align-items:center;gap:8px;transition:transform .08s,box-shadow .08s}
+.lang-toggle:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-hover)}
+.lang-toggle:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--black)}
+@media print{.lang-toggle{display:none!important}}
+</style>
+</head>
+<body>
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+<!-- ============================================================
+     SLIDE 1 — COVER
+     ============================================================ -->
+<section class="slide bg-offwhite active">
+  <div class="dotgrid"></div>
+  <div class="slide-inner center-v">
+    <!-- top chrome row -->
+    <div class="row reveal" style="justify-content:space-between;align-items:flex-start">
+      <span class="pill pink">A Bash Crash Course</span>
+    </div>
+    <!-- decorative tilted star -->
+    <div class="star reveal" style="top:300px;right:150px;background:var(--pink);transform:rotate(12deg)">
+      <span style="font-family:var(--font-code);font-weight:700;font-size:30px">$_</span>
+    </div>
+    <div style="margin-top:54px">
+      <div class="cover-kicker reveal" style="margin-bottom:18px">#!/bin/bash &nbsp;·&nbsp; for devs, sysadmins &amp; Linux tinkerers</div>
+      <h1 class="h-xl reveal">Introduction to</h1>
+      <h1 class="h-xl reveal" style="margin-top:8px"><span class="hl">Bash Scripting</span></h1>
+      <p class="body reveal" style="max-width:1180px;margin-top:34px;font-size:26px">
+        Learn the shell from the ground up — variables, conditionals, loops and functions — then
+        put it to work automating real servers, APIs, logs and deployments.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 2 — WHAT IS BASH  (ch1)
+     ============================================================ -->
+<section class="slide bg-blue">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 1 · The Basics</span>
+      <h2 class="h-lg reveal">What is Bash?</h2>
+    </div>
+    <div class="grid g2 fill reveal">
+      <div class="card">
+        <div class="ct">Bourne-Again SHell</div>
+        <p class="cb">Bash is a <strong>Unix shell and command language</strong>, widely available across operating systems and the default interpreter on most Linux systems.</p>
+        <p class="cb" style="margin-top:14px">Use it two ways: <strong>interactively</strong> in your terminal, or as a full <strong>programming language</strong> to write scripts.</p>
+      </div>
+      <div class="card">
+        <div class="ct">You'll Learn</div>
+        <p class="cb">Variables · User Input · Comments · Arguments · Arrays · Conditional Expressions · Conditionals · Loops · Functions · Debugging &amp; Testing.</p>
+        <p class="cb" style="margin-top:14px">All you need is a <strong>UNIX terminal</strong> and a text editor — VS Code, Sublime, vim or nano.</p>
+      </div>
+    </div>
+    <div class="grid g3 reveal" style="margin-top:24px">
+      <div class="card-sm"><span class="ic green"><span class="mi">settings</span></span><div class="ct">Automate</div><p class="cb">Combine Linux commands to handle repetitive SysOps / DevOps / Dev tasks.</p></div>
+      <div class="card-sm"><span class="ic yellow"><span class="mi">schedule</span></span><div class="ct">Save Time</div><p class="cb">Turn long, tedious workflows into a single command you can re-run.</p></div>
+      <div class="card-sm"><span class="ic pink"><span class="mi">groups</span></span><div class="ct">Share</div><p class="cb">One text file of instructions your whole team can execute identically.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 3 — WHY SCRIPTING  (ch1, the team example)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill green reveal">Chapter 1 · Why It Matters</span>
+      <h2 class="h-lg reveal">From 5× manual setup → 1 shared script</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="card reveal fill" style="background:var(--cream)">
+        <span class="ic pink"><span class="mi">sentiment_dissatisfied</span></span>
+        <div class="ct">The Problem</div>
+        <p class="cb">Five developers each manually set up the same tedious project environment. That's the same long task repeated five times — error-prone and slow.</p>
+      </div>
+      <div class="col center-v reveal" style="flex:0 0 auto"><span class="mi" style="font-size:60px">arrow_forward</span></div>
+      <div class="card reveal fill" style="background:var(--green)">
+        <span class="ic blue"><span class="mi">check_circle</span></span>
+        <div class="ct">The Bash Fix</div>
+        <p class="cb">Write one text file with all the instructions and share it. Now everyone just <strong>executes the script</strong> — the whole environment is created for them.</p>
+      </div>
+    </div>
+    <div class="card-sm reveal" style="margin-top:24px;background:var(--blue)">
+      <p class="cb"><strong>Key idea:</strong> a Bash script is just a sequence of the same commands you'd type by hand — bundled, repeatable, and version-controllable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 4 — BASH STRUCTURE / SHEBANG  (ch2)
+     ============================================================ -->
+<section class="slide bg-cream">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 2 · Structure</span>
+      <h2 class="h-lg reveal">Every script starts with a Shebang</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">devdojo.sh</span></div>
+<pre><span class="c"># Create the file</span>
+<span class="k">touch</span> devdojo.sh   <span class="c"># or: nano devdojo.sh</span>
+
+<span class="c"># The first line MUST point to bash</span>
+<span class="v">#!/bin/bash</span>
+
+<span class="c"># Portable alternative — searches $PATH</span>
+<span class="v">#!/usr/bin/env bash</span></pre>
+      </div>
+      <div class="col fill gap16">
+        <div class="card-sm reveal"><div class="ct">.sh extension</div><p class="cb">Name scripts with a <code>.sh</code> suffix, e.g. <code>devdojo.sh</code>.</p></div>
+        <div class="card-sm reveal"><div class="ct">What the shebang does</div><p class="cb">Tells the OS to run the file with the <code>/bin/bash</code> executable.</p></div>
+        <div class="card-sm reveal"><div class="ct">When to use <code>env</code></div><p class="cb">Bash isn't always in <code>/bin</code> (non-Linux / optional installs). <code>/usr/bin/env bash</code> finds it via <code>$PATH</code>.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 5 — HELLO WORLD  (ch3)
+     ============================================================ -->
+<section class="slide bg-green">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 3 · Hello World</span>
+      <h2 class="h-lg reveal">Your first script in 3 steps</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">devdojo.sh</span></div>
+<pre><span class="v">#!/bin/bash</span>
+
+<span class="k">echo</span> <span class="s">"Hello World!"</span></pre>
+      </div>
+      <div class="col fill gap16">
+        <div class="list-item reveal"><span class="lnum">1</span><div class="card-sm fill"><p class="cb"><strong>Write</strong> the shebang + <code>echo</code>, then save &amp; exit.</p></div></div>
+        <div class="list-item reveal"><span class="lnum">2</span><div class="card-sm fill"><p class="cb"><strong>Make it executable:</strong> <code>chmod +x devdojo.sh</code></p></div></div>
+        <div class="list-item reveal"><span class="lnum">3</span><div class="card-sm fill"><p class="cb"><strong>Run it:</strong> <code>./devdojo.sh</code> &nbsp;— or&nbsp; <code>bash devdojo.sh</code></p></div></div>
+      </div>
+    </div>
+    <div class="card-sm reveal" style="margin-top:22px;background:var(--white)">
+      <p class="cb">Because Bash is interactive too, <code>echo "Hello DevDojo!"</code> typed straight in the terminal gives the same result. Scripts shine once you <strong>combine many commands</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 6 — VARIABLES  (ch4)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill yellow reveal">Chapter 4 · Variables</span>
+      <h2 class="h-lg reveal">No data types — just <code>name=value</code></h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">variables</span></div>
+<pre><span class="v">#!/bin/bash</span>
+
+name=<span class="s">"DevDojo"</span>          <span class="c"># assign with =</span>
+greeting=<span class="s">"Hello"</span>
+
+<span class="k">echo</span> <span class="s">"</span>$greeting $name<span class="s">"</span>   <span class="c"># access with $</span>
+<span class="c"># → Hello DevDojo</span></pre>
+      </div>
+      <div class="col fill gap16">
+        <div class="card-sm reveal" style="background:var(--pink)"><div class="ct"><span class="mi">warning</span> No spaces</div><p class="cb">No spaces around <code>=</code>. Write <code>name="DevDojo"</code>, never <code>name = "DevDojo"</code>.</p></div>
+        <div class="card-sm reveal"><div class="ct">Variables hold anything</div><p class="cb">Numbers or characters — a Bash variable has no declared type.</p></div>
+        <div class="card-sm reveal"><div class="ct">No semicolons needed</div><p class="cb">Line breaks end statements; trailing <code>;</code> is optional (like JS).</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 7 — QUOTING + CURLY BRACES  (ch4)
+     ============================================================ -->
+<section class="slide bg-pink">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 4 · The #1 Habit</span>
+      <h2 class="h-lg reveal">Always quote your variables</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">quoting</span></div>
+<pre class="sm">filename=<span class="s">"my file.txt"</span>
+
+<span class="c"># WRONG → makes TWO files: "my" and "file.txt"</span>
+<span class="k">touch</span> $filename
+
+<span class="c"># RIGHT → one file: "my file.txt"</span>
+<span class="k">touch</span> <span class="s">"</span>$filename<span class="s">"</span></pre>
+      </div>
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">curly braces</span></div>
+<pre class="sm">greeting=<span class="s">"Hello"</span>
+
+<span class="k">echo</span> <span class="s">"</span>$greetings world<span class="s">"</span>    <span class="c"># empty!</span>
+<span class="k">echo</span> <span class="s">"</span>${greeting}s world<span class="s">"</span>   <span class="c"># Hellos world</span></pre>
+      </div>
+    </div>
+    <div class="grid g3 reveal" style="margin-top:22px">
+      <div class="card-sm" style="background:var(--white)"><div class="ct">Why quote?</div><p class="cb">Unquoted values undergo <strong>word splitting</strong> &amp; <strong>globbing</strong> — a real source of bugs and security holes.</p></div>
+      <div class="card-sm" style="background:var(--white)"><div class="ct">Rule of thumb</div><p class="cb">Use <code>"$name"</code>, not <code>$name</code>. (Inside <code>[[ ]]</code> splitting won't happen, but quote anyway.)</p></div>
+      <div class="card-sm" style="background:var(--white)"><div class="ct">Braces required for…</div><p class="cb">Arrays <code>${a[0]}</code>, slicing <code>${s:0:3}</code>, defaults <code>${v:-x}</code>, disambiguation.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 8 — POSITIONAL PARAMS  (ch4/ch7 bridge)
+     ============================================================ -->
+<section class="slide bg-blue">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 4 · Command-line input</span>
+      <h2 class="h-lg reveal">Reading parameters: <code>$1 $2 $@</code></h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">./devdojo.sh Bobby buddy!</span></div>
+<pre><span class="v">#!/bin/bash</span>
+
+<span class="k">echo</span> <span class="s">"Hello there </span>$1<span class="s">"</span>   <span class="c"># first param</span>
+<span class="k">echo</span> <span class="s">"Hello there </span>$2<span class="s">"</span>   <span class="c"># second param</span>
+<span class="k">echo</span> <span class="s">"Hello there </span>$@<span class="s">"</span>   <span class="c"># all params</span>
+
+<span class="out"># Hello there Bobby</span>
+<span class="out"># Hello there buddy!</span>
+<span class="out"># Hello there Bobby buddy!</span></pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card reveal"><div class="ct">Positional variables</div><p class="cb">Arguments after the script name map to <code>$1</code>, <code>$2</code>, <code>$3</code> … in the order you pass them.</p></div>
+        <div class="card reveal" style="background:var(--cream)"><div class="ct"><code>$@</code> = everything</div><p class="cb">A handy way to read all inputs at once, regardless of how many were passed.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 9 — USER INPUT  (ch5)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill pink reveal">Chapter 5 · User Input</span>
+      <h2 class="h-lg reveal">Ask the user with <code>read</code></h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">read</span></div>
+<pre class="sm"><span class="v">#!/bin/bash</span>
+
+<span class="k">echo</span> <span class="s">"What is your name?"</span>
+<span class="k">read</span> name
+
+<span class="k">echo</span> <span class="s">"Hi there </span>$name<span class="s">"</span>
+<span class="k">echo</span> <span class="s">"Welcome to DevDojo!"</span></pre>
+      </div>
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">read -p (shorter)</span></div>
+<pre class="sm"><span class="v">#!/bin/bash</span>
+
+<span class="k">read</span> -p <span class="s">"What is your name? "</span> name
+
+<span class="k">echo</span> <span class="s">"Hi there </span>$name<span class="s">"</span>
+<span class="k">echo</span> <span class="s">"Welcome to DevDojo!"</span></pre>
+      </div>
+    </div>
+    <div class="card-sm reveal" style="margin-top:22px;background:var(--green)">
+      <p class="cb"><code>read</code> prompts the user and stores their typed text in a variable. The <code>-p</code> flag prints a prompt message inline — one fewer <code>echo</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 10 — COMMENTS  (ch6)
+     ============================================================ -->
+<section class="slide bg-yellow">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 6 · Comments</span>
+      <h2 class="h-lg reveal">Leave notes with <code>#</code></h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.2">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">commented script</span></div>
+<pre><span class="v">#!/bin/bash</span>
+
+<span class="c"># Ask the user for their name</span>
+<span class="k">read</span> -p <span class="s">"What is your name? "</span> name
+
+<span class="c"># Greet the user</span>
+<span class="k">echo</span> <span class="s">"Hi there </span>$name<span class="s">"</span>
+<span class="k">echo</span> <span class="s">"Welcome to DevDojo!"</span></pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card reveal"><div class="ct"># at line start</div><p class="cb">Anything after <code>#</code> is ignored by Bash and never printed to the screen.</p></div>
+        <div class="card reveal" style="background:var(--white)"><div class="ct">Why comment?</div><p class="cb">Describe complex logic so teammates (and future-you) can navigate the script with ease.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 11 — ARGUMENTS  (ch7)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill blue reveal">Chapter 7 · Arguments</span>
+      <h2 class="h-lg reveal">Arguments, <code>$@</code>, and <code>$0</code></h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">./arguments.sh dog cat bird</span></div>
+<pre class="sm"><span class="k">echo</span> <span class="s">"Argument one is </span>$1<span class="s">"</span>     <span class="out"># dog</span>
+<span class="k">echo</span> <span class="s">"Argument two is </span>$2<span class="s">"</span>     <span class="out"># cat</span>
+<span class="k">echo</span> <span class="s">"Argument three is </span>$3<span class="s">"</span>   <span class="out"># bird</span>
+<span class="k">echo</span> <span class="s">"All arguments: </span>$@<span class="s">"</span>      <span class="out"># dog cat bird</span>
+
+<span class="c"># $0 is the script itself</span>
+<span class="k">echo</span> <span class="s">"This file is </span>$0<span class="s">"</span>
+<span class="k">rm</span> -f <span class="s">"</span>$0<span class="s">"</span>   <span class="c"># <span class="mi">warning</span> self-delete — back up first!</span></pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card reveal"><div class="ct"><code>$1 … $n</code></div><p class="cb">Each argument after the script name, referenced by position.</p></div>
+        <div class="card reveal" style="background:var(--cream)"><div class="ct"><code>$@</code></div><p class="cb">All arguments together.</p></div>
+        <div class="card reveal" style="background:var(--pink)"><div class="ct"><code>$0</code></div><p class="cb">The script's own name — useful for self-reference or self-destruct.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 12 — ARRAYS  (ch8)
+     ============================================================ -->
+<section class="slide bg-green">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 8 · Arrays</span>
+      <h2 class="h-lg reveal">Many values under one name</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.15">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">arrays</span></div>
+<pre class="sm">my_array=(<span class="s">"value 1"</span> <span class="s">"value 2"</span> <span class="s">"value 3"</span> <span class="s">"value 4"</span>)
+
+<span class="k">echo</span> <span class="s">"</span>${my_array[1]}<span class="s">"</span>    <span class="out"># value 2  (0-indexed)</span>
+<span class="k">echo</span> <span class="s">"</span>${my_array[-1]}<span class="s">"</span>   <span class="out"># value 4  (last)</span>
+<span class="k">echo</span> <span class="s">"</span>${my_array[@]}<span class="s">"</span>    <span class="out"># all elements</span>
+<span class="k">echo</span> <span class="s">"</span>${#my_array[@]}<span class="s">"</span>   <span class="out"># 4  (count, with #)</span></pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card reveal"><div class="ct">Initialise</div><p class="cb">Space-separated values inside <code>( )</code>. Quote each element to keep spaces intact.</p></div>
+        <div class="card reveal" style="background:var(--blue)"><div class="ct"><span class="mi">warning</span> Braces + quotes</div><p class="cb">Always use curly braces <strong>and</strong> double quotes around array expansions.</p></div>
+        <div class="card reveal" style="background:var(--yellow)"><div class="ct"><code>[@]</code> = all</div><p class="cb">Prefix with <code>#</code> for the element count.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 13 — ARRAY + STRING SLICING  (ch8)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill pink reveal">Chapter 8 · Slicing</span>
+      <h2 class="h-lg reveal">Array &amp; string slicing</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">array slicing (Bash 4+)</span></div>
+<pre class="sm">array=(<span class="s">"A"</span> <span class="s">"B"</span> <span class="s">"C"</span> <span class="s">"D"</span> <span class="s">"E"</span>)
+
+<span class="k">echo</span> <span class="s">"</span>${array[@]:1:3}<span class="s">"</span>  <span class="out"># B C D</span>
+<span class="k">echo</span> <span class="s">"</span>${array[@]:3}<span class="s">"</span>    <span class="out"># D E  (to end)</span></pre>
+      </div>
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">${string:start:length}</span></div>
+<pre class="sm">text=<span class="s">"Hello, World!"</span>
+
+<span class="k">echo</span> <span class="s">"</span>${text:7:5}<span class="s">"</span>   <span class="out"># World</span>
+<span class="k">echo</span> <span class="s">"</span>${text:7:10}<span class="s">"</span>  <span class="out"># World!  (stops at end)</span>
+<span class="k">echo</span> <span class="s">"</span>${text:3}<span class="s">"</span>     <span class="out"># lo, World!</span></pre>
+      </div>
+    </div>
+    <div class="card-sm reveal" style="margin-top:22px;background:var(--cream)">
+      <p class="cb">The second number is the <strong>maximum length</strong>, not an end index (unlike Python). Ask for more characters than remain and Bash simply stops at the end — no error.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 14 — CONDITIONAL EXPRESSIONS: FILE TESTS  (ch9)
+     ============================================================ -->
+<section class="slide bg-blue">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 9 · Conditional Expressions</span>
+      <h2 class="h-lg reveal">File tests with <code>[[ ]]</code></h2>
+    </div>
+    <p class="body sm reveal" style="margin-bottom:18px">You don't need to memorise these — refer back whenever you need them.</p>
+    <div class="grid g4 fill reveal gap16">
+      <div class="card-sm"><div class="ct" style="font-size:16px">-e / -a</div><p class="cb">file <strong>exists</strong></p></div>
+      <div class="card-sm"><div class="ct" style="font-size:16px">-f</div><p class="cb">exists &amp; is a <strong>regular file</strong></p></div>
+      <div class="card-sm"><div class="ct" style="font-size:16px">-d</div><p class="cb">exists &amp; is a <strong>directory</strong></p></div>
+      <div class="card-sm"><div class="ct" style="font-size:16px">-h / -L</div><p class="cb"><strong>symbolic link</strong></p></div>
+      <div class="card-sm"><div class="ct" style="font-size:16px">-r</div><p class="cb"><strong>readable</strong></p></div>
+      <div class="card-sm"><div class="ct" style="font-size:16px">-w</div><p class="cb"><strong>writable</strong></p></div>
+      <div class="card-sm"><div class="ct" style="font-size:16px">-x</div><p class="cb"><strong>executable</strong></p></div>
+      <div class="card-sm"><div class="ct" style="font-size:16px">-s</div><p class="cb">size <strong>&gt; zero</strong></p></div>
+      <div class="card-sm"><div class="ct" style="font-size:16px">-b</div><p class="cb"><strong>block</strong> special file</p></div>
+      <div class="card-sm"><div class="ct" style="font-size:16px">-c</div><p class="cb"><strong>char</strong> special file</p></div>
+      <div class="card-sm" style="background:var(--white)"><div class="ct" style="font-size:16px">Example</div><p class="cb" style="font-family:var(--font-code);font-size:14px">[[ -f ${file} ]]</p></div>
+      <div class="card-sm" style="background:var(--yellow)"><div class="ct" style="font-size:18px"><span class="mi">lightbulb</span> Tip</div><p class="cb">Same operators work in <code>test</code> &amp; <code>[ ]</code> too.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 15 — CONDITIONAL EXPRESSIONS: STRING / ARITH / EXIT  (ch9)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill green reveal">Chapter 9 · Conditional Expressions</span>
+      <h2 class="h-lg reveal">String, arithmetic &amp; exit tests</h2>
+    </div>
+    <div class="grid g3 fill reveal gap20">
+      <div class="card">
+        <div class="ct"><span class="mi">text_fields</span> String</div>
+        <p class="cb" style="font-family:var(--font-code);font-size:22px;line-height:1.85">
+          <span class="v">-z</span> ${s} → empty<br>
+          <span class="v">-n</span> ${s} → non-empty<br>
+          <span class="v">-v</span> name → set<br>
+          ${a} == "${b}"<br>
+          ${a} != "${b}"<br>
+          ${a} &lt; ${b} · ${a} &gt; ${b}
+        </p>
+      </div>
+      <div class="card" style="background:var(--cream)">
+        <div class="ct"><span class="mi">tag</span> Arithmetic</div>
+        <p class="cb" style="font-family:var(--font-code);font-size:22px;line-height:1.85">
+          <span class="v">-eq</span> equal<br>
+          <span class="v">-ne</span> not equal<br>
+          <span class="v">-lt</span> less than<br>
+          <span class="v">-le</span> less / equal<br>
+          <span class="v">-gt</span> greater than<br>
+          <span class="v">-ge</span> greater / equal
+        </p>
+      </div>
+      <div class="card" style="background:var(--blue)">
+        <div class="ct"><span class="mi">bolt</span> Combine &amp; Exit</div>
+        <p class="cb" style="font-family:var(--font-code);font-size:21px;line-height:1.8">
+          [[ a ]] &amp;&amp; [[ b ]] <span class="c"># AND</span><br>
+          [[ a ]] || [[ b ]] <span class="c"># OR</span><br><br>
+          [[ $? -eq 0 ]] <span class="c"># ok</span><br>
+          [[ $? -gt 0 ]] <span class="c"># error</span>
+        </p>
+      </div>
+    </div>
+    <div class="card-sm reveal" style="margin-top:20px;background:var(--pink)">
+      <p class="cb"><span class="mi">warning</span> In <code>[[ ]]</code>, the right side of <code>==</code>/<code>!=</code> is a <strong>glob pattern</strong> unless quoted. Quote it for an exact string match.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 16 — IF / ELIF / ELSE  (ch10)
+     ============================================================ -->
+<section class="slide bg-pink">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 10 · Conditionals</span>
+      <h2 class="h-lg reveal"><code>if</code> · <code>elif</code> · <code>else</code></h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">if / elif / else</span></div>
+<pre class="sm"><span class="k">read</span> -p <span class="s">"Enter a number: "</span> num
+
+<span class="k">if</span> [[ $num -gt 0 ]] ; <span class="k">then</span>
+    <span class="k">echo</span> <span class="s">"The number is positive"</span>
+<span class="k">elif</span> [[ $num -lt 0 ]] ; <span class="k">then</span>
+    <span class="k">echo</span> <span class="s">"The number is negative"</span>
+<span class="k">else</span>
+    <span class="k">echo</span> <span class="s">"The number is 0"</span>
+<span class="k">fi</span></pre>
+      </div>
+      <div class="col fill gap16">
+        <div class="card-sm reveal" style="background:var(--white)"><div class="ct">Structure</div><p class="cb" style="font-family:var(--font-code);font-size:14px">if [[ test ]]<br>then<br>&nbsp;&nbsp;commands<br>fi</p></div>
+        <div class="card-sm reveal" style="background:var(--white)"><div class="ct">Guard example</div><p class="cb" style="font-family:var(--font-code);font-size:13.5px">if (( $EUID == 0 )); then<br>&nbsp;&nbsp;echo "Don't run as root"<br>&nbsp;&nbsp;exit<br>fi</p></div>
+        <div class="card-sm reveal" style="background:var(--green)"><div class="ct">Multiple conditions</div><p class="cb">Chain with <code>&amp;&amp;</code> (and) / <code>||</code> (or) to test several things at once.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 17 — CASE  (ch10)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill yellow reveal">Chapter 10 · Conditionals</span>
+      <h2 class="h-lg reveal">The <code>case</code> statement</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.2">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">case</span></div>
+<pre class="sm"><span class="k">read</span> -p <span class="s">"Enter your car brand: "</span> car
+
+<span class="k">case</span> $car <span class="k">in</span>
+  Tesla)
+    <span class="k">echo</span> <span class="s">"Factory is in the USA." ;;</span>
+  BMW | Mercedes | Audi | Porsche)
+    <span class="k">echo</span> <span class="s">"Factory is in Germany." ;;</span>
+  Toyota | Mazda | Subaru)
+    <span class="k">echo</span> <span class="s">"Factory is in Japan." ;;</span>
+  *)
+    <span class="k">echo</span> <span class="s">"Unknown car brand" ;;</span>
+<span class="k">esac</span></pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card-sm reveal"><p class="cb"><code>case $var in</code> — start, then pattern lists.</p></div>
+        <div class="card-sm reveal"><p class="cb"><code>)</code> ends a pattern; <code>|</code> ORs several patterns.</p></div>
+        <div class="card-sm reveal" style="background:var(--blue)"><p class="cb">Each clause ends with <code>;;</code> &nbsp;·&nbsp; <code>*)</code> is the default.</p></div>
+        <div class="card-sm reveal" style="background:var(--green)"><p class="cb">Close the block with <code>esac</code> ("case" backwards).</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 18 — FOR LOOPS  (ch11)
+     ============================================================ -->
+<section class="slide bg-cream">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 11 · Loops</span>
+      <h2 class="h-lg reveal"><code>for</code> loops</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">loop an array</span></div>
+<pre class="sm">users=(<span class="s">"devdojo"</span> <span class="s">"bobby"</span> <span class="s">"tony"</span>)
+
+<span class="k">for</span> user <span class="k">in</span> <span class="s">"</span>${users[@]}<span class="s">"</span>
+<span class="k">do</span>
+    <span class="k">echo</span> <span class="s">"</span>$user<span class="s">"</span>
+<span class="k">done</span></pre>
+      </div>
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">loop a number range</span></div>
+<pre class="sm"><span class="k">for</span> num <span class="k">in</span> {1..10}
+<span class="k">do</span>
+    <span class="k">echo</span> <span class="s">"</span>$num<span class="s">"</span>
+<span class="k">done</span></pre>
+      </div>
+    </div>
+    <div class="card-sm reveal" style="margin-top:22px;background:var(--white)">
+      <p class="cb">Pattern: <code>for var in &lt;list&gt;</code> → <code>do</code> → commands → <code>done</code>. Quote <code>"${arr[@]}"</code> so elements with spaces are handled correctly. Use <code>{1..10}</code> for numeric sequences.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 19 — WHILE & UNTIL  (ch11)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill blue reveal">Chapter 11 · Loops</span>
+      <h2 class="h-lg reveal"><code>while</code> vs <code>until</code></h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">while — run WHILE true</span></div>
+<pre class="sm">counter=1
+<span class="k">while</span> [[ $counter -le 10 ]]
+<span class="k">do</span>
+    <span class="k">echo</span> <span class="s">"</span>$counter<span class="s">"</span>
+    ((counter++))
+<span class="k">done</span></pre>
+      </div>
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">until — run UNTIL true</span></div>
+<pre class="sm">count=1
+<span class="k">until</span> [[ $count -gt 10 ]]
+<span class="k">do</span>
+    <span class="k">echo</span> <span class="s">"</span>$count<span class="s">"</span>
+    ((count++))
+<span class="k">done</span></pre>
+      </div>
+    </div>
+    <div class="grid g2 reveal" style="margin-top:22px">
+      <div class="card-sm" style="background:var(--green)"><p class="cb"><strong>while</strong> repeats <em>while</em> the condition stays true. Increment with <code>((counter++))</code> to avoid infinite loops.</p></div>
+      <div class="card-sm" style="background:var(--pink)"><p class="cb"><strong>until</strong> is the mirror image — it repeats <em>until</em> the condition becomes true. Great for input validation.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 20 — BREAK & CONTINUE  (ch11)
+     ============================================================ -->
+<section class="slide bg-blue">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 11 · Loops</span>
+      <h2 class="h-lg reveal">Control flow: <code>break</code> &amp; <code>continue</code></h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">continue — skip this iteration</span></div>
+<pre class="sm"><span class="k">for</span> i <span class="k">in</span> 1 2 3 4 5
+<span class="k">do</span>
+    <span class="k">if</span> [[ $i -eq 2 ]]; <span class="k">then</span>
+        <span class="k">echo</span> <span class="s">"skipping 2"</span>
+        <span class="k">continue</span>
+    <span class="k">fi</span>
+    <span class="k">echo</span> <span class="s">"i is </span>$i<span class="s">"</span>
+<span class="k">done</span></pre>
+      </div>
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">break 2 — exit the OUTER loop</span></div>
+<pre class="sm"><span class="k">for</span> (( a = 1; a &lt; 10; a++ )); <span class="k">do</span>
+  <span class="k">echo</span> <span class="s">"outer: </span>$a<span class="s">"</span>
+  <span class="k">for</span> (( b = 1; b &lt; 100; b++ )); <span class="k">do</span>
+    <span class="k">if</span> [[ $b -gt 5 ]]; <span class="k">then</span>
+        <span class="k">break</span> 2
+    <span class="k">fi</span>
+    <span class="k">echo</span> <span class="s">"inner: </span>$b<span class="s">"</span>
+  <span class="k">done</span>
+<span class="k">done</span></pre>
+      </div>
+    </div>
+    <div class="grid g2 reveal" style="margin-top:20px">
+      <div class="card-sm" style="background:var(--white)"><p class="cb"><strong>continue [n]</strong> stops the current iteration and starts the next; <code>n</code> resumes the n-th enclosing loop.</p></div>
+      <div class="card-sm" style="background:var(--white)"><p class="cb"><strong>break [n]</strong> ends the loop immediately; <code>break 2</code> exits two levels — the outer loop too.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 21 — FUNCTIONS  (ch12)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill pink reveal">Chapter 12 · Functions</span>
+      <h2 class="h-lg reveal">Reuse code with functions</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">functions</span></div>
+<pre class="sm"><span class="k">function</span> hello() {
+    <span class="k">echo</span> <span class="s">"Hello </span>$1<span class="s">!"</span>
+}
+
+hello DevDojo      <span class="c"># call — NO parentheses</span>
+<span class="out"># → Hello DevDojo!</span></pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card-sm reveal"><div class="ct">Two forms</div><p class="cb">Write <code>function name() { }</code> or just <code>name() { }</code> — the keyword is optional (nicer to read).</p></div>
+        <div class="card-sm reveal" style="background:var(--yellow)"><div class="ct"><span class="mi">warning</span> Calling</div><p class="cb">Invoke with just the name — <strong>no parentheses</strong>.</p></div>
+        <div class="card-sm reveal" style="background:var(--blue)"><div class="ct">Arguments</div><p class="cb">Functions receive args exactly like scripts: <code>$1</code>, <code>$2</code>, …</p></div>
+      </div>
+    </div>
+    <div class="card-sm reveal" style="margin-top:20px;background:var(--green)">
+      <p class="cb">Good functions carry a header comment: <strong>Description · Globals · Arguments · Outputs · Returns</strong> (0 on success, non-zero on error).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 22 — DEBUGGING & TESTING  (ch13)
+     ============================================================ -->
+<section class="slide bg-green">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 13 · Debugging &amp; Testing</span>
+      <h2 class="h-lg reveal">See exactly what your script runs</h2>
+    </div>
+    <div class="grid g3 fill reveal gap20">
+      <div class="card"><span class="ic green"><span class="mi">terminal</span></span><div class="ct">bash -x</div><p class="cb">Run with <code>bash -x ./script.sh</code> to print every command as it executes.</p></div>
+      <div class="card" style="background:var(--cream)"><span class="ic pink"><span class="mi">manage_search</span></span><div class="ct">set -x</div><p class="cb">Add <code>set -x</code> before a specific line to trace just that section.</p></div>
+      <div class="card" style="background:var(--blue)"><span class="ic yellow"><span class="mi">verified</span></span><div class="ct">ShellCheck</div><p class="cb">Paste your script at <strong>shellcheck.net</strong> (or run the CLI) for instant improvement suggestions.</p></div>
+    </div>
+    <div class="card-sm reveal" style="margin-top:22px;background:var(--white)">
+      <p class="cb"><strong>Why it helps:</strong> tracing shows the real, expanded commands — variables substituted, quotes resolved — so you can spot exactly where logic diverges from intent. <span class="mi">star</span> Star ShellCheck on GitHub and contribute!</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 23 — TERMINAL SHORTCUTS  (ch13)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill yellow reveal">Chapter 13 · Shortcuts</span>
+      <h2 class="h-lg reveal">Terminal shortcuts that save the day</h2>
+    </div>
+    <div class="grid g4 fill reveal gap16">
+      <div class="card-sm"><div class="ct">Ctrl + R</div><p class="cb">Search command history backward (the big one!)</p></div>
+      <div class="card-sm" style="background:var(--pink)"><div class="ct">Ctrl + K</div><p class="cb">Delete from cursor → end of line</p></div>
+      <div class="card-sm" style="background:var(--blue)"><div class="ct">Ctrl + U</div><p class="cb">Delete from cursor → start of line</p></div>
+      <div class="card-sm" style="background:var(--green)"><div class="ct">Ctrl + W</div><p class="cb">Delete one word backward</p></div>
+      <div class="card-sm" style="background:var(--cream)"><div class="ct">Ctrl + L</div><p class="cb">Clear the screen (instead of <code>clear</code>)</p></div>
+      <div class="card-sm"><div class="ct">Ctrl + C</div><p class="cb">Terminate the current command</p></div>
+      <div class="card-sm"><div class="ct">Ctrl + Z</div><p class="cb">Send current command to background</p></div>
+      <div class="card-sm" style="background:var(--yellow)"><div class="ct">Ctrl + S / Q</div><p class="cb">Stop / resume output to the screen</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 24 — CUSTOM COMMANDS / ALIASES  (ch14)
+     ============================================================ -->
+<section class="slide bg-yellow">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 14 · Aliases</span>
+      <h2 class="h-lg reveal">Create custom bash commands</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.2">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">~/.bashrc</span></div>
+<pre class="xs"><span class="c"># Long command typed all the time…</span>
+<span class="k">netstat</span> -plant | <span class="k">grep</span> <span class="s">'80\|443'</span> | <span class="k">grep</span> -v LISTEN | <span class="k">wc</span> -l
+
+<span class="c"># …becomes a short alias:</span>
+<span class="k">alias</span> conn=<span class="s">"echo 'Total connections:' ; \
+  netstat -plant | grep '80\|443' | grep -v LISTEN | wc -l"</span>
+
+<span class="c"># Now just run:</span>
+conn</pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card-sm reveal" style="background:var(--white)"><div class="ct">Make it persistent</div><p class="cb">Add the <code>alias</code> line to <code>~/.bashrc</code> (or <code>~/.bash_profile</code>) so it survives logout.</p></div>
+        <div class="card-sm reveal" style="background:var(--white)"><div class="ct">List them all</div><p class="cb">Run <code>alias</code> with no arguments to see every alias in your shell.</p></div>
+        <div class="card-sm reveal" style="background:var(--green)"><div class="ct">No root needed</div><p class="cb">Aliases work without sudo — unlike dropping scripts in <code>/usr/bin</code>.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 25 — SECTION DIVIDER: REAL-WORLD SCRIPTS
+     ============================================================ -->
+<section class="slide bg-black">
+  <div class="slide-inner center-v">
+    <div class="star reveal" style="top:120px;right:160px;background:var(--pink);transform:rotate(-10deg)"><span style="font-family:var(--font-code);font-weight:700;font-size:26px;color:#000">&gt;_</span></div>
+    <div class="tilt reveal" style="bottom:150px;left:120px;width:140px;height:70px;background:var(--green);transform:rotate(-6deg)"></div>
+    <div class="close-frame reveal" style="align-self:flex-start">
+      <div class="cover-kicker reveal" style="color:var(--cream);margin-bottom:18px">Part Two · Chapters 15 – 25</div>
+      <h2 class="h-xl reveal" style="color:var(--white);font-size:104px">Real-World<br>Scripts</h2>
+      <p class="body reveal" style="color:var(--cream);margin-top:28px;max-width:1000px;font-size:24px">
+        Foundations done. Now put Bash to work: server status, interactive menus, remote fleets,
+        JSON APIs, log forensics, email, password generation, redirection &amp; full LAMP automation.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 26 — FIRST REAL SCRIPT: SERVER STATUS  (ch15)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill blue reveal">Chapter 15 · Your First Real Script</span>
+      <h2 class="h-lg reveal">A server status report</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.15">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">status.sh</span></div>
+<pre class="xs"><span class="v">#!/bin/bash</span>
+server_name=$(<span class="k">hostname</span>)   <span class="c"># $() runs a command</span>
+
+<span class="k">function</span> memory_check() {
+    <span class="k">echo</span> <span class="s">"Memory on </span>${server_name}<span class="s">:"</span>; <span class="k">free</span> -h
+}
+<span class="k">function</span> cpu_check()    { <span class="k">uptime</span>; }
+<span class="k">function</span> tcp_check()    { <span class="k">wc</span> -l &lt; /proc/net/tcp; }
+<span class="k">function</span> kernel_check() { <span class="k">uname</span> -r; }
+
+<span class="k">function</span> all_checks() {
+    memory_check; cpu_check; tcp_check; kernel_check
+}
+all_checks</pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card-sm reveal"><div class="ct">It reports</div><p class="cb">Memory usage · CPU load · TCP connections · exact kernel version.</p></div>
+        <div class="card-sm reveal" style="background:var(--cream)"><div class="ct">Command substitution</div><p class="cb"><code>$(hostname)</code> runs the command and stores its output in a variable.</p></div>
+        <div class="card-sm reveal" style="background:var(--pink)"><div class="ct">Composition</div><p class="cb">Small single-purpose functions, wrapped by one <code>all_checks</code> orchestrator.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 27 — INTERACTIVE MENU  (ch16)
+     ============================================================ -->
+<section class="slide bg-pink">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 16 · Interactive Menu</span>
+      <h2 class="h-lg reveal">A colorful multiple-choice menu</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.2">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">menu.sh</span></div>
+<pre class="xs">green=<span class="s">'\e[32m'</span>; clear=<span class="s">'\e[0m'</span>      <span class="c"># color vars</span>
+ColorGreen(){ <span class="k">echo</span> -ne <span class="s">"</span>${green}${1}${clear}<span class="s">"</span>; }
+
+menu(){
+<span class="k">echo</span> -ne <span class="s">"
+$(ColorGreen '1)') Memory usage
+$(ColorGreen '2)') CPU load
+$(ColorGreen '0)') Exit
+Choose an option: "</span>
+    <span class="k">read</span> a
+    <span class="k">case</span> $a <span class="k">in</span>
+        1) memory_check ; menu ;;
+        2) cpu_check ; menu ;;
+        0) <span class="k">exit</span> 0 ;;
+        *) <span class="k">echo</span> <span class="s">"Wrong option."</span>; menu ;;
+    <span class="k">esac</span>
+}
+menu</pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card reveal" style="background:var(--white)"><div class="ct">ANSI colors</div><p class="cb">Wrap text in escape codes like <code>\e[32m</code> … <code>\e[0m</code> via small helper functions for readable menus.</p></div>
+        <div class="card reveal" style="background:var(--yellow)"><div class="ct">Recursion = loop</div><p class="cb">Each case calls <code>menu</code> again, so the menu re-appears after every action until the user picks <strong>Exit</strong>.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 28 — REMOTE SERVERS  (ch17)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill green reveal">Chapter 17 · Remote Execution</span>
+      <h2 class="h-lg reveal">Run one script on many servers</h2>
+    </div>
+    <div class="code reveal" style="margin-bottom:22px">
+      <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">one command, every server</span></div>
+<pre class="sm"><span class="k">while</span> IFS= <span class="k">read</span> -r server; <span class="k">do</span>
+    <span class="k">ssh</span> <span class="s">"your_user@</span>${server}<span class="s">"</span> <span class="s">'bash -s'</span> &lt; ./remote_check.sh
+<span class="k">done</span> &lt; servers.txt</pre>
+    </div>
+    <div class="grid g3 fill reveal gap20">
+      <div class="card-sm"><span class="ic blue"><span class="mi">description</span></span><div class="ct">servers.txt</div><p class="cb">One server IP per line — the loop reads through them all.</p></div>
+      <div class="card-sm" style="background:var(--blue)"><span class="ic"><span class="mi">lan</span></span><div class="ct">bash -s</div><p class="cb">Pipes the local script over SSH into the remote shell's stdin — no copying needed.</p></div>
+      <div class="card-sm" style="background:var(--cream)"><span class="ic pink"><span class="mi">rocket_launch</span></span><div class="ct">No manual logins</div><p class="cb">No copying to each box, no individual sessions. Scales to many servers &amp; bigger scripts.</p></div>
+    </div>
+    <div class="card-sm reveal" style="margin-top:20px;background:var(--white)">
+      <p class="cb">Any command you can run on the command line works in a script. For larger fleets, graduate to a tool like <strong>Ansible</strong> — but this shows the core idea with pure Bash.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 29 — JSON WITH JQ  (ch18)
+     ============================================================ -->
+<section class="slide bg-blue">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 18 · jq</span>
+      <h2 class="h-lg reveal">Parse JSON in the terminal</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">jq basics</span></div>
+<pre class="sm"><span class="c"># install: apt / dnf / pacman / brew install jq</span>
+
+<span class="k">curl</span> <span class="s">"https://api...?apiKey=</span>$KEY<span class="s">"</span> | <span class="k">jq</span>        <span class="c"># pretty-print</span>
+<span class="k">curl</span> ... | <span class="k">jq</span> <span class="s">'.[0]'</span>          <span class="c"># first element</span>
+<span class="k">curl</span> ... | <span class="k">jq</span> <span class="s">'.[].question'</span>   <span class="c"># one key, all items</span></pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card reveal"><div class="ct">What is jq?</div><p class="cb">A lightweight, flexible command-line <strong>JSON processor</strong> — portable C, zero runtime dependencies.</p></div>
+        <div class="card reveal" style="background:var(--green)"><div class="ct">Pipe &amp; filter</div><p class="cb">Pipe any JSON into <code>jq</code> to format, index <code>.[0]</code>, or extract keys <code>.[].question</code>.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 30 — JQ IN A SCRIPT  (ch18)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill pink reveal">Chapter 18 · jq in a script</span>
+      <h2 class="h-lg reveal">Build a quiz from an API</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.25">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">quiz.sh</span></div>
+<pre class="xs">url=<span class="s">'https://quizapi.io/api/v1/questions?apiKey=KEY&amp;limit=10'</span>
+output=$(<span class="k">curl</span> <span class="s">"</span>$url<span class="s">"</span> 2&gt;/dev/null)
+
+output=$(<span class="k">echo</span> <span class="s">"</span>$output<span class="s">"</span> | <span class="k">jq</span> <span class="s">'.[0]'</span>)            <span class="c"># first question</span>
+question=$(<span class="k">echo</span> <span class="s">"</span>$output<span class="s">"</span> | <span class="k">jq</span> <span class="s">'.question'</span>)
+answer_a=$(<span class="k">echo</span> <span class="s">"</span>$output<span class="s">"</span> | <span class="k">jq</span> <span class="s">'.answers.answer_a'</span>)
+answer_b=$(<span class="k">echo</span> <span class="s">"</span>$output<span class="s">"</span> | <span class="k">jq</span> <span class="s">'.answers.answer_b'</span>)
+
+<span class="k">echo</span> <span class="s">"
+Question: </span>${question}<span class="s">
+A) </span>${answer_a}<span class="s">
+B) </span>${answer_b}<span class="s">"</span></pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card-sm reveal"><p class="cb">Store the API response in a variable, then drill into it step by step with <code>jq</code>.</p></div>
+        <div class="card-sm reveal" style="background:var(--yellow)"><p class="cb"><code>2&gt;/dev/null</code> hides curl's progress meter so only JSON is captured.</p></div>
+        <div class="card-sm reveal" style="background:var(--blue)"><p class="cb">Now Bash can talk to almost any REST API — read, extract, reformat.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 31 — CLOUDFLARE API CHALLENGE  (ch19)
+     ============================================================ -->
+<section class="slide bg-green">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 19 · Challenge</span>
+      <h2 class="h-lg reveal">Auto-toggle Cloudflare DDoS protection</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="col fill gap16">
+        <div class="card reveal"><span class="ic pink"><span class="mi">track_changes</span></span><div class="ct">The brief</div><p class="cb">Monitor CPU load; if it spikes, call the Cloudflare API to enable <em>"I'm Under Attack"</em> mode — then turn it back off when load returns to normal.</p></div>
+        <div class="card reveal" style="background:var(--cream)"><span class="ic blue"><span class="mi">key</span></span><div class="ct">You'll need</div><p class="cb">A Cloudflare account, API key &amp; Zone ID — plus <code>curl</code> installed (<code>curl --version</code>).</p></div>
+      </div>
+      <div class="code reveal" style="flex:1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">crontab -e · run every 30s</span></div>
+<pre class="xs">CF_ZONE_ID=YOUR_CF_ZONE_ID
+CF_API_KEY=YOUR_CF_API_KEY
+
+<span class="c"># Two jobs → effectively every 30 seconds</span>
+* * * * * /path/protection.sh
+* * * * * ( <span class="k">sleep</span> 30 ; /path/protection.sh )</pre>
+        <div class="card-sm" style="margin-top:18px;background:var(--white);box-shadow:none;border:none;padding:0"><p class="cb" style="font-size:15px"><span class="mi">warning</span> Caveat: if an attack makes the server unresponsive, the script may not fire — real monitoring (e.g. Nagios) is sturdier.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 32 — LOG PARSER  (ch20)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill blue reveal">Chapter 20 · Challenge</span>
+      <h2 class="h-lg reveal">Summarize NGINX &amp; Apache access logs</h2>
+    </div>
+    <div class="grid g3 fill reveal gap20">
+      <div class="card"><span class="ic blue"><span class="mi">bar_chart</span></span><div class="ct">Top POSTs</div><p class="cb">The 20 pages receiving the most POST requests.</p></div>
+      <div class="card" style="background:var(--cream)"><span class="ic green"><span class="mi">trending_up</span></span><div class="ct">Top GETs</div><p class="cb">The 20 pages receiving the most GET requests.</p></div>
+      <div class="card" style="background:var(--pink)"><span class="ic yellow"><span class="mi">public</span></span><div class="ct">Top IPs</div><p class="cb">The 20 busiest IP addresses and their geo-location.</p></div>
+    </div>
+    <div class="code reveal" style="margin-top:22px">
+      <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">spike_check</span></div>
+<pre class="sm"><span class="k">chmod</span> +x spike_check
+./spike_check /var/log/apache2/access.log    <span class="c"># or /var/log/nginx/access.log</span></pre>
+    </div>
+    <div class="card-sm reveal" style="margin-top:18px;background:var(--green)">
+      <p class="cb"><strong>Read-only &amp; fast.</strong> Spot brute-force patterns (e.g. many hits on <code>xmlrpc.php</code>) and unexpected foreign traffic — an early warning before a bigger attack.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 33 — SENDING EMAILS  (ch21)
+     ============================================================ -->
+<section class="slide bg-cream">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 21 · Email</span>
+      <h2 class="h-lg reveal">Send mail with SSMTP</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="col fill gap16">
+        <div class="card-sm reveal"><div class="ct">1 · Install</div><p class="cb" style="font-family:var(--font-code);font-size:14px">sudo apt install ssmtp mailutils</p></div>
+        <div class="card-sm reveal"><div class="ct">2 · Configure</div><p class="cb">Edit <code>/etc/ssmtp/ssmtp.conf</code> with your <code>mailhub</code>, <code>AuthUser</code>, <code>AuthPass</code>, <code>UseSTARTTLS=YES</code> (Gmail SMTP works too).</p></div>
+        <div class="card-sm reveal" style="background:var(--blue)"><div class="ct"><span class="mi">attach_file</span> Attachments</div><p class="cb"><code>sudo apt install mpack</code>, then <code>mpack -s "Subject" file.zip you@dom.com</code></p></div>
+      </div>
+      <div class="code reveal" style="flex:1.1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">3 · send</span></div>
+<pre class="sm"><span class="k">echo</span> <span class="s">"Email body here"</span> \
+  | <span class="k">mail</span> -s <span class="s">"Subject here"</span> you@yourdomain.com</pre>
+        <div class="card-sm" style="margin-top:18px;background:var(--white);border:none;box-shadow:none;padding:0"><p class="cb" style="font-size:15px">SSMTP forwards outbound mail (alerts, cron output) to a mail host. It's a sender only — no inbox, no queue. Drop the command straight into any script.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 34 — PASSWORD GENERATOR  (ch22)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill yellow reveal">Chapter 22 · Password Generator</span>
+      <h2 class="h-lg reveal">Random passwords from <code>/dev/urandom</code></h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.2">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">password.sh</span></div>
+<pre class="sm"><span class="v">#!/bin/bash</span>
+<span class="k">read</span> -p <span class="s">"How many characters? "</span> pass_length
+
+<span class="c"># Generate 10 candidates of the chosen length</span>
+<span class="k">for</span> i <span class="k">in</span> {1..10}; <span class="k">do</span>
+  <span class="k">tr</span> -cd <span class="s">'[:alnum:]'</span> &lt; /dev/urandom \
+    | <span class="k">fold</span> -w<span class="s">"</span>${pass_length}<span class="s">"</span> \
+    | <span class="k">head</span> -n 1
+<span class="k">done</span></pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card-sm reveal"><div class="ct">Other one-liners</div><p class="cb" style="font-family:var(--font-code);font-size:13.5px">date | md5sum<br>date | sha256sum<br>openssl rand -base64 10</p></div>
+        <div class="card-sm reveal" style="background:var(--green)"><div class="ct">Why urandom?</div><p class="cb"><code>/dev/urandom</code> is the preferred source — intended for cryptographic use. <code>tr</code> keeps only letters &amp; digits.</p></div>
+        <div class="card-sm reveal" style="background:var(--pink)"><div class="ct"><span class="mi">warning</span> Security</div><p class="cb">A practice project — for real secrets use a trusted password manager &amp; 2FA.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 35 — REDIRECTION  (ch23)
+     ============================================================ -->
+<section class="slide bg-blue">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 23 · Redirection</span>
+      <h2 class="h-lg reveal">Three streams: STDIN · STDOUT · STDERR</h2>
+    </div>
+    <div class="grid g3 reveal gap20" style="margin-bottom:22px">
+      <div class="card"><div class="ct">STDIN · 0</div><p class="cb">Manages input in the terminal.</p></div>
+      <div class="card" style="background:var(--green)"><div class="ct">STDOUT · 1</div><p class="cb">Normal output text.</p></div>
+      <div class="card" style="background:var(--pink)"><div class="ct">STDERR · 2</div><p class="cb">Error output text.</p></div>
+    </div>
+    <div class="code reveal fill">
+      <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">redirecting streams</span></div>
+<pre class="sm"><span class="k">echo</span> <span class="s">"Hello"</span> &gt; file.txt        <span class="c"># overwrite (truncates)</span>
+<span class="k">echo</span> <span class="s">"World"</span> &gt;&gt; file.txt       <span class="c"># append</span>
+<span class="k">ls</span> --hello 2&gt; error.txt        <span class="c"># redirect errors</span>
+<span class="k">ls</span> --hello 2&gt; /dev/null         <span class="c"># discard errors</span>
+./install.sh &gt; out.txt 2&gt;&amp;1      <span class="c"># both → same file</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 36 — PIPES / HEREDOC / HERESTRING + SUMMARY  (ch23)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill green reveal">Chapter 23 · Pipes &amp; Heredocs</span>
+      <h2 class="h-lg reveal">Chaining commands &amp; the operator cheat-sheet</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.05">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">pipes · heredoc · herestring</span></div>
+<pre class="xs"><span class="k">ls</span> | <span class="k">grep</span> <span class="s">".txt"</span>            <span class="c"># pipe output → input</span>
+
+<span class="k">cat</span> &lt;&lt; EOF                  <span class="c"># heredoc (multi-line)</span>
+Hello World!
+How are you?
+EOF
+
+<span class="k">wc</span> &lt;&lt;&lt; <span class="s">"a single line to stdin"</span>   <span class="c"># herestring</span></pre>
+      </div>
+      <div class="card-flat reveal" style="flex:1;padding:18px 22px">
+        <div class="ct" style="font-size:18px;margin-bottom:12px">Operator cheat-sheet</div>
+        <p class="cb" style="font-family:var(--font-code);font-size:14.5px;line-height:1.95">
+          <span class="v">&gt;</span>&nbsp;&nbsp;save output to a file<br>
+          <span class="v">&gt;&gt;</span>&nbsp;append output to a file<br>
+          <span class="v">&lt;</span>&nbsp;&nbsp;read input from a file<br>
+          <span class="v">2&gt;</span>&nbsp;redirect error messages<br>
+          <span class="v">|</span>&nbsp;&nbsp;output of one → input of next<br>
+          <span class="v">&lt;&lt;</span>&nbsp;pipe multiple lines cleanly<br>
+          <span class="v">&lt;&lt;&lt;</span> pipe a single line cleanly
+        </p>
+      </div>
+    </div>
+    <div class="card-sm reveal" style="margin-top:20px;background:var(--cream)">
+      <p class="cb">Pipes connect <strong>command → command</strong>; redirections connect <strong>command ↔ file</strong>. Build arbitrary chains: <code>ls -l | tail -n +2 | cut -d ' ' -f3 | sort | uniq -c</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 37 — WORDPRESS LAMP AUTOMATION  (ch24)
+     ============================================================ -->
+<section class="slide bg-pink">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 24 · Capstone</span>
+      <h2 class="h-lg reveal">Automate a full WordPress LAMP stack</h2>
+    </div>
+    <div class="grid g4 fill reveal gap16" style="margin-bottom:20px">
+      <div class="card-sm" style="background:var(--white)"><span class="lnum" style="margin-bottom:10px">1</span><div class="ct" style="font-size:17px">lamp_install</div><p class="cb">Update apt, ufw firewall, Apache2, MariaDB, PHP &amp; mods.</p></div>
+      <div class="card-sm" style="background:var(--white)"><span class="lnum" style="margin-bottom:10px">2</span><div class="ct" style="font-size:17px">virtual_host</div><p class="cb">Create <code>/var/www/$DOMAIN</code>, the vhost conf, enable the site.</p></div>
+      <div class="card-sm" style="background:var(--white)"><span class="lnum" style="margin-bottom:10px">3</span><div class="ct" style="font-size:17px">ssl_config</div><p class="cb">Self-signed OpenSSL cert, hardened ciphers &amp; headers.</p></div>
+      <div class="card-sm" style="background:var(--white)"><span class="lnum" style="margin-bottom:10px">4</span><div class="ct" style="font-size:17px">wordpress</div><p class="cb">DB + user, download WP, wire up <code>wp-config.php</code>.</p></div>
+    </div>
+    <div class="code reveal fill">
+      <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">execute() — one orchestrator</span></div>
+<pre class="sm">execute () {
+    lamp_install
+    apache_virtual_host_setup
+    ssl_config
+    wordpress_config       <span class="c"># calls db_config first</span>
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 38 — COMMON ERRORS & FIXES  (ch25)
+     ============================================================ -->
+<section class="slide bg-offwhite">
+  <div class="dotgrid"></div>
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill yellow reveal">Chapter 25 · Troubleshooting</span>
+      <h2 class="h-lg reveal">Common errors &amp; their fixes</h2>
+    </div>
+    <div class="grid g3 fill reveal gap16">
+      <div class="card-sm"><div class="ct" style="font-size:17px">Permission denied</div><p class="cb"><code>chmod +x script.sh</code></p></div>
+      <div class="card-sm" style="background:var(--blue)"><div class="ct" style="font-size:17px">Bad interpreter ^M</div><p class="cb">Windows line-endings → <code>dos2unix script.sh</code></p></div>
+      <div class="card-sm" style="background:var(--green)"><div class="ct" style="font-size:17px">command not found</div><p class="cb">Run as <code>./script.sh</code> or add dir to <code>$PATH</code></p></div>
+      <div class="card-sm" style="background:var(--cream)"><div class="ct" style="font-size:17px">syntax error near `then`</div><p class="cb">Need <code>; then</code> … <code>fi</code></p></div>
+      <div class="card-sm" style="background:var(--pink)"><div class="ct" style="font-size:17px">unexpected end of file</div><p class="cb">Unclosed <code>if</code>/<code>for</code>/quote — close with <code>fi</code>/<code>done</code></p></div>
+      <div class="card-sm"><div class="ct" style="font-size:17px">integer expression expected</div><p class="cb">Non-numeric value in arithmetic test</p></div>
+      <div class="card-sm" style="background:var(--cream)"><div class="ct" style="font-size:17px">bad substitution</div><p class="cb">Bash syntax under <code>sh</code> → run with <code>bash</code></p></div>
+      <div class="card-sm" style="background:var(--blue)"><div class="ct" style="font-size:17px">redirection denied</div><p class="cb">Write to a writable path or <code>sudo</code></p></div>
+      <div class="card-sm" style="background:var(--green)"><div class="ct" style="font-size:17px">loop over a dir</div><p class="cb">Use <code>for f in /docs/*</code> — add <code>/*</code></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 39 — DEBUGGING TIPS & TAKEAWAYS  (ch25)
+     ============================================================ -->
+<section class="slide bg-green">
+  <div class="slide-inner">
+    <div class="header">
+      <span class="pill reveal">Chapter 25 · Debugging Toolkit</span>
+      <h2 class="h-lg reveal">Tips &amp; key takeaways</h2>
+    </div>
+    <div class="row fill gap20">
+      <div class="code reveal" style="flex:1.1">
+        <div class="code-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><span class="tag">debugging toolkit</span></div>
+<pre class="sm"><span class="k">set</span> -x                <span class="c"># print each command</span>
+<span class="k">echo</span> $?               <span class="c"># last exit status</span>
+<span class="k">bash</span> -n script.sh    <span class="c"># validate syntax, no run</span>
+<span class="k">bash</span> -v script.sh    <span class="c"># show lines as they run</span>
+... 2&gt; error.log      <span class="c"># capture errors</span>
+<span class="k">trap</span> <span class="s">'echo "Error on line </span>$LINENO<span class="s">"'</span> ERR</pre>
+      </div>
+      <div class="col fill gap16 center-v">
+        <div class="card reveal" style="background:var(--white)"><div class="ct">Most errors come from…</div><p class="cb">Missing permissions · syntax mistakes · unset variables · wrong shell.</p></div>
+        <div class="card reveal" style="background:var(--yellow)"><div class="ct">The fix mindset</div><p class="cb">Read the message, reproduce with tracing, isolate the line — then correct quoting, structure, or types.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 40 — WRAP UP / CLOSE
+     ============================================================ -->
+<section class="slide bg-black">
+  <div class="slide-inner center-v">
+    <div class="star reveal" style="top:130px;right:170px;background:var(--yellow);transform:rotate(14deg)"><span style="font-family:var(--font-display);font-weight:900;font-size:34px;color:#000">★</span></div>
+    <div class="tilt reveal" style="bottom:170px;right:240px;width:120px;height:120px;background:var(--blue);transform:rotate(-8deg)"></div>
+    <div class="close-frame reveal" style="align-self:flex-start">
+      <div class="cover-kicker reveal" style="color:var(--cream);margin-bottom:18px">You made it <span class="mi">celebration</span></div>
+      <h2 class="h-xl reveal" style="color:var(--white);font-size:108px">Now go<br>automate.</h2>
+      <p class="body reveal" style="color:var(--cream);margin-top:28px;max-width:1020px;font-size:24px">
+        You've got the foundations and a toolbox of real scripts. Best next step: <strong>write your own
+        script and share it with the world</strong> — that's how any language sticks.
+      </p>
+      <div class="row reveal" style="gap:16px;margin-top:30px">
+        <span class="pill yellow"><span class="mi">star</span> Star it on GitHub</span>
+        <span class="pill pink"><span class="mi">alternate_email</span> Tag @bobbyiliev_</span>
+        <span class="pill green"><span class="mi">menu_book</span> introduction-to-bash-scripting</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- persistent chrome -->
+<div class="progress" id="progress"></div>
+<div class="counter" id="counter">01 / 40</div>
+<nav class="nav" aria-label="Slide navigation">
+  <button id="prevBtn" aria-label="Previous slide">‹</button>
+  <button id="nextBtn" aria-label="Next slide">›</button>
+</nav>
+
+<!-- language toggle (JP / EN) -->
+<button class="lang-toggle" id="langToggle" aria-label="Switch to Japanese"><span class="mi">translate</span>日本語</button>
+
+<!-- inline editing -->
+<div class="edit-hotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)"><span class="mi">edit</span></button>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   - fixed 16:9 stage scaling
+   - keyboard / wheel / touch navigation
+   - progress bar + NN / NN counter
+   =========================================== */
+class SlidePresentation{
+  constructor(){
+    this.slides=[...document.querySelectorAll('.slide')];
+    this.stage=document.getElementById('deckStage');
+    this.counter=document.getElementById('counter');
+    this.progress=document.getElementById('progress');
+    this.current=0;
+    this.total=this.slides.length;
+    this.setupScale();
+    this.setupKeys();
+    this.setupTouch();
+    this.setupWheel();
+    document.getElementById('prevBtn').addEventListener('click',()=>this.go(this.current-1));
+    document.getElementById('nextBtn').addEventListener('click',()=>this.go(this.current+1));
+    this.show(0);
+  }
+  setupScale(){
+    const scale=()=>{
+      const f=Math.min(window.innerWidth/1920,window.innerHeight/1080);
+      const x=(window.innerWidth-1920*f)/2;
+      const y=(window.innerHeight-1080*f)/2;
+      this.stage.style.transform=`translate(${x}px, ${y}px) scale(${f})`;
+    };
+    scale();window.addEventListener('resize',scale);
+  }
+  pad(n){return String(n).padStart(2,'0');}
+  show(i){
+    this.current=Math.max(0,Math.min(i,this.total-1));
+    this.slides.forEach((s,idx)=>{
+      s.classList.toggle('active',idx===this.current);
+      s.classList.toggle('visible',idx===this.current);
+    });
+    this.counter.textContent=`${this.pad(this.current+1)} / ${this.pad(this.total)}`;
+    this.progress.style.width=`${((this.current+1)/this.total)*100}%`;
+  }
+  go(i){this.show(i);}
+  setupKeys(){
+    document.addEventListener('keydown',e=>{
+      if(e.target.getAttribute('contenteditable')==='true')return;
+      if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();this.go(this.current+1);}
+      else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();this.go(this.current-1);}
+      else if(e.key==='Home'){this.go(0);}
+      else if(e.key==='End'){this.go(this.total-1);}
+    });
+  }
+  setupTouch(){
+    let x0=null;
+    addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
+    addEventListener('touchend',e=>{
+      if(x0===null)return;
+      const dx=e.changedTouches[0].clientX-x0;
+      if(Math.abs(dx)>50)this.go(this.current+(dx<0?1:-1));
+      x0=null;
+    },{passive:true});
+  }
+  setupWheel(){
+    let lock=false;
+    addEventListener('wheel',e=>{
+      if(lock)return;
+      if(Math.abs(e.deltaY)<24)return;
+      lock=true;this.go(this.current+(e.deltaY>0?1:-1));
+      setTimeout(()=>lock=false,520);
+    },{passive:true});
+  }
+}
+const deck=new SlidePresentation();
+window.deck=deck;
+
+/* ===========================================
+   INLINE TEXT EDITING (post-draft affordance)
+   Hover top-left or press E → click any text → edit → Ctrl+S to save
+   =========================================== */
+const editor={
+  isActive:false,
+  toggleEditMode(){
+    this.isActive=!this.isActive;
+    const t=document.getElementById('editToggle');
+    t.classList.toggle('active',this.isActive);
+    t.classList.toggle('show',this.isActive);
+    document.querySelectorAll('.slide [class]').forEach(el=>{
+      if(el.children.length===0&&el.textContent.trim()){
+        el.setAttribute('contenteditable',this.isActive);
+      }
+    });
+  }
+};
+const hotzone=document.querySelector('.edit-hotzone');
+const editToggle=document.getElementById('editToggle');
+let hideTimeout=null;
+hotzone.addEventListener('mouseenter',()=>{clearTimeout(hideTimeout);editToggle.classList.add('show');});
+hotzone.addEventListener('mouseleave',()=>{hideTimeout=setTimeout(()=>{if(!editor.isActive)editToggle.classList.remove('show');},400);});
+editToggle.addEventListener('mouseenter',()=>clearTimeout(hideTimeout));
+editToggle.addEventListener('mouseleave',()=>{hideTimeout=setTimeout(()=>{if(!editor.isActive)editToggle.classList.remove('show');},400);});
+editToggle.addEventListener('click',()=>editor.toggleEditMode());
+hotzone.addEventListener('click',()=>editor.toggleEditMode());
+document.addEventListener('keydown',e=>{
+  if((e.key==='e'||e.key==='E')&&e.target.getAttribute('contenteditable')!=='true'){editor.toggleEditMode();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){
+    e.preventDefault();
+    const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='introduction-to-bash-scripting-slides.html';a.click();
+  }
+});
+
+/* ===========================================
+   BILINGUAL JP / EN TOGGLE
+   - tags translatable nodes with a stable per-slide key (slideIndex:group:nth)
+   - caches the original English HTML, swaps to Japanese on demand
+   - graceful: any key without a Japanese entry simply stays in English
+   - Bash code stays as-is; only comments, labels, headings & prose translate
+   =========================================== */
+(function(){
+  /* selector groups, queried per-slide in document order */
+  const GROUPS=[
+    ['h','.h-xl, .h-lg, .h-md'],
+    ['pill','.pill'],
+    ['kick','.cover-kicker'],
+    ['body','.body'],
+    ['ct','.ct'],
+    ['cb','.cb'],
+    ['tag','.code-bar .tag'],
+    ['c','.code pre .c, .code pre .out']
+  ];
+  const enCache=new Map();
+  document.querySelectorAll('.slide').forEach((slide,si)=>{
+    GROUPS.forEach(([name,sel])=>{
+      slide.querySelectorAll(sel).forEach((el,i)=>{
+        el.dataset.i18nKey=si+':'+name+':'+i;
+        enCache.set(el,el.innerHTML);
+      });
+    });
+  });
+
+  /* Japanese strings (HTML preserved; inline <code>/<strong> kept). */
+  const JA={
+    /* 1 — Cover */
+    '0:pill:0':'Bash 速習コース',
+    '0:kick:0':'#!/bin/bash &nbsp;·&nbsp; 開発者・サーバー管理者・Linux 好きのために',
+    '0:h:0':'はじめての',
+    '0:h:1':'<span class="hl">Bash スクリプト</span>',
+    '0:body:0':'シェルを基礎から学びます — 変数・条件分岐・ループ・関数 — そして実際のサーバー、API、ログ、デプロイの自動化に活かします。',
+    /* 2 — What is Bash */
+    '1:pill:0':'第1章 · 基礎','1:h:0':'Bash とは？',
+    '1:ct:1':'学べること','1:ct:2':'自動化','1:ct:3':'時間を節約','1:ct:4':'共有',
+    '1:cb:0':'Bash は<strong>Unix シェルでありコマンド言語</strong>です。多くの OS で利用でき、ほとんどの Linux で標準のインタプリタになっています。',
+    '1:cb:1':'使い方は2通り。ターミナルでの<strong>対話的</strong>な利用と、スクリプトを書く本格的な<strong>プログラミング言語</strong>としての利用です。',
+    '1:cb:2':'変数 · ユーザー入力 · コメント · 引数 · 配列 · 条件式 · 条件分岐 · ループ · 関数 · デバッグとテスト。',
+    '1:cb:3':'必要なのは<strong>UNIX ターミナル</strong>とテキストエディタだけ — VS Code、Sublime、vim、nano など。',
+    '1:cb:4':'Linux コマンドを組み合わせ、繰り返しの SysOps / DevOps / 開発作業を処理します。',
+    '1:cb:5':'長く退屈な作業を、何度でも再実行できる1つのコマンドに変えます。',
+    '1:cb:6':'手順を記したテキストファイル1つを、チーム全員が同じように実行できます。',
+    /* 3 — Why scripting */
+    '2:pill:0':'第1章 · なぜ重要か','2:h:0':'5回の手作業 → 1つの共有スクリプトへ',
+    '2:ct:0':'課題','2:ct:1':'Bash による解決',
+    '2:cb:0':'5人の開発者がそれぞれ同じ退屈な環境構築を手作業で行う。同じ長い作業を5回繰り返すことになり、ミスも起きやすく遅い。',
+    '2:cb:1':'すべての手順を1つのテキストファイルに書いて共有する。あとは全員が<strong>スクリプトを実行</strong>するだけ — 環境一式が自動で作られます。',
+    '2:cb:2':'<strong>重要な考え方:</strong> Bash スクリプトとは、手で打つのと同じコマンドを並べたもの — まとめて、繰り返せて、バージョン管理できます。',
+    /* 4 — Shebang */
+    '3:pill:0':'第2章 · 構造','3:h:0':'すべてのスクリプトはシバンで始まる',
+    '3:c:0':'# ファイルを作成','3:c:1':'# または: nano devdojo.sh','3:c:2':'# 最初の行は必ず bash を指す','3:c:3':'# 移植性の高い書き方 — $PATH を検索',
+    '3:ct:0':'.sh 拡張子','3:ct:1':'シバンの役割','3:ct:2':'env を使う場面',
+    '3:cb:0':'スクリプト名には <code>.sh</code> を付けます（例: <code>devdojo.sh</code>）。',
+    '3:cb:1':'OS に対し、このファイルを <code>/bin/bash</code> で実行するよう指示します。',
+    '3:cb:2':'Bash は常に <code>/bin</code> にあるとは限りません（非 Linux／任意インストール）。<code>/usr/bin/env bash</code> なら <code>$PATH</code> から探します。',
+    /* 5 — Hello World */
+    '4:pill:0':'第3章 · Hello World','4:h:0':'はじめてのスクリプトを3ステップで',
+    '4:cb:0':'<strong>書く:</strong> シバンと <code>echo</code> を書いて保存・終了。',
+    '4:cb:1':'<strong>実行権限を付与:</strong> <code>chmod +x devdojo.sh</code>',
+    '4:cb:2':'<strong>実行:</strong> <code>./devdojo.sh</code> — または <code>bash devdojo.sh</code>',
+    '4:cb:3':'Bash は対話的にも使えるので、ターミナルに直接 <code>echo "Hello DevDojo!"</code> と打っても同じ結果です。スクリプトの真価は<strong>多くのコマンドを組み合わせる</strong>ときに発揮されます。',
+    /* 6 — Variables */
+    '5:pill:0':'第4章 · 変数','5:h:0':'型はない — ただ <code>name=value</code>','5:tag:0':'変数',
+    '5:c:0':'# = で代入','5:c:1':'# $ でアクセス','5:c:2':'# → Hello DevDojo',
+    '5:ct:0':'<span class="mi">warning</span> スペース禁止','5:ct:1':'変数は何でも入る','5:ct:2':'セミコロン不要',
+    '5:cb:0':'<code>=</code> の前後にスペースを入れないこと。<code>name="DevDojo"</code> と書き、<code>name = "DevDojo"</code> とは書きません。',
+    '5:cb:1':'数値でも文字でも — Bash の変数に宣言された型はありません。',
+    '5:cb:2':'改行で文が終わります。末尾の <code>;</code> は任意です（JS と同様）。',
+    /* 7 — Quoting */
+    '6:pill:0':'第4章 · 一番大事な習慣','6:h:0':'変数は必ずクォートする','6:tag:0':'クォート','6:tag:1':'波かっこ',
+    '6:c:0':'# 誤り → "my" と "file.txt" の2ファイルができる','6:c:1':'# 正しい → "my file.txt" の1ファイル','6:c:2':'# 空になる！','6:c:3':'# Hellos world',
+    '6:ct:0':'なぜクォート？','6:ct:1':'経験則','6:ct:2':'波かっこが必要なのは…',
+    '6:cb:0':'クォートしない値は<strong>単語分割</strong>と<strong>グロブ展開</strong>を受け — バグやセキュリティ欠陥の温床になります。',
+    '6:cb:1':'<code>$name</code> ではなく <code>"$name"</code> を使う。（<code>[[ ]]</code> 内では分割は起きませんが、それでもクォートを。）',
+    '6:cb:2':'配列 <code>${a[0]}</code>、スライス <code>${s:0:3}</code>、デフォルト値 <code>${v:-x}</code>、区切りの明確化。',
+    /* 8 — Positional params */
+    '7:pill:0':'第4章 · コマンドライン入力','7:h:0':'引数を読む: <code>$1 $2 $@</code>',
+    '7:c:0':'# 第1引数','7:c:1':'# 第2引数','7:c:2':'# すべての引数',
+    '7:ct:0':'位置パラメータ','7:ct:1':'<code>$@</code> = すべて',
+    '7:cb:0':'スクリプト名の後ろの引数が、渡した順に <code>$1</code>, <code>$2</code>, <code>$3</code> … に対応します。',
+    '7:cb:1':'渡された個数に関係なく、すべての入力を一度に読み取る便利な方法です。',
+    /* 9 — read */
+    '8:pill:0':'第5章 · ユーザー入力','8:h:0':'<code>read</code> でユーザーに尋ねる','8:tag:1':'read -p（短く）',
+    '8:cb:0':'<code>read</code> はユーザーに入力を促し、打ち込んだ文字を変数に格納します。<code>-p</code> フラグはプロンプトを同じ行に表示し、<code>echo</code> を1つ省けます。',
+    /* 10 — Comments */
+    '9:pill:0':'第6章 · コメント','9:h:0':'<code>#</code> でメモを残す','9:tag:0':'コメント付きスクリプト',
+    '9:c:0':'# ユーザーに名前を尋ねる','9:c:1':'# ユーザーに挨拶する',
+    '9:ct:0':'行頭の #','9:ct:1':'なぜコメント？',
+    '9:cb:0':'<code>#</code> 以降は Bash に無視され、画面にも表示されません。',
+    '9:cb:1':'複雑なロジックを説明しておけば、仲間（そして未来の自分）がスクリプトを読みやすくなります。',
+    /* 11 — Arguments */
+    '10:pill:0':'第7章 · 引数','10:h:0':'引数、<code>$@</code>、<code>$0</code>',
+    '10:c:4':'# $0 はスクリプト自身','10:c:5':'# <span class="mi">warning</span> 自己削除 — 先にバックアップを！',
+    '10:cb:0':'スクリプト名の後ろの各引数を、位置で参照します。',
+    '10:cb:1':'すべての引数をまとめたもの。',
+    '10:cb:2':'スクリプト自身の名前 — 自己参照や自己削除に使えます。',
+    /* 12 — Arrays */
+    '11:pill:0':'第8章 · 配列','11:h:0':'1つの名前に複数の値','11:tag:0':'配列',
+    '11:c:0':'# value 2（0 始まり）','11:c:1':'# value 4（最後）','11:c:2':'# すべての要素','11:c:3':'# 4（個数、# を付ける）',
+    '11:ct:0':'初期化','11:ct:1':'<span class="mi">warning</span> 波かっこ + クォート','11:ct:2':'<code>[@]</code> = すべて',
+    '11:cb:0':'<code>( )</code> 内に空白区切りで値を並べます。空白を保つため各要素をクォート。',
+    '11:cb:1':'配列展開には必ず波かっこ<strong>と</strong>ダブルクォートを使います。',
+    '11:cb:2':'<code>#</code> を前に付けると要素数になります。',
+    /* 13 — Slicing */
+    '12:pill:0':'第8章 · スライス','12:h:0':'配列と文字列のスライス','12:tag:0':'配列スライス（Bash 4+）',
+    '12:c:0':'# B C D','12:c:1':'# D E（最後まで）','12:c:2':'# World','12:c:3':'# World!（末尾で停止）','12:c:4':'# lo, World!',
+    '12:cb:0':'2つ目の数字は<strong>最大の長さ</strong>で、終了インデックスではありません（Python と違う点）。残りより多い文字数を指定しても、Bash は末尾で止まるだけでエラーになりません。',
+    /* 14 — File tests */
+    '13:pill:0':'第9章 · 条件式','13:h:0':'<code>[[ ]]</code> によるファイルテスト',
+    '13:body:0':'これらは暗記する必要はありません — 必要なときに見返してください。',
+    '13:cb:0':'ファイルが<strong>存在する</strong>','13:cb:1':'存在し<strong>通常ファイル</strong>である','13:cb:2':'存在し<strong>ディレクトリ</strong>である',
+    '13:cb:3':'<strong>シンボリックリンク</strong>','13:cb:4':'<strong>読み取り可能</strong>','13:cb:5':'<strong>書き込み可能</strong>','13:cb:6':'<strong>実行可能</strong>',
+    '13:cb:7':'サイズが<strong>0 より大きい</strong>','13:cb:8':'<strong>ブロック</strong>特殊ファイル','13:cb:9':'<strong>キャラクタ</strong>特殊ファイル',
+    '13:cb:11':'<code>test</code> や <code>[ ]</code> でも同じ演算子が使えます。',
+    '13:ct:10':'例','13:ct:11':'<span class="mi">lightbulb</span> ヒント',
+    /* 15 — String / arith / exit */
+    '14:pill:0':'第9章 · 条件式','14:h:0':'文字列・数値・終了ステータスのテスト',
+    '14:ct:0':'<span class="mi">text_fields</span> 文字列','14:ct:1':'<span class="mi">tag</span> 数値','14:ct:2':'<span class="mi">bolt</span> 結合と終了ステータス',
+    '14:cb:0':'<span class="v">-z</span> ${s} → 空<br><span class="v">-n</span> ${s} → 空でない<br><span class="v">-v</span> name → 設定済み<br>${a} == "${b}"<br>${a} != "${b}"<br>${a} &lt; ${b} · ${a} &gt; ${b}',
+    '14:cb:1':'<span class="v">-eq</span> 等しい<br><span class="v">-ne</span> 等しくない<br><span class="v">-lt</span> より小さい<br><span class="v">-le</span> 以下<br><span class="v">-gt</span> より大きい<br><span class="v">-ge</span> 以上',
+    '14:cb:2':'[[ a ]] &amp;&amp; [[ b ]] <span class="c"># かつ</span><br>[[ a ]] || [[ b ]] <span class="c"># または</span><br><br>[[ $? -eq 0 ]] <span class="c"># 成功</span><br>[[ $? -gt 0 ]] <span class="c"># エラー</span>',
+    '14:cb:3':'<span class="mi">warning</span> <code>[[ ]]</code> 内では、<code>==</code>/<code>!=</code> の右辺はクォートしない限り<strong>グロブパターン</strong>です。完全一致にはクォートを。',
+    /* 16 — if/elif/else */
+    '15:pill:0':'第10章 · 条件分岐','15:h:0':'<code>if</code> · <code>elif</code> · <code>else</code>',
+    '15:ct:0':'構造','15:ct:1':'ガードの例','15:ct:2':'複数条件',
+    '15:cb:2':'<code>&amp;&amp;</code>（かつ）/ <code>||</code>（または）で複数の条件を同時に判定できます。',
+    /* 17 — case */
+    '16:pill:0':'第10章 · 条件分岐','16:h:0':'<code>case</code> 文',
+    '16:cb:0':'<code>case $var in</code> で開始し、パターンを並べます。',
+    '16:cb:1':'<code>)</code> でパターンを閉じ、<code>|</code> で複数パターンを OR 結合。',
+    '16:cb:2':'各節は <code>;;</code> で終わり、<code>*)</code> がデフォルトです。',
+    '16:cb:3':'ブロックは <code>esac</code>（"case" の逆さ）で閉じます。',
+    /* 18 — for */
+    '17:pill:0':'第11章 · ループ','17:h:0':'<code>for</code> ループ','17:tag:0':'配列をループ','17:tag:1':'数値の範囲をループ',
+    '17:cb:0':'パターン: <code>for var in &lt;リスト&gt;</code> → <code>do</code> → コマンド → <code>done</code>。空白を含む要素も正しく扱えるよう <code>"${arr[@]}"</code> をクォート。数列には <code>{1..10}</code> を使います。',
+    /* 19 — while/until */
+    '18:pill:0':'第11章 · ループ','18:h:0':'<code>while</code> と <code>until</code>','18:tag:0':'while — 真の間くり返す','18:tag:1':'until — 真になるまでくり返す',
+    '18:cb:0':'<strong>while</strong> は条件が真の<em>間</em>くり返します。<code>((counter++))</code> でカウントを増やし無限ループを防ぎます。',
+    '18:cb:1':'<strong>until</strong> はその逆 — 条件が真に<em>なるまで</em>くり返します。入力検証に便利。',
+    /* 20 — break/continue */
+    '19:pill:0':'第11章 · ループ','19:h:0':'制御フロー: <code>break</code> と <code>continue</code>','19:tag:0':'continue — この回をスキップ','19:tag:1':'break 2 — 外側のループを抜ける',
+    '19:cb:0':'<strong>continue [n]</strong> は現在の回を止めて次へ進みます。<code>n</code> で n 番目の外側ループを再開。',
+    '19:cb:1':'<strong>break [n]</strong> は即座にループを終了。<code>break 2</code> は2階層 — 外側のループも抜けます。',
+    /* 21 — Functions */
+    '20:pill:0':'第12章 · 関数','20:h:0':'関数でコードを再利用','20:tag:0':'関数',
+    '20:c:0':'# 呼び出し — かっこは不要','20:c:1':'# → Hello DevDojo!',
+    '20:ct:0':'2つの書き方','20:ct:1':'<span class="mi">warning</span> 呼び出し','20:ct:2':'引数',
+    '20:cb:0':'<code>function name() { }</code> または <code>name() { }</code> — キーワードは省略可（読みやすい方で）。',
+    '20:cb:1':'名前だけで呼び出します — <strong>かっこは付けません</strong>。',
+    '20:cb:2':'関数はスクリプトと同じく引数を受け取ります: <code>$1</code>, <code>$2</code>, …',
+    '20:cb:3':'良い関数にはヘッダコメントを: <strong>説明 · グローバル変数 · 引数 · 出力 · 戻り値</strong>（成功で 0、失敗で 0 以外）。',
+    /* 22 — Debugging */
+    '21:pill:0':'第13章 · デバッグとテスト','21:h:0':'スクリプトの実行内容を正確に見る',
+    '21:cb:0':'<code>bash -x ./script.sh</code> で実行すると、各コマンドを実行時に表示します。',
+    '21:cb:1':'特定の行の前に <code>set -x</code> を置けば、その区間だけトレースできます。',
+    '21:cb:2':'<strong>shellcheck.net</strong> にスクリプトを貼る（または CLI を実行）と、その場で改善案が得られます。',
+    '21:cb:3':'<strong>なぜ役立つ？</strong> トレースは変数が展開されクォートが解決された実際のコマンドを示すので、ロジックが意図とずれる箇所を正確に見つけられます。<span class="mi">star</span> GitHub で ShellCheck にスターを、そして貢献を！',
+    /* 23 — Shortcuts */
+    '22:pill:0':'第13章 · ショートカット','22:h:0':'いざというとき助かるターミナルのショートカット',
+    '22:cb:0':'コマンド履歴を後方検索（これが本命！）','22:cb:1':'カーソルから行末まで削除','22:cb:2':'カーソルから行頭まで削除','22:cb:3':'単語1つ分を後方削除',
+    '22:cb:4':'画面をクリア（<code>clear</code> の代わり）','22:cb:5':'実行中のコマンドを終了','22:cb:6':'実行中のコマンドをバックグラウンドへ','22:cb:7':'画面出力を停止／再開',
+    /* 24 — Aliases */
+    '23:pill:0':'第14章 · エイリアス','23:h:0':'独自の bash コマンドを作る',
+    '23:c:0':'# いつも打つ長いコマンドが…','23:c:1':'# …短いエイリアスになる:','23:c:2':'# あとはこれだけ:',
+    '23:ct:0':'永続化する','23:ct:1':'一覧表示','23:ct:2':'root 不要',
+    '23:cb:0':'<code>alias</code> 行を <code>~/.bashrc</code>（または <code>~/.bash_profile</code>）に追記すれば、ログアウトしても残ります。',
+    '23:cb:1':'引数なしで <code>alias</code> を実行すると、シェルの全エイリアスを表示します。',
+    '23:cb:2':'エイリアスは sudo 不要 — <code>/usr/bin</code> にスクリプトを置くのと違います。',
+    /* 25 — Section divider */
+    '24:kick:0':'第2部 · 第15〜25章','24:h:0':'実践的な<br>スクリプト',
+    '24:body:0':'基礎は完了。ここからは Bash を実戦に: サーバー状態、対話メニュー、リモート群、JSON API、ログ解析、メール、パスワード生成、リダイレクト、そして LAMP の完全自動化。',
+    /* 26 — Server status */
+    '25:pill:0':'第15章 · はじめての実践スクリプト','25:h:0':'サーバー状態レポート','25:c:0':'# $() はコマンドを実行',
+    '25:ct:0':'レポート内容','25:ct:1':'コマンド置換','25:ct:2':'組み合わせ',
+    '25:cb:0':'メモリ使用量 · CPU 負荷 · TCP 接続数 · 正確なカーネルバージョン。',
+    '25:cb:1':'<code>$(hostname)</code> はコマンドを実行し、その出力を変数に格納します。',
+    '25:cb:2':'単一目的の小さな関数を、1つの <code>all_checks</code> でまとめて呼び出します。',
+    /* 27 — Interactive menu */
+    '26:pill:0':'第16章 · 対話メニュー','26:h:0':'色付きの選択式メニュー','26:c:0':'# 色の変数',
+    '26:ct:0':'ANSI カラー','26:ct:1':'再帰 = ループ',
+    '26:cb:0':'テキストをエスケープコード（<code>\\e[32m</code> … <code>\\e[0m</code>）で囲み、小さなヘルパー関数で読みやすいメニューに。',
+    '26:cb:1':'各 case が再び <code>menu</code> を呼ぶので、ユーザーが<strong>Exit</strong>を選ぶまでメニューが繰り返し表示されます。',
+    /* 28 — Remote servers */
+    '27:pill:0':'第17章 · リモート実行','27:h:0':'1つのスクリプトを多数のサーバーで実行','27:tag:0':'1コマンドで全サーバーへ','27:ct:2':'ログイン不要',
+    '27:cb:0':'1行に1つサーバー IP を書くと、ループが順に読み込みます。',
+    '27:cb:1':'ローカルのスクリプトを SSH 経由でリモートシェルの標準入力に流し込みます — コピー不要。',
+    '27:cb:2':'各マシンへのコピーも個別セッションも不要。多数のサーバーや大きなスクリプトにも対応。',
+    '27:cb:3':'コマンドラインで実行できるものは何でもスクリプトで動きます。大規模な群には <strong>Ansible</strong> のようなツールへ — ここでは純粋な Bash で核心を示します。',
+    /* 29 — jq */
+    '28:pill:0':'第18章 · jq','28:h:0':'ターミナルで JSON を解析','28:tag:0':'jq の基本',
+    '28:c:0':'# インストール: apt / dnf / pacman / brew install jq','28:c:1':'# 整形表示','28:c:2':'# 最初の要素','28:c:3':'# 1つのキーを全要素から',
+    '28:ct:0':'jq とは？','28:ct:1':'パイプして絞り込む',
+    '28:cb:0':'軽量で柔軟なコマンドライン<strong>JSON プロセッサ</strong> — 移植性の高い C 製、ランタイム依存ゼロ。',
+    '28:cb:1':'JSON を <code>jq</code> にパイプして整形、<code>.[0]</code> で添字アクセス、<code>.[].question</code> でキー抽出。',
+    /* 30 — jq in a script */
+    '29:pill:0':'第18章 · スクリプトでの jq','29:h:0':'API からクイズを作る','29:c:0':'# 最初の問題',
+    '29:cb:0':'API のレスポンスを変数に保存し、<code>jq</code> で一段ずつ掘り下げます。',
+    '29:cb:1':'<code>2&gt;/dev/null</code> で curl の進捗表示を隠し、JSON だけを取得します。',
+    '29:cb:2':'これで Bash はほぼ任意の REST API とやり取りできます — 取得・抽出・整形。',
+    /* 31 — Cloudflare */
+    '30:pill:0':'第19章 · チャレンジ','30:h:0':'Cloudflare の DDoS 防御を自動切替','30:tag:0':'crontab -e · 30秒ごとに実行','30:c:0':'# 2つのジョブ → 実質30秒ごと',
+    '30:ct:0':'課題','30:ct:1':'必要なもの',
+    '30:cb:0':'CPU 負荷を監視し、急上昇したら Cloudflare API を呼んで<em>「I\'m Under Attack」</em>モードを有効化 — 負荷が戻ったら解除します。',
+    '30:cb:1':'Cloudflare アカウント、API キー、Zone ID、そして <code>curl</code>（<code>curl --version</code>）。',
+    '30:cb:2':'<span class="mi">warning</span> 注意: 攻撃でサーバーが応答不能になるとスクリプトが起動しないことも — 本格的な監視（例: Nagios）の方が堅牢です。',
+    /* 32 — Log parser */
+    '31:pill:0':'第20章 · チャレンジ','31:h:0':'NGINX と Apache のアクセスログを集計','31:c:0':'# または /var/log/nginx/access.log',
+    '31:ct:0':'最多 POST','31:ct:1':'最多 GET','31:ct:2':'最多 IP',
+    '31:cb:0':'POST リクエストが最も多い20ページ。','31:cb:1':'GET リクエストが最も多い20ページ。','31:cb:2':'最も活発な20の IP アドレスとその地理的位置。',
+    '31:cb:3':'<strong>読み取り専用で高速。</strong> ブルートフォースの兆候（例: <code>xmlrpc.php</code> への大量アクセス）や予期しない海外トラフィックを発見 — 大規模攻撃の前の早期警告に。',
+    /* 33 — Email */
+    '32:pill:0':'第21章 · メール','32:h:0':'SSMTP でメールを送る','32:tag:0':'3 · 送信',
+    '32:ct:0':'1 · インストール','32:ct:1':'2 · 設定','32:ct:2':'<span class="mi">attach_file</span> 添付ファイル',
+    '32:cb:1':'<code>/etc/ssmtp/ssmtp.conf</code> を編集し、<code>mailhub</code>、<code>AuthUser</code>、<code>AuthPass</code>、<code>UseSTARTTLS=YES</code> を設定（Gmail SMTP も可）。',
+    '32:cb:2':'<code>sudo apt install mpack</code>、続いて <code>mpack -s "Subject" file.zip you@dom.com</code>',
+    '32:cb:3':'SSMTP は送信メール（アラートや cron 出力）をメールホストへ転送します。送信専用 — 受信箱もキューもありません。コマンドをそのままスクリプトに入れられます。',
+    /* 34 — Password generator */
+    '33:pill:0':'第22章 · パスワード生成','33:h:0':'<code>/dev/urandom</code> からランダムパスワード','33:c:0':'# 指定した長さの候補を10個生成',
+    '33:ct:0':'他のワンライナー','33:ct:1':'なぜ urandom？','33:ct:2':'<span class="mi">warning</span> セキュリティ',
+    '33:cb:1':'<code>/dev/urandom</code> が推奨の供給源 — 暗号用途を想定。<code>tr</code> で英数字だけを残します。',
+    '33:cb:2':'練習用プロジェクトです — 実際の機密には信頼できるパスワードマネージャと2要素認証を。',
+    /* 35 — Redirection */
+    '34:pill:0':'第23章 · リダイレクト','34:h:0':'3つのストリーム: STDIN · STDOUT · STDERR','34:tag:0':'ストリームのリダイレクト',
+    '34:c:0':'# 上書き（切り詰め）','34:c:1':'# 追記','34:c:2':'# エラーをリダイレクト','34:c:3':'# エラーを捨てる','34:c:4':'# 両方 → 同じファイルへ',
+    '34:cb:0':'ターミナルでの入力を担います。','34:cb:1':'通常の出力テキスト。','34:cb:2':'エラーの出力テキスト。',
+    /* 36 — Pipes / heredoc */
+    '35:pill:0':'第23章 · パイプとヒアドキュメント','35:h:0':'コマンドの連結と演算子チートシート','35:tag:0':'パイプ · ヒアドキュメント · ヒアストリング',
+    '35:c:0':'# 出力 → 入力をパイプ','35:c:1':'# ヒアドキュメント（複数行）','35:c:2':'# ヒアストリング',
+    '35:ct:0':'演算子チートシート',
+    '35:cb:0':'<span class="v">&gt;</span>&nbsp;&nbsp;出力をファイルに保存<br><span class="v">&gt;&gt;</span>&nbsp;出力をファイルに追記<br><span class="v">&lt;</span>&nbsp;&nbsp;ファイルから入力を読む<br><span class="v">2&gt;</span>&nbsp;エラーをリダイレクト<br><span class="v">|</span>&nbsp;&nbsp;一方の出力 → 次の入力<br><span class="v">&lt;&lt;</span>&nbsp;複数行をきれいに渡す<br><span class="v">&lt;&lt;&lt;</span> 単一行をきれいに渡す',
+    '35:cb:1':'パイプは<strong>コマンド → コマンド</strong>を、リダイレクトは<strong>コマンド ↔ ファイル</strong>をつなぎます。自由に連結可能: <code>ls -l | tail -n +2 | cut -d \' \' -f3 | sort | uniq -c</code>。',
+    /* 37 — WordPress LAMP */
+    '36:pill:0':'第24章 · 総合演習','36:h:0':'WordPress の LAMP スタックを丸ごと自動化','36:tag:0':'execute() — 1つのまとめ役','36:c:0':'# 先に db_config を呼ぶ',
+    '36:cb:0':'apt 更新、ufw ファイアウォール、Apache2、MariaDB、PHP とモジュール。',
+    '36:cb:1':'<code>/var/www/$DOMAIN</code>、vhost 設定を作成し、サイトを有効化。',
+    '36:cb:2':'自己署名 OpenSSL 証明書、強化した暗号方式とヘッダ。',
+    '36:cb:3':'DB とユーザー作成、WP をダウンロードし <code>wp-config.php</code> を設定。',
+    /* 38 — Common errors */
+    '37:pill:0':'第25章 · トラブルシューティング','37:h:0':'よくあるエラーと対処法',
+    '37:cb:1':'Windows の改行コード → <code>dos2unix script.sh</code>',
+    '37:cb:2':'<code>./script.sh</code> で実行、または <code>$PATH</code> にディレクトリを追加',
+    '37:cb:3':'<code>; then</code> … <code>fi</code> が必要',
+    '37:cb:4':'<code>if</code>/<code>for</code>/クォートが未閉 — <code>fi</code>/<code>done</code> で閉じる',
+    '37:cb:5':'数値テストに非数値が入っている',
+    '37:cb:6':'<code>sh</code> で Bash 構文 → <code>bash</code> で実行',
+    '37:cb:7':'書き込み可能なパスに書くか <code>sudo</code>',
+    '37:cb:8':'<code>for f in /docs/*</code> のように <code>/*</code> を付ける',
+    /* 39 — Debugging tips */
+    '38:pill:0':'第25章 · デバッグ道具箱','38:h:0':'ヒントと要点','38:tag:0':'デバッグ道具箱',
+    '38:c:0':'# 各コマンドを表示','38:c:1':'# 直前の終了ステータス','38:c:2':'# 構文チェック（実行しない）','38:c:3':'# 実行しながら行を表示','38:c:4':'# エラーを記録',
+    '38:ct:0':'エラーの主な原因は…','38:ct:1':'直すときの考え方',
+    '38:cb:0':'権限不足 · 構文ミス · 未設定の変数 · 間違ったシェル。',
+    '38:cb:1':'メッセージを読み、トレースで再現し、行を特定 — そしてクォート・構造・型を直します。',
+    /* 40 — Close */
+    '39:kick:0':'やりきりました <span class="mi">celebration</span>','39:h:0':'さあ、<br>自動化しよう。',
+    '39:body:0':'基礎と実践スクリプトの道具箱が手に入りました。次の一歩は<strong>自分のスクリプトを書いて世界に共有すること</strong> — どんな言語もそうやって身につきます。',
+    '39:pill:0':'<span class="mi">star</span> GitHub でスターを',
+    '39:pill:1':'<span class="mi">alternate_email</span> @bobbyiliev_ をタグ付け',
+    '39:pill:2':'<span class="mi">menu_book</span> introduction-to-bash-scripting'
+  };
+
+  let lang='en';
+  const btn=document.getElementById('langToggle');
+  function apply(target){
+    document.querySelectorAll('[data-i18n-key]').forEach(el=>{
+      if(target==='ja'){
+        const t=JA[el.dataset.i18nKey];
+        if(t!=null) el.innerHTML=t;
+      }else{
+        el.innerHTML=enCache.get(el);
+      }
+    });
+    document.documentElement.lang=target;
+    lang=target;
+    btn.innerHTML = target==='en'
+      ? '<span class="mi">translate</span>日本語'
+      : '<span class="mi">translate</span>EN';
+    btn.setAttribute('aria-label', target==='en' ? 'Switch to Japanese' : 'Switch to English');
+  }
+  btn.addEventListener('click',()=>apply(lang==='en'?'ja':'en'));
+})();
+</script>
+</body>
+</html>

@@ -44,3 +44,28 @@ To show a picture: save your screenshot into [`S2/img/`](./img/) with the **exac
 🔸 **Deliberately deferred to later sessions:** VLAN theory & trunking → **Session 4**; DHCP/DNS/ARP services in depth → **Session 3**; routing protocols → **Session 4**.
 
 **Verdict:** Labs A–B fully exercise every Session 2 learning objective. Add the subnetting drills (via the homework) for fluency, and the optional FIN/HTTPS capture for depth — then S2 practice is complete.
+
+---
+
+## Group Work — Lab B build in teams
+
+For the **Packet Tracer Multi-Subnet IP Design Build (Lab B)**, students work in mixed teams so that every group pairs Japanese and Thai students together.
+
+**Class composition:** 25 students total — 20 Thai (TH) + 5 Japanese (JP).
+
+**Grouping rule:** each group has **4 TH + 1 JP = 5 students**, giving **5 groups** total. The single JP member in each group acts as the **liaison/note-taker** so the JP students are spread evenly across all teams rather than clustered.
+
+| Group | Thai (TH) | Japanese (JP) | Size |
+|---|---|---|---|
+| Group 1 | TH-01, TH-02, TH-03, TH-04 | JP-01 | 5 |
+| Group 2 | TH-05, TH-06, TH-07, TH-08 | JP-02 | 5 |
+| Group 3 | TH-09, TH-10, TH-11, TH-12 | JP-03 | 5 |
+| Group 4 | TH-13, TH-14, TH-15, TH-16 | JP-04 | 5 |
+| Group 5 | TH-17, TH-18, TH-19, TH-20 | JP-05 | 5 |
+| **Total** | **20** | **5** | **25** |
+
+**How each group works:**
+1. Together, design one subnet scheme for the assigned network and split the address space across the required subnets.
+2. Each member builds and configures **one router/subnet** in Packet Tracer, then the group connects them into a single topology.
+3. Verify end-to-end routing with `ping` / `tracert` across all subnets, and reproduce the two common failures (wrong mask, IP conflict) as a team.
+4. The JP liaison records the group's final addressing table and submits it as the group deliverable.

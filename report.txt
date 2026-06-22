@@ -1,1 +1,9 @@
-      68
+PING www.google.com (142.251.151.119): 56 data bytes
+Request timeout for icmp_seq 0
+64 bytes from 142.251.151.119: icmp_seq=1 ttl=118 time=326.436 ms
+64 bytes from 142.251.151.119: icmp_seq=2 ttl=118 time=98.198 ms
+64 bytes from 142.251.151.119: icmp_seq=3 ttl=118 time=17.376 ms
+
+--- www.google.com ping statistics ---
+4 packets transmitted, 3 packets received, 25.0% packet loss
+round-trip min/avg/max/stddev = 17.376/147.337/326.436/130.870 ms
