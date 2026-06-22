@@ -30,6 +30,21 @@
 - [セッション3 — ネットワークサービス：DHCP・DNS・ARP](/S3/README.ja.md)
 - [セッション4 — ルーティング・スイッチング・VLAN](/S4/README.md)
 
+---
+
+## ボーナス — インタラクティブ教材
+
+自分のペースで試せる、ブラウザだけで動く追加教材です。HTMLファイルを開くだけ、インストール不要：
+
+| 教材 | 内容 |
+|----------|-----------|
+| **ネットワーク基礎シミュレータ**<br>(network_simulation.html) | 中核概念をインタラクティブに試せる遊び場 — **OSIカプセル化**、**TCP 3ウェイハンドシェイク**、パケットの旅、**DNS/ARP** のウォークスルー、**IP/IPv6/サブネット**計算機。*(日本語UI)* |
+| **PacketLens — パケットアナライザ**<br>(wireshark_explain/index.html) | **パケットの読み方**を教える Wireshark 風の「シグナルアナライザ」：キャプチャ → 解析、**プロトコル分解**（HTTP / TCP / DNS）、パケットストリーム、**16進数・ASCII** のフィールド表示 — すべて安全なシミュレーションキャプチャから（実際の通信は発生しません）。 |
+| **ネットワークエンジニアのためのシェル＆スクリプティング**<br>(shell_scripting_for_network_engineers.html) | **Bash と PowerShell** を並べて学ぶ53枚のインタラクティブスライド — ネットワークコマンド（`ping`, `dig`, `netstat`, `curl`）、パイプとフィルタ（`grep`, `awk`, `tee`）、最初のスクリプトを段階的に作成、ループ／条件分岐／関数、5本のスクリプトツールキット、**cron / タスクスケジューラ**。コードをクリックすると解説、文字サイズ調整可能。 |
+| **Bashスクリプティング入門 — クラッシュコース**<br>(introduction-to-bash-scripting-slides.html) | ゼロから実用的なBash自動化までを2部構成で学ぶ40枚のスライド。**基礎編：** シバン、3ステップで作る最初のスクリプト、変数とクォート、`read`／位置パラメータ／`$@`、配列と文字列スライス、ファイル／文字列／算術テスト、`if`／`case`、ループ、関数、`set -x` でのデバッグ、エイリアスとターミナルショートカット。**実践ツールキット：** サーバーステータスレポート、対話メニュー、SSHで複数サーバーに1つのスクリプトを実行、`jq` でのJSON解析、APIからのクイズ作成、Cloudflare DDoS防御の自動切替、NGINX／Apacheログの集計、SSMTPでのメール送信、`/dev/urandom` からのランダムパスワード生成、3つのストリーム（STDIN・STDOUT・STDERR）、演算子チートシート、WordPress LAMPスタックの完全自動化。キーボード操作対応、インストール不要。*([bobbyiliev/introduction-to-bash-scripting](https://github.com/bobbyiliev/introduction-to-bash-scripting/tree/main) を基に作成。)* |
+
+---
+
 ## 推奨される補助ツール
 
 | ツール | 目的 | 導入セッション |
@@ -84,6 +99,15 @@
 | Cisco NetAcad | `netacad.com` | 公式の体系的コース |
 | TryHackMe | `tryhackme.com` | インタラクティブなセキュリティ演習 |
 | Blue Team Labs Online | `blueteamlabs.online` | 防御側のチャレンジ |
+
+### 無料の電子書籍・リファレンス
+> [Bobby Iliev](https://github.com/bobbyiliev) によるオープンソースの電子書籍 — 上記のコマンドライン／スクリプティングのボーナス教材と好相性です。
+
+| 提供元 | URL | 説明 |
+|--------|-----|-------------|
+| Introduction to Bash Scripting | [bobbyiliev/introduction-to-bash-scripting](https://github.com/bobbyiliev/introduction-to-bash-scripting/tree/main) | Bashスクリプトを書くための無料電子書籍 — Bashクラッシュコース教材の基になっています |
+| Introduction to Git and GitHub | [bobbyiliev/introduction-to-git-and-github-ebook](https://github.com/bobbyiliev/introduction-to-git-and-github-ebook/tree/main) | Git と GitHub の基礎を扱う無料電子書籍 |
+| 101 Linux Commands | [bobbyiliev/101-linux-commands](https://github.com/bobbyiliev/101-linux-commands/tree/main#file-hierarchy-standard-fhs) | 主要な Linux コマンドとファイル階層標準（FHS）の無料電子書籍 |
 
 ---
 
