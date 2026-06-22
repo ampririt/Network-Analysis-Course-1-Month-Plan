@@ -41,6 +41,7 @@ Standalone, browser-based extras to explore on your own — just open the HTML f
 | **Network Fundamentals Simulator**<br>(network_simulation.html) | An interactive playground for the core concepts — **OSI encapsulation**, the **TCP 3-way handshake**, a packet's journey, **DNS/ARP** walkthroughs, and **IP/IPv6/subnet** calculators. *(Japanese UI)* |
 | **PacketLens — Packet Analyzer**<br>(wireshark_explain/index.html) | A Wireshark-style "signal analyzer" that teaches **how to read packets**: capture → analyze, **protocol dissection** (HTTP / TCP / DNS), packet stream, and **hex · ASCII** field views — all from safe simulated captures (no bytes on the wire). |
 | **Shell & Scripting for Network Engineers**<br>(shell_scripting_for_network_engineers.html) | A 53-slide interactive deck on automating the command line in **Bash & PowerShell** side by side — network commands (`ping`, `dig`, `netstat`, `curl`), pipes & filters (`grep`, `awk`, `tee`), writing your first script step by step, loops / conditionals / functions, a 5-script toolkit, and **cron / Task Scheduler**. Click any code to explain it; adjustable text size. |
+| **Introduction to Bash Scripting — A Crash Course**<br>(introduction-to-bash-scripting-slides.html) | A 40-slide deck that takes you from zero to real Bash automation, in two parts. **Foundations:** the shebang, your first script in 3 steps, variables & quoting, `read` / positional parameters / `$@`, arrays & string slicing, file / string / arithmetic tests, `if` / `case`, loops, functions, `set -x` for debugging, and aliases & terminal shortcuts. **Real-world toolkit:** a server status report, an interactive menu, running one script across many servers over SSH, parsing JSON with `jq`, building a quiz from an API, auto-toggling Cloudflare DDoS protection, summarizing NGINX / Apache logs, sending mail via SSMTP, random passwords from `/dev/urandom`, the three streams (STDIN · STDOUT · STDERR), an operator cheat-sheet, and automating a full WordPress LAMP stack. Keyboard-navigable; no install. *(Adapted from [bobbyiliev/introduction-to-bash-scripting](https://github.com/bobbyiliev/introduction-to-bash-scripting/tree/main).)* |
 
 ---
 
@@ -87,6 +88,15 @@ Standalone, browser-based extras to explore on your own — just open the HTML f
 | Cisco NetAcad | `netacad.com` | Official structured courses |
 | TryHackMe | `tryhackme.com` | Interactive security rooms |
 | Blue Team Labs Online | `blueteamlabs.online` | Defensive challenges |
+
+### Free eBooks & References
+> Open-source ebooks by [Bobby Iliev](https://github.com/bobbyiliev) — great companions for the command-line / scripting bonus decks above.
+
+| Source | URL | Description |
+|--------|-----|-------------|
+| Introduction to Bash Scripting | [bobbyiliev/introduction-to-bash-scripting](https://github.com/bobbyiliev/introduction-to-bash-scripting/tree/main) | Free ebook on writing Bash scripts — the basis for the Bash crash-course deck |
+| Introduction to Git and GitHub | [bobbyiliev/introduction-to-git-and-github-ebook](https://github.com/bobbyiliev/introduction-to-git-and-github-ebook/tree/main) | Free ebook covering Git & GitHub fundamentals |
+| 101 Linux Commands | [bobbyiliev/101-linux-commands](https://github.com/bobbyiliev/101-linux-commands/tree/main#file-hierarchy-standard-fhs) | Free ebook on essential Linux commands & the File Hierarchy Standard (FHS) |
 
 ---
 
