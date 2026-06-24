@@ -16212,5 +16212,25 @@
         }).observe(simSlide, { attributes: true, attributeFilter: ["class"] });
       }
     </script>
-  </body>
+  <script>
+/* === Fullscreen toggle: press F (ignores text editing & modifier combos) === */
+(function () {
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'f' && e.key !== 'F') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return; // leave Ctrl/Cmd+F etc. alone
+    var el = document.activeElement;
+    if (el && (el.isContentEditable || el.tagName === 'INPUT' ||
+               el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) return;
+    e.preventDefault();
+    var doc = document, root = doc.documentElement;
+    var fsEl = doc.fullscreenElement || doc.webkitFullscreenElement;
+    if (!fsEl) {
+      (root.requestFullscreen || root.webkitRequestFullscreen || function () {}).call(root);
+    } else {
+      (doc.exitFullscreen || doc.webkitExitFullscreen || function () {}).call(doc);
+    }
+  });
+})();
+</script>
+</body>
 </html>
